@@ -1,0 +1,23 @@
+.menu-item {
+    white-space: nowrap;
+    padding: 0 8px;
+    background-color: #333333;
+    cursor: pointer;
+}
+
+.menu-item > a {
+    display: block;
+    padding: 0 10px;
+    font-size: 14px;
+    font-family: 'Source Sans Pro Regular';
+    font-weight: 400;
+    text-decoration: none;
+    color: white;
+    letter-spacing: 0.5px;
+    line-height: 32px;
+}
+
+.menu-item:hover {
+    background-color: #1A9CB0;
+}
+

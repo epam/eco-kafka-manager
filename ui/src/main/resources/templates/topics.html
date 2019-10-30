@@ -1,0 +1,264 @@
+<!--
+ * Copyright 2019 EPAM Systems
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License.  You may obtain a copy
+ * of the License at
+ * 
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ -->
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="templates :: header(~{},~{},~{})">
+</head>
+<body>
+
+    <script type="text/javascript" th:inline="javascript">
+        /*<![CDATA[*/
+        var pageCurrent = [[${(page != null)?(page.number + 1):(0)}]];
+        var totalPagesCurrent = [[${(page != null)?(page.totalPages):(0)}]];
+        /*]]>*/
+        $(function() {
+            $('#search_form').submit(function(e) {
+                e.preventDefault();
+                location.params(
+                        {
+                            topicName: $('#topicName').val(),
+                            minPartitionCount: $('#minPartitionCount').val(),
+                            maxPartitionCount: $('#maxPartitionCount').val(),
+                            minReplicationFactor: $('#minReplicationFactor').val(),
+                            maxReplicationFactor: $('#maxReplicationFactor').val(),
+                            minConsumerCount: $('#minConsumerCount').val(),
+                            maxConsumerCount: $('#maxConsumerCount').val(),
+                            replicationState: $('#replicationState').val(),
+                            configString: $('#configString').val(),
+                            description: $('#description').val(),
+                            page: 1
+                        }, 
+                        {}, 
+                        {});
+            });
+            $('#pagination').twbsPagination({
+                startPage: pageCurrent,
+                totalPages: totalPagesCurrent,
+                visiblePages: 11,
+                initiateStartPageClick: false,
+                first:'&lt;&lt;',
+                prev:'&lt;',
+                next:'&gt;',
+                last:'&gt;&gt;',
+                onPageClick: function (e, pageClicked) {
+                    e.preventDefault();
+                    location.params({page: pageClicked}, {}, {});
+                }
+            });
+        });
+    </script>
+
+    
+
+    <div th:replace="templates :: navbar"></div>
+    
+    <div class="main-content">
+
+        <div class="container-fluid">
+
+            <div class="row">
+                <div class="col-md-10 col-md-offset-1">
+                    <h3>Topics (<span th:text="${totalCount}"></span>)</h3>
+                </div>
+            </div>
+        
+            <div class="row">
+            
+                <div class="col-md-10 col-md-offset-1">
+                
+                    <div class="panel panel-default ">
+                        <div class="panel-body">
+                        
+                            <a 
+                                th:href="@{/topic_create}" 
+                                class="btn btn-primary right-icon">
+                                Create <i class="fa fa-plus"></i>
+                            </a>
+                        
+                            <div class="dropdown" style="display:inline-block;">
+                                <button 
+                                    class="btn btn-primary right-icon dropdown-toggle" 
+                                    type="button" 
+                                    id="exportButton" 
+                                    data-toggle="dropdown" 
+                                    aria-haspopup="true" 
+                                    aria-expanded="true">
+                                    Export <i class="fa fa-external-link"></i>
+                                </button>
+                                <ul class="dropdown-menu" aria-labelledby="exportButton">
+                                    <li>
+                                        <a 
+                                            th:href="@{/topics_export(exporterType=PLAIN, topicName=${searchQuery.topicName}, minPartitionCount=${searchQuery.minPartitionCount}, maxPartitionCount=${searchQuery.maxPartitionCount}, minReplicationFactor=${searchQuery.minReplicationFactor}, maxReplicationFactor=${searchQuery.maxReplicationFactor}, minConsumerCount=${searchQuery.minConsumerCount}, maxConsumerCount=${searchQuery.maxConsumerCount}, replicationState=${searchQuery.replicationState}, configString=${searchQuery.configString}, description=${searchQuery.description})}" target="_blank">
+                                            Plain
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a 
+                                            th:href="@{/topics_export(exporterType=JSON, topicName=${searchQuery.topicName}, minPartitionCount=${searchQuery.minPartitionCount}, maxPartitionCount=${searchQuery.maxPartitionCount}, minReplicationFactor=${searchQuery.minReplicationFactor}, maxReplicationFactor=${searchQuery.maxReplicationFactor}, minConsumerCount=${searchQuery.minConsumerCount}, maxConsumerCount=${searchQuery.maxConsumerCount}, replicationState=${searchQuery.replicationState}, configString=${searchQuery.configString}, description=${searchQuery.description})}" target="_blank">
+                                            Json
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                            
+                        </div>
+                    </div>            
+                
+                    <form class="form-inline form-flex" id="search_form">
+                        <input 
+                            type="text"
+                            class="form-control" 
+                            id="topicName" 
+                            placeholder="Topic Name"
+                            th:value="${searchQuery.topicName}"/>
+                        <input
+                            type="number"
+                            class="form-control"
+                            min="1"
+                            id="minPartitionCount" 
+                            placeholder="Min Partition Count"
+                            th:value="${searchQuery.minPartitionCount}"/>
+                        <input 
+                            type="number"
+                            class="form-control"
+                            min="1"
+                            id="maxPartitionCount" 
+                            placeholder="Max Partition Count"
+                            th:value="${searchQuery.maxPartitionCount}"/>
+                        <input 
+                            type="number"
+                            class="form-control"
+                            min="1"
+                            id="minReplicationFactor" 
+                            placeholder="Min Replication Factor"
+                            th:value="${searchQuery.minReplicationFactor}"/>
+                        <input 
+                            type="number"
+                            class="form-control"
+                            min="1"
+                            id="maxReplicationFactor" 
+                            placeholder="Max Replication Factor"
+                            th:value="${searchQuery.maxReplicationFactor}"/>
+                        <input 
+                            type="number"
+                            class="form-control"
+                            min="1"
+                            id="minConsumerCount" 
+                            placeholder="Min Consumer Count"
+                            th:value="${searchQuery.minConsumerCount}"/>
+                        <input 
+                            type="number"
+                            class="form-control"
+                            min="1"
+                            id="maxConsumerCount" 
+                            placeholder="Max Consumer Count"
+                            th:value="${searchQuery.maxConsumerCount}"/>
+                        <select class="form-control" id="replicationState">
+                            <option 
+                                th:each="state : ${T(com.epam.eco.kafkamanager.TopicSearchQuery$ReplicationState).values()}"
+                                th:value="${state}" 
+                                th:text="${state}"
+                                th:selected="${state == searchQuery.replicationState}">
+                            </option>
+                        </select>
+                        <input
+                            type="text"
+                            class="form-control" 
+                            id="configString" 
+                            placeholder="Config: Value;..."
+                            th:value="${searchQuery.configString}"/>
+                        <input
+                            type="text"
+                            class="form-control"
+                            id="description" 
+                            placeholder="Description"
+                            th:value="${searchQuery.description}"/>
+                        <button
+                            type="submit"
+                            class="btn btn-primary">
+                            Find
+                        </button>
+                    </form>
+                
+                </div>
+            
+            </div>
+            
+            <div class="row">
+        
+                <div class="col-md-10 col-md-offset-1">
+                
+                    <div th:if="${page != null}">
+                        <table class="table table-bordered table-striped table-hover">
+                            <thead>
+                                <tr>
+                                    <td>Name</td>
+                                    <td>Partitions</td>
+                                    <td>Replicas</td>
+                                    <td>Config</td>
+                                    <td>Consumer Groups</td>
+                                    <td>Description</td>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr 
+                                    th:each="topic : ${page.content}"
+                                    th:classappend="${topic.hasUnderReplicatedPartitions()} ? 'warning' : ''">
+                                    <td>
+                                        <a th:href="@{/topics/{name}(name=${topic.name})}"><span th:text="${topic.name}"></span></a>
+                                    </td>
+                                    <td th:text="${topic.partitionCount}"></td>
+                                    <td th:text="${topic.replicationFactor}"></td>
+                                    <td 
+                                        th:text="${topic.configOverridesAsString}"
+                                        style="white-space:pre-wrap;"></td>
+                                    <td>
+                                        <th:block th:each="group : ${topic.getConsumerGroupNamesAsCollapsedCol(5)}">
+                                            <a th:if="${!group.divider}" th:href="@{/consumer_groups/{name}(name=${group.value})}">
+                                                <span th:text="${group.value}" style="float:left;clear:left;"></span>
+                                            </a>
+                                            <span th:if="${group.divider}" th:text="..." style="float:left;clear:left;"></span>
+                                        </th:block>
+                                    </td>
+                                    <td 
+                                        th:text="${topic.metadataDescription}" 
+                                        style="word-wrap:break-word;max-width:150px">
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        
+                        <div
+                            th:if="${page.numberOfElements > 0}" 
+                            th:text="${'Showing ' + (page.number * page.size + 1) + ' to ' + (page.number * page.size + page.numberOfElements) + ' of ' + page.totalElements}">
+                        </div>
+                        
+                        <ul id="pagination" class="pagination pagination-sm"></ul>
+        
+                    </div>
+        
+                </div>
+        
+            </div>
+        
+        </div>
+
+    </div>
+
+    <div th:replace="templates :: footer"></div>
+    
+</body>
+</html>

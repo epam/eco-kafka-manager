@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<FindBugsFilter
+        xmlns="https://github.com/spotbugs/filter/3.0.0"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="https://github.com/spotbugs/filter/3.0.0 https://raw.githubusercontent.com/spotbugs/spotbugs/3.1.0/spotbugs/etc/findbugsfilter.xsd">
+
+    <Match>
+        <Class name="com.epam.eco.kafkamanager.client.consumer.exec.RestConsumerGroupOffsetResetterTaskExecutor" />
+        <Method name="doExecute" />
+        <Bug pattern="EXS_EXCEPTION_SOFTENING_NO_CONSTRAINTS" />
+    </Match>
+    <Match>
+        <Class name="com.epam.eco.kafkamanager.client.consumer.exec.RestConsumerGroupTopicOffsetFetcherTaskExecutor" />
+        <Method name="doExecute" />
+        <Bug pattern="EXS_EXCEPTION_SOFTENING_NO_CONSTRAINTS" />
+    </Match>
+    <Match>
+        <Class name="com.epam.eco.kafkamanager.client.topic.exec.RestTopicOffsetFetcherTaskExecutor" />
+        <Method name="doExecute" />
+        <Bug pattern="EXS_EXCEPTION_SOFTENING_NO_CONSTRAINTS" />
+    </Match>
+    <Match>
+        <Class name="com.epam.eco.kafkamanager.client.topic.exec.RestTopicPurgerTaskExecutor" />
+        <Method name="doExecute" />
+        <Bug pattern="EXS_EXCEPTION_SOFTENING_NO_CONSTRAINTS" />
+    </Match>
+    <Match>
+        <Class name="com.epam.eco.kafkamanager.client.topic.exec.RestTopicRecordCounterTaskExecutor" />
+        <Method name="doExecute" />
+        <Bug pattern="EXS_EXCEPTION_SOFTENING_NO_CONSTRAINTS" />
+    </Match>
+    <Match>
+        <Class name="com.epam.eco.kafkamanager.client.topic.exec.RestTopicRecordFetcherTaskExecutor" />
+        <Method name="doExecute" />
+        <Bug pattern="EXS_EXCEPTION_SOFTENING_NO_CONSTRAINTS" />
+    </Match>
+    <Match>
+        <Class name="com.epam.eco.kafkamanager.client.autoconfigure.KafkaManagerClientAutoConfiguration$1" />
+        <Method name="handleError" />
+        <Bug pattern="SF_SWITCH_NO_DEFAULT" />
+    </Match>
+    <Match>
+        <Class name="com.epam.eco.kafkamanager.client.RestKafkaManager" />
+        <Or>
+            <Method name="brokerExists" />
+            <Method name="consumerGroupExists" />
+            <Method name="topicExists" />
+            <Method name="transactionExists" />
+        </Or>
+        <Bug pattern="EXS_EXCEPTION_SOFTENING_RETURN_FALSE" />
+    </Match>
+
+</FindBugsFilter>

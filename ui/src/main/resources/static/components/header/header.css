@@ -1,0 +1,38 @@
+.header-content {
+    display: flex;
+    justify-content: flex-start;
+    height: 48px;
+    background-color: #464547;
+    color: white;
+    padding: 0 !important;
+}
+
+.brand {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-shrink: 0;
+    background-color: #39C2D7;
+}
+
+.brand a {
+    display: flex;
+    line-height: 48px;
+    font-size: 16px;
+    color: white;
+    padding: 0 14px;
+    font-family: 'Source Sans Pro Regular';
+    text-transform: uppercase;
+    text-decoration: none;
+}
+
+.brand a img {
+    padding: 0 4px;     
+}
+
+.menu-wrapper {
+    display: flex;
+    flex: 1;
+    flex-direction: row;
+    background-color: #464547;
+}

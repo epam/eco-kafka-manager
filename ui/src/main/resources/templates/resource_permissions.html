@@ -1,0 +1,141 @@
+<!--
+ * Copyright 2019 EPAM Systems
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License.  You may obtain a copy
+ * of the License at
+ * 
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ -->
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="templates :: header(~{},~{},~{})">
+</head>
+<body>
+
+    <div th:replace="templates :: navbar"></div>
+    
+    <div class="main-content"> 
+    
+        <div class="container-fluid">
+
+            <div class="row">
+        
+                <div class="col-md-10 col-md-offset-1">
+                
+                    <div class="panel panel-default">
+                        <div class="panel-body">
+                            <a 
+                                th:href="@{/permissions}" 
+                                class="btn btn-primary right-icon">
+                                Back To Permissions <span class="glyphicon glyphicon-arrow-left"></span>
+                            </a>
+                            <a
+                                    th:href="@{/permissions/resource_metadata(resourceType=${resourceType}, resourceName=${resourceName}, kafkaPrincipal=${kafkaPrincipal})}"
+                                    class="btn btn-primary right-icon">
+                                Edit Metadata <span class="glyphicon glyphicon-tags"></span>
+                            </a>
+                        </div>
+                    </div>
+        
+                    <div class="panel panel-default">
+                        <div class="panel-heading">Permission</div>
+                        <div class="panel-body">
+                            <p>
+                                <b>Resource Type:</b>
+                                <span th:text="${resourceType}"></span>
+                            </p>
+                            <p>
+                                <b>Resource Name:</b>
+                                <span th:text="${resourceName}"></span>
+                            </p>
+                            <p>
+                                <b>Kafka Principal:</b>
+                                <span th:text="${kafkaPrincipal}"></span>
+                            </p>
+                            <p>
+                                <b>Description:</b>
+                                <span 
+                                    th:text="${metadata != null ? metadata.description : ''}"
+                                    style="white-space:pre-wrap;"></span>
+                            </p>
+                        </div>
+                    </div>
+        
+                    <table class="table table-bordered table-striped table-hover">
+                        <thead>
+                            <tr>
+                                <td>Resource Type</td>
+                                <td>Resource Name</td>
+                                <td>Kafka Principal</td>
+                                <td>Permission Type</td>
+                                <td>Operation</td>
+                                <td>Host</td>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr style="background-color: #FFFFFF; text-align:center;">
+                                <td colspan="6">
+                                    Permissions to <span th:text="${resourceType + ' (' + resourceName + ')'}" style="font-weight:bold"></span>:
+                                </td>
+                            </tr>
+                                    
+                            <tr 
+                                th:if="${resourcePermissions != null}"
+                                th:each="permission : ${resourcePermissions}">
+                                <td th:text="${permission.resourceType}"></td>
+                                <td>
+                                    <a 
+                                        th:href="@{/permissions/resource(resourceType=${permission.resourceType}, resourceName=${permission.resourceName}, kafkaPrincipal=${permission.kafkaPrincipal})}">
+                                        <span th:text="${permission.resourceName}"></span>
+                                    </a>
+                                </td>
+                                <td th:text="${permission.kafkaPrincipal}" th:class="${permission.kafkaPrincipal.toString().equals(kafkaPrincipal)} ? warning : default"></td>
+                                <td th:text="${permission.permissionType}"></td>
+                                <td th:text="${permission.operation}"></td>
+                                <td th:text="${permission.host}"></td>
+                            </tr>
+        
+                            <tr style="background-color: #FFFFFF; text-align:center;">
+                                <td colspan="6">
+                                    Other <span th:text="${kafkaPrincipal}" style="font-weight:bold"></span>'s permissions:
+                                </td>
+                            </tr>
+        
+                            <tr 
+                                th:if="${principalPermissions != null}"
+                                th:each="permission : ${principalPermissions}">
+                                <td th:text="${permission.resourceType}"></td>
+                                <td>
+                                    <a 
+                                        th:href="@{/permissions/resource(resourceType=${permission.resourceType}, resourceName=${permission.resourceName}, kafkaPrincipal=${permission.kafkaPrincipal})}">
+                                        <span th:text="${permission.resourceName}"></span>
+                                    </a>
+                                </td>
+                                <td th:text="${permission.kafkaPrincipal}" th:class="${permission.kafkaPrincipal.toString().equals(kafkaPrincipal)} ? warning : default"></td>
+                                <td th:text="${permission.permissionType}"></td>
+                                <td th:text="${permission.operation}"></td>
+                                <td th:text="${permission.host}"></td>
+                            </tr>
+                                        
+                        </tbody>
+                    </table>
+        
+                </div>
+        
+            </div>
+        
+        </div>
+        
+    </div>
+
+    <div th:replace="templates :: footer"></div>
+
+</body>
+</html>

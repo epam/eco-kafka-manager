@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<FindBugsFilter
+        xmlns="https://github.com/spotbugs/filter/3.0.0"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="https://github.com/spotbugs/filter/3.0.0 https://raw.githubusercontent.com/spotbugs/spotbugs/3.1.0/spotbugs/etc/findbugsfilter.xsd">
+
+    <Match>
+        <Class name="com.epam.eco.kafkamanager.ui.metrics.expose.prometheus.UdmEnrichingDropwizardExports" />
+        <Method name="_from" />
+        <Bug pattern="RFI_SET_ACCESSIBLE" />
+    </Match>
+    <Match>
+        <Class name="com.epam.eco.kafkamanager.ui.topics.browser.RecordFetchParams" />
+        <Method name="getAsBoolean" />
+        <Bug pattern="NP_BOOLEAN_RETURN_NULL,TBP_TRISTATE_BOOLEAN_PATTERN" />
+    </Match>
+    <Match>
+        <Class name="com.epam.eco.kafkamanager.ui.consumers.ResetGroupOffsetsParams" />
+        <Method name="getAsBoolean" />
+        <Bug pattern="NP_BOOLEAN_RETURN_NULL,TBP_TRISTATE_BOOLEAN_PATTERN" />
+    </Match>
+    <Match>
+        <Class name="com.epam.eco.kafkamanager.ui.metrics.expose.prometheus.UdmEnrichingDropwizardExports" />
+        <Method name="extractOriginMetricName" />
+        <Bug pattern="UCPM_USE_CHARACTER_PARAMETERIZED_METHOD" />
+    </Match>
+    <Match>
+        <Class name="com.epam.eco.kafkamanager.ui.brokers.BrokerController" />
+        <Method name="metadata" />
+        <Bug pattern="SPRING_UNVALIDATED_REDIRECT" />
+    </Match>
+    <Match>
+        <Class name="com.epam.eco.kafkamanager.ui.consumers.ConsumerGroupController" />
+        <Method name="metadata" />
+        <Bug pattern="SPRING_UNVALIDATED_REDIRECT" />
+    </Match>
+    <Match>
+        <Class name="com.epam.eco.kafkamanager.ui.consumers.ConsumerGroupOffsetResetterController" />
+        <Method name="reset" />
+        <Bug pattern="SPRING_UNVALIDATED_REDIRECT" />
+    </Match>
+    <Match>
+        <Class name="com.epam.eco.kafkamanager.ui.metrics.udm.ConsumerGroupLagUDMController" />
+        <Method name="save" />
+        <Bug pattern="SPRING_UNVALIDATED_REDIRECT" />
+    </Match>
+    <Match>
+        <Class name="com.epam.eco.kafkamanager.ui.metrics.udm.TopicOffsetIncreaseUDMController" />
+        <Method name="save" />
+        <Bug pattern="SPRING_UNVALIDATED_REDIRECT" />
+    </Match>
+    <Match>
+        <Class name="com.epam.eco.kafkamanager.ui.permissions.ResourcePermissionController" />
+        <Method name="metadata" />
+        <Bug pattern="SPRING_UNVALIDATED_REDIRECT" />
+    </Match>
+    <Match>
+        <Class name="com.epam.eco.kafkamanager.ui.topics.TopicController" />
+        <Or>
+            <Method name="recordCounter" />
+            <Method name="purger" />
+            <Method name="create" />
+            <Method name="config" />
+            <Method name="partitions" />
+            <Method name="metadata" />
+        </Or>
+        <Bug pattern="SPRING_UNVALIDATED_REDIRECT" />
+    </Match>
+    <Match>
+        <Class name="com.epam.eco.kafkamanager.ui.topics.browser.TopicBrowserController" />
+        <Method name="fetch" />
+        <Bug pattern="SPRING_UNVALIDATED_REDIRECT" />
+    </Match>
+    <Match>
+        <Class name="com.epam.eco.kafkamanager.ui.metrics.expose.prometheus.UdmEnrichingDropwizardExports" />
+        <Method name="_from" />
+        <Bug pattern="EXS_EXCEPTION_SOFTENING_NO_CONSTRAINTS" />
+    </Match>
+    <Match>
+        <Class name="com.epam.eco.kafkamanager.ui.GlobalErrorController" />
+        <Method name="enrichErrorAttributes" />
+        <Bug pattern="UP_UNUSED_PARAMETER" />
+    </Match>
+    <Match>
+        <Class name="com.epam.eco.kafkamanager.ui.permissions.export.GroupedByPrincipalJsonPermissionExporter" />
+        <Method name="toJsonRecord" />
+        <Bug pattern="OCP_OVERLY_CONCRETE_PARAMETER" />
+    </Match>
+    <Match>
+        <Class name="com.epam.eco.kafkamanager.ui.permissions.export.JsonPermissionExporter" />
+        <Method name="toJsonRecord" />
+        <Bug pattern="CE_CLASS_ENVY" />
+    </Match>
+    <Match>
+        <Class name="com.epam.eco.kafkamanager.ui.permissions.export.PlainPermissionExporter" />
+        <Method name="export" />
+        <Bug pattern="CE_CLASS_ENVY" />
+    </Match>
+    <Match>
+        <Class name="com.epam.eco.kafkamanager.ui.metrics.expose.prometheus.UdmEnrichingDropwizardExports" />
+        <Method name="rebuildUdmMetricIfPossible" />
+        <Bug pattern="ITC_INHERITANCE_TYPE_CHECKING" />
+    </Match>
+    <Match>
+        <Class name="com.epam.eco.kafkamanager.ui.metrics.udm.UDMetricWrapper" />
+        <Bug pattern="FCCD_FIND_CLASS_CIRCULAR_DEPENDENCY" />
+    </Match>
+    <Match>
+        <Class name="com.epam.eco.kafkamanager.ui.utils.InetAddressUtils" />
+        <Method name="getHostName" />
+        <Bug pattern="MDM_INETADDRESS_GETLOCALHOST,EXS_EXCEPTION_SOFTENING_NO_CONSTRAINTS" />
+    </Match>
+    <Match>
+        <Class name="com.epam.eco.kafkamanager.ui.GlobalErrorController" />
+        <Method name="error" />
+        <Bug pattern="SPRING_CSRF_UNRESTRICTED_REQUEST_MAPPING" />
+    </Match>
+
+</FindBugsFilter>

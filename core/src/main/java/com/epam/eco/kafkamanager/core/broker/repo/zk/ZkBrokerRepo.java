@@ -1,0 +1,257 @@
+/*
+ * Copyright 2019 EPAM Systems
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License.  You may obtain a copy
+ * of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ */
+package com.epam.eco.kafkamanager.core.broker.repo.zk;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
+
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
+
+import org.apache.commons.lang3.Validate;
+import org.apache.curator.framework.CuratorFramework;
+import org.apache.kafka.clients.admin.Config;
+import org.apache.kafka.clients.admin.ConfigEntry;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import com.epam.eco.commons.kafka.ScalaConversions;
+import com.epam.eco.kafkamanager.BrokerInfo;
+import com.epam.eco.kafkamanager.BrokerMetadataKey;
+import com.epam.eco.kafkamanager.BrokerRepo;
+import com.epam.eco.kafkamanager.BrokerSearchQuery;
+import com.epam.eco.kafkamanager.ConfigValue;
+import com.epam.eco.kafkamanager.EndPointInfo;
+import com.epam.eco.kafkamanager.EntityType;
+import com.epam.eco.kafkamanager.KafkaAdminOperations;
+import com.epam.eco.kafkamanager.Metadata;
+import com.epam.eco.kafkamanager.MetadataKey;
+import com.epam.eco.kafkamanager.MetadataRepo;
+import com.epam.eco.kafkamanager.MetadataUpdateListener;
+import com.epam.eco.kafkamanager.NotFoundException;
+import com.epam.eco.kafkamanager.core.spring.AsyncStartingBean;
+import com.epam.eco.kafkamanager.repo.AbstractKeyValueRepo;
+import com.epam.eco.kafkamanager.repo.CachedRepo;
+
+import kafka.cluster.Broker;
+
+/**
+ * @author Andrei_Tytsik
+ */
+public class ZkBrokerRepo extends AbstractKeyValueRepo<Integer, BrokerInfo, BrokerSearchQuery> implements BrokerRepo, CachedRepo<Integer>, ZkBrokerCache.CacheListener, MetadataUpdateListener, AsyncStartingBean {
+
+    private final static Logger LOGGER = LoggerFactory.getLogger(ZkBrokerRepo.class);
+
+    @Autowired
+    private KafkaAdminOperations adminOperations;
+    @Autowired
+    private MetadataRepo metadataRepo;
+    @Autowired
+    private CuratorFramework curatorFramework;
+
+    private ZkBrokerCache brokerCache;
+
+    private final Map<Integer, BrokerInfo> brokerInfoCache = new ConcurrentHashMap<>();
+
+    @PostConstruct
+    private void init() {
+        initBrokerCache();
+        subscribeOnMetadataUpdates();
+
+        LOGGER.info("Initialized");
+    }
+
+    @Override
+    public void startAsync() throws Exception {
+        startBrokerCache();
+
+        LOGGER.info("Started");
+    }
+
+    @PreDestroy
+    private void destroy() throws Exception {
+        destroyBrokeCache();
+
+        LOGGER.info("Destroyed");
+    }
+
+    private void initBrokerCache() {
+        brokerCache = new ZkBrokerCache(curatorFramework, this);
+    }
+
+    private void startBrokerCache() throws Exception {
+        brokerCache.start();
+    }
+
+    private void destroyBrokeCache() throws Exception {
+        brokerCache.close();
+    }
+
+    private void subscribeOnMetadataUpdates() {
+        metadataRepo.registerUpdateListener(this);
+    }
+
+    @Override
+    public int size() {
+        return brokerCache.size();
+    }
+
+    @Override
+    public boolean contains(Integer brokerId) {
+        Validate.notNull(brokerId, "Broker id is null");
+        Validate.isTrue(brokerId >= 0, "Broker id is invalid");
+
+        return brokerCache.contains(brokerId);
+    }
+
+    @Override
+    public BrokerInfo get(Integer brokerId) {
+        Validate.notNull(brokerId, "Broker id is null");
+        Validate.isTrue(brokerId >= 0, "Broker id is invalid");
+
+        BrokerInfo brokerInfo = getBrokerFromInfoCacheOrCreate(brokerId);
+        if (brokerInfo == null) {
+            throw new NotFoundException(String.format("Broker not found by id %d", brokerId));
+        }
+
+        return brokerInfo;
+    }
+
+    @Override
+    public List<BrokerInfo> values() {
+        List<BrokerInfo> brokerInfos = new ArrayList<>();
+        brokerCache.listBrokerIds().forEach(brokerId -> {
+            BrokerInfo brokerInfo = getBrokerFromInfoCacheOrCreate(brokerId);
+            if (brokerInfo != null) {
+                brokerInfos.add(brokerInfo);
+            }
+        });
+        Collections.sort(brokerInfos);
+        return brokerInfos;
+    }
+
+    @Override
+    public List<BrokerInfo> values(List<Integer> brokerIds) {
+        Validate.noNullElements(
+                brokerIds, "Collection of broker ids can't be null or contain null elements");
+
+        List<BrokerInfo> brokerInfos = new ArrayList<>();
+        brokerIds.forEach(brokerId -> {
+            BrokerInfo brokerInfo = getBrokerFromInfoCacheOrCreate(brokerId);
+            if (brokerInfo != null) {
+                brokerInfos.add(brokerInfo);
+            }
+        });
+        Collections.sort(brokerInfos);
+        return brokerInfos;
+    }
+
+    @Override
+    public List<Integer> keys() {
+        return new ArrayList<>(brokerCache.listBrokerIds());
+    }
+
+    @Override
+    public void evict(Integer brokerId) {
+        removeBrokerFromInfoCache(brokerId);
+    }
+
+    @Override
+    public void onBrokerUpdated(Broker broker) {
+        Validate.notNull(broker, "Broker is null");
+
+        removeBrokerFromInfoCache(broker.id());
+    }
+
+    @Override
+    public void onBrokerRemoved(Integer brokerId) {
+        removeBrokerFromInfoCache(brokerId);
+    }
+
+    @Override
+    public void onMetadataUpdated(MetadataKey key, Metadata metadata) {
+        Validate.notNull(key, "Metadata key is null");
+        Validate.notNull(metadata, "Metadata is null");
+
+        if (key.getEntityType() != EntityType.BROKER) {
+            return;
+        }
+
+        removeBrokerFromInfoCache(((BrokerMetadataKey)key).getBrokerId());
+    }
+
+    @Override
+    public void onMetadataRemoved(MetadataKey key) {
+        Validate.notNull(key, "Metadata key is null");
+
+        if (key.getEntityType() != EntityType.BROKER) {
+            return;
+        }
+
+        removeBrokerFromInfoCache(((BrokerMetadataKey)key).getBrokerId());
+    }
+
+    private void removeBrokerFromInfoCache(Integer brokerId) {
+        Validate.notNull(brokerId, "Broker id is null");
+
+        brokerInfoCache.remove(brokerId);
+    }
+
+    private BrokerInfo getBrokerFromInfoCacheOrCreate(Integer brokerId) {
+        return brokerInfoCache.computeIfAbsent(
+                brokerId,
+                key -> {
+                    Broker group = brokerCache.getBroker(brokerId);
+                    return group != null ? toInfo(group) : null;
+                });
+    }
+
+    private BrokerInfo toInfo(Broker broker) {
+        List<EndPointInfo> endPoints =
+                ScalaConversions.asJavaList(broker.endPoints()).stream().
+                map(endPoint -> new EndPointInfo(
+                                endPoint.securityProtocol(),
+                                endPoint.host(),
+                                endPoint.port())).
+                collect(Collectors.toList());
+
+        Config config = adminOperations.describeBrokerConfig(broker.id());
+
+        Map<String, ConfigValue> configValues = config.entries().stream().
+                collect(Collectors.toMap(
+                        ConfigEntry::name,
+                        e -> new ConfigValue(
+                                e.name(),
+                                e.value(),
+                                e.isDefault(),
+                                e.isSensitive(),
+                                e.isReadOnly())));
+
+        return BrokerInfo.builder().
+                id(broker.id()).
+                endPoints(endPoints).
+                rack(ScalaConversions.asOptional(broker.rack()).orElse(null)).
+                config(configValues).
+                metadata(metadataRepo.get(BrokerMetadataKey.with(broker.id()))).
+                build();
+    }
+
+}

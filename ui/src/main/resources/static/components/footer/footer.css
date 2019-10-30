@@ -1,0 +1,29 @@
+.footer-content {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    height: 40px;
+    margin: 0;
+    background-color: #464547;
+}
+  
+.footer-content a {
+    margin: 0 20px;
+    cursor: pointer;
+    color: #1a9cb0;
+    text-decoration: none;
+}
+  
+.footer-content a:active,
+.footer-content a:hover,
+.footer-content a:focus {
+    color: #1a9cb0;
+    text-decoration: underline;
+    outline: 0;
+}
+  
+.footer-content .build-info {
+    margin: 0 10px;
+    color: white;
+    font-family: "Source Sans Pro Regular"
+}

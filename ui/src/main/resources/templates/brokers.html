@@ -1,0 +1,112 @@
+<!--
+ * Copyright 2019 EPAM Systems
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License.  You may obtain a copy
+ * of the License at
+ * 
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ -->
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="templates :: header(~{},~{},~{})">
+</head>
+<body>
+
+    <script type="text/javascript" th:inline="javascript">
+        /*<![CDATA[*/
+        var pageCurrent = [[${(page != null)?(page.number + 1):(0)}]];
+        var totalPagesCurrent = [[${(page != null)?(page.totalPages):(0)}]];
+        /*]]>*/
+        $(function() {
+            $('#pagination').twbsPagination({
+                startPage: pageCurrent,
+                totalPages: totalPagesCurrent,
+                visiblePages: 11,
+                initiateStartPageClick: false,
+                first:'&lt;&lt;',
+                prev:'&lt;',
+                next:'&gt;',
+                last:'&gt;&gt;',
+                onPageClick: function (e, pageClicked) {
+                    e.preventDefault();
+                    location.params({page: pageClicked}, {}, {});
+                }
+            });
+        });
+    </script>
+
+    <div th:replace="templates :: navbar"></div>
+    
+    <div class="main-content">
+
+        <div class="container-fluid">
+
+            <div class="row">
+                <div class="col-md-10 col-md-offset-1">
+                    <h3>Brokers (<span th:text="${totalCount}"></span>)</h3>
+                </div>
+            </div>
+            
+            <div class="row">
+
+                <div class="col-md-10 col-md-offset-1">
+
+                    <div th:if="${page != null}">
+                        <table class="table table-bordered table-striped table-hover">
+                            <thead>
+                                <tr>
+                                    <td>Id</td>
+                                    <td>EndPoints</td>
+                                    <td>Rack</td>
+                                    <td>Description</td>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="broker : ${page.content}">
+                                    <td>
+                                        <a th:href="@{/brokers/{id}(id=${broker.id})}"><span th:text="${broker.id}"></span></a>
+                                    </td>
+                                    <td>
+                                        <span 
+                                            th:each="endPoint : ${broker.getEndPointsAsCollapsedCol(5)}" 
+                                            th:text="${endPoint}"
+                                            style="display:block;">
+                                        </span>
+                                    </td>
+                                    <td th:text="${broker.rack}"></td>
+                                    <td 
+                                        th:text="${broker.metadataDescription}" 
+                                        style="word-wrap:break-word;max-width:200px">
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                            
+                        <div
+                            th:if="${page.numberOfElements > 0}" 
+                            th:text="${'Showing ' + (page.number * page.size + 1) + ' to ' + (page.number * page.size + page.numberOfElements) + ' of ' + page.totalElements}">
+                        </div>
+                        
+                        <ul id="pagination" class="pagination pagination-sm"></ul>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <div th:replace="templates :: footer"></div>
+    
+</body>
+</html>

@@ -1,0 +1,131 @@
+<!--
+ * Copyright 2019 EPAM Systems
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License.  You may obtain a copy
+ * of the License at
+ * 
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ -->
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="templates :: header(~{},~{},~{})">
+</head>
+<body>
+
+    <div th:replace="templates :: navbar"></div>
+    
+    <div class="main-content">
+    
+        <div class="container-fluid">
+
+            <div class="row">
+        
+                <div class="col-md-10 col-md-offset-1">
+                
+                    <div class="panel panel-default">
+                        <div class="panel-body panel-flex">
+                            <a 
+                                th:href="@{/transactions}" 
+                                class="btn btn-primary right-icon">
+                                Back To Transactions <i class="fa fa-arrow-left"></i>
+                            </a>
+                        </div>
+                    </div>
+                
+                    <div class="panel panel-default">
+                        <div class="panel-heading">Transaction</div>
+                        <div class="panel-body">
+                            <p>
+                                <b>Transactional Id:</b>
+                                <span th:text="${transaction.transactionalId}"></span>
+                            </p>
+                            <p>
+                                <b>Producer Id (Epoch):</b>
+                                <span th:text="${transaction.producerId + ' (' + transaction.producerEpoch + ')'}"></span>
+                            </p>
+                            <p>
+                                <b>Timeout (ms):</b>
+                                <span th:text="${transaction.timeoutMs}"></span>
+                            </p>
+                            <p>
+                                <b>Success RPM:</b>
+                                <span
+                                    th:if="${transaction.successRpm != null AND transaction.successRpm > 0}" 
+                                    th:text="${transaction.successRpm}"
+                                    th:classappend="text-success">
+                                </span>
+                            </p>
+                            <p>
+                                <b>Fail RPM:</b>
+                                <span
+                                    th:if="${transaction.failRpm != null AND transaction.failRpm > 0}" 
+                                    th:text="${transaction.failRpm}"
+                                    th:classappend="text-danger">
+                                </span>
+                            </p>
+                            <p>
+                                <b>Execution Time Statistics:</b>
+                                Min: <span th:text="${transaction.execMinTime}"></span>
+                                Max: <span th:text="${transaction.execMaxTime}"></span>
+                                Mean: <span th:text="${transaction.execMeanTime}"></span>
+                            </p>
+                            <p>
+                                <b style="float:left;clear:left;">Topics:</b>
+                                <th:block th:each="topic : ${transaction.topicNames}">
+                                    <a th:href="@{/topics/{name}(name=${topic})}">
+                                        <span th:text="${topic}" style="float:left;clear:left;"></span>
+                                    </a>
+                                </th:block>
+                            </p>
+                        </div>
+                    </div>
+                    
+                    <div class="panel panel-default">
+                        <div class="panel-heading">History</div>
+                        <div class="panel-body">
+                            <table th:if="${!transaction.history.isEmpty()}" class="table table-bordered table-striped table-hover">
+                                <thead>
+                                    <tr>
+                                        <td>State</td>
+                                        <td>Partitions</td>
+                                        <td>Start Date</td>
+                                        <td>Update Date</td>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr th:each="metadata : ${transaction.history}">
+                                        <td th:text="${metadata.state}"></td>
+                                        <td>
+                                            <span 
+                                                th:each="partition : ${metadata.getPartitionsAsCollapsedCol(-1)}" 
+                                                th:text="${partition}"
+                                                style="display:block;">
+                                            </span>
+                                        </td>
+                                        <td th:text="${metadata.startDate}"></td>
+                                        <td th:text="${metadata.lastUpdateDate}"></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                
+                </div>
+        
+            </div>
+        
+        </div>
+
+    </div>
+
+    <div th:replace="templates :: footer"></div>
+        
+</body>
+</html>

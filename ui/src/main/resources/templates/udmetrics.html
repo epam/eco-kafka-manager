@@ -1,0 +1,202 @@
+<!--
+ * Copyright 2019 EPAM Systems
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License.  You may obtain a copy
+ * of the License at
+ * 
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ -->
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="templates :: header(~{},~{},~{})">
+</head>
+<body>
+
+    <script type="text/javascript" th:inline="javascript">
+        /*<![CDATA[*/
+        var pageCurrent = [[${(page != null)?(page.number + 1):(0)}]];
+        var totalPagesCurrent = [[${(page != null)?(page.totalPages):(0)}]];
+        /*]]>*/
+        $(function() {
+            
+            $('#search_form').submit(function(e) {
+                e.preventDefault();
+                location.params(
+                        {
+                            type: $('#type').val(), 
+                            resourceName: $('#resourceName').val(),
+                            status: $('#status').val(),
+                            page: 1
+                        }, 
+                        {}, 
+                        {});
+            });
+            
+            $('#pagination').twbsPagination({
+                startPage: pageCurrent,
+                totalPages: totalPagesCurrent,
+                visiblePages: 11,
+                initiateStartPageClick: false,
+                first:'&lt;&lt;',
+                prev:'&lt;',
+                next:'&gt;',
+                last:'&gt;&gt;',
+                onPageClick: function (e, pageClicked) {
+                    e.preventDefault();
+                    location.params({page: pageClicked}, {}, {});
+                }
+            });
+            
+            $('.delete-udm-link').click(function(e) {
+                e.preventDefault();
+                var action = $(this).data("action");
+                $('#delete-udm-form').prop('action', action);
+                $('#delete-udm-form').submit();
+            });
+            
+        });
+    </script>
+    
+    
+
+    <div th:replace="templates :: navbar"></div>
+    
+    <div class="main-content">
+
+        <div class="container-fluid">
+
+            <div class="row">
+                <div class="col-md-10 col-md-offset-1">
+                    <h3>User-Defined Metrics (<span th:text="${totalCount}"></span>)</h3>
+                </div>
+            </div>
+        
+            <div class="row">
+                <div class="col-md-10 col-md-offset-1">
+                    <form class="form-inline form-flex" id="search_form">
+                        <select class="form-control" id="type">
+                            <option value="">-</option>
+                            <option 
+                                th:each="type : ${T(com.epam.eco.kafkamanager.udmetrics.UDMetricType).values()}"
+                                th:value="${type}" 
+                                th:text="${type}"
+                                th:selected="${type == searchQuery.type}">
+                            </option>
+                        </select>
+                        <input 
+                            type="text" 
+                            class="form-control"
+                            id="resourceName" 
+                            placeholder="Resource Name"
+                            th:value="${searchQuery.resourceName}"/>
+                        <select class="form-control" id="status">
+                            <option value="">-</option>
+                            <option 
+                                th:each="status : ${T(com.epam.eco.kafkamanager.udmetrics.UDMetricSearchQuery$Status).values()}"
+                                th:value="${status}" 
+                                th:text="${status}"
+                                th:selected="${status == searchQuery.status}">
+                            </option>
+                        </select>
+                        <button 
+                            type="submit" 
+                            class="btn btn-primary">
+                            Find
+                        </button>
+                    </form>
+                </div>
+            </div>
+            
+            <div class="row">
+        
+                <div class="col-md-10 col-md-offset-1">
+        
+                    <div th:if="${page != null}">
+                        <table class="table table-bordered table-striped table-hover">
+                            <thead>
+                                <tr>
+                                    <td>Type</td>
+                                    <td>Resource Name</td>
+                                    <td>Config</td>
+                                    <td>Metric Set</td>
+                                    <td></td>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr 
+                                    th:each="udm : ${page.content}"
+                                    th:classappend="${udm.hasErrors()} ? 'danger' : ''">
+                                    <td th:text="${udm.type}" th:title="${udm.type.description()}"></td>
+                                    <td>
+                                        <a th:if="${udm.isConsumerGroupResource()}"
+                                        th:href="@{/consumer_groups/{name}(name=${udm.resourceName})}">
+                                            <span th:text="${udm.resourceName}"></span>
+                                        </a>
+                                        <a th:if="${udm.isTopicResource()}"
+                                        th:href="@{/topics/{name}(name=${udm.resourceName})}">
+                                            <span th:text="${udm.resourceName}"></span>
+                                        </a>
+                                        <span th:if="${udm.isOtherResource()}" th:text="${udm.resourceName}"></span>
+                                    </td>
+                                    <td th:text="${udm.configAsString}" style="white-space:pre-wrap;"></td>
+                                    <td>
+                                        <span 
+                                            th:each="metric : ${udm.getMetricsAsCollapsedCol(5)}" 
+                                            th:text="${metric}"
+                                            style="display:block;">
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <div class="btn-group">
+                                            <button class="btn btn-default transparent dropdown-toggle right-icon" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                Action <span class="caret"></span>
+                                            </button>
+                                            <ul class="dropdown-menu">
+                                                <li>
+                                                    <a th:href="@{${udm.url}}">
+                                                        <span class="glyphicon glyphicon-edit"></span> Edit
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <a class="delete-udm-link" href="#" th:attr="data-action=${udm.url}">
+                                                        <span class="glyphicon glyphicon-remove"></span> Delete
+                                                    </a>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                        <form id="delete-udm-form" method="post">
+                                            <input type="hidden" name="_method" value="delete"/>
+                                            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+                                        </form>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                            
+                        <div
+                            th:if="${page.numberOfElements > 0}" 
+                            th:text="${'Showing ' + (page.number * page.size + 1) + ' to ' + (page.number * page.size + page.numberOfElements) + ' of ' + page.totalElements}">
+                        </div>
+                        
+                        <ul id="pagination" class="pagination pagination-sm"></ul>
+        
+                    </div>
+        
+                </div>
+        
+            </div>
+        
+        </div>
+    </div>
+
+    <div th:replace="templates :: footer"></div>    
+    
+</body>
+</html>

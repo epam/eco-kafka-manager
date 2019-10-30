@@ -1,0 +1,131 @@
+<!--
+ * Copyright 2019 EPAM Systems
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License.  You may obtain a copy
+ * of the License at
+ * 
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ -->
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="templates :: header(~{},~{},~{})">
+</head>
+<body>
+
+    <script type="text/javascript" th:inline="javascript">
+        $(function() {
+            
+            $('#delete-metadata-link').click(function(e) {
+                e.preventDefault();
+                $('#delete-metadata-form').submit();
+            });
+            
+        });
+    </script>
+
+    <div th:replace="templates :: navbar"></div>
+        
+    <div class="main-content">
+    
+        <div class="container-fluid">
+
+            <div class="row">
+        
+                <div class="col-md-10 col-md-offset-1">
+                
+                    <div class="panel panel-default">
+                        <div class="panel-body">
+                            <a  
+                                th:href="@{/brokers/{id}(id=${broker.id})}"
+                                class="btn btn-primary">
+                                Back To Broker <span class="glyphicon glyphicon-arrow-left"></span>
+                            </a>
+                            
+                            <a 
+                                id="delete-metadata-link" 
+                                href="#"
+                                class="btn btn-primary">
+                                Delete <span class="glyphicon glyphicon-remove"></span>
+                            </a>
+                            
+                        </div>
+                    </div>
+                
+                    <div class="panel panel-default">
+                    
+                        <div th:if="${metadata != null}" class="panel-heading">
+                            Last updated at <b><span th:text="${metadata.updated}"></span></b> by <b><span th:text="${metadata.updatedBy}"></span></b>
+                        </div>
+                        
+                        <div class="panel-body">
+                            
+                            <form 
+                                th:action="@{/brokers/{id}/metadata(id=${broker.id})}" 
+                                method="post">
+
+                                <div class="form-group">
+                                    <label for="brokerId">Broker Id</label>
+                                    <input 
+                                        type="text" 
+                                        class="form-control" 
+                                        id="brokerId" 
+                                        name="brokerId"
+                                        readonly="readonly"
+                                        th:value="${broker.id}"/>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="description">Description</label>
+                                    <textarea 
+                                        rows="5" cols="70" 
+                                        class="form-control" 
+                                        id="description" 
+                                        name="description" 
+                                        th:text="${metadata != null ? metadata.description : null}"></textarea>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="attributes">Attributes (JSON)</label>
+                                    <textarea 
+                                        rows="5" cols="70" 
+                                        class="form-control" 
+                                        id="attributes" 
+                                        name="attributes" 
+                                        th:text="${metadata != null ? metadata.attributesJson : null}"></textarea>
+                                </div>
+                                
+                                <button type="submit" class="btn btn-primary blue">Save</button>
+                        
+                            </form>
+                            
+                            <form 
+                                id="delete-metadata-form" 
+                                th:action="@{/brokers/{id}/metadata(id=${broker.id})}"
+                                method="post">
+                                <input type="hidden" name="_method" value="delete"/>
+                                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+                            </form>
+
+                        </div>
+                        
+                    </div>
+                
+                </div>
+        
+            </div>
+        
+        </div>
+
+    </div>
+
+    <div th:replace="templates :: footer"></div>
+    
+</body>
+</html>

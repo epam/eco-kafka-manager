@@ -1,0 +1,15 @@
+**/*.log
+**/target
+/.idea
+
+.settings
+.classpath
+.project
+.metadataABC
+.recommenders
+
+.git
+.gitignore
+.gitattributes
+
+.mvn/wrapper/maven-wrapper.jar

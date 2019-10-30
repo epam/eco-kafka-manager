@@ -1,0 +1,207 @@
+<!--
+ * Copyright 2019 EPAM Systems
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License.  You may obtain a copy
+ * of the License at
+ * 
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ -->
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="templates :: header(~{},~{},~{})">
+</head>
+<body>
+
+    <script type="text/javascript" th:inline="javascript">
+        $(function() {
+            
+            $('.delete-udm-link').click(function(e) {
+                e.preventDefault();
+                var action = $(this).data("action");
+                $('#delete-udm-form').prop('action', action);
+                $('#delete-udm-form').submit();
+            });
+            
+        });
+    </script>
+
+    <div th:replace="templates :: navbar"></div>
+    
+    <div class="main-content">
+
+        <div class="container-fluid">
+        
+            <div class="row">
+        
+                <div class="col-md-10 col-md-offset-1">
+                
+                    <div class="panel panel-default">
+                        <div class="panel-body panel-flex">
+                            <a 
+                                th:href="@{/consumer_groups}" 
+                                class="btn btn-primary right-icon">
+                                Back To Consumer Groups <span class="glyphicon glyphicon-arrow-left"></span>
+                            </a>
+                            <a 
+                                th:href="@{/consumer_groups/{name}/metadata(name=${group.name})}"
+                                class="btn btn-primary right-icon">
+                                Edit Metadata <span class="glyphicon glyphicon-tags"></span>
+                            </a>
+                            <a
+                                th:href="@{/consumer_groups/{name}/offset_resetter(name=${group.name})}"
+                                class="to-right btn btn-primary right-icon">
+                                Reset Offsets <span class="glyphicon glyphicon-off"></span>
+                            </a>
+                        </div>
+                    </div>
+        
+                    <div class="panel panel-default">
+                        <div class="panel-heading">Consumer Group</div>
+                        <div class="panel-body">
+                            <p>
+                                <b>Name:</b>
+                                <span th:text="${group.name}"></span>
+                            </p>
+                            <p>
+                                <b>Description:</b>
+                                <span 
+                                    th:text="${group.metadataDescription}" 
+                                    style="white-space:pre-wrap;"></span>
+                            </p>
+                            <p>
+                                <b>Storage:</b>
+                                <span th:text="${group.storageType}"></span>
+                            </p>
+                            <p>
+                                <b style="float:left;clear:left;">Topics:</b>
+                                <th:block th:each="topic : ${group.getTopicNamesAsCollapsedCol(-1)}">
+                                    <a th:href="@{/topics/{name}(name=${topic.value})}">
+                                        <span th:text="${topic.value}" style="float:left;clear:left;"></span>
+                                    </a>
+                                </th:block>
+                            </p>
+                            
+                        </div>
+                    </div>
+        
+                    <div class="panel panel-default">
+                        <div class="panel-heading">User-Defined Metrics</div>
+                        <div class="panel-body">
+                            
+                            <div class="btn-group">
+                                <button 
+                                    type="button" 
+                                    class="btn btn-default dropdown-toggle right-icon" 
+                                    th:classappend="${groupLagUdm != null ? 'btn-success' : 'btn-default'}"
+                                    data-toggle="dropdown" 
+                                    aria-haspopup="true" 
+                                    aria-expanded="false"
+                                    th:title="${groupLagUdmName}">
+                                    <span th:text="${groupLagUdmType}"></span> <span class="caret"></span>
+                                </button>
+                                <ul class="dropdown-menu">
+                                    <li>
+                                        <a th:href="@{/udmetrics/consumer_group_lag/{name}(name=${group.name})}">
+                                            <span class="glyphicon glyphicon-edit"></span> <span th:text="${groupLagUdm != null ? 'Edit' : 'Create'}"></span>
+                                        </a>
+                                    </li>
+                                    <li th:if="${groupLagUdm != null}">
+                                        <a class="delete-udm-link" href="#" th:attr="data-action=${groupLagUdm.url}">
+                                            <span class="glyphicon glyphicon-remove"></span> Delete
+                                        </a>
+                                    </li>
+                                </ul>
+                                <form id="delete-udm-form" method="post">
+                                    <input type="hidden" name="_method" value="delete"/>
+                                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+                                </form>
+                            </div>
+                            
+                        </div>
+                    </div>
+
+                    <div th:if="${group.hasMembers()}" class="panel panel-default">
+                        <div class="panel-heading">Members</div>
+                        <div class="panel-body">
+                            <table class="table table-bordered table-striped table-hover">
+                                <thead>
+                                    <tr>
+                                        <td>Client Id</td>
+                                        <td>Member Id</td>
+                                        <td>Client Host</td>
+                                        <td>Protocol Type</td>
+                                        <td>Rebalance Timeout (ms)</td>
+                                        <td>Session Timeout (ms)</td>
+                                        <td>Latest Heartbeat Date</td>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr th:each="member : ${group.members}">
+                                        <td th:text="${member.clientId}"></td>
+                                        <td th:text="${member.memberId}"></td>
+                                        <td th:text="${member.clientHost}"></td>
+                                        <td th:text="${member.protocolType}"></td>
+                                        <td th:text="${member.rebalanceTimeoutMs}"></td>
+                                        <td th:text="${member.sessionTimeoutMs}"></td>
+                                        <td th:text="${member.latestHeartbeatDate}"></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    
+                    <div th:if="${group.hasOffsets()}" class="panel panel-default">
+                        <div class="panel-heading">Offsets</div>
+                        <div class="panel-body">
+                            <table class="table table-bordered table-striped table-hover">
+                                <thead>
+                                    <tr>
+                                        <td>Partition</td>
+                                        <td>Metadata</td>
+                                        <td>Commit Date</td>
+                                        <td>Expire Date</td>
+                                        <td title="Offset / Rate Per Minute">Offset / RPM</td>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr th:each="offsetAndMetadata : ${group.offsetsAndMetadataAsList}">
+                                        <td th:text="${offsetAndMetadata.topicPartition}"></td>
+                                        <td th:text="${offsetAndMetadata.metadata}"></td>
+                                        <td 
+                                            th:text="${offsetAndMetadata.commitDate}"
+                                            th:classappend="${!offsetAndMetadata.actualForMinute ? 'warning' : ''}">
+                                        </td>
+                                        <td th:text="${offsetAndMetadata.expireDate}"></td>
+                                        <td>
+                                            <span th:text="${offsetAndMetadata.offset}"></span>
+                                            <span
+                                                th:if="${group.getOffsetRpm(offsetAndMetadata.topicPartition) != null AND group.getOffsetRpm(offsetAndMetadata.topicPartition) > 0}" 
+                                                th:text="${'/' + group.getOffsetRpm(offsetAndMetadata.topicPartition)}"
+                                                th:classappend="text-success">
+                                            </span>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+        
+                </div>
+        
+            </div>
+        
+        </div>
+
+    </div>
+
+    <div th:replace="templates :: footer"></div>
+    
+</body>
+</html>

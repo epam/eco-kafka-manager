@@ -1,0 +1,17 @@
+version: '3.5'
+services:
+
+  kafka-manager:
+    build:
+      context: '../'
+      dockerfile: './ui/Dockerfile'
+    image: 'epam/kafka-manager:latest'
+    hostname: 'kafka-manager'
+    environment:
+      - 'KAFKA_SERVERS_URL=${KAFKA_SERVERS_URL:-}'
+      - 'JAVA_OPTS=${JAVA_OPTS:-}'
+    volumes:
+      - './kafka-manager.properties:/app/config/application.properties'
+    ports:
+      - '8082:8082'
+    restart: 'on-failure'

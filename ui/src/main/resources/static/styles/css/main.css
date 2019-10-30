@@ -1,0 +1,136 @@
+@font-face {
+  font-family: 'Source Sans Pro Regular';
+  src: url(../fonts/font-sourcesanspro/sourcesanspro-regular.eot);
+  src: url(../fonts/font-sourcesanspro/sourcesanspro-regular.eot?#iefix) format('embedded-opentype'), url(../fonts/font-sourcesanspro/sourcesanspro-regular.woff) format('woff'), url(../fonts/font-sourcesanspro/sourcesanspro-regular.ttf) format('truetype'), url(../fonts/font-sourcesanspro/sourcesanspro-regular.svg) format('svg');
+  font-weight: normal;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'Source Sans Pro Light';
+  src: url(../fonts/font-sourcesanspro/sourcesanspro-light.eot);
+  src: url(../fonts/font-sourcesanspro/sourcesanspro-light.eot?#iefix) format('embedded-opentype'), url(../fonts/font-sourcesanspro/sourcesanspro-light.woff) format('woff'), url(../fonts/font-sourcesanspro/sourcesanspro-light.ttf) format('truetype'), url(../fonts/font-sourcesanspro/sourcesanspro-light.svg) format('svg');
+  font-weight: normal;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'Source Sans Pro Bold';
+  src: url(../fonts/font-sourcesanspro/sourcesanspro-bold.eot);
+  src: url(../fonts/font-sourcesanspro/sourcesanspro-bold.eot?#iefix) format('embedded-opentype'), url(../fonts/font-sourcesanspro/sourcesanspro-bold.woff) format('woff'), url(../fonts/font-sourcesanspro/sourcesanspro-bold.ttf) format('truetype'), url(../fonts/font-sourcesanspro/sourcesanspro-bold.svg) format('svg');
+  font-weight: normal;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'Source Sans Pro Semibold';
+  src: url(../fonts/font-sourcesanspro/sourcesanspro-semibold.eot);
+  src: url(../fonts/font-sourcesanspro/sourcesanspro-semibold.eot?#iefix) format('embedded-opentype'), url(../fonts/font-sourcesanspro/sourcesanspro-semibold.woff) format('woff'), url(../fonts/font-sourcesanspro/sourcesanspro-semibold.ttf) format('truetype'), url(../fonts/font-sourcesanspro/sourcesanspro-semibold.svg) format('svg');
+  font-weight: normal;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'Source Sans Pro Italic';
+  src: url(../fonts/font-sourcesanspro/sourcesanspro-it.eot);
+  src: url(../fonts/font-sourcesanspro/sourcesanspro-it.eot?#iefix) format('embedded-opentype'), url(../fonts/font-sourcesanspro/sourcesanspro-it.woff) format('woff'), url(../fonts/font-sourcesanspro/sourcesanspro-it.ttf) format('truetype'), url(../fonts/font-sourcesanspro/sourcesanspro-it.svg) format('svg');
+  font-weight: normal;
+  font-style: normal;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  outline: none;
+}
+
+html {
+  height: 100%;
+  min-width: 320px;
+  -webkit-text-size-adjust: 100%;
+  -moz-text-size-adjust: 100%;
+  -ms-text-size-adjust: 100%;
+  font-size: inherit;
+  font-family: inherit;
+  overflow-y: scroll;
+}
+
+body {
+  height: 100%;
+  padding-right: 0 !important;
+  background: #ffffff;
+  font-family: 'Source Sans Pro Regular', Arial, sans-serif;
+  font-size: 14px;
+  line-height: 18px;
+  color: #333333;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  text-transform: uppercase;
+}
+
+h1 a,
+h2 a,
+h3 a,
+h4 a,
+h5 a,
+h6 a {
+  color: #1a9cb0;
+  text-decoration: none;
+  font-size: inherit;
+}
+
+h1 a:hover,
+h2 a:hover,
+h3 a:hover,
+h4 a:hover,
+h5 a:hover,
+h6 a:hover {
+  color: #1a9cb0;
+  text-decoration: underline;
+  outline: 0;
+}
+
+h1 {
+  margin-top: 0;
+  margin-bottom: 26px;
+  font-family: 'Source Sans Pro Regular', Arial, sans-serif;
+  font-size: 30px;
+  line-height: 36px;
+}
+h2 {
+  margin-top: 0;
+  margin-bottom: 16px;
+  font-family: 'Source Sans Pro Regular', Arial, sans-serif;
+  font-size: 24px;
+  line-height: 30px;
+}
+h3 {
+  margin-top: 0;
+  margin-bottom: 10px;
+  font-family: 'Source Sans Pro Regular', Arial, sans-serif;
+  font-size: 18px;
+  line-height: 24px;
+}
+h4 {
+  margin-top: 0;
+  margin-bottom: 10px;
+  font-family: 'Source Sans Pro Bold', Arial, sans-serif;
+  font-size: 18px;
+  line-height: 24px;
+}
+h5 {
+  margin-top: 0;
+  margin-bottom: 10px;
+  font-family: 'Source Sans Pro Bold', Arial, sans-serif;
+  font-size: 16px;
+  line-height: 22px;
+}
+h6 {
+  margin-top: 0;
+  margin-bottom: 10px;
+  font-family: 'Source Sans Pro Bold', Arial, sans-serif;
+  font-size: 14px;
+  line-height: 20px;
+}

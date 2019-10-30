@@ -1,0 +1,261 @@
+<!--
+ * Copyright 2019 EPAM Systems
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License.  You may obtain a copy
+ * of the License at
+ * 
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ -->
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="templates :: header(~{},~{},~{})">
+</head>
+<body>
+
+    <script type="text/javascript" th:inline="javascript">
+        /*<![CDATA[*/
+        var pageCurrent = [[${(page != null)?(page.number + 1):(0)}]];
+        var totalPagesCurrent = [[${(page != null)?(page.totalPages):(0)}]];
+        /*]]>*/
+        $(function() {
+            $('#search_form').submit(function(e) {
+                e.preventDefault();
+                location.params(
+                        {
+                            resourceType: $('#resourceType').val(),
+                            resourceName: $('#resourceName').val(),
+                            kafkaPrincipal: $('#kafkaPrincipal').val(),
+                            permissionType: $('#permissionType').val(),
+                            operation: $('#operation').val(),
+                            host: $('#host').val(),
+                            description: $('#description').val(),
+                            page: 1
+                        }, 
+                        {}, 
+                        {});
+            });
+            $('#pagination').twbsPagination({
+                startPage: pageCurrent,
+                totalPages: totalPagesCurrent,
+                visiblePages: 11,
+                initiateStartPageClick: false,
+                first:'&lt;&lt;',
+                prev:'&lt;',
+                next:'&gt;',
+                last:'&gt;&gt;',
+                onPageClick: function (e, pageClicked) {
+                    e.preventDefault();
+                    location.params({page: pageClicked}, {}, {});
+                }
+            });
+        });
+        
+    </script>
+    
+
+    <div th:replace="templates :: navbar"></div>
+    
+    <div class="main-content"> 
+
+        <div class="container-fluid">
+
+            <div class="row">
+                <div class="col-md-10 col-md-offset-1">
+                    <h3>Permissions (<span th:text="${totalCount}"></span>)</h3>
+                </div>
+            </div>
+        
+            <div class="row">
+            
+                <div class="col-md-10 col-md-offset-1">
+                
+                    <div class="panel panel-default">
+                        <div class="panel-body">
+                        
+                            <div class="btn-group">
+                                <button 
+                                    class="btn btn-default dropdown-toggle right-icon" 
+                                    type="button" 
+                                    id="exportButton" 
+                                    data-toggle="dropdown" 
+                                    aria-haspopup="true" 
+                                    aria-expanded="true">
+                                    Export <span class="glyphicon glyphicon-export"></span>
+                                </button>
+                                <ul class="dropdown-menu" aria-labelledby="exportButton">
+                                    <li>
+                                        <a 
+                                            th:href="@{/permissions/export(exporterType=PLAIN, resourceType=${searchQuery.resourceType}, resourceName=${searchQuery.resourceName}, kafkaPrincipal=${searchQuery.kafkaPrincipal}, permissionType=${searchQuery.permissionType}, operation=${searchQuery.operation}, host=${searchQuery.host}, description=${searchQuery.description})}" target="_blank">
+                                            Plain
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a 
+                                            th:href="@{/permissions/export(exporterType=JSON, resourceType=${searchQuery.resourceType}, resourceName=${searchQuery.resourceName}, kafkaPrincipal=${searchQuery.kafkaPrincipal}, permissionType=${searchQuery.permissionType}, operation=${searchQuery.operation}, host=${searchQuery.host}, description=${searchQuery.description})}" target="_blank">
+                                            Json
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a 
+                                            th:href="@{/permissions/export(exporterType=CSV, resourceType=${searchQuery.resourceType}, resourceName=${searchQuery.resourceName}, kafkaPrincipal=${searchQuery.kafkaPrincipal}, permissionType=${searchQuery.permissionType}, operation=${searchQuery.operation}, host=${searchQuery.host}, description=${searchQuery.description})}" target="_blank">
+                                            Csv
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a 
+                                            th:href="@{/permissions/export(exporterType=GROUPED_BY_RESOURCE_PLAIN, resourceType=${searchQuery.resourceType}, resourceName=${searchQuery.resourceName}, kafkaPrincipal=${searchQuery.kafkaPrincipal}, permissionType=${searchQuery.permissionType}, operation=${searchQuery.operation}, host=${searchQuery.host}, description=${searchQuery.description})}" target="_blank">
+                                            Grouped By Resource (Plain)
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a 
+                                            th:href="@{/permissions/export(exporterType=GROUPED_BY_RESOURCE_JSON, resourceType=${searchQuery.resourceType}, resourceName=${searchQuery.resourceName}, kafkaPrincipal=${searchQuery.kafkaPrincipal}, permissionType=${searchQuery.permissionType}, operation=${searchQuery.operation}, host=${searchQuery.host}, description=${searchQuery.description})}" target="_blank">
+                                            Grouped By Resource (Json)
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a 
+                                            th:href="@{/permissions/export(exporterType=GROUPED_BY_PRINCIPAL_PLAIN, resourceType=${searchQuery.resourceType}, resourceName=${searchQuery.resourceName}, kafkaPrincipal=${searchQuery.kafkaPrincipal}, permissionType=${searchQuery.permissionType}, operation=${searchQuery.operation}, host=${searchQuery.host}, description=${searchQuery.description})}" target="_blank">
+                                            Grouped By Principal (Plain)
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a 
+                                            th:href="@{/permissions/export(exporterType=GROUPED_BY_PRINCIPAL_JSON, resourceType=${searchQuery.resourceType}, resourceName=${searchQuery.resourceName}, kafkaPrincipal=${searchQuery.kafkaPrincipal}, permissionType=${searchQuery.permissionType}, operation=${searchQuery.operation}, host=${searchQuery.host}, description=${searchQuery.description})}" target="_blank">
+                                            Grouped By Principal (Json)
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                            
+                        </div>
+                    </div>
+                
+                    <form class="form-inline form-flex" id="search_form">
+                        <select class="form-control" id="resourceType">
+                            <option value="">-</option>
+                            <option 
+                                th:each="resourceType : ${T(org.apache.kafka.common.resource.ResourceType).values()}"
+                                th:value="${resourceType}" 
+                                th:text="${resourceType}"
+                                th:selected="${resourceType == searchQuery.resourceType}">
+                            </option>
+                        </select>
+                        <input 
+                            type="text"
+                            class="form-control" 
+                            id="resourceName" 
+                            placeholder="Resource Name"
+                            th:value="${searchQuery.resourceName}"/>
+                        <input 
+                            type="text"
+                            class="form-control"
+                            id="kafkaPrincipal" 
+                            placeholder="Kafka Principal"
+                            th:value="${searchQuery.kafkaPrincipal}"/>
+                        <select class="form-control" id="permissionType">
+                            <option value="">-</option>
+                            <option 
+                                th:each="permissionType : ${T(org.apache.kafka.common.acl.AclPermissionType).values()}"
+                                th:value="${permissionType}" 
+                                th:text="${permissionType}"
+                                th:selected="${permissionType == searchQuery.permissionType}">
+                            </option>
+                        </select>
+                        <select class="form-control" id="operation">
+                            <option value="">-</option>
+                            <option 
+                                th:each="operation : ${T(org.apache.kafka.common.acl.AclOperation).values()}"
+                                th:value="${operation}" 
+                                th:text="${operation}"
+                                th:selected="${operation == searchQuery.operation}">
+                            </option>
+                        </select>
+                        <input 
+                            type="text"
+                            class="form-control"
+                            id="host" 
+                            placeholder="Host"
+                            th:value="${searchQuery.host}"/>
+                        <input 
+                            type="text"
+                            class="form-control"
+                            id="description" 
+                            placeholder="Description"
+                            th:value="${searchQuery.description}"/>
+                        <button 
+                            type="submit"
+                            class="btn btn-primary">
+                            Find
+                        </button>
+                    </form>
+                </div>
+            
+            </div>
+            
+            <div class="row">
+        
+                <div class="col-md-10 col-md-offset-1">
+                
+                    <div th:if="${page != null}">
+                        <table class="table table-bordered table-striped table-hover">
+                            <thead>
+                                <tr>
+                                    <td>Resource Type</td>
+                                    <td>Resource Name</td>
+                                    <td>Kafka Principal</td>
+                                    <td>Permission Type</td>
+                                    <td>Operation</td>
+                                    <td>Host</td>
+                                    <td>Description</td>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="permission : ${page.content}">
+                                    <td th:text="${permission.resourceType}"></td>
+                                    <td>
+                                        <a 
+                                            th:href="@{/permissions/resource(resourceType=${permission.resourceType}, resourceName=${permission.resourceName}, kafkaPrincipal=${permission.kafkaPrincipal})}">
+                                            <span th:text="${permission.resourceName}"></span>
+                                        </a>
+                                    </td>
+                                    <td th:text="${permission.kafkaPrincipal}"></td>
+                                    <td th:text="${permission.permissionType}"></td>
+                                    <td th:text="${permission.operation}"></td>
+                                    <td th:text="${permission.host}"></td>
+                                    <td 
+                                        th:text="${permission.metadataDescription}" 
+                                        style="word-wrap:break-word;max-width:150px">
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        
+                        <div
+                            th:if="${page.numberOfElements > 0}" 
+                            th:text="${'Showing ' + (page.number * page.size + 1) + ' to ' + (page.number * page.size + page.numberOfElements) + ' of ' + page.totalElements}">
+                        </div>
+                        
+                        <ul id="pagination" class="pagination pagination-sm"></ul>
+        
+                    </div>
+        
+                </div>
+        
+            </div>
+        
+        </div>
+
+    </div>
+
+    <div th:replace="templates :: footer"></div>
+
+</body>
+</html>

@@ -1,0 +1,74 @@
+@import "../components/header/header.css";
+@import "../components/header/header-menu.css";
+@import "../components/header/header-menu-item.css";
+@import "../components/footer/footer.css";
+
+@import "./css/main.css";
+
+body {
+  display: flex;
+  min-height: 100vh;
+  flex-direction: column;
+}
+
+.main-content {
+  flex: 1;
+  padding: 10px 0;
+}
+
+.transparent-btn {
+  background-color: Transparent;
+  background-repeat: no-repeat;
+  border: none;
+  cursor: pointer;
+  overflow: hidden;
+  outline: none;
+}
+
+.form-flex {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-start;
+  margin-bottom: 20px;
+}
+
+.form-flex > * {
+  flex: 1;
+  margin: 2px !important;
+}
+
+.form-flex > button {
+  flex: 0;
+  flex-basis: 160px;
+}
+
+.panel-flex {
+  display: flex;
+  justify-content: flex-start;
+  flex-wrap: wrap;
+}
+
+.panel-flex > .to-right {
+  margin-left: auto;
+}
+
+.panel-flex > * {
+  margin: 0 4px;
+}
+
+.table-hover tbody tr:hover td {
+  background-color: #E0E0E0;
+}
+
+.popover {
+  max-width: 50%;
+  white-space: pre-wrap;
+}
+
+.sticky-col {
+  position: sticky;
+  top: -1px;
+  background-color: lightgrey;
+  z-index: 10;
+}

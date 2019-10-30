@@ -1,0 +1,411 @@
+<!--
+ * Copyright 2019 EPAM Systems
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License.  You may obtain a copy
+ * of the License at
+ * 
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ -->
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="templates :: header(~{},~{},~{})">
+</head>
+<body>
+
+    <script type="text/javascript" th:inline="javascript">
+        $(function() {
+            
+            $('.delete-udm-link').click(function(e) {
+                e.preventDefault();
+                var action = $(this).data("action");
+                $('#delete-udm-form').prop('action', action);
+                $('#delete-udm-form').submit();
+            });
+            
+            $('[data-toggle="popover"]').popover();
+            
+            $(document).on('click', function (e) {
+                hidePopoverIfClickedOutside(e);
+            });
+            
+        });
+    </script>
+
+    <div th:replace="templates :: navbar"></div>
+    
+    <div class="main-content">
+    
+        <div class="container-fluid">
+
+            <div class="row">
+        
+                <div class="col-md-10 col-md-offset-1">
+                
+                    <div class="panel panel-default">
+                        <div class="panel-body panel-flex">
+                            <a 
+                                th:href="@{/topics}" 
+                                class="btn btn-primary right-icon">
+                                Back To Topics <i class="fa fa-arrow-left"></i>
+                            </a>
+
+                            <a 
+                                th:href="@{/topics/{name}/config(name=${topic.name})}"
+                                class="btn btn-primary right-icon">
+                                Update Config <i class="fa fa-pencil"></i>
+                            </a>
+                            <a 
+                                th:href="@{/topics/{name}/partitions(name=${topic.name})}"
+                                class="btn btn-primary right-icon">
+                                Add Partitions <i class="fa fa-plus"></i>
+                            </a>
+                            <a
+                                th:href="@{/topics/{name}/browser(name=${topic.name})}"
+                                class="btn btn-primary right-icon">
+                                Browse Data <i class="fa fa-search"></i>
+                            </a>
+                            <a 
+                                th:href="@{/topics/{name}/metadata(name=${topic.name})}"
+                                class="btn btn-primary right-icon">
+                                Edit Metadata <i class="fa fa-tags"></i>
+                            </a>
+                            <button 
+                                type="button"
+                                class="to-right btn btn-danger right-icon"
+                                data-toggle="modal" 
+                                data-target="#purge-confirm"
+                                th:disabled="${topic.purgeTaskRunning}">
+                                Purge <i class="fa fa-eraser"></i>
+                            </button>
+                            <div id="purge-confirm" class="modal fade" role="dialog">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <button type="button" class="close" data-dismiss="modal">&times;</button>
+                                            <h4 class="modal-title">Confirm Topic Purge</h4>
+                                        </div>
+                                        <div class="modal-body">
+                                            <p>
+                                                The process may take quite a long time (depends configured LogCleaner check interval) and there is no guarantee that data is 
+                                                completely deleted!
+                                            </p>
+                                            <p class="alert alert-danger">
+                                                <span class="glyphicon glyphicon-warning-sign"></span> The retention-related configuration of the topic is going to be changed 
+                                                to make records expire in the minimum possible period of time and then restored to the original state. If the process fails in 
+                                                the middle and doesn't manage to restore original configuration, you should <b>run "Purge" process again</b> to fix this.
+                                            </p>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <form 
+                                                th:action="@{/topics/{name}/purger(name=${topic.name})}"
+                                                method="post">
+                                                <button 
+                                                    type="button" 
+                                                    class="btn btn-primary" 
+                                                    data-dismiss="modal">
+                                                    Cancel
+                                                </button>
+                                                <button 
+                                                    type="submit" 
+                                                    class="btn btn-danger">
+                                                    Purge
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <button 
+                                type="button"
+                                class="btn btn-danger right-icon"
+                                data-toggle="modal"
+                                data-target="#delete-confirm">
+                                Delete <i class="fa fa-trash"></i>
+                            </button>
+                            <div id="delete-confirm" class="modal fade" role="dialog">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <button type="button" class="close" data-dismiss="modal">&times;</button>
+                                            <h4 class="modal-title">Confirm Topic Delete</h4>
+                                        </div>
+                                        <div class="modal-body">
+                                            <p>
+                                                Are you sure you want to delete the topic?
+                                            </p>
+                                            <p class="alert alert-danger">
+                                                <span class="glyphicon glyphicon-warning-sign"></span> It could not be restored
+                                            </p>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <form 
+                                                th:action="@{/topics/{name}/delete(name=${topic.name})}"
+                                                method="post">
+                                                <button 
+                                                    type="button" 
+                                                    class="btn btn-primary" 
+                                                    data-dismiss="modal">
+                                                    Cancel
+                                                </button>
+                                                <button 
+                                                    type="submit" 
+                                                    class="btn btn-danger">
+                                                    Delete
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                
+                    <div class="panel panel-default">
+                        <div class="panel-heading">Topic</div>
+                        <div class="panel-body">
+                            <p>
+                                <b>Name:</b>
+                                <span th:text="${topic.name}"></span>
+                            </p>
+                            <p>
+                                <b>Description:</b>
+                                <span 
+                                    th:text="${topic.metadataDescription}" 
+                                    style="white-space:pre-wrap;"></span>
+                            </p>
+                            <p>
+                                <b>Partition Count:</b>
+                                <span th:text="${topic.partitionCount}"></span>
+                            </p>
+                            <p>
+                                <b>Replication Factor:</b>
+                                <span th:text="${topic.replicationFactor}"></span>
+                            </p>
+                            <p>
+                                <b>Number Of Records:</b>
+                                <a
+                                        class="btn btn-success"
+                                        th:href="@{/topics/{name}/record_counter(name=${topic.name})}"
+                                        th:title="${topic.countRecordsTaskResultAsString}"
+                                        th:classappend="${topic.countRecordsTaskRunning} ? 'disable' : ''">
+                                    <span th:text="${topic.countRecordsTaskResultValueAsString}"></span> <span class="glyphicon glyphicon-refresh"></span>
+                                </a>
+                            </p>
+                            <p>
+                                <b style="float:left;clear:left;">Consumer Groups:</b>
+                                <th:block th:each="group : ${topic.getConsumerGroupNamesAsCollapsedCol(-1)}">
+                                    <a th:href="@{/consumer_groups/{name}(name=${group.value})}">
+                                        <span th:text="${group.value}" style="float:left;clear:left;"></span>
+                                    </a>
+                                </th:block>
+                            </p>
+                            <p style="clear:both;float:none;"></p>
+                            <p>
+                                <b style="float:left;clear:left;">Transactions:</b>
+                                <th:block th:each="transaction : ${topic.getTransactionalIdsAsCollapsedCol(-1)}">
+                                    <a th:href="@{/transactions/{id}(id=${transaction.value})}">
+                                        <span th:text="${transaction.value}" style="float:left;clear:left;"></span>
+                                    </a>
+                                </th:block>
+                            </p>
+                            
+                        </div>
+                    </div>
+        
+                    <div class="panel panel-default">
+                        <div class="panel-heading">User-Defined Metrics</div>
+                        <div class="panel-body">
+                            
+                            <div class="btn-group">
+                                <button
+                                    type="button" 
+                                    class="btn dropdown-toggle" 
+                                    th:classappend="${topicOffsetIncreaseUdm != null ? 'btn-success' : 'btn-default'}"
+                                    data-toggle="dropdown" 
+                                    aria-haspopup="true" 
+                                    aria-expanded="false"
+                                    th:title="${topicOffsetIncreaseUdmName}">
+                                    <span th:text="${topicOffsetIncreaseUdmType}"></span> <span class="caret"></span>
+                                </button>
+                                <ul class="dropdown-menu">
+                                    <li>
+                                        <a th:href="@{/udmetrics/topic_offset_increase/{name}(name=${topic.name})}">
+                                            <span class="glyphicon glyphicon-edit"></span> <span th:text="${topicOffsetIncreaseUdm != null ? 'Edit' : 'Create'}"></span>
+                                        </a>
+                                    </li>
+                                    <li th:if="${topicOffsetIncreaseUdm != null}">
+                                        <a class="delete-udm-link" href="#" th:attr="data-action=${topicOffsetIncreaseUdm.url}">
+                                            <span class="glyphicon glyphicon-remove"></span> Delete
+                                        </a>
+                                    </li>
+                                </ul>
+                                <form id="delete-udm-form" method="post">
+                                    <input type="hidden" name="_method" value="delete"/>
+                                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+                                </form>
+                            </div>
+                            
+                        </div>
+                    </div>
+                    
+                    <div class="panel panel-default">
+                        <div class="panel-heading">Partitions</div>
+                        <div class="panel-body">
+                            <table th:if="${!topic.partitions.isEmpty()}" class="table table-bordered table-striped table-hover">
+                                <thead>
+                                    <tr>
+                                        <td>Id</td>
+                                        <td>Replicas</td>
+                                        <td title="In-Sync Replicas">ISR</td>
+                                        <td>Leader</td>
+                                        <td title="Offsets / Rate Per Minute">Offsets / RPM</td>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr th:each="partition : ${topic.partitions.values()}">
+                                        <td th:text="${partition.id}"></td>
+                                        <td th:classappend="${partition.underReplicated} ? 'warning' : ''">
+                                            <th:block th:each="brokerId,iter : ${partition.replicas}">
+                                                <span th:if="${iter.index &gt; 0}" th:text="${', '}"></span>
+                                                <a th:href="@{/brokers/{id}(id=${brokerId})}">
+                                                    <span th:text="${brokerId}"></span>
+                                                </a>
+                                            </th:block>
+                                        </td>
+                                        <td th:classappend="${partition.underReplicated} ? 'warning' : ''">
+                                            <th:block th:each="brokerId,iter : ${partition.isr}">
+                                                <span th:if="${iter.index &gt; 0}" th:text="${', '}"></span>
+                                                <a th:href="@{/brokers/{id}(id=${brokerId})}">
+                                                    <span th:text="${brokerId}"></span>
+                                                </a>
+                                            </th:block>
+                                        </td>
+                                        <td>
+                                            <a th:if="${partition.leader != null}"
+                                            th:href="@{/brokers/{id}(id=${partition.leader})}"><span
+                                                    th:text="${partition.leader}"></span></a>
+                                        </td>
+                                        <td>
+                                            <span th:text="${topic.getPartitionOffsets(partition.id)}"></span>
+                                            <span
+                                                th:if="${topic.getOffsetRpm(partition.id) != null AND topic.getOffsetRpm(partition.id) > 0}" 
+                                                th:text="${'/' + topic.getOffsetRpm(partition.id)}"
+                                                th:classappend="text-success">
+                                            </span>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    
+                    <div class="panel panel-default">
+                        <div class="panel-heading">Consumer Group(s) Offsets</div>
+                        <div class="panel-body">
+                            <div th:with="offsets=${topic.consumerGroupOffsets}">
+                                
+                                <div th:if="${offsets.isEmpty()}" class="alert alert-warning">
+                                    Consumer group(s) have no commited offsets for this topic.   
+                                </div>
+                                
+                                <table th:if="${!offsets.isEmpty()}" class="table table-bordered table-striped table-hover">
+                                    <thead>
+                                        <tr>
+                                            <td>Consumer Group</td>
+                                            <td>Partition</td>
+                                            <td title="Topic Offsets / Rate Per Minute">Topic Offsets / RPM</td>
+                                            <td title="Consumer Offset / Rate Per Minute">Consumer Offset / RPM</td>
+                                            <td>Consumer Commit Date</td>
+                                            <td>Lag</td>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr th:each="offset : ${offsets}">
+                                            <td>
+                                                <a th:href="@{/consumer_groups/{name}(name=${offset.groupName})}">
+                                                    <span th:text="${offset.groupName}"></span>
+                                                </a>
+                                            </td>
+                                            <td th:text="${offset.partition}"></td>
+                                            <td>
+                                                <span th:text="${offset.topicOffsets}"></span>
+                                                <span
+                                                    th:if="${offset.topicOffsetRpm != null AND offset.topicOffsetRpm > 0}" 
+                                                    th:text="${'/' + offset.topicOffsetRpm}"
+                                                    th:classappend="text-success">
+                                                </span>
+                                            </td>
+                                            <td>
+                                                <span th:text="${offset.consumerOffset}"></span>
+                                                <span
+                                                    th:if="${offset.consumerOffsetRpm != null AND offset.consumerOffsetRpm > 0}" 
+                                                    th:text="${'/' + offset.consumerOffsetRpm}"
+                                                    th:classappend="text-success">
+                                                </span>
+                                            </td>
+                                            <td 
+                                                th:text="${offset.consumerCommitDate}"
+                                                th:classappend="${!offset.consumerOffsetActualForMinute ? 'warning' : ''}">
+                                            </td>
+                                            <td th:classappend="${offset.lag == null ? 'warning' : ''}">
+                                                <span th:if="${offset.lag != null}" th:text="${offset.lag}"></span>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="panel panel-default">
+                        <div class="panel-heading">Configs</div>
+                        <div class="panel-body">
+                            <table class="table table-bordered table-striped table-hover">
+                                <thead>
+                                    <tr>
+                                        <td>Name</td>
+                                        <td>Value</td>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr 
+                                        th:each="config : ${topic.configValues}"
+                                        th:classappend="${!config.default} ? 'info' : ''">
+                                        <td>
+                                            <span th:text="${config.name}"></span>
+                                            <a 
+                                                href="javascript:void(0);"
+                                                data-toggle="popover"
+                                                data-html="true"
+                                                th:attr="data-content=${configDef.doc(config.name)}">
+                                                <span class="glyphicon glyphicon-info-sign"></span>
+                                            </a>
+                                        </td>
+                                        <td th:text="${!config.sensitive ? config.value : '**********'}">
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                
+                </div>
+        
+            </div>
+        
+        </div>
+
+    </div>
+
+    <div th:replace="templates :: footer"></div>
+        
+</body>
+</html>

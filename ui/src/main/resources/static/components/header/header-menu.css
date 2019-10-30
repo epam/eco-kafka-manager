@@ -1,0 +1,73 @@
+.menu {
+    position: relative;
+    background-color: #464547;    
+}
+
+.menu.user-menu {
+    margin-left: auto;
+}
+
+.menu-name {
+    font-size: 16px;
+    font-weight: 400;
+    color: white;
+    font-family: 'Source Sans Pro Regular';
+}
+
+.menu > button {
+    display: flex;
+    padding: 0 10px;
+    justify-content: center;
+    align-items: center;
+    height: 48px;
+    box-sizing: border-box;
+}
+
+.menu:hover {
+    background-color: #333333;
+}
+
+.menu > button.active {
+    background-color: #333333;
+}
+
+.menu > button.active .arrow i {
+    transform: rotate(180deg);
+}
+
+.menu > button .arrow {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    margin: 0 3px;
+}
+
+.menu > button .arrow i {
+    transition: transform 0.3s;
+}
+
+.menu-items {
+    display: none;
+    position: absolute;
+    left: 0;
+    z-index: 1000;
+}
+
+.menu-items.active {
+  display: block;
+}
+
+.menu-items.fadeIn {
+    animation: fadeIn 0.2s ease-in;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}

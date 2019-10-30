@@ -1,0 +1,148 @@
+<!--
+ * Copyright 2019 EPAM Systems
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License.  You may obtain a copy
+ * of the License at
+ * 
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ -->
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="templates :: header(~{},~{},~{})">
+</head>
+<body>
+
+    <script type="text/javascript" th:inline="javascript">
+        $(function() {
+            
+            $('#clear-all-configs-link').click(function(e) {
+                e.preventDefault();
+                $('.config-textbox').each(function(idx, elem) {
+                    $(this).val('');
+                });
+            });
+
+            $('[data-toggle="popover"]').popover();
+            
+            $(document).on('click', function (e) {
+                hidePopoverIfClickedOutside(e);
+            });
+            
+        });
+    </script>
+
+    <div th:replace="templates :: navbar"></div>
+    
+    <div class="main-content">    
+    
+        <div class="container-fluid">
+
+            <div class="row">
+        
+                <div class="col-md-10 col-md-offset-1">
+
+                    <div class="panel panel-default">
+                        <div class="panel-body">
+                            <a
+                                    th:href="@{/topics/{name}(name=${topic.name})}"
+                                    class="btn btn-primary right-icon">
+                                Back To Topic <i class="fa fa-arrow-left"></i>
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <form 
+                        th:action="@{/topics/{name}/config(name=${topic.name})}" 
+                        method="post">
+                        
+                        <div class="panel panel-default">
+                            <div class="panel-heading">Topic</div>
+                            <div class="panel-body">
+                            
+                                <div class="form-group">
+                                    <label for="name">Name</label>
+                                    <input 
+                                        type="text" 
+                                        class="form-control" 
+                                        id="topicName" 
+                                        name="topicName"
+                                        readonly="readonly"
+                                        th:value="${topic.name}"/>
+                                </div>
+                                
+                            </div>
+                        </div>
+                        
+                        <div class="panel panel-default">
+                            <div class="panel-heading">Configs</div>
+                            <div class="panel-body">
+                            
+                                <a id="clear-all-configs-link" href="#" class="btn btn-default transparent right-icon small">
+                                    Clear All <i class="fa fa-remove"></i>
+                                </a>
+                            
+                                <table class="table table-bordered table-striped table-hover">
+                                    <thead>
+                                        <tr>
+                                            <td>Name</td>
+                                            <td>Value</td>
+                                            <td>Default</td>
+                                            <td>Valid Values</td>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr 
+                                            th:each="config : ${configDef.keys()}"
+                                            th:with="value=${topic.configOverrides.get(config.name)}"
+                                            th:classappend="${value != null} ? 'info' : ''">
+                                            <td>
+                                                <span th:text="${config.name}"></span>
+                                                <a 
+                                                    href="javascript:void(0);"
+                                                    data-toggle="popover"
+                                                    data-html="true"
+                                                    th:attr="data-content=${config.documentation}">
+                                                    <span class="glyphicon glyphicon-info-sign"></span>
+                                                </a>
+                                            </td>
+                                            <td>
+                                                <input 
+                                                    type="text" 
+                                                    class="form-control config-textbox"
+                                                    th:readonly="${config.internalConfig}"
+                                                    th:name="${config.name}"
+                                                    th:value="${value}"/>
+                                            </td>
+                                            <td th:text="${config.defaultValue}">
+                                            </td>
+                                            <td th:text="${config.validator}">
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary">Update</button>
+                                
+                    </form>
+                
+                </div>
+        
+            </div>
+        
+        </div>
+
+    </div>
+
+    <div th:replace="templates :: footer"></div>
+    
+</body>
+</html>

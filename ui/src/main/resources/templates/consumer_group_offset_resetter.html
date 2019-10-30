@@ -1,0 +1,178 @@
+<!--
+ * Copyright 2019 EPAM Systems
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License.  You may obtain a copy
+ * of the License at
+ * 
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ -->
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="templates :: header(~{},~{},~{})">
+</head>
+<body>
+
+    <script type="text/javascript" th:inline="javascript">
+    
+        $(function() {
+            
+            $('.partition-checkbox').change(function () {
+                var partitionElemId = $(this).data("partition-elem-id");
+                var enabled = $(this).is(":checked");
+                $("#pe_" + partitionElemId).val(enabled ? "1" : "0");
+                $("#p_" + partitionElemId).prop("disabled", !enabled);
+            });
+
+            $('#all-partitions-link').click(function(e) {
+                e.preventDefault();
+                $('.partition-checkbox').each(function(idx, elem) {
+                    $(elem).prop('checked', true);
+                    $(elem).trigger('change');
+                });
+            });
+            
+            $('#none-partitions-link').click(function(e) {
+                e.preventDefault();
+                $('.partition-checkbox').each(function(idx, elem) {
+                    $(elem).prop('checked', false);
+                    $(elem).trigger('change');
+                });
+            });
+
+            $('#smallest-partitions-link').click(function(e) {
+                e.preventDefault();
+                $('.partition-checkbox').each(function(idx, elem) {
+                    var partitionElemId = $(this).data("partition-elem-id");
+                    var offset = $(this).data("offset-smallest");
+                    $("#p_" + partitionElemId).val(offset);
+                });
+            });
+
+            $('#largest-partitions-link').click(function(e) {
+                e.preventDefault();
+                $('.partition-checkbox').each(function(idx, elem) {
+                    var partitionElemId = $(this).data("partition-elem-id");
+                    var offset = $(this).data("offset-largest");
+                    $("#p_" + partitionElemId).val(offset);
+                });
+            });
+            
+        });
+       
+    </script>
+    
+    <div th:replace="templates :: navbar"></div>
+
+    <div class="main-content">
+
+        <div class="container-fluid">
+
+            <div class="row">
+        
+                <div class="col-md-10 col-md-offset-1">
+                
+                    <div class="panel panel-default">
+                        <div class="panel-body">
+                            <a
+                                    th:href="@{/consumer_groups/{name}(name=${resetParams.groupName})}"
+                                    class="btn btn-primary right-icon">
+                                Back To Consumer Group <span class="glyphicon glyphicon-arrow-left"></span>
+                            </a>
+                        </div>
+                    </div>
+        
+                    <div class="panel panel-default">
+                        <div class="panel-heading">Reset Params</div>
+                        <div class="panel-body">
+                        
+                            <div th:if="${!group.members.isEmpty()}" class="alert alert-warning">
+                                Consumer group has <b><span th:text="${group.members.size()}"></span></b> active member(s), so resetting offsets might fail and lead to unexpected results!   
+                            </div>
+        
+                            <div th:if="${succeed != null AND succeed}" class="alert alert-success">
+                                Offsets have been successfully reset! <br/> Please note, that it might take some time to reflect actual offsets on UI.
+                            </div>
+        
+                            <form 
+                                id="reset-form"
+                                th:action="@{/consumer_groups/{name}/offset_resetter(name=${resetParams.groupName})}"
+                                method="post">
+                            
+                                <div class="form-group">
+                                    <label for="groupName">Consumer Group</label>
+                                    <input type="text" class="form-control" id="groupName" name="groupName" th:value="${resetParams.groupName}" readonly="readonly"/>
+                                </div>
+                                
+                                <a id="all-partitions-link" href="#" class="btn btn-default transparent right-icon">
+                                    All <span class="glyphicon glyphicon-ok-circle"></span>
+                                </a>
+                                <a id="none-partitions-link" href="#" class="btn btn-default transparent right-icon">
+                                    None <span class="glyphicon glyphicon-ban-circle"></span>
+                                </a>
+                                <a id="smallest-partitions-link" href="#" class="btn btn-default transparent right-icon">
+                                    Smallest <span class="glyphicon glyphicon-arrow-down"></span>
+                                </a>
+                                <a id="largest-partitions-link" href="#" class="btn btn-default transparent right-icon">
+                                    Largest <span class="glyphicon glyphicon-arrow-up"></span>
+                                </a>
+                                <div class="row" th:each="batch, batchIterator : ${resetParams.listPartitionBatches(3)}">
+                                    <th:block 
+                                        th:each="partition, partitionIterator : ${batch}" 
+                                        th:with="partitionElemId=${'' + batchIterator.index + partitionIterator.index},enabled=${resetParams.isPartitionEnabled(partition)},offset=${resetParams.getPartitionOffset(partition)},range=${resettableRanges.get(partition)}">
+                                        <div class="form-group col col-md-4">
+                                            <label th:for="${'p_' + partitionElemId}" th:text="${partition}"></label>
+                                            <div class="input-group">
+                                                <span class="input-group-addon">
+                                                    <input 
+                                                        type="checkbox" 
+                                                        class="partition-checkbox" 
+                                                        th:attr="data-partition-elem-id=${partitionElemId},data-offset-smallest=${range.smallest},data-offset-largest=${range.largest}" 
+                                                        th:checked="${enabled}"/>
+                                                </span>
+                                                <span class="input-group-addon" th:text="${range.smallest}"></span>
+                                                <input 
+                                                    type="number"
+                                                    class="form-control"
+                                                    th:min="${range.smallest}"
+                                                    th:max="${range.largest}"
+                                                    th:disabled="${!enabled}" 
+                                                    th:id="${'p_' + partitionElemId}" 
+                                                    th:name="${'p_' + partition}" 
+                                                    th:value="${offset}"/>
+                                                <span class="input-group-addon" th:text="${range.largest}"></span>
+                                                <input 
+                                                    type="hidden" 
+                                                    th:id="${'pe_' + partitionElemId}" 
+                                                    th:name="${'pe_' + partition}" 
+                                                    th:value="${enabled ? '1' : '0'}"/>
+                                            </div>
+                                        </div>
+                                    </th:block>
+                                </div>
+        
+                                <button type="submit" class="btn btn-danger">Reset</button>
+                                
+                            </form>
+                        
+                        </div>
+                    </div>
+        
+                </div>
+        
+            </div>
+        
+        </div>
+
+    </div>
+    
+    <div th:replace="templates :: footer"></div>
+    
+</body>
+</html>
