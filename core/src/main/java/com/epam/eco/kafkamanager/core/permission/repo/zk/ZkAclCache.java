@@ -16,7 +16,6 @@
 package com.epam.eco.kafkamanager.core.permission.repo.zk;
 
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -36,6 +35,7 @@ import org.apache.curator.framework.recipes.cache.TreeCache;
 import org.apache.curator.framework.recipes.cache.TreeCacheEvent;
 import org.apache.curator.framework.recipes.cache.TreeCacheEvent.Type;
 import org.apache.curator.utils.ZKPaths;
+import org.apache.kafka.common.resource.PatternType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -46,7 +46,7 @@ import com.epam.eco.kafkamanager.core.utils.ZKPathUtils;
 
 import kafka.security.auth.Acl;
 import kafka.security.auth.Resource;
-import kafka.security.auth.SimpleAclAuthorizer;
+import kafka.zk.LiteralAclStore;
 
 /**
  * @author Andrei_Tytsik
@@ -55,7 +55,7 @@ class ZkAclCache {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ZkAclCache.class);
 
-    private static final String ACL_PATH = SimpleAclAuthorizer.AclZkPath();
+    private static final String ACL_PATH = LiteralAclStore.aclPath();
 
     private static final String RESOURCE_REGEX = ACL_PATH + "/[^/]+/[^/]+";
     private static final Pattern RESOURCE_PATTERN = Pattern.compile("^" + RESOURCE_REGEX + "$");
@@ -198,8 +198,7 @@ class ZkAclCache {
     }
 
     private ACL toAcl(Resource resource, ChildData childData) {
-        String aclsInfoString = new String(childData.getData(), StandardCharsets.UTF_8);
-        Set<Acl> acls = ScalaConversions.asJavaSet(Acl.fromJson(aclsInfoString));
+        Set<Acl> acls = ScalaConversions.asJavaSet(Acl.fromBytes(childData.getData()));
         return new ACL(resource, acls);
     }
 
@@ -258,7 +257,7 @@ class ZkAclCache {
 
         public ACL copyOf() {
             return new ACL(
-                    new Resource(resource.resourceType(), resource.name()),
+                    new Resource(resource.resourceType(), resource.name(), PatternType.LITERAL),
                     new HashSet<>(permissions));
         }
 

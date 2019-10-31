@@ -27,6 +27,7 @@ import javax.annotation.PostConstruct;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.Validate;
 import org.apache.kafka.common.acl.AclOperation;
+import org.apache.kafka.common.resource.PatternType;
 import org.apache.kafka.common.security.auth.KafkaPrincipal;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -148,7 +149,7 @@ public class KafkaAuthorizer implements Authorizer {
             return null;
         }
 
-        return Resource.apply(resourceType, resourceName);
+        return Resource.apply(resourceType, resourceName, PatternType.LITERAL);
     }
 
     private static ResourceType toResourceType(EntityType entityType) {

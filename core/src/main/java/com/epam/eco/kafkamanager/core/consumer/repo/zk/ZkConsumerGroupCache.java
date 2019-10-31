@@ -44,7 +44,7 @@ import com.epam.eco.kafkamanager.core.utils.CuratorUtils;
 import com.epam.eco.kafkamanager.core.utils.InitWaitingTreeCacheStarter;
 import com.epam.eco.kafkamanager.core.utils.ZKPathUtils;
 
-import kafka.utils.ZkUtils;
+import kafka.zk.ConsumerPathZNode;
 
 /**
  * @author Andrei_Tytsik
@@ -53,7 +53,7 @@ class ZkConsumerGroupCache {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ZkConsumerGroupCache.class);
 
-    private static final String CONSUMERS_PATH = ZkUtils.ConsumersPath();
+    private static final String CONSUMERS_PATH = ConsumerPathZNode.path();
 
     private static final String CONSUMER_REGEX = CONSUMERS_PATH + "/[^/]+";
     private static final Pattern CONSUMER_PATTERN = Pattern.compile("^" + CONSUMER_REGEX + "$");

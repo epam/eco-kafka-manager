@@ -28,6 +28,9 @@ import org.apache.kafka.common.acl.AclBinding;
 import org.apache.kafka.common.acl.AclBindingFilter;
 import org.apache.kafka.common.acl.AclOperation;
 import org.apache.kafka.common.acl.AclPermissionType;
+import org.apache.kafka.common.resource.PatternType;
+import org.apache.kafka.common.resource.ResourcePattern;
+import org.apache.kafka.common.resource.ResourcePatternFilter;
 import org.apache.kafka.common.resource.ResourceType;
 
 import com.epam.eco.commons.kafka.AdminClientUtils;
@@ -65,7 +68,10 @@ public class ZkTestDataCreator {
                         HOST,
                         operation,
                         AclPermissionType.ALLOW);
-                bindings.add(new AclBinding(resource, entry));
+                bindings.add(
+                        new AclBinding(
+                                new ResourcePattern(resource.resourceType(), resource.name(), PatternType.LITERAL),
+                                entry));
             }
         }
 
@@ -94,7 +100,7 @@ public class ZkTestDataCreator {
     private static void delete() throws Exception {
         List<AclBindingFilter> bindings = new ArrayList<>();
         for (String topic : TOPICS) {
-            org.apache.kafka.common.resource.ResourceFilter resource =
+            org.apache.kafka.common.resource.ResourceFilter resourceFilter =
                     new org.apache.kafka.common.resource.ResourceFilter(ResourceType.TOPIC, topic);
             for (AclOperation operation : OPERATIONS) {
                 AccessControlEntryFilter entry = new AccessControlEntryFilter(
@@ -102,7 +108,13 @@ public class ZkTestDataCreator {
                         HOST,
                         operation,
                         AclPermissionType.ALLOW);
-                bindings.add(new AclBindingFilter(resource, entry));
+                bindings.add(
+                        new AclBindingFilter(
+                                new ResourcePatternFilter(
+                                        resourceFilter.resourceType(),
+                                        resourceFilter.name(),
+                                        PatternType.LITERAL),
+                                entry));
             }
         }
 

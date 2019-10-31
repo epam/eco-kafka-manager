@@ -45,7 +45,7 @@ import com.epam.eco.kafkamanager.core.utils.CuratorUtils;
 import com.epam.eco.kafkamanager.utils.MapperUtils;
 
 import kafka.server.ConfigType;
-import kafka.utils.ZkUtils;
+import kafka.zk.ConfigEntityTypeZNode;
 
 /**
  * @author Andrei_Tytsik
@@ -54,7 +54,7 @@ class ZkTopicConfigCache {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ZkTopicConfigCache.class);
 
-    private static final String CONFIGS_PATH = ZkUtils.getEntityConfigRootPath(ConfigType.Topic());
+    private static final String CONFIGS_PATH = ConfigEntityTypeZNode.path(ConfigType.Topic());
 
     private static final String VERSION = "version";
     private static final String CONFIG = "config";

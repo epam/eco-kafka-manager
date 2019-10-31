@@ -32,7 +32,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import com.epam.eco.commons.kafka.ZkCaller;
 import com.epam.eco.kafkamanager.ConsumerGroupInfo;
 import com.epam.eco.kafkamanager.ConsumerGroupInfo.StorageType;
 import com.epam.eco.kafkamanager.ConsumerGroupMetadataKey;
@@ -40,7 +39,6 @@ import com.epam.eco.kafkamanager.ConsumerGroupRepo;
 import com.epam.eco.kafkamanager.ConsumerGroupSearchQuery;
 import com.epam.eco.kafkamanager.ConsumerInfo;
 import com.epam.eco.kafkamanager.EntityType;
-import com.epam.eco.kafkamanager.KafkaAdminOperations;
 import com.epam.eco.kafkamanager.Metadata;
 import com.epam.eco.kafkamanager.MetadataKey;
 import com.epam.eco.kafkamanager.MetadataRepo;
@@ -52,8 +50,6 @@ import com.epam.eco.kafkamanager.core.spring.AsyncStartingBean;
 import com.epam.eco.kafkamanager.repo.AbstractKeyValueRepo;
 import com.epam.eco.kafkamanager.repo.CachedRepo;
 
-import kafka.admin.AdminUtils;
-
 /**
  * @author Andrei_Tytsik
  */
@@ -61,8 +57,6 @@ public class ZkConsumerGroupRepo extends AbstractKeyValueRepo<String, ConsumerGr
 
     private final static Logger LOGGER = LoggerFactory.getLogger(ZkConsumerGroupRepo.class);
 
-    @Autowired
-    private KafkaAdminOperations adminOperations;
     @Autowired
     private MetadataRepo metadataRepo;
     @Autowired
@@ -177,17 +171,7 @@ public class ZkConsumerGroupRepo extends AbstractKeyValueRepo<String, ConsumerGr
 
     @Override
     public ConsumerGroupInfo unassignGroupFromTopic(String groupName, String topicName) {
-        Validate.notBlank(groupName, "Group name can't be blank");
-        Validate.notBlank(topicName, "Topic name can't be blank");
-
-        ZkCaller.call(
-                adminOperations.getZkConnect(),
-                (zkUtils) -> {
-                    AdminUtils.deleteConsumerGroupInfoForTopicInZK(zkUtils, groupName, topicName);
-                    return null;
-                });
-
-        return get(groupName);
+        throw new UnsupportedOperationException();
     }
 
     @Override

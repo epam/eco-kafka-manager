@@ -51,8 +51,6 @@ import com.epam.eco.kafkamanager.core.spring.AsyncStartingBean;
 import com.epam.eco.kafkamanager.repo.AbstractKeyValueRepo;
 import com.epam.eco.kafkamanager.repo.CachedRepo;
 
-import kafka.cluster.Broker;
-
 /**
  * @author Andrei_Tytsik
  */
@@ -175,10 +173,10 @@ public class ZkBrokerRepo extends AbstractKeyValueRepo<Integer, BrokerInfo, Brok
     }
 
     @Override
-    public void onBrokerUpdated(Broker broker) {
+    public void onBrokerUpdated(kafka.zk.BrokerInfo broker) {
         Validate.notNull(broker, "Broker is null");
 
-        removeBrokerFromInfoCache(broker.id());
+        removeBrokerFromInfoCache(broker.broker().id());
     }
 
     @Override
@@ -219,21 +217,21 @@ public class ZkBrokerRepo extends AbstractKeyValueRepo<Integer, BrokerInfo, Brok
         return brokerInfoCache.computeIfAbsent(
                 brokerId,
                 key -> {
-                    Broker group = brokerCache.getBroker(brokerId);
-                    return group != null ? toInfo(group) : null;
+                    kafka.zk.BrokerInfo broker = brokerCache.getBroker(brokerId);
+                    return broker != null ? toEcoInfo(broker) : null;
                 });
     }
 
-    private BrokerInfo toInfo(Broker broker) {
+    private BrokerInfo toEcoInfo(kafka.zk.BrokerInfo broker) {
         List<EndPointInfo> endPoints =
-                ScalaConversions.asJavaList(broker.endPoints()).stream().
+                ScalaConversions.asJavaList(broker.broker().endPoints()).stream().
                 map(endPoint -> new EndPointInfo(
                                 endPoint.securityProtocol(),
                                 endPoint.host(),
                                 endPoint.port())).
                 collect(Collectors.toList());
 
-        Config config = adminOperations.describeBrokerConfig(broker.id());
+        Config config = adminOperations.describeBrokerConfig(broker.broker().id());
 
         Map<String, ConfigValue> configValues = config.entries().stream().
                 collect(Collectors.toMap(
@@ -246,11 +244,11 @@ public class ZkBrokerRepo extends AbstractKeyValueRepo<Integer, BrokerInfo, Brok
                                 e.isReadOnly())));
 
         return BrokerInfo.builder().
-                id(broker.id()).
+                id(broker.broker().id()).
                 endPoints(endPoints).
-                rack(ScalaConversions.asOptional(broker.rack()).orElse(null)).
+                rack(ScalaConversions.asOptional(broker.broker().rack()).orElse(null)).
                 config(configValues).
-                metadata(metadataRepo.get(BrokerMetadataKey.with(broker.id()))).
+                metadata(metadataRepo.get(BrokerMetadataKey.with(broker.broker().id()))).
                 build();
     }
 

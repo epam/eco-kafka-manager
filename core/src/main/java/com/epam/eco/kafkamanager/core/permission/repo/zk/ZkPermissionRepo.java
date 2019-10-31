@@ -34,7 +34,10 @@ import org.apache.kafka.common.acl.AclBinding;
 import org.apache.kafka.common.acl.AclBindingFilter;
 import org.apache.kafka.common.acl.AclOperation;
 import org.apache.kafka.common.acl.AclPermissionType;
+import org.apache.kafka.common.resource.PatternType;
 import org.apache.kafka.common.resource.ResourceFilter;
+import org.apache.kafka.common.resource.ResourcePattern;
+import org.apache.kafka.common.resource.ResourcePatternFilter;
 import org.apache.kafka.common.resource.ResourceType;
 import org.apache.kafka.common.security.auth.KafkaPrincipal;
 import org.slf4j.Logger;
@@ -172,7 +175,10 @@ public class ZkPermissionRepo extends AbstractValueRepo<PermissionInfo, Permissi
                                 semaphoreKey,
                                 PermissionOperation.UPDATE);
 
-                adminOperations.createAcl(new AclBinding(resource, ace));
+                adminOperations.createAcl(
+                        new AclBinding(
+                                new ResourcePattern(resource.resourceType(), resource.name(), PatternType.LITERAL),
+                                ace));
 
                 return updateSemaphore;
             });
@@ -207,7 +213,10 @@ public class ZkPermissionRepo extends AbstractValueRepo<PermissionInfo, Permissi
                 operation,
                 permissionType);
         AclBindingFilter aclBindingFilter = new AclBindingFilter(
-                resourceFilter,
+                new ResourcePatternFilter(
+                        resourceFilter.resourceType(),
+                        resourceFilter.name(),
+                        PatternType.LITERAL),
                 aceFilter);
         Resource semaphoreKey = ScalaConversions.asScalaResource(resourceType, resourceName);
 

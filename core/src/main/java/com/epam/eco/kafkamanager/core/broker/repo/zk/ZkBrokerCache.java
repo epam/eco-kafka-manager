@@ -16,7 +16,6 @@
 package com.epam.eco.kafkamanager.core.broker.repo.zk;
 
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -38,8 +37,9 @@ import org.slf4j.LoggerFactory;
 
 import com.epam.eco.kafkamanager.core.utils.CuratorUtils;
 
-import kafka.cluster.Broker;
-import kafka.utils.ZkUtils;
+import kafka.zk.BrokerIdZNode;
+import kafka.zk.BrokerIdsZNode;
+import kafka.zk.BrokerInfo;
 
 /**
  * @author Andrei_Tytsik
@@ -48,13 +48,13 @@ class ZkBrokerCache {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ZkBrokerCache.class);
 
-    private static final String BROKERS_PATH = ZkUtils.BrokerIdsPath();
+    private static final String BROKERS_PATH = BrokerIdsZNode.path();
 
     private final PathChildrenCache brokerPathCache;
 
     private final CacheListener cacheListener;
 
-    private final Map<Integer, Broker> brokerCache = new HashMap<>();
+    private final Map<Integer, BrokerInfo> brokerCache = new HashMap<>();
     private final ReadWriteLock lock = new ReentrantReadWriteLock();
 
     private final CountDownLatch initializedLatch = new CountDownLatch(1);
@@ -111,7 +111,7 @@ class ZkBrokerCache {
         }
     }
 
-    public Broker getBroker(Integer brokerId) {
+    public BrokerInfo getBroker(Integer brokerId) {
         lock.readLock().lock();
         try {
             return brokerCache.get(brokerId);
@@ -134,7 +134,7 @@ class ZkBrokerCache {
             return;
         }
 
-        Broker updatedBroker = null;
+        BrokerInfo updatedBroker = null;
         Integer idOfRemovedBroker = null;
 
         if (event.getType() == Type.INITIALIZED) {
@@ -158,11 +158,11 @@ class ZkBrokerCache {
         }
     }
 
-    private Broker handleBrokerUpdated(ChildData childData) {
+    private BrokerInfo handleBrokerUpdated(ChildData childData) {
         lock.writeLock().lock();
         try {
-            Broker broker = toBroker(childData);
-            brokerCache.put(broker.id(), broker);
+            BrokerInfo broker = toBroker(childData);
+            brokerCache.put(broker.broker().id(), broker);
             return broker;
         } finally {
             lock.writeLock().unlock();
@@ -180,10 +180,9 @@ class ZkBrokerCache {
         }
     }
 
-    private Broker toBroker(ChildData childData) {
+    private BrokerInfo toBroker(ChildData childData) {
         int brokerId = getBrokerId(childData);
-        String brokerInfoString = new String(childData.getData(), StandardCharsets.UTF_8);
-        return Broker.createBroker(brokerId, brokerInfoString);
+        return BrokerIdZNode.decode(brokerId, childData.getData());
     }
 
     private Integer getBrokerId(ChildData childData) {
@@ -194,7 +193,7 @@ class ZkBrokerCache {
         return Integer.valueOf(ZKPaths.getNodeFromPath(path));
     }
 
-    private void fireCacheListener(Broker updatedBroker, Integer idOfRemovedBroker) {
+    private void fireCacheListener(BrokerInfo updatedBroker, Integer idOfRemovedBroker) {
         if (updatedBroker != null) {
             try {
                 cacheListener.onBrokerUpdated(updatedBroker);
@@ -220,7 +219,7 @@ class ZkBrokerCache {
     }
 
     public static interface CacheListener {
-        void onBrokerUpdated(Broker broker);
+        void onBrokerUpdated(BrokerInfo broker);
         void onBrokerRemoved(Integer brokerId);
     }
 

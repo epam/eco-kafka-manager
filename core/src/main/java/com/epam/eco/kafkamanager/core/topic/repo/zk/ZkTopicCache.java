@@ -45,7 +45,7 @@ import com.epam.eco.kafkamanager.core.utils.InitWaitingTreeCacheStarter;
 import com.epam.eco.kafkamanager.core.utils.ZKPathUtils;
 import com.epam.eco.kafkamanager.utils.MapperUtils;
 
-import kafka.utils.ZkUtils;
+import kafka.zk.TopicsZNode;
 
 /**
  * @author Andrei_Tytsik
@@ -54,7 +54,7 @@ class ZkTopicCache {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ZkTopicCache.class);
 
-    private static final String TOPICS_PATH = ZkUtils.BrokerTopicsPath();
+    private static final String TOPICS_PATH = TopicsZNode.path();
 
     private static final String TOPIC_REGEX = TOPICS_PATH + "/[^/]+";
     private static final Pattern TOPIC_PATTERN = Pattern.compile("^" + TOPIC_REGEX + "$");
