@@ -2,7 +2,7 @@
 
 Eco Kafka Manager is a tool for monitoring and managing [Apache Kafka](https://kafka.apache.org/).
 
-The currently supported version is [1.0](https://kafka.apache.org/10/documentation.html)
+The currently supported version is [2.0](https://kafka.apache.org/20/documentation.html)
 
 ## Features
 
@@ -103,6 +103,7 @@ docker-compose -f docker/docker-compose-all.yaml down
 
 Eco Kafka Manager | Kafka
 ---  | --- 
+1.0.x | 2.0.x
 0.1.x | 1.0.x
 
 ## License
