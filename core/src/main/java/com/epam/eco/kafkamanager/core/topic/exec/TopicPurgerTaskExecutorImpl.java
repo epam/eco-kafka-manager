@@ -15,54 +15,66 @@
  */
 package com.epam.eco.kafkamanager.core.topic.exec;
 
-import java.util.concurrent.ExecutorService;
+import java.util.Collections;
 
-import javax.annotation.PreDestroy;
-import javax.cache.CacheManager;
-
+import org.apache.kafka.clients.admin.Config;
+import org.apache.kafka.clients.admin.ConfigEntry;
+import org.apache.kafka.common.config.TopicConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import com.epam.eco.commons.kafka.helpers.TopicPurger;
-import com.epam.eco.kafkamanager.KafkaManager;
+import com.epam.eco.commons.kafka.CleanupPolicy;
+import com.epam.eco.kafkamanager.KafkaAdminOperations;
 import com.epam.eco.kafkamanager.TopicPurgerTaskExecutor;
 import com.epam.eco.kafkamanager.core.autoconfigure.KafkaManagerProperties;
-import com.epam.eco.kafkamanager.exec.AbstractAsyncStatefullTaskExecutor;
+import com.epam.eco.kafkamanager.exec.AbstractTaskExecutor;
 import com.epam.eco.kafkamanager.exec.TaskResult;
 
 /**
  * @author Andrei_Tytsik
  */
-public class TopicPurgerTaskExecutorImpl extends AbstractAsyncStatefullTaskExecutor<String, Void> implements TopicPurgerTaskExecutor {
+public class TopicPurgerTaskExecutorImpl extends AbstractTaskExecutor<String, Void, Void> implements TopicPurgerTaskExecutor {
 
     @Autowired
-    private KafkaManager kafkaManager;
+    private KafkaAdminOperations adminOperations;
     @Autowired
     protected KafkaManagerProperties properties;
 
-    public TopicPurgerTaskExecutorImpl(CacheManager cacheManager) {
-        super(cacheManager);
-    }
-
-    public TopicPurgerTaskExecutorImpl(ExecutorService executor, CacheManager cacheManager) {
-        super(executor, cacheManager);
-    }
-
-    @PreDestroy
-    public void destroy() {
-        close();
-    }
-
     @Override
-    protected TaskResult<Void> doExecute(String topicName) {
+    protected TaskResult<Void> doExecute(String topicName, Void input) {
         return TaskResult.of(() -> internalExecute(topicName));
     }
 
     private Void internalExecute(String topicName) {
-        kafkaManager.getTopic(topicName); // sanity check just for case topic doesn't exist
-
-        TopicPurger topicPurger = TopicPurger.with(properties.getCommonConsumerConfig());
-        topicPurger.purge(topicName);
+        String cleanupPolicyOrig = getCleanupPolicy(topicName);
+        try {
+            changePolicyForDeleteIfNeeded(topicName, cleanupPolicyOrig);
+            adminOperations.deleteAllRecords(topicName);
+        } finally {
+            restorePolicyAfterDeleteIfNeeded(topicName, cleanupPolicyOrig);
+        }
         return null;
+    }
+
+    private String getCleanupPolicy(String topicName) {
+        Config config = adminOperations.describeTopicConfig(topicName);
+        ConfigEntry entry = config.get(TopicConfig.CLEANUP_POLICY_CONFIG);
+        return entry.value();
+    }
+
+    private void changePolicyForDeleteIfNeeded(String topicName, String cleanupPolicyOrig) {
+        if (!CleanupPolicy.DELETE.name.equals(cleanupPolicyOrig)) {
+            adminOperations.alterTopicConfig(
+                    topicName,
+                    Collections.singletonMap(TopicConfig.CLEANUP_POLICY_CONFIG, CleanupPolicy.DELETE.name));
+        }
+    }
+
+    private void restorePolicyAfterDeleteIfNeeded(String topicName, String cleanupPolicyOrig) {
+        if (!CleanupPolicy.DELETE.name.equals(cleanupPolicyOrig)) {
+            adminOperations.alterTopicConfig(
+                    topicName,
+                    Collections.singletonMap(TopicConfig.CLEANUP_POLICY_CONFIG, cleanupPolicyOrig));
+        }
     }
 
 }

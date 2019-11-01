@@ -15,40 +15,30 @@
  */
 package com.epam.eco.kafkamanager;
 
-import java.util.Optional;
-import java.util.concurrent.Future;
-
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.parameters.P;
 
-import com.epam.eco.kafkamanager.exec.AsyncStatefullTaskExecutor;
+import com.epam.eco.kafkamanager.exec.TaskExecutor;
 import com.epam.eco.kafkamanager.exec.TaskResult;
 
 /**
  * @author Andrei_Tytsik
  */
 @PreAuthorize("@authorizer.isPermitted('TOPIC', #resourceKey, 'WRITE')")
-public interface TopicPurgerTaskExecutor extends AsyncStatefullTaskExecutor<String, Void> {
+public interface TopicPurgerTaskExecutor extends TaskExecutor<String, Void, Void> {
+
+    default Void execute(@P("resourceKey") String topicName) {
+        return execute(topicName, null);
+    }
+
+    default TaskResult<Void> executeDetailed(@P("resourceKey") String topicName) {
+        return executeDetailed(topicName, null);
+    }
 
     @Override
-    Void execute(@P("resourceKey") String topicName);
+    Void execute(@P("resourceKey") String topicName, Void input);
 
     @Override
-    TaskResult<Void> executeDetailed(@P("resourceKey") String topicName);
-
-    @Override
-    Future<Void> submit(@P("resourceKey") String topicName);
-
-    @Override
-    Future<TaskResult<Void>> submitDetailed(@P("resourceKey") String topicName);
-
-    @Override
-    boolean isRunning(@P("resourceKey") String topicName);
-
-    @Override
-    Optional<TaskResult<Void>> getResult(@P("resourceKey") String topicName);
-
-    @Override
-    TaskResult<Void> getResultIfActualOrRefresh(@P("resourceKey") String topicName);
+    TaskResult<Void> executeDetailed(@P("resourceKey") String topicName, Void input);
 
 }

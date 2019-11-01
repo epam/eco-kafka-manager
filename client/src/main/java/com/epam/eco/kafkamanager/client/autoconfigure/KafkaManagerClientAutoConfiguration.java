@@ -119,7 +119,7 @@ public class KafkaManagerClientAutoConfiguration {
 
     @Bean
     public TopicPurgerTaskExecutor topicPurgerTaskExecutor() {
-        return new RestTopicPurgerTaskExecutor(cacheManager());
+        return new RestTopicPurgerTaskExecutor();
     }
 
     @Bean

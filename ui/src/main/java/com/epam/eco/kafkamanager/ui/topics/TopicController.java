@@ -172,8 +172,8 @@ public class TopicController {
 
     @PreAuthorize("@authorizer.isPermitted('TOPIC', #topicName, 'WRITE')")
     @RequestMapping(value=MAPPING_PURGER, method=RequestMethod.POST)
-    public String purger(@PathVariable("name") String topicName) {
-        kafkaManager.getTopicPurgerTaskExecutor().submit(topicName);
+    public String purger(@PathVariable("name") String topicName) throws Exception {
+        kafkaManager.getTopicPurgerTaskExecutor().execute(topicName);
         return "redirect:" + buildTopicUrl(topicName);
     }
 

@@ -16,10 +16,6 @@
 package com.epam.eco.kafkamanager.client.topic.exec;
 
 import java.util.Date;
-import java.util.concurrent.ExecutorService;
-
-import javax.annotation.PreDestroy;
-import javax.cache.CacheManager;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -31,34 +27,21 @@ import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
 import com.epam.eco.kafkamanager.TopicPurgerTaskExecutor;
-import com.epam.eco.kafkamanager.exec.AbstractAsyncStatefullTaskExecutor;
+import com.epam.eco.kafkamanager.exec.AbstractTaskExecutor;
 import com.epam.eco.kafkamanager.exec.TaskResult;
 import com.epam.eco.kafkamanager.rest.request.TopicPurgeRequest;
 
 /**
  * @author Raman_Babich
  */
-public class RestTopicPurgerTaskExecutor extends AbstractAsyncStatefullTaskExecutor<String, Void> implements TopicPurgerTaskExecutor {
+public class RestTopicPurgerTaskExecutor extends AbstractTaskExecutor<String, Void, Void> implements TopicPurgerTaskExecutor {
 
     @Autowired
     @Qualifier("KafkaManagerRestTemplate")
     private RestTemplate restTemplate;
 
-    public RestTopicPurgerTaskExecutor(CacheManager cacheManager) {
-        super(cacheManager);
-    }
-
-    public RestTopicPurgerTaskExecutor(ExecutorService executor, CacheManager cacheManager) {
-        super(executor, cacheManager);
-    }
-
-    @PreDestroy
-    public void destroy() {
-        close();
-    }
-
     @Override
-    protected TaskResult<Void> doExecute(String resourceKey) {
+    protected TaskResult<Void> doExecute(String resourceKey, Void input) {
         Date start = new Date();
         try {
             ResponseEntity<TaskResult<Void>> response = restTemplate.exchange(

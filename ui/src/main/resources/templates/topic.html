@@ -80,8 +80,7 @@
                                 type="button"
                                 class="to-right btn btn-danger right-icon"
                                 data-toggle="modal" 
-                                data-target="#purge-confirm"
-                                th:disabled="${topic.purgeTaskRunning}">
+                                data-target="#purge-confirm">
                                 Purge <i class="fa fa-eraser"></i>
                             </button>
                             <div id="purge-confirm" class="modal fade" role="dialog">
@@ -93,13 +92,16 @@
                                         </div>
                                         <div class="modal-body">
                                             <p>
-                                                The process may take quite a long time (depends configured LogCleaner check interval) and there is no guarantee that data is 
-                                                completely deleted!
+                                                Are you sure you want to purge the topic?
                                             </p>
                                             <p class="alert alert-danger">
-                                                <span class="glyphicon glyphicon-warning-sign"></span> The retention-related configuration of the topic is going to be changed 
-                                                to make records expire in the minimum possible period of time and then restored to the original state. If the process fails in 
-                                                the middle and doesn't manage to restore original configuration, you should <b>run "Purge" process again</b> to fix this.
+                                                <span class="glyphicon glyphicon-warning-sign"></span> This action cannot be undone
+                                            </p>
+                                            <p class="alert alert-danger">
+                                                <span class="glyphicon glyphicon-warning-sign"></span>
+                                                In order to make deletion of records possible for topics with <b>cleanup.policy</b> other than <b>delete</b>, 
+                                                the policy is going to be first changed to <b>delete</b> and then restored back. If the process fails in the 
+                                                middle and doesn't manage to restore the original configuration, you should manually fix this.
                                             </p>
                                         </div>
                                         <div class="modal-footer">
@@ -139,9 +141,6 @@
                                         <div class="modal-body">
                                             <p>
                                                 Are you sure you want to delete the topic?
-                                            </p>
-                                            <p class="alert alert-danger">
-                                                <span class="glyphicon glyphicon-warning-sign"></span> It could not be restored
                                             </p>
                                         </div>
                                         <div class="modal-footer">

@@ -195,15 +195,6 @@ public class TopicInfoWrapper {
         return builder.toString();
     }
 
-    public boolean isPurgeTaskRunning() {
-        try {
-            return kafkaManager.getTopicPurgerTaskExecutor()
-                    .isRunning(topicInfo.getName());
-        } catch (AccessDeniedException ade) {
-            return true;
-        }
-    }
-
     public String getConfigOverridesAsString() {
         Map<String, String> config = topicInfo.getConfigOverrides();
         if (config == null) {

@@ -103,7 +103,7 @@ public class KafkaManagerAutoConfiguration {
 
     @Bean
     public TopicPurgerTaskExecutor topicPurgerTaskExecutor() {
-        return new TopicPurgerTaskExecutorImpl(cacheManager());
+        return new TopicPurgerTaskExecutorImpl();
     }
 
     @Bean

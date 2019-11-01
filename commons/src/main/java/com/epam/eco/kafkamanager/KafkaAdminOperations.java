@@ -27,6 +27,7 @@ import org.apache.kafka.common.acl.AclBindingFilter;
  */
 public interface KafkaAdminOperations {
     Config describeBrokerConfig(int brokerId);
+    Config describeTopicConfig(String topicName);
     Map<String, Config> describeTopicConfigs(Collection<String> topicNames);
     void createAcl(AclBinding aclBinding);
     void deleteAcl(AclBindingFilter aclBindingFilter);
@@ -37,6 +38,7 @@ public interface KafkaAdminOperations {
             Map<String, String> config);
     void createPartitions(String topicName, int newPartitionCount);
     void deleteTopic(String topicName);
+    void deleteAllRecords(String topicName);
     void alterTopicConfig(String topicName, Map<String, String> configMap);
     int getDefaultReplicationFactor();
     String getZkConnect();

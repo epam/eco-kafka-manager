@@ -18,6 +18,7 @@ package com.epam.eco.kafkamanager.core;
 
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Map;
 
 import javax.annotation.PostConstruct;
@@ -61,6 +62,11 @@ public class KafkaAdminOperationsImpl implements KafkaAdminOperations {
     }
 
     @Override
+    public Config describeTopicConfig(String topicName) {
+        return describeTopicConfigs(Collections.singleton(topicName)).get(topicName);
+    }
+
+    @Override
     public Map<String, Config> describeTopicConfigs(Collection<String> topicNames) {
         return AdminClientUtils.describeTopicConfigs(adminClient, topicNames);
     }
@@ -97,6 +103,11 @@ public class KafkaAdminOperationsImpl implements KafkaAdminOperations {
     @Override
     public void deleteTopic(String topicName) {
         AdminClientUtils.deleteTopic(adminClient, topicName);
+    }
+
+    @Override
+    public void deleteAllRecords(String topicName) {
+        AdminClientUtils.deleteAllRecords(adminClient, topicName);
     }
 
     @Override
