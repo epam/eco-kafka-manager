@@ -297,7 +297,10 @@ public class KafkaConsumerGroupRepo extends AbstractKeyValueRepo<String, Consume
                     offset(offsetAndMetadata.offset()).
                     metadata(offsetAndMetadata.metadata()).
                     commitDate(offsetAndMetadata.commitTimestamp()).
-                    expireDate(offsetAndMetadata.expireTimestamp()).
+                    expireDate(
+                            offsetAndMetadata.expireTimestamp().isDefined() ?
+                            (Long)offsetAndMetadata.expireTimestamp().get() :
+                            -1L).
                     build();
             offsetAndMetadataInfos.put(topicPartition, offsetAndMetadataInfo);
         });

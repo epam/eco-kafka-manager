@@ -18,6 +18,7 @@ package com.epam.eco.kafkamanager.core.consumer.repo.kafka;
 import java.nio.ByteBuffer;
 
 import org.apache.commons.lang3.Validate;
+import org.apache.kafka.common.utils.Time;
 
 import com.epam.eco.commons.kafka.serde.KeyValueDecoder;
 
@@ -52,7 +53,9 @@ public class KafkaGroupMetadataDecoder implements KeyValueDecoder<BaseKey, Kafka
             return new KafkaOffsetMetadataRecord((OffsetKey)key, value);
         } else if (key instanceof GroupMetadataKey) {
             GroupMetadata value =
-                    valueByteBuffer != null ? GroupMetadataManager.readGroupMessageValue(((GroupMetadataKey)key).key(), valueByteBuffer) : null;
+                    valueByteBuffer != null ?
+                    GroupMetadataManager.readGroupMessageValue(((GroupMetadataKey)key).key(), valueByteBuffer, Time.SYSTEM) :
+                    null;
             return new KafkaGroupMetadataRecord((GroupMetadataKey)key, value);
         } else {
             throw new IllegalArgumentException(

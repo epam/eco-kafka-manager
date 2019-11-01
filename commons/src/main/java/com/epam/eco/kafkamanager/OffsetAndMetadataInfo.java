@@ -204,10 +204,14 @@ public class OffsetAndMetadataInfo implements Comparable<OffsetAndMetadataInfo> 
         }
 
         public Builder expireDate(long expireDate) {
-            return expireDate(
-                    LocalDateTime.ofInstant(
-                            Instant.ofEpochMilli(expireDate),
-                            TimeZone.getDefault().toZoneId()));
+            if (expireDate < 0) {
+                return expireDate(null);
+            } else {
+                return expireDate(
+                        LocalDateTime.ofInstant(
+                                Instant.ofEpochMilli(expireDate),
+                                TimeZone.getDefault().toZoneId()));
+            }
         }
 
         public Builder expireDate(LocalDateTime expireDate) {
