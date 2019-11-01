@@ -17,13 +17,13 @@ package com.epam.eco.kafkamanager.core.topic.repo.zk;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
-import java.util.concurrent.atomic.AtomicReference;
+import java.util.Objects;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.stream.Collectors;
@@ -37,9 +37,12 @@ import org.apache.curator.framework.recipes.cache.PathChildrenCacheEvent;
 import org.apache.curator.framework.recipes.cache.PathChildrenCacheEvent.Type;
 import org.apache.curator.utils.ZKPaths;
 import org.apache.kafka.clients.admin.Config;
+import org.apache.kafka.clients.admin.ConfigEntry;
+import org.apache.kafka.common.config.ConfigDef.ConfigKey;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.epam.eco.commons.kafka.config.TopicConfigDef;
 import com.epam.eco.kafkamanager.KafkaAdminOperations;
 import com.epam.eco.kafkamanager.core.utils.CuratorUtils;
 import com.epam.eco.kafkamanager.utils.MapperUtils;
@@ -54,6 +57,8 @@ class ZkTopicConfigCache {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ZkTopicConfigCache.class);
 
+    private static final Config DEFAULT_CONFIG = createDefaultConfig();
+
     private static final String CONFIGS_PATH = ConfigEntityTypeZNode.path(ConfigType.Topic());
 
     private static final String VERSION = "version";
@@ -64,7 +69,6 @@ class ZkTopicConfigCache {
     private final PathChildrenCache configPathCache;
 
     private final Map<String, TopicConfig> configCache = new HashMap<>();
-    private final AtomicReference<TopicConfig> defaultConfig = new AtomicReference<>();
     private final ReadWriteLock lock = new ReentrantReadWriteLock();
 
     private final CacheListener cacheListener;
@@ -88,7 +92,6 @@ class ZkTopicConfigCache {
                 (client, event) -> handlePathEvent(event));
         configPathCache.start(StartMode.BUILD_INITIAL_CACHE);
 
-        initDefaultConfig();
         bootstrapCache();
 
         LOGGER.info("Started");
@@ -103,15 +106,10 @@ class ZkTopicConfigCache {
     public TopicConfig getConfig(String topicName) {
         lock.readLock().lock();
         try {
-            return configCache.getOrDefault(topicName, defaultConfig.get());
+            return configCache.getOrDefault(topicName, new TopicConfig(topicName, DEFAULT_CONFIG));
         } finally {
             lock.readLock().unlock();
         }
-    }
-
-    private void initDefaultConfig() {
-        String topicName = UUID.randomUUID().toString();
-        defaultConfig.set(describeTopicConfigs(Collections.singletonList(topicName)).get(topicName));
     }
 
     private void bootstrapCache() {
@@ -225,6 +223,20 @@ class ZkTopicConfigCache {
                         ex);
             }
         }
+    }
+
+    @SuppressWarnings("deprecation")
+    private static Config createDefaultConfig() {
+        List<ConfigEntry> entries = new ArrayList<>(TopicConfigDef.INSTANCE.keys().size());
+        for (ConfigKey key : TopicConfigDef.INSTANCE.keys()) {
+            entries.add(new ConfigEntry(
+                    key.name,
+                    key.hasDefault() ? Objects.toString(key.defaultValue, null) : null,
+                    true,
+                    false,
+                    false));
+        }
+        return new Config(Collections.unmodifiableList(entries));
     }
 
     public static class TopicConfig {
