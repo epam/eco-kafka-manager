@@ -2,7 +2,7 @@ version: '3.5'
 services:
 
   zookeeper:
-    image: 'confluentinc/cp-zookeeper:4.0.2-2'
+    image: 'confluentinc/cp-zookeeper:5.0.3-1'
     hostname: 'zookeeper'
     ports:
       - '2181:2181'
@@ -29,7 +29,7 @@ services:
     # See https://rmoff.net/2018/08/02/kafka-listeners-explained/ for details
     # "`-._,-'"`-._,-'"`-._,-'"`-._,-'"`-._,-'"`-._,-'"`-._,-'"`-._,-'"`-._,-
     #
-    image: 'confluentinc/cp-kafka:4.0.2-2'
+    image: 'confluentinc/cp-kafka:5.0.3-1'
     hostname: 'kafka'
     depends_on:
       - 'zookeeper'
