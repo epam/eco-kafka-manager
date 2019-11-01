@@ -9,7 +9,7 @@
 
     <groupId>com.epam.eco.kafkamanager</groupId>
     <artifactId>kafka-manager-parent</artifactId>
-    <version>1.0.1-SNAPSHOT</version>
+    <version>1.1.0-SNAPSHOT</version>
     
     <name>Eco Kafka Manager</name>
     <packaging>pom</packaging>
@@ -72,10 +72,10 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <java.version>1.8</java.version>
-        <kafka.version>2.0.1-cp4</kafka.version>
+        <kafka.version>2.1.1-cp3</kafka.version>
         <cp.version>4.0.0</cp.version>
         <eco-commons.version>0.1.1</eco-commons.version>
-        <eco-commons-kafka.version>1.0.0</eco-commons-kafka.version>
+        <eco-commons-kafka.version>1.1.0</eco-commons-kafka.version>
         <ehcache.version>3.5.2</ehcache.version>
         <dropwizard.version>3.2.2</dropwizard.version>
         <hawkular.version>0.27.0.Final</hawkular.version>
