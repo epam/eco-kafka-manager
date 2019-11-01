@@ -65,6 +65,8 @@
                                     <td>Id</td>
                                     <td>EndPoints</td>
                                     <td>Rack</td>
+                                    <td>Version</td>
+                                    <td>JMX Port</td>
                                     <td>Description</td>
                                 </tr>
                             </thead>
@@ -81,6 +83,8 @@
                                         </span>
                                     </td>
                                     <td th:text="${broker.rack}"></td>
+                                    <td th:text="${broker.version}"></td>
+                                    <td th:text="${broker.jmxPortDisplayString}"></td>
                                     <td 
                                         th:text="${broker.metadataDescription}" 
                                         style="word-wrap:break-word;max-width:200px">

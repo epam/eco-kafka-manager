@@ -53,6 +53,15 @@ public class BrokerInfoWrapper {
     public String getRack() {
         return brokerInfo.getRack();
     }
+    public int getVersion() {
+        return brokerInfo.getVersion();
+    }
+    public int getJmxPort() {
+        return brokerInfo.getJmxPort();
+    }
+    public String getJmxPortDisplayString() {
+        return brokerInfo.getJmxPort() > 0 ? "" + brokerInfo.getJmxPort() : "";
+    }
     public Map<String, ConfigValue> getConfig() {
         return brokerInfo.getConfig();
     }

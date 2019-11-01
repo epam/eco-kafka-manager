@@ -51,6 +51,7 @@ import com.epam.eco.kafkamanager.core.spring.AsyncStartingBean;
 import com.epam.eco.kafkamanager.repo.AbstractKeyValueRepo;
 import com.epam.eco.kafkamanager.repo.CachedRepo;
 
+
 /**
  * @author Andrei_Tytsik
  */
@@ -232,7 +233,6 @@ public class ZkBrokerRepo extends AbstractKeyValueRepo<Integer, BrokerInfo, Brok
                 collect(Collectors.toList());
 
         Config config = adminOperations.describeBrokerConfig(broker.broker().id());
-
         Map<String, ConfigValue> configValues = config.entries().stream().
                 collect(Collectors.toMap(
                         ConfigEntry::name,
@@ -247,6 +247,8 @@ public class ZkBrokerRepo extends AbstractKeyValueRepo<Integer, BrokerInfo, Brok
                 id(broker.broker().id()).
                 endPoints(endPoints).
                 rack(ScalaConversions.asOptional(broker.broker().rack()).orElse(null)).
+                version(broker.version()).
+                jmxPort(broker.jmxPort()).
                 config(configValues).
                 metadata(metadataRepo.get(BrokerMetadataKey.with(broker.broker().id()))).
                 build();
