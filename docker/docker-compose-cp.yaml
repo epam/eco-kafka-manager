@@ -2,7 +2,7 @@ version: '3.5'
 services:
 
   zookeeper:
-    image: 'confluentinc/cp-zookeeper:5.1.3-1'
+    image: 'confluentinc/cp-zookeeper:5.2.3-1'
     hostname: 'zookeeper'
     ports:
       - '2181:2181'
@@ -29,7 +29,7 @@ services:
     # See https://rmoff.net/2018/08/02/kafka-listeners-explained/ for details
     # "`-._,-'"`-._,-'"`-._,-'"`-._,-'"`-._,-'"`-._,-'"`-._,-'"`-._,-'"`-._,-
     #
-    image: 'confluentinc/cp-kafka:5.1.3-1'
+    image: 'confluentinc/cp-kafka:5.2.3-1'
     hostname: 'kafka'
     depends_on:
       - 'zookeeper'
@@ -47,7 +47,7 @@ services:
     restart: 'on-failure'
 
   schema-registry:
-    image: 'confluentinc/cp-schema-registry:5.1.3-1'
+    image: 'confluentinc/cp-schema-registry:5.2.3-1'
     hostname: 'schema-registry'
     depends_on:
       - 'zookeeper'
