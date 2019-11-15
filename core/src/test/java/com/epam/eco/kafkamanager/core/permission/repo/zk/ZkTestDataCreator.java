@@ -41,7 +41,7 @@ import com.epam.eco.commons.kafka.config.AdminClientConfigBuilder;
  */
 public class ZkTestDataCreator {
 
-    private static final String BOOTSTRAP_SERVERS = "kafka:9092";
+    private static final String BOOTSTRAP_SERVERS = "localhost:9092";
     private static final String[] TOPICS = {"topic1", "topic2", "topic3"};
     private static final String PRINCIPAL = "User:test-principal";
     private static final String HOST = "*";
