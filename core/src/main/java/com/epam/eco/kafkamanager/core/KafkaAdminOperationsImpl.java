@@ -24,6 +24,7 @@ import java.util.Map;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.kafka.clients.admin.AdminClient;
 import org.apache.kafka.clients.admin.Config;
 import org.apache.kafka.clients.admin.ConsumerGroupDescription;
@@ -138,9 +139,13 @@ public class KafkaAdminOperationsImpl implements KafkaAdminOperations {
 
     @Override
     public String getZkConnect() {
-        return AdminClientUtils.describeAnyBrokerConfigEntry(
-                adminClient,
-                KafkaConfig.ZkConnectProp()).value();
+        String zkConnect = properties.getZkConnect();
+        if (StringUtils.isBlank(zkConnect)) {
+            zkConnect = AdminClientUtils.describeAnyBrokerConfigEntry(
+                    adminClient,
+                    KafkaConfig.ZkConnectProp()).value();
+        }
+        return zkConnect;
     }
 
 }

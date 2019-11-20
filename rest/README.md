@@ -83,6 +83,7 @@ docker run --name kafka-manager-rest \
 Name | Description | Default
 ---  | ---         | --- 
 `eco.kafkamanager.core.bootstrapServers` | A comma-separated list of Kafka brokers to connect to. |
+`eco.kafkamanager.core.zkConnect` | An external representation of Zookeeper connection string (with external host/IP) to connect to Kafka/ZK inside Docker containers. For other cases this property should be left empty. |
 `eco.kafkamanager.core.schemaRegistryUrl` | URL to the [Schema Registry](https://docs.confluent.io/current/schema-registry/index.html) REST API, used for reading records in Avro format serialized using the Schema Registry. |
 `eco.kafkamanager.core.clientConfig[property]` | Common Kafka [client properties](https://kafka.apache.org/10/documentation.html#adminclientconfigs), used to connect to cluster. |
 `eco.kafkamanager.core.metadataStoreBootstrapTimeoutInMs` | Max duration in milliseconds for bootstrapping user-defined metadata. If timeout is too small, you may observe stale data for some time (gets consistent eventually) after service is started. | 180000

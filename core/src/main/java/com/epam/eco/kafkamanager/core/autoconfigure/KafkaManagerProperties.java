@@ -39,6 +39,7 @@ public class KafkaManagerProperties {
     public static final String GROUP_ID = "_eco_kafka_manager";
 
     private String bootstrapServers;
+    private String zkConnect;
     private String schemaRegistryUrl;
     private Map<String, Object> clientConfig;
     private long metadataStoreBootstrapTimeoutInMs = 3 * 60 * 1000;
@@ -61,6 +62,12 @@ public class KafkaManagerProperties {
     }
     public void setBootstrapServers(String bootstrapServers) {
         this.bootstrapServers = bootstrapServers;
+    }
+    public String getZkConnect() {
+        return zkConnect;
+    }
+    public void setZkConnect(String zkConnect) {
+        this.zkConnect = zkConnect;
     }
     public String getSchemaRegistryUrl() {
         return schemaRegistryUrl;
