@@ -26,8 +26,11 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.Validate;
+import org.apache.kafka.common.ConsumerGroupState;
 import org.apache.kafka.common.TopicPartition;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -40,7 +43,11 @@ import com.epam.eco.commons.kafka.KafkaUtils;
 public class ConsumerGroupInfo implements MetadataAware, Comparable<ConsumerGroupInfo> {
 
     private final String name;
-    private final List<ConsumerInfo> members;
+    private final Integer coordinator;
+    private final ConsumerGroupState state;
+    private final String protocolType;
+    private final String partitionAssignor;
+    private final List<ConsumerGroupMemberInfo> members;
     private final List<String> topicNames;
     private final Map<TopicPartition, OffsetAndMetadataInfo> offsetsAndMetadata;
     private final Map<TopicPartition, Long> offsets;
@@ -50,7 +57,11 @@ public class ConsumerGroupInfo implements MetadataAware, Comparable<ConsumerGrou
 
     public ConsumerGroupInfo(
             @JsonProperty("name") String name,
-            @JsonProperty("members") Collection<ConsumerInfo> members,
+            @JsonProperty("coordinator") Integer coordinator,
+            @JsonProperty("state") ConsumerGroupState state,
+            @JsonProperty("protocolType") String protocolType,
+            @JsonProperty("partitionAssignor") String partitionAssignor,
+            @JsonProperty("members") Collection<ConsumerGroupMemberInfo> members,
             @JsonProperty("offsetsAndMetadata") Map<TopicPartition, OffsetAndMetadataInfo> offsetsAndMetadata,
             @JsonProperty("offsetTimeSeries") Map<TopicPartition, OffsetTimeSeries> offsetTimeSeries,
             @JsonProperty("storageType") StorageType storageType,
@@ -75,8 +86,12 @@ public class ConsumerGroupInfo implements MetadataAware, Comparable<ConsumerGrou
         Validate.notNull(storageType, "Storage type is null");
 
         this.name = name;
+        this.coordinator = coordinator;
+        this.state = state;
+        this.protocolType = protocolType;
+        this.partitionAssignor = partitionAssignor;
         this.members =
-                members != null ?
+                !CollectionUtils.isEmpty(members) ?
                 members.stream().
                         sorted().
                         collect(
@@ -85,12 +100,12 @@ public class ConsumerGroupInfo implements MetadataAware, Comparable<ConsumerGrou
                                         Collections::unmodifiableList)) :
                 Collections.emptyList();
         this.offsetsAndMetadata =
-                offsetsAndMetadata != null ?
+                !MapUtils.isEmpty(offsetsAndMetadata) ?
                 Collections.unmodifiableMap(
                         KafkaUtils.sortedByTopicPartitionKeyMap(offsetsAndMetadata)) :
                 Collections.emptyMap();
         this.offsets =
-                offsetsAndMetadata != null ?
+                !MapUtils.isEmpty(offsetsAndMetadata) ?
                 Collections.unmodifiableMap(
                         KafkaUtils.sortedByTopicPartitionKeyMap(
                                 offsetsAndMetadata.entrySet().stream().
@@ -100,7 +115,7 @@ public class ConsumerGroupInfo implements MetadataAware, Comparable<ConsumerGrou
                                                     entry -> entry.getValue().getOffset())))) :
                 Collections.emptyMap();
         this.offsetTimeSeries =
-                offsetTimeSeries != null ?
+                !MapUtils.isEmpty(offsetTimeSeries) ?
                 Collections.unmodifiableMap(new HashMap<>(offsetTimeSeries)) :
                 Collections.emptyMap();
         this.topicNames =
@@ -113,7 +128,19 @@ public class ConsumerGroupInfo implements MetadataAware, Comparable<ConsumerGrou
     public String getName() {
         return name;
     }
-    public List<ConsumerInfo> getMembers() {
+    public Integer getCoordinator() {
+        return coordinator;
+    }
+    public ConsumerGroupState getState() {
+        return state;
+    }
+    public String getProtocolType() {
+        return protocolType;
+    }
+    public String getPartitionAssignor() {
+        return partitionAssignor;
+    }
+    public List<ConsumerGroupMemberInfo> getMembers() {
         return members;
     }
     public List<String> getTopicNames() {
@@ -149,6 +176,10 @@ public class ConsumerGroupInfo implements MetadataAware, Comparable<ConsumerGrou
     public int hashCode() {
         return Objects.hash(
                 name,
+                coordinator,
+                state,
+                protocolType,
+                partitionAssignor,
                 members,
                 topicNames,
                 offsetsAndMetadata,
@@ -168,6 +199,10 @@ public class ConsumerGroupInfo implements MetadataAware, Comparable<ConsumerGrou
         ConsumerGroupInfo that = (ConsumerGroupInfo)obj;
         return
                 Objects.equals(this.name, that.name) &&
+                Objects.equals(this.coordinator, that.coordinator) &&
+                Objects.equals(this.state, that.state) &&
+                Objects.equals(this.protocolType, that.protocolType) &&
+                Objects.equals(this.partitionAssignor, that.partitionAssignor) &&
                 Objects.equals(this.members, that.members) &&
                 Objects.equals(this.topicNames, that.topicNames) &&
                 Objects.equals(this.offsetsAndMetadata, that.offsetsAndMetadata) &&
@@ -180,6 +215,10 @@ public class ConsumerGroupInfo implements MetadataAware, Comparable<ConsumerGrou
     public String toString() {
         return
                 "{name: " + name +
+                ", coordinator: " + coordinator +
+                ", state: " + state +
+                ", protocolType: " + protocolType +
+                ", partitionAssignor: " + partitionAssignor +
                 ", members: " + members +
                 ", topicNames: " + topicNames +
                 ", offsetsAndMetadata: " + offsetsAndMetadata +
@@ -209,7 +248,11 @@ public class ConsumerGroupInfo implements MetadataAware, Comparable<ConsumerGrou
     public static class Builder {
 
         private String name;
-        private List<ConsumerInfo> members = new ArrayList<>();
+        private Integer coordinator;
+        private ConsumerGroupState state;
+        private String protocolType;
+        private String partitionAssignor;
+        private List<ConsumerGroupMemberInfo> members = new ArrayList<>();
         private Map<TopicPartition, OffsetAndMetadataInfo> offsetsAndMetadata = new HashMap<>();
         private Map<TopicPartition, OffsetTimeSeries> offsetTimeSeries = new HashMap<>();
         private StorageType storageType;
@@ -225,6 +268,10 @@ public class ConsumerGroupInfo implements MetadataAware, Comparable<ConsumerGrou
             }
 
             this.name = origin.name;
+            this.coordinator = origin.coordinator;
+            this.state = origin.state;
+            this.protocolType = origin.protocolType;
+            this.partitionAssignor = origin.partitionAssignor;
             this.members.addAll(origin.members);
             this.offsetsAndMetadata.putAll(origin.offsetsAndMetadata);
             this.offsetTimeSeries.putAll(origin.getOffsetTimeSeries());
@@ -236,14 +283,30 @@ public class ConsumerGroupInfo implements MetadataAware, Comparable<ConsumerGrou
             this.name = name;
             return this;
         }
-        public Builder addMember(ConsumerInfo member) {
+        public Builder coordinator(Integer coordinator) {
+            this.coordinator = coordinator;
+            return this;
+        }
+        public Builder state(ConsumerGroupState state) {
+            this.state = state;
+            return this;
+        }
+        public Builder protocolType(String protocolType) {
+            this.protocolType = protocolType;
+            return this;
+        }
+        public Builder partitionAssignor(String partitionAssignor) {
+            this.partitionAssignor = partitionAssignor;
+            return this;
+        }
+        public Builder addMember(ConsumerGroupMemberInfo member) {
             this.members.add(member);
             return this;
         }
         public Builder removeMemberById(String memberId) {
-            Iterator<ConsumerInfo> iterator = this.members.iterator();
+            Iterator<ConsumerGroupMemberInfo> iterator = this.members.iterator();
             while (iterator.hasNext()) {
-                ConsumerInfo member = iterator.next();
+                ConsumerGroupMemberInfo member = iterator.next();
                 if (member.getMemberId().equals(memberId)) {
                     iterator.remove();
                     break;
@@ -251,7 +314,7 @@ public class ConsumerGroupInfo implements MetadataAware, Comparable<ConsumerGrou
             }
             return this;
         }
-        public Builder members(List<ConsumerInfo> members) {
+        public Builder members(List<ConsumerGroupMemberInfo> members) {
             this.members.clear();
             if (members != null) {
                 this.members.addAll(members);
@@ -292,6 +355,10 @@ public class ConsumerGroupInfo implements MetadataAware, Comparable<ConsumerGrou
         public ConsumerGroupInfo build() {
             return new ConsumerGroupInfo(
                     name,
+                    coordinator,
+                    state,
+                    protocolType,
+                    partitionAssignor,
                     members,
                     offsetsAndMetadata,
                     offsetTimeSeries,

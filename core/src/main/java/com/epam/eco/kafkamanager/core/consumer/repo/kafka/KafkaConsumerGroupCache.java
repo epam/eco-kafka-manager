@@ -26,31 +26,38 @@ import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.stream.Collectors;
 
+import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.Validate;
+import org.apache.kafka.clients.admin.ConsumerGroupDescription;
 import org.apache.kafka.common.TopicPartition;
 import org.apache.kafka.common.internals.Topic;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.epam.eco.commons.kafka.cache.KafkaCache;
-import com.epam.eco.commons.kafka.consumer.bootstrap.TimestampOffsetInitializer;
-import com.epam.eco.kafkamanager.DatePeriod;
+import com.epam.eco.commons.kafka.consumer.bootstrap.EndOffsetInitializer;
+import com.epam.eco.kafkamanager.KafkaAdminOperations;
 import com.epam.eco.kafkamanager.OffsetTimeSeries;
 
 import kafka.common.OffsetAndMetadata;
 import kafka.coordinator.group.BaseKey;
+import kafka.coordinator.group.GroupMetadata;
+import kafka.coordinator.group.GroupMetadataKey;
+import kafka.coordinator.group.OffsetKey;
 
 /**
  * @author Andrei_Tytsik
  */
-class KafkaConsumerGroupCache implements com.epam.eco.commons.kafka.cache.CacheListener<BaseKey, KafkaMetadataRecord<?, ?>> {
+class KafkaConsumerGroupCache implements com.epam.eco.commons.kafka.cache.CacheListener<BaseKey, Object> {
 
     private final static Logger LOGGER = LoggerFactory.getLogger(KafkaConsumerGroupCache.class);
 
-    private final KafkaCache<BaseKey, KafkaMetadataRecord<?, ?>> metadataCache;
+    private final KafkaAdminOperations adminOperations;
+
+    private final KafkaCache<BaseKey, Object> metadataCache;
 
     private final Map<String, KafkaGroupMetadata> groupCache = new HashMap<>();
-    private final Map<String, Set<String>> groupsOfTopic = new HashMap<>();
+    private final Map<String, Set<String>> topicGroups = new HashMap<>();
     private final Map<String, Map<TopicPartition, OffsetTimeSeries>> offsetTimeSeries =
             new HashMap<>();
     private final ReadWriteLock lock = new ReentrantReadWriteLock();
@@ -58,23 +65,21 @@ class KafkaConsumerGroupCache implements com.epam.eco.commons.kafka.cache.CacheL
     private final CacheListener cacheListener;
 
     public KafkaConsumerGroupCache(
+            KafkaAdminOperations adminOperations,
             String bootstrapServers,
             Map<String, Object> consumerConfig,
-            long bootstrapTimeoutInMs,
-            DatePeriod dataFreshness,
             CacheListener cacheListener) {
+        Validate.notNull(adminOperations, "Admin Operations can't be null");
         Validate.notNull(cacheListener, "Cache Listener can't be null");
 
-        this.metadataCache = KafkaCache.<BaseKey, KafkaMetadataRecord<?, ?>>builder().
+        this.adminOperations = adminOperations;
+        this.metadataCache = KafkaCache.<BaseKey, Object>builder().
                 bootstrapServers(bootstrapServers).
                 topicName(Topic.GROUP_METADATA_TOPIC_NAME).
-                bootstrapTimeoutInMs(bootstrapTimeoutInMs).
+                bootstrapTimeoutInMs(1).
                 consumerConfig(consumerConfig).
-                offsetInitializer(
-                        TimestampOffsetInitializer.forNowMinus(
-                                dataFreshness.amount(),
-                                dataFreshness.unit())).
-                keyValueDecoder(new KafkaGroupMetadataDecoder()).
+                offsetInitializer(EndOffsetInitializer.INSTANCE).
+                keyValueDecoder(new ServerGroupMetadataDecoder()).
                 consumerParallelismAvailableCores().
                 storeData(false).
                 listener(this).
@@ -83,6 +88,7 @@ class KafkaConsumerGroupCache implements com.epam.eco.commons.kafka.cache.CacheL
     }
 
     public void start() throws Exception {
+        bootstrapInitialData();
         startMetadataCache();
 
         LOGGER.info("Started");
@@ -134,7 +140,7 @@ class KafkaConsumerGroupCache implements com.epam.eco.commons.kafka.cache.CacheL
     public List<String> listGroupNamesOfTopic(String topicName) {
         lock.readLock().lock();
         try {
-            Set<String> groupNames = groupsOfTopic.get(topicName);
+            Set<String> groupNames = topicGroups.get(topicName);
             return groupNames != null ? new ArrayList<>(groupNames) : Collections.emptyList();
         } finally {
             lock.readLock().unlock();
@@ -157,54 +163,55 @@ class KafkaConsumerGroupCache implements com.epam.eco.commons.kafka.cache.CacheL
     }
 
     @Override
-    public void onCacheUpdated(Map<BaseKey, KafkaMetadataRecord<?, ?>> update) {
-        Validate.notNull(update, "Update can't be null");
-
-        if (update.isEmpty()) {
+    public void onCacheUpdated(Map<BaseKey, Object> cacheUpdate) {
+        if (MapUtils.isEmpty(cacheUpdate)) {
             return;
         }
 
-        Map<String, KafkaGroupMetadata> effectiveUpdate = new HashMap<>();
+        Map<String, GroupMetadataAdapter> groupUpdates = new HashMap<>();
+        Map<String, Map<TopicPartition, OffsetAndMetadataAdapter>> offsetUpdates = new HashMap<>();
 
-        lock.writeLock().lock();
-        try {
-            update.values().forEach(record -> {
-                try {
-                    KafkaGroupMetadata groupMetadata = getGroupMetadata(record.getGroupName(), true);
-                    if (record instanceof KafkaOffsetMetadataRecord) {
-                        KafkaOffsetMetadataRecord offsetMetadataRecord = (KafkaOffsetMetadataRecord)record;
-                        groupMetadata.updateOffsetAndMetadata(
-                                offsetMetadataRecord.getKey(),
-                                offsetMetadataRecord.getValue());
-                        updateGroupsOfTopic(offsetMetadataRecord);
-                        updateOffsetTimeSeries(offsetMetadataRecord);
-                    } else if (record instanceof KafkaGroupMetadataRecord) {
-                        KafkaGroupMetadataRecord groupMetadataRecord = (KafkaGroupMetadataRecord)record;
-                        groupMetadata.updateGroupMetadata(groupMetadataRecord.getValue());
-                    } else {
-                        LOGGER.warn("Ignoring unsupported metadata record = {}", record);
-                    }
+        cacheUpdate.forEach((key, value) -> {
+            if (key instanceof GroupMetadataKey) {
+                GroupMetadataKey groupMetadataKey = (GroupMetadataKey)key;
+                GroupMetadataAdapter groupMetadata =
+                        ServerGroupMetadata.ofNullable((GroupMetadata)value);
 
-                    boolean removed = removeGroupMetadataIfHasNoMetadata(groupMetadata);
+                String groupName = groupMetadataKey.key();
+                groupUpdates.put(groupName, groupMetadata);
+            } else if (key instanceof OffsetKey) {
+                OffsetKey offsetKey = (OffsetKey)key;
+                OffsetAndMetadataAdapter offsetAndMetadata =
+                        ServerOffsetAndMetadata.ofNullable((OffsetAndMetadata)value);
 
-                    if (removed) {
-                        effectiveUpdate.put(groupMetadata.getName(), null);
-                    } else {
-                        effectiveUpdate.put(groupMetadata.getName(), groupMetadata);
-                    }
-                } catch (Exception ex) {
-                    LOGGER.error(
-                            String.format(
-                                    "Failed to handle 'group metadata updated' event. Record = %s",
-                                    record),
-                            ex);
-                }
-            });
-        } finally {
-            lock.writeLock().unlock();
+                String groupName = offsetKey.key().group();
+                TopicPartition topicPartition = offsetKey.key().topicPartition();
+
+                Map<TopicPartition, OffsetAndMetadataAdapter> offsetsMetadata =
+                        offsetUpdates.computeIfAbsent(
+                                groupName,
+                                k -> new HashMap<>());
+
+                offsetsMetadata.put(topicPartition, offsetAndMetadata);
+            } else {
+                LOGGER.warn("Ignoring unsupported group metadata record: key={}, value={}", key, value);
+            }
+        });
+
+        applyUpdates(groupUpdates, offsetUpdates, UpdateMode.UPDATE);
+    }
+
+    private void bootstrapInitialData() {
+        Map<String, GroupMetadataAdapter> groupUpdates =
+                toClientGroupMetadataUpdates(adminOperations.describeAllConsumerGroups());
+        if (MapUtils.isEmpty(groupUpdates)) {
+            return;
         }
 
-        fireCacheListener(effectiveUpdate);
+        Map<String, Map<TopicPartition, OffsetAndMetadataAdapter>> offsetUpdates =
+                toClientOffsetMetadataUpdates(adminOperations.listAllConsumerGroupOffsets());
+
+        applyUpdates(groupUpdates, offsetUpdates, UpdateMode.SET);
     }
 
     private void startMetadataCache() throws Exception {
@@ -215,72 +222,214 @@ class KafkaConsumerGroupCache implements com.epam.eco.commons.kafka.cache.CacheL
         metadataCache.close();
     }
 
-    private KafkaGroupMetadata getGroupMetadata(String groupName, boolean createIfMissing) {
+    private void applyUpdates(
+            Map<String, GroupMetadataAdapter> groupUpdates,
+            Map<String, Map<TopicPartition, OffsetAndMetadataAdapter>> offsetUpdates,
+            UpdateMode mode) {
+        if (MapUtils.isEmpty(groupUpdates) && MapUtils.isEmpty(offsetUpdates)) {
+            return;
+        }
+
+        Map<String, KafkaGroupMetadata> effectiveUpdate = new HashMap<>();
+
+        lock.writeLock().lock();
+        try {
+            if (!MapUtils.isEmpty(groupUpdates)) {
+                groupUpdates.forEach((groupName, update) -> {
+                    try {
+                        KafkaGroupMetadata groupMetadata = getGroupMetadata(groupName, update != null);
+                        if (groupMetadata != null) {
+                            groupMetadata.setGroupMetadata(update);
+
+                            boolean removed = removeGroupMetadataIfInvalid(groupMetadata);
+                            if (removed) {
+                                effectiveUpdate.put(groupMetadata.getName(), null);
+                            } else {
+                                effectiveUpdate.put(groupMetadata.getName(), groupMetadata);
+                            }
+                        }
+                    } catch (Exception ex) {
+                        LOGGER.error(
+                                String.format(
+                                        "Failed to apply group metadata update: group=%s, update=%s",
+                                        groupName, update),
+                                ex);
+                    }
+                });
+            }
+            if (!MapUtils.isEmpty(offsetUpdates)) {
+                offsetUpdates.forEach((groupName, update) -> {
+                    try {
+                        KafkaGroupMetadata groupMetadata = getGroupMetadata(groupName, false);
+                        if (groupMetadata == null) {
+                            throw new RuntimeException("Group not found");
+                        }
+
+                        if (mode == UpdateMode.SET) {
+                            groupMetadata.setOffsetsMetadata(update);
+                            setTopicGroups(groupName, update);
+                            setOffsetTimeSeries(groupName, update);
+                        } else if (mode == UpdateMode.UPDATE) {
+                            groupMetadata.updateOffsetsMetadata(update);
+                            updateTopicGroups(groupName, update);
+                            updateOffsetTimeSeries(groupName, update);
+                        } else {
+                            throw new IllegalArgumentException("Unknown update mode " + mode);
+                        }
+
+                        effectiveUpdate.put(groupMetadata.getName(), groupMetadata);
+                    } catch (Exception ex) {
+                        LOGGER.error(
+                                String.format(
+                                        "Failed to apply offset metadata update: group=%s, update=%s",
+                                        groupName, update),
+                                ex);
+                    }
+                });
+            }
+        } finally {
+            lock.writeLock().unlock();
+        }
+
+        fireCacheListener(effectiveUpdate);
+    }
+
+    private KafkaGroupMetadata getGroupMetadata(String groupName, boolean createIfAbsent) {
         KafkaGroupMetadata groupMetadata = groupCache.get(groupName);
-        if (groupMetadata == null && createIfMissing) {
+        if (groupMetadata == null && createIfAbsent) {
             groupMetadata = new KafkaGroupMetadata(groupName);
             groupCache.put(groupName, groupMetadata);
         }
         return groupMetadata;
     }
 
-    private void updateGroupsOfTopic(KafkaOffsetMetadataRecord offsetMetadataRecord) {
-        String groupName = offsetMetadataRecord.getGroupName();
-        String topicName = offsetMetadataRecord.getKey().key().topicPartition().topic();
-        Set<String> groupNames = groupsOfTopic.get(topicName);
-        if (offsetMetadataRecord.getValue() != null) { // add
-            if (groupNames == null) {
-                groupNames = new HashSet<>();
-                groupsOfTopic.put(topicName, groupNames);
-            }
-            groupNames.add(groupName);
-        } else { // remove
-            if (groupNames != null) {
-                groupNames.remove(groupName);
-                if (groupNames.isEmpty()) {
-                    groupsOfTopic.remove(topicName);
-                }
-            }
-        }
-    }
-
-    private void updateOffsetTimeSeries(KafkaOffsetMetadataRecord offsetMetadataRecord) {
-        String groupName = offsetMetadataRecord.getGroupName();
-        TopicPartition topicPartition = offsetMetadataRecord.getKey().key().topicPartition();
-        Map<TopicPartition, OffsetTimeSeries> groupTimeSeries =
-                offsetTimeSeries.get(groupName);
-        OffsetAndMetadata offsetAndMetadata = offsetMetadataRecord.getValue();
-        if (offsetAndMetadata != null) {
-            if (groupTimeSeries == null) {
-                groupTimeSeries = new HashMap<>();
-                offsetTimeSeries.put(groupName, groupTimeSeries);
-            }
-
-            OffsetTimeSeries partitionTimeSeries = groupTimeSeries.get(topicPartition);
-            if (partitionTimeSeries == null) {
-                partitionTimeSeries = new OffsetTimeSeries(topicPartition);
-                groupTimeSeries.put(topicPartition, partitionTimeSeries);
-            }
-
-            partitionTimeSeries.append(
-                    offsetAndMetadata.commitTimestamp(),
-                    offsetAndMetadata.offset());
-        } else {
-            if (groupTimeSeries != null) {
-                groupTimeSeries.remove(topicPartition);
-                if (groupTimeSeries.isEmpty()) {
-                    offsetTimeSeries.remove(groupName);
-                }
-            }
-        }
-    }
-
-    private boolean removeGroupMetadataIfHasNoMetadata(KafkaGroupMetadata groupMetadata) {
-        if (groupMetadata.hasMetadata()) {
+    private boolean removeGroupMetadataIfInvalid(KafkaGroupMetadata groupMetadata) {
+        if (groupMetadata.isValid()) {
             return false;
         }
 
         return groupCache.remove(groupMetadata.getName()) != null;
+    }
+
+    private void setTopicGroups(
+            String groupName,
+            Map<TopicPartition, OffsetAndMetadataAdapter> offsetsMetadata) {
+        if (MapUtils.isEmpty(offsetsMetadata)) {
+            return;
+        }
+
+        Set<String> topicNames = offsetsMetadata.entrySet().stream().
+                filter(entry -> entry.getValue() != null).
+                map(entry -> entry.getKey().topic()).
+                collect(Collectors.toSet());
+        topicNames.forEach(topicName -> {
+            Set<String> groups = topicGroups.get(topicName);
+            if (groups == null) {
+                groups = new HashSet<>();
+                topicGroups.put(topicName, groups);
+            }
+            groups.add(groupName);
+        });
+    }
+
+    private void updateTopicGroups(
+            String groupName,
+            Map<TopicPartition, OffsetAndMetadataAdapter> offsetsMetadata) {
+        if (MapUtils.isEmpty(offsetsMetadata)) {
+            return;
+        }
+
+        offsetsMetadata.forEach((topicPartition, offsetAndMetadata) -> {
+            String topicName = topicPartition.topic();
+            Set<String> groups = topicGroups.get(topicName);
+            if (offsetAndMetadata != null) { // add
+                if (groups == null) {
+                    groups = new HashSet<>();
+                    topicGroups.put(topicName, groups);
+                }
+                groups.add(groupName);
+            } else { // remove
+                if (groups != null) {
+                    groups.remove(groupName);
+                    if (groups.isEmpty()) {
+                        topicGroups.remove(topicName);
+                    }
+                }
+            }
+        });
+    }
+
+    private void setOffsetTimeSeries(
+            String groupName,
+            Map<TopicPartition, OffsetAndMetadataAdapter> offsetsMetadata) {
+        if (MapUtils.isEmpty(offsetsMetadata)) {
+            return;
+        }
+
+        offsetsMetadata.entrySet().stream().
+            // client API gives no timestampts...
+            filter(entry -> entry.getValue() != null && entry.getValue().getCommitTimestamp() != null).
+            forEach(entry -> {
+                TopicPartition topicPartition = entry.getKey();
+                OffsetAndMetadataAdapter offsetAndMetadata = entry.getValue();
+
+                Map<TopicPartition, OffsetTimeSeries> groupTimeSeries = offsetTimeSeries.get(groupName);
+                if (groupTimeSeries == null) {
+                    groupTimeSeries = new HashMap<>();
+                    offsetTimeSeries.put(groupName, groupTimeSeries);
+                }
+
+                OffsetTimeSeries partitionTimeSeries = groupTimeSeries.get(topicPartition);
+                if (partitionTimeSeries == null) {
+                    partitionTimeSeries = new OffsetTimeSeries(topicPartition);
+                    groupTimeSeries.put(topicPartition, partitionTimeSeries);
+                }
+
+                partitionTimeSeries.append(
+                        offsetAndMetadata.getCommitTimestamp(),
+                        offsetAndMetadata.getOffset());
+            });
+    }
+
+    private void updateOffsetTimeSeries(
+            String groupName,
+            Map<TopicPartition, OffsetAndMetadataAdapter> offsetsMetadata) {
+        if (MapUtils.isEmpty(offsetsMetadata)) {
+            return;
+        }
+
+        offsetsMetadata.entrySet().stream().
+            // client API gives no timestampts...
+            filter(entry -> entry.getValue() == null || entry.getValue().getCommitTimestamp() != null).
+            forEach(entry -> {
+                TopicPartition topicPartition = entry.getKey();
+                OffsetAndMetadataAdapter offsetAndMetadata = entry.getValue();
+
+                Map<TopicPartition, OffsetTimeSeries> groupTimeSeries = offsetTimeSeries.get(groupName);
+                if (offsetAndMetadata != null) {
+                    if (groupTimeSeries == null) {
+                        groupTimeSeries = new HashMap<>();
+                        offsetTimeSeries.put(groupName, groupTimeSeries);
+                    }
+
+                    OffsetTimeSeries partitionTimeSeries = groupTimeSeries.get(topicPartition);
+                    if (partitionTimeSeries == null) {
+                        partitionTimeSeries = new OffsetTimeSeries(topicPartition);
+                        groupTimeSeries.put(topicPartition, partitionTimeSeries);
+                    }
+
+                    partitionTimeSeries.append(
+                            offsetAndMetadata.getCommitTimestamp(),
+                            offsetAndMetadata.getOffset());
+                } else {
+                    if (groupTimeSeries != null) {
+                        groupTimeSeries.remove(topicPartition);
+                        if (groupTimeSeries.isEmpty()) {
+                            offsetTimeSeries.remove(groupName);
+                        }
+                    }
+                }
+            });
     }
 
     private void fireCacheListener(Map<String, KafkaGroupMetadata> update) {
@@ -291,7 +440,7 @@ class KafkaConsumerGroupCache implements com.epam.eco.commons.kafka.cache.CacheL
                 } catch (Exception ex) {
                     LOGGER.error(
                             String.format(
-                                    "Failed to handle 'group metadata updated' event. Group = %s",
+                                    "Failed to handle 'group metadata updated'. Group = %s",
                                     metadata),
                             ex);
                 }
@@ -301,12 +450,47 @@ class KafkaConsumerGroupCache implements com.epam.eco.commons.kafka.cache.CacheL
                 } catch (Exception ex) {
                     LOGGER.error(
                             String.format(
-                                    "Failed to handle 'group metadata removed' event. Group name = %s",
+                                    "Failed to handle 'group metadata removed'. Group name = %s",
                                     name),
                             ex);
                 }
             }
         });
+    }
+
+    private static Map<String, GroupMetadataAdapter> toClientGroupMetadataUpdates(
+            Map<String, ConsumerGroupDescription> rawGroups) {
+        if (MapUtils.isEmpty(rawGroups)) {
+            return Collections.emptyMap();
+        }
+
+        return rawGroups.entrySet().stream().
+                collect(
+                        Collectors.toMap(
+                                entry -> entry.getKey(),
+                                entry -> ClientGroupMetadata.ofNullable(entry.getValue())));
+    }
+
+    private static Map<String, Map<TopicPartition, OffsetAndMetadataAdapter>> toClientOffsetMetadataUpdates(
+            Map<String, Map<TopicPartition, org.apache.kafka.clients.consumer.OffsetAndMetadata>> rawOffsets) {
+        if (MapUtils.isEmpty(rawOffsets)) {
+            return Collections.emptyMap();
+        }
+
+        Map<String, Map<TopicPartition, OffsetAndMetadataAdapter>> offsetUpdates = new HashMap<>();
+        rawOffsets.forEach((groupName, rawOffsetsMetadata) -> {
+            Map<TopicPartition, OffsetAndMetadataAdapter> offsetsMetadata = rawOffsetsMetadata.entrySet().stream().
+                    collect(
+                            Collectors.toMap(
+                                    entry -> entry.getKey(),
+                                    entry -> ClientOffsetAndMetadata.ofNullable(entry.getValue())));
+            offsetUpdates.put(groupName, offsetsMetadata);
+        });
+        return offsetUpdates;
+    }
+
+    private static enum UpdateMode {
+        SET, UPDATE
     }
 
     public static interface CacheListener {

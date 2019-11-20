@@ -16,6 +16,7 @@
 package com.epam.eco.kafkamanager.core.consumer.repo.kafka;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -26,20 +27,22 @@ import java.util.stream.Collectors;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.Validate;
 import org.apache.kafka.common.TopicPartition;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import com.epam.eco.commons.kafka.ScalaConversions;
 import com.epam.eco.kafkamanager.ConsumerGroupInfo;
 import com.epam.eco.kafkamanager.ConsumerGroupInfo.StorageType;
+import com.epam.eco.kafkamanager.ConsumerGroupMemberInfo;
 import com.epam.eco.kafkamanager.ConsumerGroupMetadataKey;
 import com.epam.eco.kafkamanager.ConsumerGroupRepo;
 import com.epam.eco.kafkamanager.ConsumerGroupSearchQuery;
-import com.epam.eco.kafkamanager.ConsumerInfo;
 import com.epam.eco.kafkamanager.EntityType;
+import com.epam.eco.kafkamanager.KafkaAdminOperations;
 import com.epam.eco.kafkamanager.Metadata;
 import com.epam.eco.kafkamanager.MetadataKey;
 import com.epam.eco.kafkamanager.MetadataRepo;
@@ -51,11 +54,6 @@ import com.epam.eco.kafkamanager.core.spring.AsyncStartingBean;
 import com.epam.eco.kafkamanager.repo.AbstractKeyValueRepo;
 import com.epam.eco.kafkamanager.repo.CachedRepo;
 
-import kafka.common.OffsetAndMetadata;
-import kafka.coordinator.group.GroupMetadata;
-import kafka.coordinator.group.MemberMetadata;
-import kafka.coordinator.group.OffsetKey;
-
 /**
  * @author Andrei_Tytsik
  */
@@ -63,6 +61,8 @@ public class KafkaConsumerGroupRepo extends AbstractKeyValueRepo<String, Consume
 
     private final static Logger LOGGER = LoggerFactory.getLogger(KafkaConsumerGroupRepo.class);
 
+    @Autowired
+    private KafkaAdminOperations adminOperations;
     @Autowired
     private KafkaManagerProperties properties;
     @Autowired
@@ -96,10 +96,9 @@ public class KafkaConsumerGroupRepo extends AbstractKeyValueRepo<String, Consume
 
     private void initGroupCache() {
         groupCache = new KafkaConsumerGroupCache(
+                adminOperations,
                 properties.getBootstrapServers(),
                 properties.getClientConfig(),
-                properties.getConsumerStoreBootstrapTimeoutInMs(),
-                properties.getConsumerStoreBootstrapDataFreshness(),
                 this);
     }
 
@@ -247,12 +246,17 @@ public class KafkaConsumerGroupRepo extends AbstractKeyValueRepo<String, Consume
 
     private ConsumerGroupInfo toConsumerGroupInfo(KafkaGroupMetadata metadata) {
         String groupName = metadata.getName();
-        List<ConsumerInfo> consumerInfos = toConsumerInfos(metadata.getGroupMetadata());
+        GroupMetadataAdapter groupMetadata = metadata.getGroupMetadata();
+        List<ConsumerGroupMemberInfo> memberInfos = toMemberInfos(groupMetadata);
         Map<TopicPartition, OffsetAndMetadataInfo> offsetAndMetadataInfos =
-                toOffsetAndMetadataInfos(metadata.getOffsetsAndMetadata());
+                toOffsetAndMetadataInfos(metadata.getOffsetsMetadata());
         return ConsumerGroupInfo.builder().
                 name(groupName).
-                members(consumerInfos).
+                coordinator(groupMetadata.getCoordinator()).
+                state(groupMetadata.getState()).
+                protocolType(groupMetadata.getProtocolType()).
+                partitionAssignor(groupMetadata.getPartitionAssignor()).
+                members(memberInfos).
                 offsetsAndMetadata(offsetAndMetadataInfos).
                 offsetTimeSeries(groupCache.getOffsetTimeSeries(groupName)).
                 storageType(StorageType.KAFKA).
@@ -260,47 +264,40 @@ public class KafkaConsumerGroupRepo extends AbstractKeyValueRepo<String, Consume
                 build();
     }
 
-    private static List<ConsumerInfo> toConsumerInfos(GroupMetadata groupMetadata) {
-        if (groupMetadata == null || groupMetadata.allMembers().isEmpty()) {
+    private static List<ConsumerGroupMemberInfo> toMemberInfos(GroupMetadataAdapter groupMetadata) {
+        Collection<MemberMetadataAdapter> members = groupMetadata.getMembers();
+        if (CollectionUtils.isEmpty(members)) {
             return Collections.emptyList();
         }
 
-        List<MemberMetadata> memberMetadatas = ScalaConversions.
-                asJavaList(groupMetadata.allMemberMetadata());
-        return memberMetadatas.stream().
-                map(metadata -> ConsumerInfo.builder().
-                        groupName(metadata.groupId()).
-                        clientId(metadata.clientId()).
-                        memberId(metadata.memberId()).
-                        clientHost(metadata.clientHost()).
-                        protocolType(metadata.protocolType()).
-                        rebalanceTimeoutMs(metadata.rebalanceTimeoutMs()).
-                        sessionTimeoutMs(metadata.sessionTimeoutMs()).
-                        latestHeartbeatDate(metadata.latestHeartbeat()).
+        return members.stream().
+                map(metadata -> ConsumerGroupMemberInfo.builder().
+                        clientId(metadata.getClientId()).
+                        memberId(metadata.getMemberId()).
+                        clientHost(metadata.getClientHost()).
+                        rebalanceTimeoutMs(metadata.getRebalanceTimeoutMs()).
+                        sessionTimeoutMs(metadata.getSessionTimeoutMs()).
+                        latestHeartbeatDate(metadata.getLatestHeartbeatDate()).
+                        assignment(metadata.getAssignment()).
                         build()).
                 sorted().
                 collect(Collectors.toList());
     }
 
     private static Map<TopicPartition, OffsetAndMetadataInfo> toOffsetAndMetadataInfos(
-            Map<OffsetKey, OffsetAndMetadata> offsetsAndMetadata) {
-        if (offsetsAndMetadata.isEmpty()) {
+            Map<TopicPartition, OffsetAndMetadataAdapter> offsetsAndMetadata) {
+        if (MapUtils.isEmpty(offsetsAndMetadata)) {
             return Collections.emptyMap();
         }
 
         Map<TopicPartition, OffsetAndMetadataInfo> offsetAndMetadataInfos = new HashMap<>();
-        offsetsAndMetadata.keySet().forEach(offsetKey -> {
-            OffsetAndMetadata offsetAndMetadata = offsetsAndMetadata.get(offsetKey);
-            TopicPartition topicPartition = offsetKey.key().topicPartition();
+        offsetsAndMetadata.forEach((topicPartition,offsetAndMetadata) -> {
             OffsetAndMetadataInfo offsetAndMetadataInfo = OffsetAndMetadataInfo.builder().
                     topicPartition(topicPartition).
-                    offset(offsetAndMetadata.offset()).
-                    metadata(offsetAndMetadata.metadata()).
-                    commitDate(offsetAndMetadata.commitTimestamp()).
-                    expireDate(
-                            offsetAndMetadata.expireTimestamp().isDefined() ?
-                            (Long)offsetAndMetadata.expireTimestamp().get() :
-                            -1L).
+                    offset(offsetAndMetadata.getOffset()).
+                    metadata(offsetAndMetadata.getMetadata()).
+                    commitDate(offsetAndMetadata.getCommitTimestamp()).
+                    expireDate(offsetAndMetadata.getExpireTimestamp()).
                     build();
             offsetAndMetadataInfos.put(topicPartition, offsetAndMetadataInfo);
         });

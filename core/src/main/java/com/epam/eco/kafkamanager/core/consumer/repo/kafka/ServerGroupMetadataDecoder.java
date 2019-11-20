@@ -22,9 +22,7 @@ import org.apache.kafka.common.utils.Time;
 
 import com.epam.eco.commons.kafka.serde.KeyValueDecoder;
 
-import kafka.common.OffsetAndMetadata;
 import kafka.coordinator.group.BaseKey;
-import kafka.coordinator.group.GroupMetadata;
 import kafka.coordinator.group.GroupMetadataKey;
 import kafka.coordinator.group.GroupMetadataManager;
 import kafka.coordinator.group.OffsetKey;
@@ -32,34 +30,32 @@ import kafka.coordinator.group.OffsetKey;
 /**
  * @author Andrei_Tytsik
  */
-public class KafkaGroupMetadataDecoder implements KeyValueDecoder<BaseKey, KafkaMetadataRecord<?, ?>> {
+class ServerGroupMetadataDecoder implements KeyValueDecoder<BaseKey, Object> {
 
     @Override
     public BaseKey decodeKey(byte[] keyBytes) {
         Validate.notNull(keyBytes, "Key bytes array can't be null");
 
-        ByteBuffer keyByteBuffer = ByteBuffer.wrap(keyBytes);
-        return GroupMetadataManager.readMessageKey(keyByteBuffer);
+        return GroupMetadataManager.readMessageKey(ByteBuffer.wrap(keyBytes));
     }
 
     @Override
-    public KafkaMetadataRecord<?, ?> decodeValue(BaseKey key, byte[] valueBytes) {
+    public Object decodeValue(BaseKey key, byte[] valueBytes) {
         Validate.notNull(key, "Key can't be null");
 
-        ByteBuffer valueByteBuffer = valueBytes != null ? ByteBuffer.wrap(valueBytes) : null;
+        if (valueBytes == null) {
+            return null;
+        }
+
         if (key instanceof OffsetKey) {
-            OffsetAndMetadata value =
-                    valueByteBuffer != null ? GroupMetadataManager.readOffsetMessageValue(valueByteBuffer) : null;
-            return new KafkaOffsetMetadataRecord((OffsetKey)key, value);
+            return GroupMetadataManager.readOffsetMessageValue(ByteBuffer.wrap(valueBytes));
         } else if (key instanceof GroupMetadataKey) {
-            GroupMetadata value =
-                    valueByteBuffer != null ?
-                    GroupMetadataManager.readGroupMessageValue(((GroupMetadataKey)key).key(), valueByteBuffer, Time.SYSTEM) :
-                    null;
-            return new KafkaGroupMetadataRecord((GroupMetadataKey)key, value);
+            return GroupMetadataManager.readGroupMessageValue(
+                    ((GroupMetadataKey)key).key(),
+                    ByteBuffer.wrap(valueBytes),
+                    Time.SYSTEM);
         } else {
-            throw new IllegalArgumentException(
-                    String.format("Unsupported key=%s", key));
+            throw new IllegalArgumentException("Unsupported key=" + key);
         }
     }
 

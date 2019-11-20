@@ -16,7 +16,9 @@
 package com.epam.eco.kafkamanager;
 
 import java.time.LocalDateTime;
+import java.util.Collections;
 
+import org.apache.kafka.common.TopicPartition;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -27,19 +29,18 @@ import com.epam.eco.kafkamanager.utils.TestObjectMapperSingleton;
 /**
  * @author Andrei_Tytsik
  */
-public class ConsumerInfoTest {
+public class ConsumerGroupMemberInfoTest {
 
     @Test
     public void testSerializedToJsonAndBack() throws Exception {
-        ConsumerInfo origin = ConsumerInfo.builder().
-                groupName("groupName").
+        ConsumerGroupMemberInfo origin = ConsumerGroupMemberInfo.builder().
                 clientId("clientId").
                 memberId("memberId").
                 clientHost("localhost").
-                protocolType("ssl").
                 rebalanceTimeoutMs(3000).
                 latestHeartbeatDate(LocalDateTime.now()).
                 sessionTimeoutMs(10000).
+                assignment(Collections.singleton(new TopicPartition("topic", 0))).
                 build();
 
         ObjectMapper mapper = TestObjectMapperSingleton.getObjectMapper();
@@ -47,9 +48,9 @@ public class ConsumerInfoTest {
         String json = mapper.writeValueAsString(origin);
         Assert.assertNotNull(json);
 
-        ConsumerInfo deserialized = mapper.readValue(
+        ConsumerGroupMemberInfo deserialized = mapper.readValue(
                 json,
-                ConsumerInfo.class);
+                ConsumerGroupMemberInfo.class);
         Assert.assertNotNull(deserialized);
         Assert.assertEquals(origin, deserialized);
     }

@@ -26,6 +26,9 @@ import javax.annotation.PreDestroy;
 
 import org.apache.kafka.clients.admin.AdminClient;
 import org.apache.kafka.clients.admin.Config;
+import org.apache.kafka.clients.admin.ConsumerGroupDescription;
+import org.apache.kafka.clients.consumer.OffsetAndMetadata;
+import org.apache.kafka.common.TopicPartition;
 import org.apache.kafka.common.acl.AclBinding;
 import org.apache.kafka.common.acl.AclBindingFilter;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -121,6 +124,16 @@ public class KafkaAdminOperationsImpl implements KafkaAdminOperations {
                 AdminClientUtils.describeAnyBrokerConfigEntry(
                         adminClient,
                         KafkaConfig.DefaultReplicationFactorProp()).value());
+    }
+
+    @Override
+    public Map<String, ConsumerGroupDescription> describeAllConsumerGroups() {
+        return AdminClientUtils.describeAllConsumerGroups(adminClient);
+    }
+
+    @Override
+    public Map<String, Map<TopicPartition, OffsetAndMetadata>> listAllConsumerGroupOffsets() {
+        return AdminClientUtils.listAllConsumerGroupOffsets(adminClient);
     }
 
     @Override

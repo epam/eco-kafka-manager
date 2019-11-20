@@ -57,5 +57,10 @@
         <Method name="lambda$onCacheUpdated$1" />
         <Bug pattern="ITC_INHERITANCE_TYPE_CHECKING" />
     </Match>
-
+    <Match>
+        <Class name="com.epam.eco.kafkamanager.core.consumer.repo.kafka.ServerGroupMetadataDecoder" />
+        <Method name="decodeValue" />
+        <Bug pattern="URV_UNRELATED_RETURN_VALUES" />
+    </Match>
+    
 </FindBugsFilter>

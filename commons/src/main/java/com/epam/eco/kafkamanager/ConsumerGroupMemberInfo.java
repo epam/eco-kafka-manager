@@ -17,53 +17,63 @@ package com.epam.eco.kafkamanager;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 import java.util.Objects;
 import java.util.TimeZone;
+import java.util.stream.Collectors;
 
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.Validate;
+import org.apache.kafka.common.TopicPartition;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
  * @author Andrei_Tytsik
  */
-public class ConsumerInfo implements Comparable<ConsumerInfo> {
+public class ConsumerGroupMemberInfo implements Comparable<ConsumerGroupMemberInfo> {
 
-    private final String groupName;
     private final String clientId;
     private final String memberId;
     private final String clientHost;
-    private final String protocolType;
     private final Integer rebalanceTimeoutMs;
     private final Integer sessionTimeoutMs;
     private final LocalDateTime latestHeartbeatDate;
+    private final List<TopicPartition> assignment;
 
-    public ConsumerInfo(
-            @JsonProperty("groupName") String groupName,
+    public ConsumerGroupMemberInfo(
             @JsonProperty("clientId") String clientId,
             @JsonProperty("memberId") String memberId,
             @JsonProperty("clientHost") String clientHost,
-            @JsonProperty("protocolType") String protocolType,
             @JsonProperty("rebalanceTimeoutMs") Integer rebalanceTimeoutMs,
             @JsonProperty("sessionTimeoutMs") Integer sessionTimeoutMs,
-            @JsonProperty("latestHeartbeatDate") LocalDateTime latestHeartbeatDate) {
-        Validate.notBlank(groupName, "Group name is blank");
+            @JsonProperty("latestHeartbeatDate") LocalDateTime latestHeartbeatDate,
+            @JsonProperty("assignment") Collection<TopicPartition> assignment) {
         Validate.notBlank(clientId, "Client id is blank");
+        if (assignment != null) {
+            Validate.noNullElements(assignment, "Collection of assignments contains null elements");
+        }
 
-        this.groupName = groupName;
         this.clientId = clientId;
         this.memberId = memberId;
         this.clientHost = clientHost;
-        this.protocolType = protocolType;
         this.rebalanceTimeoutMs = rebalanceTimeoutMs;
         this.sessionTimeoutMs = sessionTimeoutMs;
         this.latestHeartbeatDate = latestHeartbeatDate;
+        this.assignment =
+                !CollectionUtils.isEmpty(assignment) ?
+                assignment.stream().
+                        sorted().
+                        collect(
+                                Collectors.collectingAndThen(
+                                        Collectors.toList(),
+                                        Collections::unmodifiableList)) :
+                Collections.emptyList();
     }
 
-    public String getGroupName() {
-        return groupName;
-    }
     public String getClientId() {
         return clientId;
     }
@@ -72,9 +82,6 @@ public class ConsumerInfo implements Comparable<ConsumerInfo> {
     }
     public String getClientHost() {
         return clientHost;
-    }
-    public String getProtocolType() {
-        return protocolType;
     }
     public Integer getRebalanceTimeoutMs() {
         return rebalanceTimeoutMs;
@@ -85,18 +92,20 @@ public class ConsumerInfo implements Comparable<ConsumerInfo> {
     public LocalDateTime getLatestHeartbeatDate() {
         return latestHeartbeatDate;
     }
+    public List<TopicPartition> getAssignment() {
+        return assignment;
+    }
 
     @Override
     public int hashCode() {
         return Objects.hash(
-                groupName,
                 clientId,
                 memberId,
                 clientHost,
-                protocolType,
                 rebalanceTimeoutMs,
                 sessionTimeoutMs,
-                latestHeartbeatDate);
+                latestHeartbeatDate,
+                assignment);
     }
 
     @Override
@@ -107,38 +116,33 @@ public class ConsumerInfo implements Comparable<ConsumerInfo> {
         if (obj == null || obj.getClass() != this.getClass()) {
             return false;
         }
-        ConsumerInfo that = (ConsumerInfo)obj;
+        ConsumerGroupMemberInfo that = (ConsumerGroupMemberInfo)obj;
         return
-                Objects.equals(this.groupName, that.groupName) &&
                 Objects.equals(this.clientId, that.clientId) &&
                 Objects.equals(this.memberId, that.memberId) &&
                 Objects.equals(this.clientHost, that.clientHost) &&
-                Objects.equals(this.protocolType, that.protocolType) &&
                 Objects.equals(this.rebalanceTimeoutMs, that.rebalanceTimeoutMs) &&
                 Objects.equals(this.sessionTimeoutMs, that.sessionTimeoutMs) &&
-                Objects.equals(this.latestHeartbeatDate, that.latestHeartbeatDate);
+                Objects.equals(this.latestHeartbeatDate, that.latestHeartbeatDate) &&
+                Objects.equals(this.assignment, that.assignment);
     }
 
     @Override
     public String toString() {
         return
-                "{groupName: " + groupName +
-                ", clientId: " + clientId +
+                "{clientId: " + clientId +
                 ", memberId: " + memberId +
                 ", clientHost: " + clientHost +
-                ", protocolType: " + protocolType +
                 ", rebalanceTimeoutMs: " + rebalanceTimeoutMs +
                 ", sessionTimeoutMs: " + sessionTimeoutMs +
                 ", latestHeartbeatDate: " + latestHeartbeatDate +
+                ", assignment: " + assignment +
                 "}";
     }
 
     @Override
-    public int compareTo(ConsumerInfo that) {
-        int result = ObjectUtils.compare(this.groupName, that.groupName);
-        if (result == 0) {
-            result = ObjectUtils.compare(this.clientId, that.clientId);
-        }
+    public int compareTo(ConsumerGroupMemberInfo that) {
+        int result = ObjectUtils.compare(this.clientId, that.clientId);
         if (result == 0) {
             result = ObjectUtils.compare(this.memberId, that.memberId);
         }
@@ -151,19 +155,14 @@ public class ConsumerInfo implements Comparable<ConsumerInfo> {
 
     public static class Builder {
 
-        private String groupName;
         private String clientId;
         private String memberId;
         private String clientHost;
-        private String protocolType;
         private Integer rebalanceTimeoutMs;
         private Integer sessionTimeoutMs;
         private LocalDateTime latestHeartbeatDate;
+        private Collection<TopicPartition> assignment;
 
-        public Builder groupName(String groupName) {
-            this.groupName = groupName;
-            return this;
-        }
         public Builder clientId(String clientId) {
             this.clientId = clientId;
             return this;
@@ -176,10 +175,6 @@ public class ConsumerInfo implements Comparable<ConsumerInfo> {
             this.clientHost = clientHost;
             return this;
         }
-        public Builder protocolType(String protocolType) {
-            this.protocolType = protocolType;
-            return this;
-        }
         public Builder rebalanceTimeoutMs(Integer rebalanceTimeoutMs) {
             this.rebalanceTimeoutMs = rebalanceTimeoutMs;
             return this;
@@ -188,31 +183,34 @@ public class ConsumerInfo implements Comparable<ConsumerInfo> {
             this.sessionTimeoutMs = sessionTimeoutMs;
             return this;
         }
+        public Builder latestHeartbeatDate(Long latestHeartbeatDate) {
+            if (latestHeartbeatDate == null) {
+                return latestHeartbeatDate((LocalDateTime)null);
+            } else {
+                return latestHeartbeatDate(
+                        LocalDateTime.ofInstant(
+                                Instant.ofEpochMilli(latestHeartbeatDate),
+                                TimeZone.getDefault().toZoneId()));
+            }
+        }
         public Builder latestHeartbeatDate(LocalDateTime latestHeartbeatDate) {
             this.latestHeartbeatDate = latestHeartbeatDate;
             return this;
         }
-        public Builder latestHeartbeatDate(Long latestHeartbeatDate) {
-            if (latestHeartbeatDate != null && latestHeartbeatDate > 0) {
-                this.latestHeartbeatDate = LocalDateTime.ofInstant(
-                        Instant.ofEpochMilli(latestHeartbeatDate),
-                        TimeZone.getDefault().toZoneId());
-            } else {
-                this.latestHeartbeatDate = null;
-            }
+        public Builder assignment(Collection<TopicPartition> assignment) {
+            this.assignment = assignment;
             return this;
         }
 
-        public ConsumerInfo build() {
-            return new ConsumerInfo(
-                    groupName,
+        public ConsumerGroupMemberInfo build() {
+            return new ConsumerGroupMemberInfo(
                     clientId,
                     memberId,
                     clientHost,
-                    protocolType,
                     rebalanceTimeoutMs,
                     sessionTimeoutMs,
-                    latestHeartbeatDate);
+                    latestHeartbeatDate,
+                    assignment);
         }
 
     }

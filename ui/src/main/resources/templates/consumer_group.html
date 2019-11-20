@@ -70,6 +70,18 @@
                                 <span th:text="${group.name}"></span>
                             </p>
                             <p>
+                                <b>State:</b>
+                                <span th:text="${group.state}"></span>
+                            </p>
+                            <p>
+                                <b>Protocol Type:</b>
+                                <span th:text="${group.protocolType}"></span>
+                            </p>
+                            <p>
+                                <b>Partition Assignor:</b>
+                                <span th:text="${group.partitionAssignor}"></span>
+                            </p>
+                            <p>
                                 <b>Description:</b>
                                 <span 
                                     th:text="${group.metadataDescription}" 
@@ -136,10 +148,10 @@
                                         <td>Client Id</td>
                                         <td>Member Id</td>
                                         <td>Client Host</td>
-                                        <td>Protocol Type</td>
                                         <td>Rebalance Timeout (ms)</td>
                                         <td>Session Timeout (ms)</td>
                                         <td>Latest Heartbeat Date</td>
+                                        <td>Assignment</td>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -147,10 +159,15 @@
                                         <td th:text="${member.clientId}"></td>
                                         <td th:text="${member.memberId}"></td>
                                         <td th:text="${member.clientHost}"></td>
-                                        <td th:text="${member.protocolType}"></td>
                                         <td th:text="${member.rebalanceTimeoutMs}"></td>
                                         <td th:text="${member.sessionTimeoutMs}"></td>
                                         <td th:text="${member.latestHeartbeatDate}"></td>
+                                        <td>
+											<th:block th:each="partition,iter : ${member.assignment}">
+                                                <span th:if="${iter.index &gt; 0}" th:text="${', '}"></span>
+                                                <span th:text="${partition}"></span>
+                                            </th:block>
+                                        </td>
                                     </tr>
                                 </tbody>
                             </table>

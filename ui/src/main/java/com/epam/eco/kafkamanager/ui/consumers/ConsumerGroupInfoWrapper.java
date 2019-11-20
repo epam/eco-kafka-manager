@@ -21,15 +21,16 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.Validate;
+import org.apache.kafka.common.ConsumerGroupState;
 import org.apache.kafka.common.TopicPartition;
 
 import com.epam.eco.kafkamanager.ConsumerGroupInfo;
 import com.epam.eco.kafkamanager.ConsumerGroupInfo.StorageType;
-import com.epam.eco.kafkamanager.ui.utils.CollapsedCollectionIterable;
-import com.epam.eco.kafkamanager.ConsumerInfo;
+import com.epam.eco.kafkamanager.ConsumerGroupMemberInfo;
 import com.epam.eco.kafkamanager.Metadata;
 import com.epam.eco.kafkamanager.OffsetAndMetadataInfo;
 import com.epam.eco.kafkamanager.OffsetTimeSeries;
+import com.epam.eco.kafkamanager.ui.utils.CollapsedCollectionIterable;
 
 /**
  * @author Andrei_Tytsik
@@ -54,11 +55,23 @@ public class ConsumerGroupInfoWrapper {
         return groupInfo.getName();
     }
 
+    public ConsumerGroupState getState() {
+        return groupInfo.getState();
+    }
+
+    public String getProtocolType() {
+        return groupInfo.getProtocolType();
+    }
+
+    public String getPartitionAssignor() {
+        return groupInfo.getPartitionAssignor();
+    }
+
     public boolean hasMembers() {
         return !groupInfo.getMembers().isEmpty();
     }
 
-    public List<ConsumerInfo> getMembers() {
+    public List<ConsumerGroupMemberInfo> getMembers() {
         return groupInfo.getMembers();
     }
 

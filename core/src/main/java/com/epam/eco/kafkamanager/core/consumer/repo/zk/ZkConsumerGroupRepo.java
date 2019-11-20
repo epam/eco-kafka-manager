@@ -34,10 +34,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import com.epam.eco.kafkamanager.ConsumerGroupInfo;
 import com.epam.eco.kafkamanager.ConsumerGroupInfo.StorageType;
+import com.epam.eco.kafkamanager.ConsumerGroupMemberInfo;
 import com.epam.eco.kafkamanager.ConsumerGroupMetadataKey;
 import com.epam.eco.kafkamanager.ConsumerGroupRepo;
 import com.epam.eco.kafkamanager.ConsumerGroupSearchQuery;
-import com.epam.eco.kafkamanager.ConsumerInfo;
 import com.epam.eco.kafkamanager.EntityType;
 import com.epam.eco.kafkamanager.Metadata;
 import com.epam.eco.kafkamanager.MetadataKey;
@@ -230,9 +230,8 @@ public class ZkConsumerGroupRepo extends AbstractKeyValueRepo<String, ConsumerGr
     }
 
     private ConsumerGroupInfo toInfo(ConsumerGroup group) {
-        List<ConsumerInfo> consumerInfos = group.members.stream().
-                map(member -> ConsumerInfo.builder().
-                        groupName(group.name).
+        List<ConsumerGroupMemberInfo> memberInfos = group.members.stream().
+                map(member -> ConsumerGroupMemberInfo.builder().
                         clientId(member).
                         build()).
                 collect(Collectors.toList());
@@ -248,7 +247,7 @@ public class ZkConsumerGroupRepo extends AbstractKeyValueRepo<String, ConsumerGr
         return ConsumerGroupInfo.builder().
                 name(group.name).
                 offsetsAndMetadata(offsetAndMetadataInfos).
-                members(consumerInfos).
+                members(memberInfos).
                 storageType(StorageType.ZOOKEEPER).
                 metadata(metadataRepo.get(ConsumerGroupMetadataKey.with(group.name))).
                 build();

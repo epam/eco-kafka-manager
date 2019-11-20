@@ -191,11 +191,15 @@ public class OffsetAndMetadataInfo implements Comparable<OffsetAndMetadataInfo> 
             return this;
         }
 
-        public Builder commitDate(long commitDate) {
-            return commitDate(
-                    LocalDateTime.ofInstant(
-                            Instant.ofEpochMilli(commitDate),
-                            TimeZone.getDefault().toZoneId()));
+        public Builder commitDate(Long commitDate) {
+            if (commitDate == null) {
+                return commitDate((LocalDateTime)null);
+            } else {
+                return commitDate(
+                        LocalDateTime.ofInstant(
+                                Instant.ofEpochMilli(commitDate),
+                                TimeZone.getDefault().toZoneId()));
+            }
         }
 
         public Builder commitDate(LocalDateTime commitDate) {
@@ -203,9 +207,9 @@ public class OffsetAndMetadataInfo implements Comparable<OffsetAndMetadataInfo> 
             return this;
         }
 
-        public Builder expireDate(long expireDate) {
-            if (expireDate < 0) {
-                return expireDate(null);
+        public Builder expireDate(Long expireDate) {
+            if (expireDate == null) {
+                return expireDate((LocalDateTime)null);
             } else {
                 return expireDate(
                         LocalDateTime.ofInstant(

@@ -19,6 +19,9 @@ import java.util.Collection;
 import java.util.Map;
 
 import org.apache.kafka.clients.admin.Config;
+import org.apache.kafka.clients.admin.ConsumerGroupDescription;
+import org.apache.kafka.clients.consumer.OffsetAndMetadata;
+import org.apache.kafka.common.TopicPartition;
 import org.apache.kafka.common.acl.AclBinding;
 import org.apache.kafka.common.acl.AclBindingFilter;
 
@@ -41,5 +44,7 @@ public interface KafkaAdminOperations {
     void deleteAllRecords(String topicName);
     void alterTopicConfig(String topicName, Map<String, String> configMap);
     int getDefaultReplicationFactor();
+    Map<String, ConsumerGroupDescription> describeAllConsumerGroups();
+    Map<String, Map<TopicPartition, OffsetAndMetadata>> listAllConsumerGroupOffsets();
     String getZkConnect();
 }

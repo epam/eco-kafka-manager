@@ -75,7 +75,7 @@
         <kafka.version>2.2.2-cp1</kafka.version>
         <cp.version>5.2.3</cp.version>
         <eco-commons.version>0.1.1</eco-commons.version>
-        <eco-commons-kafka.version>1.2.0</eco-commons-kafka.version>
+        <eco-commons-kafka.version>1.2.1</eco-commons-kafka.version>
         <ehcache.version>3.5.2</ehcache.version>
         <dropwizard.version>3.2.2</dropwizard.version>
         <hawkular.version>0.27.0.Final</hawkular.version>

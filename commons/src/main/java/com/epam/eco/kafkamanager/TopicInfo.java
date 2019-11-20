@@ -61,8 +61,7 @@ public class TopicInfo implements MetadataAware, Comparable<TopicInfo> {
         Validate.noNullElements(config.values(), "Collection of config values contains null elements");
 
         this.name = name;
-        this.partitions = Collections.unmodifiableMap(
-                KafkaUtils.sortedByTopicPartitionKeyMap(partitions));
+        this.partitions = Collections.unmodifiableMap(KafkaUtils.sortedByTopicPartitionKeyMap(partitions));
         this.config = Collections.unmodifiableMap(new TreeMap<>(config));
         this.metadata = metadata;
 

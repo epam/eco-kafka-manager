@@ -16,7 +16,9 @@
 package com.epam.eco.kafkamanager;
 
 import java.time.LocalDateTime;
+import java.util.Collections;
 
+import org.apache.kafka.common.ConsumerGroupState;
 import org.apache.kafka.common.TopicPartition;
 import org.junit.Assert;
 import org.junit.Test;
@@ -34,25 +36,27 @@ public class ConsumerGroupInfoTest {
     public void testSerializedToJsonAndBack() throws Exception {
         ConsumerGroupInfo origin = ConsumerGroupInfo.builder()
                 .name("consumerGroupName")
-                .addMember(ConsumerInfo.builder()
-                        .groupName("consumerGroupName")
+                .coordinator(1)
+                .state(ConsumerGroupState.STABLE)
+                .protocolType("consumer")
+                .partitionAssignor("range")
+                .addMember(ConsumerGroupMemberInfo.builder()
                         .clientId("1")
                         .latestHeartbeatDate(LocalDateTime.now())
                         .clientHost("1.1.1.1")
                         .memberId("memberId-1")
-                        .protocolType("tcp")
                         .rebalanceTimeoutMs(1000)
                         .sessionTimeoutMs(10000)
+                        .assignment(Collections.singleton(new TopicPartition("topic", 0)))
                         .build())
-                .addMember(ConsumerInfo.builder()
-                        .groupName("consumerGroupName")
+                .addMember(ConsumerGroupMemberInfo.builder()
                         .clientId("2")
                         .latestHeartbeatDate(LocalDateTime.now())
                         .clientHost("2.2.2.2")
                         .memberId("memberId-2")
-                        .protocolType("tcp")
                         .rebalanceTimeoutMs(1000)
                         .sessionTimeoutMs(10000)
+                        .assignment(Collections.singleton(new TopicPartition("topic", 0)))
                         .build())
                 .storageType(ConsumerGroupInfo.StorageType.KAFKA)
                 .addOffsetsAndMetadata(OffsetAndMetadataInfo.builder()

@@ -18,41 +18,45 @@ package com.epam.eco.kafkamanager.core.consumer.repo.kafka;
 import org.apache.commons.lang3.Validate;
 
 import kafka.common.OffsetAndMetadata;
-import kafka.coordinator.group.OffsetKey;
 
 /**
  * @author Andrei_Tytsik
  */
-class KafkaOffsetMetadataRecord implements KafkaMetadataRecord<OffsetKey, OffsetAndMetadata> {
+class ServerOffsetAndMetadata implements OffsetAndMetadataAdapter {
 
-    private final OffsetKey key;
-    private final OffsetAndMetadata value;
+    private final OffsetAndMetadata metadata;
 
-    public KafkaOffsetMetadataRecord(OffsetKey key, OffsetAndMetadata value) {
-        Validate.notNull(key, "Key is null");
+    public ServerOffsetAndMetadata(OffsetAndMetadata metadata) {
+        Validate.notNull(metadata, "Offset metadata is null");
 
-        this.key = key;
-        this.value = value;
+        this.metadata = metadata;
     }
 
     @Override
-    public String getGroupName() {
-        return key.key().group();
+    public long getOffset() {
+        return metadata.offset();
     }
 
     @Override
-    public OffsetKey getKey() {
-        return key;
+    public String getMetadata() {
+        return metadata.metadata();
     }
 
     @Override
-    public OffsetAndMetadata getValue() {
-        return value;
+    public Long getCommitTimestamp() {
+        return metadata.commitTimestamp();
     }
 
     @Override
-    public String toString() {
-        return String.format("{key: %s, value: %s}", key, value);
+    public Long getExpireTimestamp() {
+        return
+                metadata.expireTimestamp().isDefined() ?
+                (Long)metadata.expireTimestamp().get() :
+                null;
+    }
+
+    public static ServerOffsetAndMetadata ofNullable(OffsetAndMetadata metadata) {
+        return metadata != null ? new ServerOffsetAndMetadata(metadata) : null;
     }
 
 }

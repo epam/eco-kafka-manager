@@ -41,11 +41,9 @@ public class KafkaManagerProperties {
     private String bootstrapServers;
     private String schemaRegistryUrl;
     private Map<String, Object> clientConfig;
-    private long consumerStoreBootstrapTimeoutInMs = 3 * 60 * 1000;
-    private DatePeriod consumerStoreBootstrapDataFreshness = DatePeriod.ONE_DAY;
     private long metadataStoreBootstrapTimeoutInMs = 3 * 60 * 1000;
     private long transactionStoreBootstrapTimeoutInMs = 3 * 60 * 1000;
-    private DatePeriod transactionStoreBootstrapDataFreshness = DatePeriod.ONE_DAY;
+    private DatePeriod transactionStoreBootstrapDataFreshness = DatePeriod.ONE_HOUR;
 
     private Map<String, Object> commonConsumerConfig;
     private Map<String, Object> commonProducerConfig;
@@ -75,18 +73,6 @@ public class KafkaManagerProperties {
     }
     public void setClientConfig(Map<String, Object> clientConfig) {
         this.clientConfig = clientConfig;
-    }
-    public long getConsumerStoreBootstrapTimeoutInMs() {
-        return consumerStoreBootstrapTimeoutInMs;
-    }
-    public void setConsumerStoreBootstrapTimeoutInMs(long consumerStoreBootstrapTimeoutInMs) {
-        this.consumerStoreBootstrapTimeoutInMs = consumerStoreBootstrapTimeoutInMs;
-    }
-    public DatePeriod getConsumerStoreBootstrapDataFreshness() {
-        return consumerStoreBootstrapDataFreshness;
-    }
-    public void setConsumerStoreBootstrapDataFreshness(DatePeriod consumerStoreBootstrapDataFreshness) {
-        this.consumerStoreBootstrapDataFreshness = consumerStoreBootstrapDataFreshness;
     }
     public long getMetadataStoreBootstrapTimeoutInMs() {
         return metadataStoreBootstrapTimeoutInMs;

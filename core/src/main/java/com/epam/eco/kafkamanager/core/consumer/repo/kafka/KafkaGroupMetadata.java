@@ -17,12 +17,11 @@ package com.epam.eco.kafkamanager.core.consumer.repo.kafka;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicReference;
 
+import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.Validate;
-
-import kafka.common.OffsetAndMetadata;
-import kafka.coordinator.group.GroupMetadata;
-import kafka.coordinator.group.OffsetKey;
+import org.apache.kafka.common.TopicPartition;
 
 /**
  * @author Andrei_Tytsik
@@ -30,8 +29,8 @@ import kafka.coordinator.group.OffsetKey;
 class KafkaGroupMetadata {
 
     private final String name;
-    private GroupMetadata groupMetadata;
-    private final Map<OffsetKey, OffsetAndMetadata> offsetsAndMetadata = new HashMap<>();
+    private final AtomicReference<GroupMetadataAdapter> groupMetadata = new AtomicReference<>();
+    private final Map<TopicPartition, OffsetAndMetadataAdapter> offsetsMetadata = new HashMap<>();
 
     public KafkaGroupMetadata(String name) {
         Validate.notBlank(name, "Name can't be blank");
@@ -43,40 +42,54 @@ class KafkaGroupMetadata {
         return name;
     }
 
-    public GroupMetadata getGroupMetadata() {
-        return groupMetadata;
+    public GroupMetadataAdapter getGroupMetadata() {
+        return groupMetadata.get();
     }
 
-    public Map<OffsetKey, OffsetAndMetadata> getOffsetsAndMetadata() {
-        return offsetsAndMetadata;
+    public Map<TopicPartition, OffsetAndMetadataAdapter> getOffsetsMetadata() {
+        return offsetsMetadata;
     }
 
-    public void updateGroupMetadata(GroupMetadata metadata) {
-        this.groupMetadata = metadata;
+    public void setGroupMetadata(GroupMetadataAdapter groupMetadata) {
+        this.groupMetadata.set(groupMetadata);
     }
 
-    public void updateOffsetsAndMetadata(Map<OffsetKey, OffsetAndMetadata> offsetsAndMetadata) {
-        this.offsetsAndMetadata.putAll(offsetsAndMetadata);
-    }
+    public void setOffsetsMetadata(Map<TopicPartition, OffsetAndMetadataAdapter> offsetsMetadata) {
+        this.offsetsMetadata.clear();
 
-    public void updateOffsetAndMetadata(OffsetKey key, OffsetAndMetadata value) {
-        Validate.notNull(key, "Key is null");
-
-        if (value != null) {
-            offsetsAndMetadata.put(key, value);
-        } else {
-            offsetsAndMetadata.remove(key);
+        if (!MapUtils.isEmpty(offsetsMetadata)) {
+            this.offsetsMetadata.putAll(offsetsMetadata);
         }
     }
 
-    public boolean hasMetadata() {
-        return groupMetadata != null || !offsetsAndMetadata.isEmpty();
+    public void updateOffsetsMetadata(Map<TopicPartition, OffsetAndMetadataAdapter> offsetsMetadata) {
+        if (MapUtils.isEmpty(offsetsMetadata)) {
+            return;
+        }
+
+        offsetsMetadata.forEach(this::updateOffsetMetadata);
+    }
+
+    public void updateOffsetMetadata(
+            TopicPartition topicPartition,
+            OffsetAndMetadataAdapter offsetAndMetadata) {
+        Validate.notNull(topicPartition, "TopicPartition is null");
+
+        if (offsetAndMetadata != null) {
+            offsetsMetadata.put(topicPartition, offsetAndMetadata);
+        } else {
+            offsetsMetadata.remove(topicPartition);
+        }
+    }
+
+    public boolean isValid() {
+        return groupMetadata.get() != null;
     }
 
     public KafkaGroupMetadata copyOf() {
-        KafkaGroupMetadata copy = new KafkaGroupMetadata(this.name);
-        copy.updateGroupMetadata(this.groupMetadata);
-        copy.updateOffsetsAndMetadata(this.offsetsAndMetadata);
+        KafkaGroupMetadata copy = new KafkaGroupMetadata(getName());
+        copy.setGroupMetadata(getGroupMetadata());
+        copy.setOffsetsMetadata(getOffsetsMetadata());
         return copy;
     }
 
