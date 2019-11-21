@@ -30,6 +30,7 @@
                 location.params(
                         {
                             groupName: $('#groupName').val(), 
+                            state: $('#state').val(),
                             storageType: $('#storageType').val(),
                             description: $('#description').val(),
                             page: 1
@@ -79,7 +80,16 @@
                             id="groupName" 
                             placeholder="Group Name"
                             th:value="${searchQuery.groupName}"/>
-                        <select class="form-control" id="storageType">
+                        <select title="State" class="form-control" id="state">
+                            <option value="">-</option>
+                            <option 
+                                th:each="state : ${T(org.apache.kafka.common.ConsumerGroupState).values()}"
+                                th:value="${state.name()}" 
+                                th:text="${state}"
+                                th:selected="${state == searchQuery.state}">
+                            </option>
+                        </select>
+                        <select title="Storage Type" class="form-control" id="storageType">
                             <option value="">-</option>
                             <option 
                                 th:each="type : ${T(com.epam.eco.kafkamanager.ConsumerGroupInfo$StorageType).values()}"
@@ -115,6 +125,7 @@
                                 <tr>
                                     <td>Name</td>
                                     <td>Storage</td>
+                                    <td>State</td>
                                     <td>Topics</td>
                                     <td>Members</td>
                                     <td>Offsets</td>
@@ -127,8 +138,8 @@
                                         <a th:href="@{/consumer_groups/{name}(name=${group.name})}"><span
                                                 th:text="${group.name}"></span></a>
                                     </td>
-                                    <td th:text="${group.storageType}">
-                                    </td>
+                                    <td th:text="${group.storageType}"/>
+                                    <td th:text="${group.state}"/>
                                     <td>
                                         <th:block th:each="topic : ${group.getTopicNamesAsCollapsedCol(5)}">
                                             <a th:if="${!topic.divider}" th:href="@{/topics/{name}(name=${topic.value})}">

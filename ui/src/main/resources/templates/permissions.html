@@ -139,7 +139,7 @@
                     </div>
                 
                     <form class="form-inline form-flex" id="search_form">
-                        <select class="form-control" id="resourceType">
+                        <select title="Resource Type" class="form-control" id="resourceType">
                             <option value="">-</option>
                             <option 
                                 th:each="resourceType : ${T(org.apache.kafka.common.resource.ResourceType).values()}"
@@ -160,7 +160,7 @@
                             id="kafkaPrincipal" 
                             placeholder="Kafka Principal"
                             th:value="${searchQuery.kafkaPrincipal}"/>
-                        <select class="form-control" id="permissionType">
+                        <select title="Permission Type" class="form-control" id="permissionType">
                             <option value="">-</option>
                             <option 
                                 th:each="permissionType : ${T(org.apache.kafka.common.acl.AclPermissionType).values()}"
@@ -169,7 +169,7 @@
                                 th:selected="${permissionType == searchQuery.permissionType}">
                             </option>
                         </select>
-                        <select class="form-control" id="operation">
+                        <select title="Operation" class="form-control" id="operation">
                             <option value="">-</option>
                             <option 
                                 th:each="operation : ${T(org.apache.kafka.common.acl.AclOperation).values()}"

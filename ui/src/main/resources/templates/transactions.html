@@ -78,7 +78,7 @@
                             placeholder="Transactional Id"
                             th:value="${searchQuery.transactionalId}"/>
 
-                        <select class="form-control" id="state">
+                        <select title="State" class="form-control" id="state">
                             <option value="">-</option>
                             <option 
                                 th:each="state : ${T(com.epam.eco.commons.kafka.TransactionState).values()}"

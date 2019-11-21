@@ -81,7 +81,7 @@
             <div class="row">
                 <div class="col-md-10 col-md-offset-1">
                     <form class="form-inline form-flex" id="search_form">
-                        <select class="form-control" id="type">
+                        <select title="Type" class="form-control" id="type">
                             <option value="">-</option>
                             <option 
                                 th:each="type : ${T(com.epam.eco.kafkamanager.udmetrics.UDMetricType).values()}"
@@ -96,7 +96,7 @@
                             id="resourceName" 
                             placeholder="Resource Name"
                             th:value="${searchQuery.resourceName}"/>
-                        <select class="form-control" id="status">
+                        <select title="Status" class="form-control" id="status">
                             <option value="">-</option>
                             <option 
                                 th:each="status : ${T(com.epam.eco.kafkamanager.udmetrics.UDMetricSearchQuery$Status).values()}"

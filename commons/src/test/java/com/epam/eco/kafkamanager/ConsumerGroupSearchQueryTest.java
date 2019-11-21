@@ -18,6 +18,7 @@ package com.epam.eco.kafkamanager;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.kafka.common.ConsumerGroupState;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -35,6 +36,7 @@ public class ConsumerGroupSearchQueryTest {
     public void testSerializedToJsonAndBack() throws Exception {
         ConsumerGroupSearchQuery origin = ConsumerGroupSearchQuery.builder().
                 groupName("group1").
+                state(ConsumerGroupState.STABLE).
                 storageType(StorageType.KAFKA).
                 description("description").
                 build();
@@ -55,12 +57,14 @@ public class ConsumerGroupSearchQueryTest {
     public void testDeserializedFromJson1() throws Exception {
         Map<String, Object> json = new HashMap<>();
         json.put("groupName", "group1");
+        json.put("state", "EMPTY");
         json.put("storageType", "KAFKA");
         json.put("description", "description");
 
         ConsumerGroupSearchQuery query = ConsumerGroupSearchQuery.fromJson(json);
         Assert.assertNotNull(query);
         Assert.assertEquals("group1", query.getGroupName());
+        Assert.assertEquals(ConsumerGroupState.EMPTY, query.getState());
         Assert.assertEquals(StorageType.KAFKA, query.getStorageType());
         Assert.assertEquals("description", query.getDescription());
     }
@@ -70,6 +74,7 @@ public class ConsumerGroupSearchQueryTest {
         String json =
                 "{" +
                 "\"groupName\": \"group1\"" +
+                ", \"state\": \"COMPLETING_REBALANCE\"" +
                 ", \"storageType\": \"KAFKA\"" +
                 ", \"description\": \"description\"" +
                 "}";
@@ -77,6 +82,7 @@ public class ConsumerGroupSearchQueryTest {
         ConsumerGroupSearchQuery query = ConsumerGroupSearchQuery.fromJson(json);
         Assert.assertNotNull(query);
         Assert.assertEquals("group1", query.getGroupName());
+        Assert.assertEquals(ConsumerGroupState.COMPLETING_REBALANCE, query.getState());
         Assert.assertEquals(StorageType.KAFKA, query.getStorageType());
         Assert.assertEquals("description", query.getDescription());
     }

@@ -166,7 +166,7 @@
                             id="maxConsumerCount" 
                             placeholder="Max Consumer Count"
                             th:value="${searchQuery.maxConsumerCount}"/>
-                        <select class="form-control" id="replicationState">
+                        <select title="Replication State" class="form-control" id="replicationState">
                             <option 
                                 th:each="state : ${T(com.epam.eco.kafkamanager.TopicSearchQuery$ReplicationState).values()}"
                                 th:value="${state}" 

@@ -20,6 +20,7 @@ import java.util.Objects;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
+import org.apache.kafka.common.ConsumerGroupState;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -32,20 +33,26 @@ import com.epam.eco.kafkamanager.utils.MapperUtils;
 public class ConsumerGroupSearchQuery implements SearchQuery<ConsumerGroupInfo> {
 
     private final String groupName;
+    private final ConsumerGroupState state;
     private final StorageType storageType;
     private final String description;
 
     public ConsumerGroupSearchQuery(
             @JsonProperty("groupName") String groupName,
+            @JsonProperty("state") ConsumerGroupState state,
             @JsonProperty("storageType") StorageType storageType,
             @JsonProperty("description") String description) {
         this.groupName = groupName;
+        this.state = state;
         this.storageType = storageType;
         this.description = description;
     }
 
     public String getGroupName() {
         return groupName;
+    }
+    public ConsumerGroupState getState() {
+        return state;
     }
     public StorageType getStorageType() {
         return storageType;
@@ -60,6 +67,7 @@ public class ConsumerGroupSearchQuery implements SearchQuery<ConsumerGroupInfo> 
 
         return
                 (StringUtils.isBlank(groupName) || StringUtils.containsIgnoreCase(obj.getName(), groupName)) &&
+                (state == null || Objects.equals(obj.getState(), state)) &&
                 (storageType == null || Objects.equals(obj.getStorageType(), storageType)) &&
                 (
                         StringUtils.isBlank(description) ||
@@ -78,19 +86,21 @@ public class ConsumerGroupSearchQuery implements SearchQuery<ConsumerGroupInfo> 
         ConsumerGroupSearchQuery that = (ConsumerGroupSearchQuery) obj;
         return
                 Objects.equals(this.groupName, that.groupName) &&
+                Objects.equals(this.state, that.state) &&
                 Objects.equals(this.storageType, that.storageType) &&
                 Objects.equals(this.description, that.description);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(groupName, storageType, description);
+        return Objects.hash(groupName, state, storageType, description);
     }
 
     @Override
     public String toString() {
         return
                 "{groupName: " + groupName +
+                ", state: " + state +
                 ", storageType: " + storageType +
                 ", description: " + description +
                 "}";
@@ -123,6 +133,7 @@ public class ConsumerGroupSearchQuery implements SearchQuery<ConsumerGroupInfo> 
     public static class Builder {
 
         private String groupName;
+        private ConsumerGroupState state;
         private StorageType storageType;
         private String description;
 
@@ -132,12 +143,18 @@ public class ConsumerGroupSearchQuery implements SearchQuery<ConsumerGroupInfo> 
             }
 
             this.groupName = origin.groupName;
+            this.state = origin.state;
             this.storageType = origin.storageType;
             this.description = origin.description;
         }
 
         public Builder groupName(String groupName) {
             this.groupName = groupName;
+            return this;
+        }
+
+        public Builder state(ConsumerGroupState state) {
+            this.state = state;
             return this;
         }
 
@@ -152,7 +169,7 @@ public class ConsumerGroupSearchQuery implements SearchQuery<ConsumerGroupInfo> 
         }
 
         public ConsumerGroupSearchQuery build() {
-            return new ConsumerGroupSearchQuery(groupName, storageType, description);
+            return new ConsumerGroupSearchQuery(groupName, state, storageType, description);
         }
 
     }
