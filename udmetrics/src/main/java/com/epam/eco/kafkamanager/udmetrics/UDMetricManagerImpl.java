@@ -31,6 +31,7 @@ import javax.annotation.PostConstruct;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.Validate;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -202,7 +203,9 @@ public class UDMetricManagerImpl implements UDMetricManager, UpdateListener {
                     kafkaManager);
             return UDMetric.with(config, metrics);
         } catch (Exception ex) {
-            return UDMetric.withErrors(config, Collections.singletonList(ex.getMessage()));
+            String message =
+                    ex.getMessage() != null ? ex.getMessage() : ExceptionUtils.getMessage(ex);
+            return UDMetric.withErrors(config, Collections.singletonList(message));
         }
     }
 
