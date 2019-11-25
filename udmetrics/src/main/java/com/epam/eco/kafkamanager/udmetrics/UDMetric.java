@@ -16,57 +16,49 @@
 package com.epam.eco.kafkamanager.udmetrics;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.Validate;
-
-import com.codahale.metrics.Metric;
-import com.codahale.metrics.MetricSet;
 
 /**
  * @author Andrei_Tytsik
  */
-public final class UDMetric implements MetricSet, Comparable<UDMetric> {
+public final class UDMetric implements Comparable<UDMetric> {
 
     private final UDMetricConfig config;
-    private final Map<String, Metric> metrics;
+    private final List<Metric> metrics;
     private final List<String> errors;
 
     private final int hashCode;
     private final String toString;
 
-    public UDMetric(
+    private UDMetric(
             UDMetricConfig config,
-            List<String> errors) {
+            Collection<Metric> metrics,
+            Collection<String> errors) {
         Validate.notNull(config, "Config is null");
-        Validate.notEmpty(errors, "Collection of errors is null or empty");
+        if (!CollectionUtils.isEmpty(metrics)) {
+            Validate.noNullElements(metrics, "Collection of metrics contain null elements");
+        }
+        if (!CollectionUtils.isEmpty(errors)) {
+            Validate.noNullElements(errors, "Collection of errors contain null elements");
+        }
 
         this.config = config;
-        this.metrics = Collections.emptyMap();
-        this.errors = Collections.unmodifiableList(new ArrayList<>(errors));
-
-        hashCode = calculateHashCode();
-        toString = calculateToString();
-    }
-
-    public UDMetric(
-            UDMetricConfig config,
-            Map<String, Metric> metrics) {
-        Validate.notNull(config, "Config is null");
-        Validate.notEmpty(metrics, "Metrics map is null or empty");
-        Validate.noNullElements(
-                metrics.keySet(), "Collection of metric keys contain null elements");
-        Validate.noNullElements(
-                metrics.values(), "Collection of metric values contain null elements");
-
-        this.config = config;
-        this.metrics = Collections.unmodifiableMap(new LinkedHashMap<>(metrics));
-        this.errors = Collections.emptyList();
+        this.metrics =
+                !CollectionUtils.isEmpty(metrics) ?
+                Collections.unmodifiableList(new ArrayList<>(metrics)) :
+                Collections.emptyList();
+        this.errors =
+                !CollectionUtils.isEmpty(errors) ?
+                Collections.unmodifiableList(new ArrayList<>(errors)) :
+                Collections.emptyList();
 
         hashCode = calculateHashCode();
         toString = calculateToString();
@@ -84,8 +76,7 @@ public final class UDMetric implements MetricSet, Comparable<UDMetric> {
     public Map<String, Object> getConfig() {
         return config.getConfig();
     }
-    @Override
-    public Map<String, Metric> getMetrics() {
+    public List<Metric> getMetrics() {
         return metrics;
     }
     public List<String> getErrors() {
@@ -138,16 +129,12 @@ public final class UDMetric implements MetricSet, Comparable<UDMetric> {
                 "}";
     }
 
-    public static UDMetric with(
-            UDMetricConfig config,
-            Map<String, Metric> metrics) {
-        return new UDMetric(config, metrics);
+    public static UDMetric with(UDMetricConfig config, Collection<Metric> metrics) {
+        return new UDMetric(config, metrics, null);
     }
 
-    public static UDMetric with(
-            UDMetricConfig config,
-            List<String> errors) {
-        return new UDMetric(config, errors);
+    public static UDMetric withErrors(UDMetricConfig config, Collection<String> errors) {
+        return new UDMetric(config, null, errors);
     }
 
 }

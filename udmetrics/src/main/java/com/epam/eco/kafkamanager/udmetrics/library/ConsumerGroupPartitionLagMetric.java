@@ -22,37 +22,69 @@ import org.apache.kafka.common.TopicPartition;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.codahale.metrics.Gauge;
-
 import com.epam.eco.commons.kafka.KafkaUtils;
 import com.epam.eco.commons.kafka.OffsetRange;
 import com.epam.eco.kafkamanager.KafkaManager;
 import com.epam.eco.kafkamanager.exec.TaskResult;
-import com.epam.eco.kafkamanager.udmetrics.schedule.ScheduleCalculatedMetric;
+import com.epam.eco.kafkamanager.udmetrics.Metric;
+import com.epam.eco.kafkamanager.udmetrics.ScheduleCalculatedMetric;
+
+import io.micrometer.core.instrument.Tags;
 
 /**
  * @author Andrei_Tytsik
  */
-public class ConsumerGroupPartitionLagMetric implements Gauge<Long>, ScheduleCalculatedMetric {
+public class ConsumerGroupPartitionLagMetric implements Metric, ScheduleCalculatedMetric {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ConsumerGroupPartitionLagMetric.class);
 
+    public static final String TAG_GROUP = "group";
+    public static final String TAG_TOPIC = "topic";
+    public static final String TAG_PARTITION = "partition";
+
     private final String groupName;
     private final TopicPartition partition;
+
+    private final Tags tags;
 
     private final KafkaManager kafkaManager;
 
     public ConsumerGroupPartitionLagMetric(
             String groupName,
-            TopicPartition partition,
+            TopicPartition topicPartition,
             KafkaManager kafkaManager) {
-        Validate.notBlank(groupName, "Group name is blank");
-        Validate.notNull(partition, "Partition is null");
         Validate.notNull(kafkaManager, "Kafka manager is null");
 
         this.groupName = groupName;
-        this.partition = partition;
+        this.partition = topicPartition;
         this.kafkaManager = kafkaManager;
+
+        this.tags = Tags.of(
+                TAG_GROUP, groupName,
+                TAG_TOPIC, topicPartition.topic(),
+                TAG_PARTITION, "" + topicPartition.partition());
+    }
+
+    @Override
+    public Tags getTags() {
+        return tags;
+    }
+
+    @Override
+    public double value() {
+        if (!checkGroupExists()) {
+            return Double.NaN;
+        }
+
+        try {
+            Long offset = getPartitionOffset();
+            OffsetRange offsetRange = getPartitionOffsetRange();
+
+            return calculateLag(offsetRange, offset);
+        } catch (Exception ex) {
+            LOGGER.error("Failed to calculate consumer group lag: {}", ex.getMessage());
+            return Double.NaN;
+        }
     }
 
     @Override
@@ -68,23 +100,6 @@ public class ConsumerGroupPartitionLagMetric implements Gauge<Long>, ScheduleCal
         }
     }
 
-    @Override
-    public Long getValue() {
-        if (!checkGroupExists()) {
-            return null;
-        }
-
-        try {
-            Long offset = getPartitionOffset();
-            OffsetRange offsetRange = getPartitionOffsetRange();
-
-            return calculateLag(offsetRange, offset);
-        } catch (Exception ex) {
-            LOGGER.error("Failed to calculate consumer group lag: {}", ex.getMessage());
-            return null;
-        }
-    }
-
     public String getGroupName() {
         return groupName;
     }
@@ -92,9 +107,9 @@ public class ConsumerGroupPartitionLagMetric implements Gauge<Long>, ScheduleCal
         return partition;
     }
 
-    private Long calculateLag(OffsetRange offsetRange, Long offset) {
+    private double calculateLag(OffsetRange offsetRange, Long offset) {
         if (offsetRange == null || offset == null) {
-            return null;
+            return Double.NaN;
         }
 
         long lag = KafkaUtils.calculateConsumerLag(offsetRange, offset);
@@ -128,14 +143,9 @@ public class ConsumerGroupPartitionLagMetric implements Gauge<Long>, ScheduleCal
         return exists;
     }
 
-    public static ConsumerGroupPartitionLagMetric with(
-            String consumerGroupName,
-            TopicPartition topicPartition,
-            KafkaManager kafkaManager) {
-        return new ConsumerGroupPartitionLagMetric(
-                consumerGroupName,
-                topicPartition,
-                kafkaManager);
+    @Override
+    public String toString() {
+        return tags.toString();
     }
 
 }

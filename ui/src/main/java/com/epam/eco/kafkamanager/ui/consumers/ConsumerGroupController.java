@@ -97,7 +97,7 @@ public class ConsumerGroupController {
                 ATTR_GROUP,
                 ConsumerGroupInfoWrapper.wrap(kafkaManager.getConsumerGroup(groupName)));
 
-        String groupLagUdmName = UDMetricType.CONSUMER_GROUP_LAG.formatMetricName(groupName);
+        String groupLagUdmName = UDMetricType.CONSUMER_GROUP_LAG.formatName(groupName);
         model.addAttribute(ATTR_GROUP_LAG_UDM_TYPE, UDMetricType.CONSUMER_GROUP_LAG);
         model.addAttribute(ATTR_GROUP_LAG_UDM_NAME, groupLagUdmName);
         model.addAttribute(ATTR_GROUP_LAG_UDM, getAndWrapUdm(groupLagUdmName));
