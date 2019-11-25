@@ -13,26 +13,30 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package com.epam.eco.kafkamanager.udmetrics;
+package com.epam.eco.kafkamanager.udmetrics.utils;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Map;
+import java.util.Comparator;
 
-import com.epam.eco.kafkamanager.KafkaManager;
+import com.epam.eco.kafkamanager.udmetrics.Metric;
 
 /**
  * @author Andrei_Tytsik
  */
-public interface UDMetricCreator {
+public class MetricComparator implements Comparator<Metric> {
 
-    Collection<Metric> create(
-            String resourceName,
-            Map<String, Object> config,
-            KafkaManager kafkaManager);
+    public static final MetricComparator INSTANCE = new MetricComparator();
 
-    default Map<String, Object> configTemplate() {
-        return Collections.emptyMap();
+    @Override
+    public int compare(Metric o1, Metric o2) {
+        if (o1 == o2) {
+            return 0;
+        } else if (o2 == null) {
+            return 1;
+        } else if (o1 == null) {
+            return -1;
+        }
+
+        return MeterTagsComparator.INSTANCE.compare(o1.getTags(), o2.getTags());
     }
 
 }

@@ -15,20 +15,20 @@
  */
 package com.epam.eco.kafkamanager.udmetrics.library;
 
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.TreeMap;
+import java.util.TreeSet;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 
-import com.codahale.metrics.Metric;
-
 import com.epam.eco.kafkamanager.KafkaManager;
 import com.epam.eco.kafkamanager.TopicInfo;
-import com.epam.eco.kafkamanager.udmetrics.UDMetricConfig;
+import com.epam.eco.kafkamanager.udmetrics.Metric;
 import com.epam.eco.kafkamanager.udmetrics.UDMetricCreator;
-import com.epam.eco.kafkamanager.udmetrics.utils.MetricNameUtils;
+import com.epam.eco.kafkamanager.udmetrics.utils.MetricComparator;
 
 /**
  * @author Andrei_Tytsik
@@ -38,36 +38,39 @@ public class ConsumerGroupLagUDMCreator implements UDMetricCreator {
     public static final String TOPIC_NAMES = "topicNames";
 
     @Override
-    public Map<String, Metric> create(UDMetricConfig config, KafkaManager kafkaManager) {
-        Validate.notNull(config, "UDM config is null");
+    public Collection<Metric> create(String groupName, Map<String, Object> config, KafkaManager kafkaManager) {
+        Validate.notNull(config, "Config is null");
         Validate.notNull(kafkaManager, "KafkaManager is null");
 
-        kafkaManager.getConsumerGroup(config.getResourceName()); // sanity check
+        kafkaManager.getConsumerGroup(groupName); // sanity check
 
-        Map<String, Metric> metrics = new TreeMap<>();
+        Collection<Metric> metrics = new TreeSet<>(MetricComparator.INSTANCE);
         getTopicNames(config).forEach(topicName -> {
             TopicInfo topicInfo = kafkaManager.getTopic(topicName);
-            topicInfo.getPartitions().keySet().forEach((topicPartition) -> {
-                metrics.put(
-                        MetricNameUtils.sanitizeName(topicPartition.toString()),
-                        ConsumerGroupPartitionLagMetric.with(
-                                config.getResourceName(),
-                                topicPartition,
-                                kafkaManager));
-            });
+            topicInfo.getPartitions().keySet().forEach(topicPartition -> metrics.add(
+                    new ConsumerGroupPartitionLagMetric(
+                            groupName,
+                            topicPartition,
+                            kafkaManager)));
         });
-
         return metrics;
     }
 
+    @Override
+    public Map<String, Object> configTemplate() {
+        Map<String, Object> template = new HashMap<>();
+        template.put(TOPIC_NAMES, null);
+        return template;
+    }
+
     @SuppressWarnings("unchecked")
-    private List<String> getTopicNames(UDMetricConfig config) {
-        List<String> topicNames = (List<String>)config.getConfig().get(TOPIC_NAMES);
+    private List<String> getTopicNames(Map<String, Object> config) {
+        List<String> topicNames = (List<String>)config.get(TOPIC_NAMES);
         validateTopicNames(config, topicNames);
         return topicNames;
     }
 
-    private void validateTopicNames(UDMetricConfig config, List<String> topicNames) {
+    private void validateTopicNames(Map<String, Object> config, List<String> topicNames) {
         if (topicNames == null || topicNames.isEmpty()) {
             throw new RuntimeException(
                     String.format("UDM config %s: '%s' is missing", config, TOPIC_NAMES));
