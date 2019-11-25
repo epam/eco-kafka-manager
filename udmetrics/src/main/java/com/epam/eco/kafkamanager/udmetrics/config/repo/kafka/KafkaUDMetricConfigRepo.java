@@ -73,6 +73,11 @@ public class KafkaUDMetricConfigRepo extends AbstractKeyValueRepo<String, UDMetr
         LOGGER.info("Started");
     }
 
+    @Override
+    public int getPhase() {
+        return 1;
+    }
+
     @PreDestroy
     private void destroy() {
         destroyConfigCache();
