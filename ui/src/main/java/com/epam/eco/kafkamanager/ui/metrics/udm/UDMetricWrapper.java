@@ -15,13 +15,14 @@
  */
 package com.epam.eco.kafkamanager.ui.metrics.udm;
 
+import java.util.Collection;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Objects;
 
 import org.apache.commons.lang3.Validate;
 
-import com.codahale.metrics.Metric;
-
+import com.epam.eco.kafkamanager.udmetrics.Metric;
 import com.epam.eco.kafkamanager.udmetrics.UDMetric;
 import com.epam.eco.kafkamanager.udmetrics.UDMetricType;
 import com.epam.eco.kafkamanager.ui.utils.CollapsedCollectionIterable;
@@ -55,7 +56,7 @@ public class UDMetricWrapper {
         return udm.getConfig();
     }
 
-    public Map<String, Metric> getMetrics() {
+    public Collection<Metric> getMetrics() {
         return udm.getMetrics();
     }
 
@@ -93,7 +94,8 @@ public class UDMetricWrapper {
 
     public CollapsedCollectionIterable<String> getMetricsAsCollapsedCol(int size) {
         return new CollapsedCollectionIterable<>(
-                udm.getMetrics().keySet(),
+                udm.getMetrics(),
+                Objects::toString,
                 size);
     }
 

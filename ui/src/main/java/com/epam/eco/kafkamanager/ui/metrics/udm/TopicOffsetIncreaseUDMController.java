@@ -97,7 +97,7 @@ public class TopicOffsetIncreaseUDMController extends UDMAbstractController {
     }
 
     public static String buildMetricName(String topicName) {
-        return UDMetricType.TOPIC_OFFSET_INCREASE.formatMetricName(topicName);
+        return UDMetricType.TOPIC_OFFSET_INCREASE.formatName(topicName);
     }
 
     public static String buildMetricUrl(UDMetric udm) {

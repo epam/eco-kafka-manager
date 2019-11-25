@@ -23,21 +23,27 @@ import org.apache.kafka.common.TopicPartition;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.codahale.metrics.Gauge;
-
 import com.epam.eco.commons.kafka.OffsetRange;
 import com.epam.eco.kafkamanager.KafkaManager;
 import com.epam.eco.kafkamanager.exec.TaskResult;
-import com.epam.eco.kafkamanager.udmetrics.schedule.ScheduleCalculatedMetric;
+import com.epam.eco.kafkamanager.udmetrics.Metric;
+import com.epam.eco.kafkamanager.udmetrics.ScheduleCalculatedMetric;
+
+import io.micrometer.core.instrument.Tags;
 
 /**
  * @author Andrei_Tytsik
  */
-public class TopicPartitionOffsetIncreaseMetric implements Gauge<Long>, ScheduleCalculatedMetric {
+public class TopicPartitionOffsetIncreaseMetric implements Metric, ScheduleCalculatedMetric {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TopicPartitionOffsetIncreaseMetric.class);
 
+    public static final String TAG_TOPIC = "topic";
+    public static final String TAG_PARTITION = "partition";
+
     private final TopicPartition topicPartition;
+
+    private final Tags tags;
 
     private final KafkaManager kafkaManager;
 
@@ -46,11 +52,34 @@ public class TopicPartitionOffsetIncreaseMetric implements Gauge<Long>, Schedule
     public TopicPartitionOffsetIncreaseMetric(
             TopicPartition topicPartition,
             KafkaManager kafkaManager) {
-        Validate.notNull(topicPartition, "Topic partition is null");
-        Validate.notNull(kafkaManager, "Kafka Manager is null");
+        Validate.notNull(kafkaManager, "Kafka manager is null");
 
         this.topicPartition = topicPartition;
         this.kafkaManager = kafkaManager;
+
+        this.tags = Tags.of(
+                TAG_TOPIC, topicPartition.topic(),
+                TAG_PARTITION, "" + topicPartition.partition());
+    }
+
+    @Override
+    public Tags getTags() {
+        return tags;
+    }
+
+    @Override
+    public double value() {
+        if (!checkTopicExists()) {
+            return Double.NaN;
+        }
+
+        try {
+            OffsetRange topicOffsetRange = getTopicOffsetRange();
+            return calculateOffsetIncrease(topicOffsetRange);
+        } catch (Exception ex) {
+            LOGGER.error("Failed to calculate offset increase for topic partition", ex);
+        }
+        return Double.NaN;
     }
 
     @Override
@@ -71,32 +100,17 @@ public class TopicPartitionOffsetIncreaseMetric implements Gauge<Long>, Schedule
         }
     }
 
-    @Override
-    public Long getValue() {
-        if (!checkTopicExists()) {
-            return null;
-        }
-
-        try {
-            OffsetRange topicOffsetRange = getTopicOffsetRange();
-            return calculateOffsetIncrease(topicOffsetRange);
-        } catch (Exception ex) {
-            LOGGER.error("Failed to calculate offset increase for topic partition", ex);
-        }
-        return null;
-    }
-
     public TopicPartition getTopicPartition() {
         return topicPartition;
     }
 
-    private Long calculateOffsetIncrease(OffsetRange topicOffsetRangeNew) {
+    private double calculateOffsetIncrease(OffsetRange topicOffsetRangeNew) {
         OffsetRange topicOffsetRangeOld = this.topicOffsetRangeOld.get();
         if (
                 topicOffsetRangeNew == null ||
                 topicOffsetRangeOld == null ||
                 topicOffsetRangeOld.getLargest() > topicOffsetRangeNew.getLargest()) {
-            return null;
+            return Double.NaN;
         }
         return topicOffsetRangeNew.getLargest() - topicOffsetRangeOld.getLargest();
     }
@@ -116,18 +130,17 @@ public class TopicPartitionOffsetIncreaseMetric implements Gauge<Long>, Schedule
         kafkaManager.getTopicOffsetFetcherTaskExecutor().submit(topicPartition.topic());
     }
 
-    public static TopicPartitionOffsetIncreaseMetric with(
-            TopicPartition topicPartition,
-            KafkaManager kafkaManager) {
-        return new TopicPartitionOffsetIncreaseMetric(topicPartition, kafkaManager);
-    }
-
     private boolean checkTopicExists() {
         boolean exists = kafkaManager.topicExists(topicPartition.topic());
         if (!exists) {
             LOGGER.warn("Topic '{}' doesn't exist", topicPartition.topic());
         }
         return exists;
+    }
+
+    @Override
+    public String toString() {
+        return tags.toString();
     }
 
 }

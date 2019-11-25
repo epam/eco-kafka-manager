@@ -13,11 +13,14 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package com.epam.eco.kafkamanager.udmetrics.schedule;
+package com.epam.eco.kafkamanager.udmetrics;
+
+import io.micrometer.core.instrument.Tags;
 
 /**
  * @author Andrei_Tytsik
  */
-public interface ScheduleCalculatedMetric {
-    void calculateValue();
+public interface Metric {
+    Tags getTags();
+    double value();
 }

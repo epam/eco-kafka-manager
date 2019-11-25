@@ -15,18 +15,17 @@
  */
 package com.epam.eco.kafkamanager.udmetrics.library;
 
+import java.util.Collection;
 import java.util.Map;
-import java.util.TreeMap;
+import java.util.TreeSet;
 
 import org.apache.commons.lang3.Validate;
 
-import com.codahale.metrics.Metric;
-
 import com.epam.eco.kafkamanager.KafkaManager;
 import com.epam.eco.kafkamanager.TopicInfo;
-import com.epam.eco.kafkamanager.udmetrics.UDMetricConfig;
+import com.epam.eco.kafkamanager.udmetrics.Metric;
 import com.epam.eco.kafkamanager.udmetrics.UDMetricCreator;
-import com.epam.eco.kafkamanager.udmetrics.utils.MetricNameUtils;
+import com.epam.eco.kafkamanager.udmetrics.utils.MetricComparator;
 
 /**
  * @author Andrei_Tytsik
@@ -34,19 +33,14 @@ import com.epam.eco.kafkamanager.udmetrics.utils.MetricNameUtils;
 public class TopicOffsetIncreaseUDMCreator implements UDMetricCreator {
 
     @Override
-    public Map<String, Metric> create(UDMetricConfig config, KafkaManager kafkaManager) {
-        Validate.notNull(config, "UDM config is null");
+    public Collection<Metric> create(String topicName, Map<String, Object> config, KafkaManager kafkaManager) {
+        Validate.notNull(kafkaManager, "KafkaManager is null");
 
-        Map<String, Metric> metrics = new TreeMap<>();
-        TopicInfo topicInfo = kafkaManager.getTopic(config.getResourceName());
-        topicInfo.getPartitions().keySet().forEach((topicPartition) -> {
-            metrics.put(
-                    MetricNameUtils.sanitizeName(topicPartition.toString()),
-                    TopicPartitionOffsetIncreaseMetric.with(
-                            topicPartition,
-                            kafkaManager));
-        });
+        TopicInfo topicInfo = kafkaManager.getTopic(topicName);
 
+        Collection<Metric> metrics = new TreeSet<>(MetricComparator.INSTANCE);
+        topicInfo.getPartitions().keySet().forEach(topicPartition -> metrics.add(
+                new TopicPartitionOffsetIncreaseMetric(topicPartition, kafkaManager)));
         return metrics;
     }
 
