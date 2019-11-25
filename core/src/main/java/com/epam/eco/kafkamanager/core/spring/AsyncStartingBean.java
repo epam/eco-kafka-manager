@@ -19,5 +19,13 @@ package com.epam.eco.kafkamanager.core.spring;
  * @author Andrei_Tytsik
  */
 public interface AsyncStartingBean {
+
+    int DEFAULT_PHASE = 0;
+
     void startAsync() throws Exception;
+
+    default int getPhase() {
+        return DEFAULT_PHASE;
+    }
+
 }
