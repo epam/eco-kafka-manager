@@ -77,9 +77,6 @@
         <eco-commons.version>0.1.1</eco-commons.version>
         <eco-commons-kafka.version>1.0.0</eco-commons-kafka.version>
         <ehcache.version>3.5.2</ehcache.version>
-        <dropwizard.version>3.2.2</dropwizard.version>
-        <hawkular.version>0.27.0.Final</hawkular.version>
-        <prometheus.version>0.3.0</prometheus.version>
         <curator.version>4.0.1</curator.version>
         <commons-collections4.version>4.1</commons-collections4.version>
         <commons-csv.version>1.5</commons-csv.version>
@@ -169,36 +166,6 @@
                         <artifactId>slf4j-log4j12</artifactId>
                     </exclusion>
                 </exclusions>
-            </dependency>
-            <dependency>
-                <groupId>io.dropwizard.metrics</groupId>
-                <artifactId>metrics-core</artifactId>
-                <version>${dropwizard.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>io.dropwizard.metrics</groupId>
-                <artifactId>metrics-graphite</artifactId>
-                <version>${dropwizard.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.hawkular.metrics</groupId>
-                <artifactId>hawkular-dropwizard-reporter</artifactId>
-                <version>${hawkular.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>io.prometheus</groupId>
-                <artifactId>simpleclient_spring_boot</artifactId>
-                <version>${prometheus.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>io.prometheus</groupId>
-                <artifactId>simpleclient_hotspot</artifactId>
-                <version>${prometheus.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>io.prometheus</groupId>
-                <artifactId>simpleclient_dropwizard</artifactId>
-                <version>${prometheus.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.curator</groupId>

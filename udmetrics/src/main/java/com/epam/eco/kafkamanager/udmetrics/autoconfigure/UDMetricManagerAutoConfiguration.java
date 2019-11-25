@@ -15,21 +15,18 @@
  */
 package com.epam.eco.kafkamanager.udmetrics.autoconfigure;
 
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 
-import com.codahale.metrics.MetricRegistry;
-
+import com.epam.eco.kafkamanager.udmetrics.ScheduleCalculatedMetricExecutor;
 import com.epam.eco.kafkamanager.udmetrics.UDMetricManager;
 import com.epam.eco.kafkamanager.udmetrics.UDMetricManagerImpl;
 import com.epam.eco.kafkamanager.udmetrics.config.repo.kafka.KafkaUDMetricConfigRepoConfiguration;
 import com.epam.eco.kafkamanager.udmetrics.library.ConsumerGroupLagUDMCreator;
 import com.epam.eco.kafkamanager.udmetrics.library.TopicOffsetIncreaseUDMCreator;
-import com.epam.eco.kafkamanager.udmetrics.schedule.ScheduleCalculatedMetricExecutor;
 
 /**
  * @author Andrei_Tytsik
@@ -39,12 +36,6 @@ import com.epam.eco.kafkamanager.udmetrics.schedule.ScheduleCalculatedMetricExec
 @EnableConfigurationProperties(UDMetricManagerProperties.class)
 @Import(KafkaUDMetricConfigRepoConfiguration.class)
 public class UDMetricManagerAutoConfiguration {
-
-    @Bean
-    @ConditionalOnMissingBean
-    public MetricRegistry metricRegistry() {
-        return new MetricRegistry();
-    }
 
     @Bean
     public UDMetricManager udMetricManager() {

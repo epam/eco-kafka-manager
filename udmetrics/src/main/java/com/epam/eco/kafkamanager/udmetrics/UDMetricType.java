@@ -15,13 +15,12 @@
  */
 package com.epam.eco.kafkamanager.udmetrics;
 
-import java.util.Collections;
-import java.util.HashMap;
+import java.util.Collection;
 import java.util.Map;
 
+import com.epam.eco.kafkamanager.KafkaManager;
 import com.epam.eco.kafkamanager.udmetrics.library.ConsumerGroupLagUDMCreator;
 import com.epam.eco.kafkamanager.udmetrics.library.TopicOffsetIncreaseUDMCreator;
-import com.epam.eco.kafkamanager.udmetrics.utils.MetricNameUtils;
 
 /**
  * @author Andrei_Tytsik
@@ -36,14 +35,8 @@ public enum UDMetricType {
                     "Separate metric is created for each topic-partition.";
         }
         @Override
-        public Map<String, Object> configTemplate() {
-            Map<String, Object> template = new HashMap<>();
-            template.put(ConsumerGroupLagUDMCreator.TOPIC_NAMES, null);
-            return template;
-        }
-        @Override
-        public String formatMetricName(String consumerGroup) {
-            return MetricNameUtils.sanitizeAndConcatenateNames("consumer_group_lag", consumerGroup);
+        public String formatName(String consumerGroup) {
+            return "consumer_group_lag_" + consumerGroup;
         }
     },
 
@@ -55,12 +48,8 @@ public enum UDMetricType {
                     "Separate metric is created for each topic-partition.";
         }
         @Override
-        public Map<String, Object> configTemplate() {
-            return Collections.emptyMap();
-        }
-        @Override
-        public String formatMetricName(String topic) {
-            return MetricNameUtils.sanitizeAndConcatenateNames("topic_offset_increase", topic);
+        public String formatName(String topic) {
+            return "topic_offset_increase_" + topic;
         }
     };
 
@@ -71,11 +60,17 @@ public enum UDMetricType {
     }
 
     public abstract String description();
-    public abstract Map<String, Object> configTemplate();
-    public abstract String formatMetricName(String resourceName);
+    public abstract String formatName(String resourceName);
 
-    public UDMetricCreator creator() {
-        return creator;
+    public Map<String, Object> configTemplate() {
+        return creator.configTemplate();
+    }
+
+    public Collection<Metric> create(
+            String resourceName,
+            Map<String, Object> config,
+            KafkaManager kafkaManager) {
+        return creator.create(resourceName, config, kafkaManager);
     }
 
 }

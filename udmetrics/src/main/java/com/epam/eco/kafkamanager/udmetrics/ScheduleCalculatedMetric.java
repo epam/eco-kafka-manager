@@ -15,24 +15,9 @@
  */
 package com.epam.eco.kafkamanager.udmetrics;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Map;
-
-import com.epam.eco.kafkamanager.KafkaManager;
-
 /**
  * @author Andrei_Tytsik
  */
-public interface UDMetricCreator {
-
-    Collection<Metric> create(
-            String resourceName,
-            Map<String, Object> config,
-            KafkaManager kafkaManager);
-
-    default Map<String, Object> configTemplate() {
-        return Collections.emptyMap();
-    }
-
+public interface ScheduleCalculatedMetric {
+    void calculateValue();
 }

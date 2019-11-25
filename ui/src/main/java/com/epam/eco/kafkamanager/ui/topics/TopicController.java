@@ -130,7 +130,7 @@ public class TopicController {
                 ATTR_TOPIC,
                 TopicInfoWrapper.wrap(topicName, kafkaManager));
 
-        String topicOffsetIncreaseUdmName = UDMetricType.TOPIC_OFFSET_INCREASE.formatMetricName(topicName);
+        String topicOffsetIncreaseUdmName = UDMetricType.TOPIC_OFFSET_INCREASE.formatName(topicName);
         model.addAttribute(ATTR_TOPIC_OFFSET_INCREASE_UDM_TYPE, UDMetricType.TOPIC_OFFSET_INCREASE);
         model.addAttribute(ATTR_TOPIC_OFFSET_INCREASE_UDM_NAME, topicOffsetIncreaseUdmName);
         model.addAttribute(ATTR_TOPIC_OFFSET_INCREASE_UDM, getAndWrapUdm(topicOffsetIncreaseUdmName));

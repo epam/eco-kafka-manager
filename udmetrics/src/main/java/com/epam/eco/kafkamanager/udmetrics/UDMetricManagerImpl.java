@@ -16,7 +16,9 @@
 package com.epam.eco.kafkamanager.udmetrics;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -27,18 +29,19 @@ import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
 
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.Validate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 
-import com.codahale.metrics.Metric;
-import com.codahale.metrics.MetricRegistry;
-
 import com.epam.eco.kafkamanager.KafkaManager;
 import com.epam.eco.kafkamanager.udmetrics.UDMetricConfigRepo.UpdateListener;
-import com.epam.eco.kafkamanager.udmetrics.utils.MetricNameUtils;
+
+import io.micrometer.core.instrument.Gauge;
+import io.micrometer.core.instrument.Meter.Id;
+import io.micrometer.core.instrument.MeterRegistry;
 
 
 /**
@@ -50,12 +53,13 @@ public class UDMetricManagerImpl implements UDMetricManager, UpdateListener {
     private KafkaManager kafkaManager;
 
     @Autowired
-    private MetricRegistry metricRegistry;
+    private MeterRegistry meterRegistry;
 
     @Autowired
     private UDMetricConfigRepo configRepo;
 
     private final Map<String, UDMetric> udmRegistry = new TreeMap<>();
+    private final Map<String, Set<Id>> nameIdsMapping = new TreeMap<>();
     private final ReadWriteLock lock = new ReentrantReadWriteLock();
 
     @PostConstruct
@@ -76,12 +80,12 @@ public class UDMetricManagerImpl implements UDMetricManager, UpdateListener {
         Validate.notBlank(resourceName, "Resource name is blank");
 
         UDMetricConfig udmConfig = UDMetricConfig.with(
-                type.formatMetricName(resourceName),
+                type.formatName(resourceName),
                 type,
                 resourceName,
                 config);
 
-        return createAndRegister(udmConfig, true);
+        return createAndRegisterUdm(udmConfig, true);
     }
 
     @Override
@@ -90,7 +94,7 @@ public class UDMetricManagerImpl implements UDMetricManager, UpdateListener {
 
         lock.writeLock().lock();
         try {
-            unregisterUDMByName(name);
+            unregisterUdmByName(name);
 
             configRepo.remove(name);
         } finally {
@@ -164,12 +168,21 @@ public class UDMetricManagerImpl implements UDMetricManager, UpdateListener {
         return values.stream().filter(query::matches).collect(Collectors.toList());
     }
 
-    private UDMetric createAndRegister(UDMetricConfig config, boolean persist) {
+    @Override
+    public void onConfigUpdated(String name, UDMetricConfig config) {
+        createAndRegisterUdm(config, false);
+    }
+
+    @Override
+    public void onConfigRemoved(String name) {
+        remove(name);
+    }
+
+    private UDMetric createAndRegisterUdm(UDMetricConfig config, boolean persist) {
         lock.writeLock().lock();
         try {
-            UDMetric udm = createUDM(config);
-
-            registerUDM(udm);
+            UDMetric udm = createUdm(config);
+            registerUdm(udm);
 
             if (persist) {
                 configRepo.createOrReplace(config);
@@ -181,49 +194,42 @@ public class UDMetricManagerImpl implements UDMetricManager, UpdateListener {
         }
     }
 
-    @Override
-    public void onConfigUpdated(String name, UDMetricConfig config) {
-        createAndRegister(config, false);
-    }
-
-    @Override
-    public void onConfigRemoved(String name) {
-        remove(name);
-    }
-
-    private UDMetric createUDM(UDMetricConfig config) {
-        UDMetricCreator creator = config.getType().creator();
+    private UDMetric createUdm(UDMetricConfig config) {
         try {
-            Map<String, Metric> metrics = creator.create(config, kafkaManager);
+            Collection<Metric> metrics = config.getType().create(
+                    config.getResourceName(),
+                    config.getConfig(),
+                    kafkaManager);
             return UDMetric.with(config, metrics);
         } catch (Exception ex) {
-            return UDMetric.with(
-                    config,
-                    Collections.singletonList(ex.getMessage()));
+            return UDMetric.withErrors(config, Collections.singletonList(ex.getMessage()));
         }
     }
 
-    private void registerUDM(UDMetric udm) {
-        unregisterUDMByName(udm.getName());
+    private void registerUdm(UDMetric udm) {
+        unregisterUdmByName(udm.getName());
 
         if (!udm.hasErrors()) {
-            metricRegistry.register(udm.getName(), udm);
+            Set<Id> ids = new HashSet<>();
+            nameIdsMapping.put(udm.getName(), ids);
+            udm.getMetrics().forEach(metric -> {
+                Gauge gauge = Gauge.builder(udm.getName(), metric, m -> m.value()).
+                        tags(metric.getTags()).
+                        strongReference(true).
+                        register(meterRegistry);
+                ids.add(gauge.getId());
+            });
         }
 
         udmRegistry.put(udm.getName(), udm);
     }
 
-    private void unregisterUDMByName(String name) {
-        UDMetric udm = udmRegistry.get(name);
-        if (udm == null) {
-            return;
+    private void unregisterUdmByName(String name) {
+        Set<Id> ids = nameIdsMapping.get(name);
+        if (!CollectionUtils.isEmpty(ids)) {
+            ids.forEach(id -> meterRegistry.remove(id));
         }
-
-        Set<String> concatenatedNames = MetricNameUtils.extractConcatenatedNames(name, udm);
-        if (concatenatedNames != null) {
-            concatenatedNames.forEach(metricRegistry::remove);
-        }
-
+        nameIdsMapping.remove(name);
         udmRegistry.remove(name);
     }
 

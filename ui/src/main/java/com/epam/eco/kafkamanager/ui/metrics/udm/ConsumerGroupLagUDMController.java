@@ -110,7 +110,7 @@ public class ConsumerGroupLagUDMController extends UDMAbstractController {
     }
 
     public static String buildMetricName(String groupName) {
-        return UDMetricType.CONSUMER_GROUP_LAG.formatMetricName(groupName);
+        return UDMetricType.CONSUMER_GROUP_LAG.formatName(groupName);
     }
 
     public static String buildMetricUrl(UDMetric udm) {
