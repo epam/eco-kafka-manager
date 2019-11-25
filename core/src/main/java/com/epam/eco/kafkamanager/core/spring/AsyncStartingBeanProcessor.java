@@ -16,7 +16,11 @@
 package com.epam.eco.kafkamanager.core.spring;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.TreeMap;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -37,6 +41,8 @@ public class AsyncStartingBeanProcessor {
 
     private final static Logger LOGGER = LoggerFactory.getLogger(AsyncStartingBeanProcessor.class);
 
+    private final static int START_TIMEOUT_MINS = 5;
+
     @Autowired(required=false)
     private List<AsyncStartingBean> beans;
 
@@ -45,6 +51,29 @@ public class AsyncStartingBeanProcessor {
         if (CollectionUtils.isEmpty(beans)) {
             return;
         }
+
+        Map<Integer, List<AsyncStartingBean>> phases = groupByPhase(beans);
+        for (Entry<Integer, List<AsyncStartingBean>> entry : phases.entrySet()) {
+            startBeansInPhase(entry.getKey(), entry.getValue());
+        }
+    }
+
+    private static Map<Integer, List<AsyncStartingBean>> groupByPhase(
+            List<AsyncStartingBean> beans) {
+        Map<Integer, List<AsyncStartingBean>> grouped = new TreeMap<>();
+        beans.forEach(bean -> {
+            List<AsyncStartingBean> group = grouped.computeIfAbsent(
+                    bean.getPhase(),
+                    k -> new LinkedList<>());
+            group.add(bean);
+        });
+        return grouped;
+    }
+
+    private static void startBeansInPhase(
+            int phase,
+            List<AsyncStartingBean> beans) throws InterruptedException {
+        LOGGER.info("Starting {} bean(s) asyncronously in phase {}", beans.size(), phase);
 
         ExecutorService executor = Executors.newFixedThreadPool(beans.size());
         List<Callable<Object>> tasks = new ArrayList<>(beans.size());
@@ -57,7 +86,7 @@ public class AsyncStartingBeanProcessor {
         }
         executor.invokeAll(tasks);
         executor.shutdown();
-        executor.awaitTermination(5, TimeUnit.MINUTES);
+        executor.awaitTermination(START_TIMEOUT_MINS, TimeUnit.MINUTES);
     }
 
 }
