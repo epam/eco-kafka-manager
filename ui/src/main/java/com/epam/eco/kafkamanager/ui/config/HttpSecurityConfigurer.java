@@ -41,9 +41,9 @@ public final class HttpSecurityConfigurer {
                         "/**/*.woff",
                         "/**/*.ttf",
                         "/logout",
-                        "/health",
-                        "/info",
-                        "/metrics").permitAll().
+                        "/actuator/health",
+                        "/actuator/info",
+                        "/actuator/metrics").permitAll().
                 antMatchers(HttpMethod.POST, "/udmetrics/topic_offset_increase/*").hasRole(ADMIN_ROLE).
                 antMatchers(HttpMethod.DELETE, "/udmetrics/topic_offset_increase/*").hasRole(ADMIN_ROLE).
                 antMatchers(HttpMethod.POST, "/udmetrics/consumer_group_lag/*").hasRole(ADMIN_ROLE).
