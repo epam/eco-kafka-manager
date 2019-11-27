@@ -23,7 +23,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import javax.servlet.http.HttpServletResponse;
 
@@ -207,7 +206,7 @@ public class TopicController {
                 topicName(topicName).
                 partitionCount(partitionCount).
                 replicationFactor(replicationFactor).
-                config(extractConfigOverrides(paramsMap)).
+                config(extractConfigsFromParams(paramsMap)).
                 description(description).
                 attributes(!StringUtils.isBlank(attributes) ? MapperUtils.jsonToMap(attributes) : null).
                 build();
@@ -234,7 +233,7 @@ public class TopicController {
             @RequestParam Map<String, String> paramsMap) {
         TopicConfigUpdateParams params = TopicConfigUpdateParams.builder().
                 topicName(topicName).
-                config(extractConfigOverrides(paramsMap)).
+                config(extractConfigsFromParams(paramsMap)).
                 build();
 
         TopicInfo topicInfo = kafkaManager.updateTopic(params);
@@ -303,27 +302,14 @@ public class TopicController {
         return page.map((topicInfo) -> TopicInfoWrapper.wrap(topicInfo, kafkaManager));
     }
 
-    public static Map<String, String> extractConfigOverrides(Map<String, String> paramsMap) {
-        Set<Map.Entry<String, String>> paramEntries = paramsMap.entrySet();
-        Map<String, String> overrides = new HashMap<>((int) Math.ceil(paramEntries.size() / 0.75));
-        for (Map.Entry<String, String> entry : paramEntries) {
-            String key = entry.getKey();
-            if (TopicConfigDef.INSTANCE.key(key) == null) {
-                continue;
+    public static Map<String, String> extractConfigsFromParams(Map<String, String> paramsMap) {
+        Map<String, String> configs = new HashMap<>((int) Math.ceil(paramsMap.size() / 0.75));
+        paramsMap.forEach((key, value) -> {
+            if (TopicConfigDef.INSTANCE.key(key) != null) {
+                configs.put(key, StringUtils.stripToNull(value));
             }
-
-            String value = StringUtils.stripToNull(entry.getValue());
-            if (value == null) {
-                continue;
-            }
-
-            if (TopicConfigDef.INSTANCE.isDefaultValue(key, value)) {
-                continue;
-            }
-
-            overrides.put(key, value);
-        }
-        return overrides;
+        });
+        return configs;
     }
 
     public static String buildTopicUrl(String topicName) {

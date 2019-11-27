@@ -34,7 +34,7 @@ public interface TopicRepo extends KeyValueRepo<String, TopicInfo, TopicSearchQu
             Map<String, String> config);
 
     @PreAuthorize("@authorizer.isPermitted('TOPIC', #topicName, 'ALTER_CONFIG')")
-    TopicInfo updateConfig(String topicName, Map<String, String> config);
+    TopicInfo updateConfig(String topicName, Map<String, String> configs);
 
     @PreAuthorize("@authorizer.isPermitted('TOPIC', #topicName, 'ALTER')")
     TopicInfo createPartitions(String topicName, int newPartitionCount);

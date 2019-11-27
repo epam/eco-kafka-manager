@@ -231,9 +231,9 @@ public class ZkTopicRepo extends AbstractKeyValueRepo<String, TopicInfo, TopicSe
     }
 
     @Override
-    public TopicInfo updateConfig(String topicName, Map<String, String> config) {
+    public TopicInfo updateConfig(String topicName, Map<String, String> configs) {
         Validate.notBlank(topicName, "Topic name is blank");
-        Validate.notNull(config, "Config is null");
+        Validate.notNull(configs, "Map of configs is null");
 
         ResourceSemaphores.ResourceSemaphore<String, TopicOperation> semaphore = null;
         try {
@@ -243,7 +243,7 @@ public class ZkTopicRepo extends AbstractKeyValueRepo<String, TopicInfo, TopicSe
                         ResourceSemaphores.ResourceSemaphore<String, TopicOperation> updateSemaphore =
                                 semaphores.createSemaphore(topicName, TopicOperation.UPDATE);
 
-                        adminOperations.alterTopicConfig(topicName, config);
+                        adminOperations.alterTopicConfigs(topicName, configs);
 
                         return updateSemaphore;
                         },

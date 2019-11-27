@@ -29,6 +29,7 @@ import org.apache.kafka.common.acl.AclBindingFilter;
  * @author Andrei_Tytsik
  */
 public interface KafkaAdminOperations {
+
     Config describeBrokerConfig(int brokerId);
     Config describeTopicConfig(String topicName);
     Map<String, Config> describeTopicConfigs(Collection<String> topicNames);
@@ -42,9 +43,18 @@ public interface KafkaAdminOperations {
     void createPartitions(String topicName, int newPartitionCount);
     void deleteTopic(String topicName);
     void deleteAllRecords(String topicName);
-    void alterTopicConfig(String topicName, Map<String, String> configMap);
+
+    /**
+     * @deprecated use {#link {@link #alterTopicConfigs(String, Map)}}
+     */
+    @Deprecated
+    void alterTopicConfig(String topicName, Map<String, String> configs);
+
+    void alterTopicConfigs(String topicName, Map<String, String> configs);
+
     int getDefaultReplicationFactor();
     Map<String, ConsumerGroupDescription> describeAllConsumerGroups();
     Map<String, Map<TopicPartition, OffsetAndMetadata>> listAllConsumerGroupOffsets();
     String getZkConnect();
+
 }

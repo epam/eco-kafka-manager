@@ -114,9 +114,15 @@ public class KafkaAdminOperationsImpl implements KafkaAdminOperations {
         AdminClientUtils.deleteAllRecords(adminClient, topicName);
     }
 
+    @Deprecated
     @Override
-    public void alterTopicConfig(String topicName, Map<String, String> configMap) {
-        AdminClientUtils.alterTopicConfig(adminClient, topicName, configMap);
+    public void alterTopicConfig(String topicName, Map<String, String> configs) {
+        AdminClientUtils.alterTopicConfig(adminClient, topicName, configs);
+    }
+
+    @Override
+    public void alterTopicConfigs(String topicName, Map<String, String> configs) {
+        AdminClientUtils.alterTopicConfigs(adminClient, topicName, configs);
     }
 
     @Override

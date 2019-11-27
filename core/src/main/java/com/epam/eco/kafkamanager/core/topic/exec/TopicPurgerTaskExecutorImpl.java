@@ -63,7 +63,7 @@ public class TopicPurgerTaskExecutorImpl extends AbstractTaskExecutor<String, Vo
 
     private void changePolicyForDeleteIfNeeded(String topicName, String cleanupPolicyOrig) {
         if (!CleanupPolicy.DELETE.name.equals(cleanupPolicyOrig)) {
-            adminOperations.alterTopicConfig(
+            adminOperations.alterTopicConfigs(
                     topicName,
                     Collections.singletonMap(TopicConfig.CLEANUP_POLICY_CONFIG, CleanupPolicy.DELETE.name));
         }
@@ -71,7 +71,7 @@ public class TopicPurgerTaskExecutorImpl extends AbstractTaskExecutor<String, Vo
 
     private void restorePolicyAfterDeleteIfNeeded(String topicName, String cleanupPolicyOrig) {
         if (!CleanupPolicy.DELETE.name.equals(cleanupPolicyOrig)) {
-            adminOperations.alterTopicConfig(
+            adminOperations.alterTopicConfigs(
                     topicName,
                     Collections.singletonMap(TopicConfig.CLEANUP_POLICY_CONFIG, cleanupPolicyOrig));
         }
