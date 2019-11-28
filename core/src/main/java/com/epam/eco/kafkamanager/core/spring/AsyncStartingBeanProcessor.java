@@ -15,15 +15,16 @@
  */
 package com.epam.eco.kafkamanager.core.spring;
 
-import java.util.ArrayList;
+import java.util.IdentityHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.TreeMap;
-import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.collections4.CollectionUtils;
@@ -41,7 +42,7 @@ public class AsyncStartingBeanProcessor {
 
     private final static Logger LOGGER = LoggerFactory.getLogger(AsyncStartingBeanProcessor.class);
 
-    private final static int START_TIMEOUT_MINS = 5;
+    private final static int BEAN_START_TIMEOUT_MINS = 10;
 
     @Autowired(required=false)
     private List<AsyncStartingBean> beans;
@@ -52,13 +53,13 @@ public class AsyncStartingBeanProcessor {
             return;
         }
 
-        Map<Integer, List<AsyncStartingBean>> phases = groupByPhase(beans);
+        Map<Integer, List<AsyncStartingBean>> phases = groupBeansByPhase(beans);
         for (Entry<Integer, List<AsyncStartingBean>> entry : phases.entrySet()) {
-            startBeansInPhase(entry.getKey(), entry.getValue());
+            startBeansInPhase(entry.getValue(), entry.getKey());
         }
     }
 
-    private static Map<Integer, List<AsyncStartingBean>> groupByPhase(
+    private static Map<Integer, List<AsyncStartingBean>> groupBeansByPhase(
             List<AsyncStartingBean> beans) {
         Map<Integer, List<AsyncStartingBean>> grouped = new TreeMap<>();
         beans.forEach(bean -> {
@@ -70,23 +71,33 @@ public class AsyncStartingBeanProcessor {
         return grouped;
     }
 
-    private static void startBeansInPhase(
-            int phase,
-            List<AsyncStartingBean> beans) throws InterruptedException {
+    private static void startBeansInPhase(List<AsyncStartingBean> beans, int phase) throws Exception {
         LOGGER.info("Starting {} bean(s) asyncronously in phase {}", beans.size(), phase);
 
         ExecutorService executor = Executors.newFixedThreadPool(beans.size());
-        List<Callable<Object>> tasks = new ArrayList<>(beans.size());
-        for (AsyncStartingBean bean : beans) {
-            tasks.add(() -> {
-                LOGGER.info("Starting bean {} asyncronously", bean);
-                bean.startAsync();
-                return null;
-            });
+        try {
+            Map<AsyncStartingBean, Future<Void>> futures = new IdentityHashMap<>();
+            for (AsyncStartingBean bean : beans) {
+                Future<Void> future = executor.submit(() -> {
+                    LOGGER.info("Starting bean {} asyncronously", bean);
+                    bean.startAsync();
+                    return null;
+                });
+                futures.put(bean, future);
+            }
+            for (Entry<AsyncStartingBean, Future<Void>> entry : futures.entrySet()) {
+                AsyncStartingBean bean = entry.getKey();
+                Future<Void> future = entry.getValue();
+                try {
+                    future.get(BEAN_START_TIMEOUT_MINS, TimeUnit.MINUTES);
+                } catch (Exception ex) {
+                    Throwable cause = ex instanceof ExecutionException ? ex.getCause() : ex;
+                    throw new RuntimeException("Failed to start bean " + bean + " asyncronously" , cause);
+                }
+            }
+        } finally {
+            executor.shutdownNow();
         }
-        executor.invokeAll(tasks);
-        executor.shutdown();
-        executor.awaitTermination(START_TIMEOUT_MINS, TimeUnit.MINUTES);
     }
 
 }
