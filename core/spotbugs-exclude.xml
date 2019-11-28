@@ -62,5 +62,10 @@
         <Method name="decodeValue" />
         <Bug pattern="URV_UNRELATED_RETURN_VALUES" />
     </Match>
-    
+    <Match>
+        <Class name="com.epam.eco.kafkamanager.core.spring.AsyncStartingBeanProcessor" />
+        <Method name="startBeansInPhase" />
+        <Bug pattern="EXS_EXCEPTION_SOFTENING_NO_CONSTRAINTS" />
+    </Match>
+
 </FindBugsFilter>
