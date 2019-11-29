@@ -30,9 +30,17 @@ import org.apache.commons.lang3.Validate;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.kafka.clients.admin.ConfigEntry;
 import org.apache.kafka.common.TopicPartition;
+import org.apache.kafka.common.errors.RetriableException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.classify.Classifier;
+import org.springframework.retry.RetryPolicy;
+import org.springframework.retry.backoff.FixedBackOffPolicy;
+import org.springframework.retry.policy.ExceptionClassifierRetryPolicy;
+import org.springframework.retry.policy.NeverRetryPolicy;
+import org.springframework.retry.policy.SimpleRetryPolicy;
+import org.springframework.retry.support.RetryTemplate;
 
 import com.epam.eco.commons.concurrent.ResourceSemaphores;
 import com.epam.eco.kafkamanager.AlreadyExistsException;
@@ -116,9 +124,32 @@ public class ZkTopicRepo extends AbstractKeyValueRepo<String, TopicInfo, TopicSe
     }
 
     private void initTopicConfigCache() {
+        RetryTemplate retryTemplate = new RetryTemplate();
+
+        FixedBackOffPolicy backOffPolicy = new FixedBackOffPolicy();
+        backOffPolicy.setBackOffPeriod(500L);
+        retryTemplate.setBackOffPolicy(backOffPolicy);
+
+        SimpleRetryPolicy simpleRetryPolicy = new SimpleRetryPolicy(10);
+        NeverRetryPolicy neverRetryPolicy = new NeverRetryPolicy();
+
+        ExceptionClassifierRetryPolicy retryPolicy = new ExceptionClassifierRetryPolicy();
+        retryPolicy.setExceptionClassifier(new Classifier<Throwable, RetryPolicy>() {
+            private static final long serialVersionUID = 1L;
+            @Override
+            public RetryPolicy classify(Throwable classifiable) {
+                if (classifiable instanceof RetriableException) {
+                    return simpleRetryPolicy;
+                }
+                return neverRetryPolicy;
+            }
+        });
+        retryTemplate.setRetryPolicy(retryPolicy);
+
         topicConfigCache = new ZkTopicConfigCache(
                 curatorFramework,
                 adminOperations,
+                retryTemplate,
                 this);
     }
 

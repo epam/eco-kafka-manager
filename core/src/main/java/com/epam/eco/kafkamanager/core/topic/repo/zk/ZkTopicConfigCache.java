@@ -41,6 +41,7 @@ import org.apache.kafka.clients.admin.ConfigEntry;
 import org.apache.kafka.common.config.ConfigDef.ConfigKey;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.retry.support.RetryTemplate;
 
 import com.epam.eco.commons.kafka.config.TopicConfigDef;
 import com.epam.eco.kafkamanager.KafkaAdminOperations;
@@ -71,19 +72,24 @@ class ZkTopicConfigCache {
     private final Map<String, TopicConfig> configCache = new HashMap<>();
     private final ReadWriteLock lock = new ReentrantReadWriteLock();
 
+    private RetryTemplate retryTemplate;
+
     private final CacheListener cacheListener;
 
     public ZkTopicConfigCache(
             CuratorFramework curatorFramework,
             KafkaAdminOperations adminOperations,
+            RetryTemplate retryTemplate,
             CacheListener cacheListener) {
         Validate.notNull(curatorFramework, "Curator framework can't be null");
         Validate.notNull(adminOperations, "KafkaAdminOperations can't be null");
+        Validate.notNull(retryTemplate, "Retry template can't be null");
         Validate.notNull(cacheListener, "Cache Listener can't be null");
 
         configPathCache = new PathChildrenCache(curatorFramework, CONFIGS_PATH, false);
 
         this.adminOperations = adminOperations;
+        this.retryTemplate = retryTemplate;
         this.cacheListener = cacheListener;
     }
 
@@ -170,7 +176,13 @@ class ZkTopicConfigCache {
     }
 
     private Map<String, TopicConfig> describeTopicConfigs(Collection<String> topicNames) {
-        Map<String, Config> configs = adminOperations.describeTopicConfigs(topicNames);
+        Map<String, Config> configs = new HashMap<>(topicNames.size(), 1);
+        for (String topicName : topicNames) {
+            Config config = retryTemplate.execute(
+                    context -> adminOperations.describeTopicConfig(topicName),
+                    retryContext -> DEFAULT_CONFIG);
+            configs.put(topicName, config);
+        }
         return configs.entrySet().stream().
                 collect(Collectors.toMap(
                         Map.Entry::getKey,
