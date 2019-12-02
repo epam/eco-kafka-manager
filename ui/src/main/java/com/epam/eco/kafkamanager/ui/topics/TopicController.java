@@ -23,6 +23,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import javax.servlet.http.HttpServletResponse;
 
@@ -206,7 +207,7 @@ public class TopicController {
                 topicName(topicName).
                 partitionCount(partitionCount).
                 replicationFactor(replicationFactor).
-                config(extractConfigsFromParams(paramsMap)).
+                config(extractConfigsFromParams(paramsMap, true)).
                 description(description).
                 attributes(!StringUtils.isBlank(attributes) ? MapperUtils.jsonToMap(attributes) : null).
                 build();
@@ -233,7 +234,7 @@ public class TopicController {
             @RequestParam Map<String, String> paramsMap) {
         TopicConfigUpdateParams params = TopicConfigUpdateParams.builder().
                 topicName(topicName).
-                config(extractConfigsFromParams(paramsMap)).
+                config(extractConfigsFromParams(paramsMap, false)).
                 build();
 
         TopicInfo topicInfo = kafkaManager.updateTopic(params);
@@ -302,13 +303,24 @@ public class TopicController {
         return page.map((topicInfo) -> TopicInfoWrapper.wrap(topicInfo, kafkaManager));
     }
 
-    public static Map<String, String> extractConfigsFromParams(Map<String, String> paramsMap) {
+    public static Map<String, String> extractConfigsFromParams(
+            Map<String, String> paramsMap,
+            boolean skipNullsAndDefaults) {
         Map<String, String> configs = new HashMap<>((int) Math.ceil(paramsMap.size() / 0.75));
-        paramsMap.forEach((key, value) -> {
-            if (TopicConfigDef.INSTANCE.key(key) != null) {
-                configs.put(key, StringUtils.stripToNull(value));
+        for (Entry<String, String> entry : paramsMap.entrySet()) {
+            String key = entry.getKey();
+            String value = entry.getValue();
+            if (
+                    TopicConfigDef.INSTANCE.key(key) == null ||
+                    (
+                            skipNullsAndDefaults &&
+                            (
+                                    StringUtils.isBlank(value) ||
+                                    TopicConfigDef.INSTANCE.isDefaultValue(key, value)))) {
+                continue;
             }
-        });
+            configs.put(key, StringUtils.stripToNull(value));
+        }
         return configs;
     }
 
