@@ -27,7 +27,6 @@ import javax.annotation.PreDestroy;
 
 import org.apache.commons.lang3.Validate;
 import org.apache.curator.framework.CuratorFramework;
-import org.apache.kafka.clients.admin.Config;
 import org.apache.kafka.clients.admin.ConfigEntry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -51,11 +50,13 @@ import com.epam.eco.kafkamanager.core.spring.AsyncStartingBean;
 import com.epam.eco.kafkamanager.repo.AbstractKeyValueRepo;
 import com.epam.eco.kafkamanager.repo.CachedRepo;
 
+import kafka.cluster.EndPoint;
+
 
 /**
  * @author Andrei_Tytsik
  */
-public class ZkBrokerRepo extends AbstractKeyValueRepo<Integer, BrokerInfo, BrokerSearchQuery> implements BrokerRepo, CachedRepo<Integer>, ZkBrokerCache.CacheListener, MetadataUpdateListener, AsyncStartingBean {
+public class ZkBrokerRepo extends AbstractKeyValueRepo<Integer, BrokerInfo, BrokerSearchQuery> implements BrokerRepo, CachedRepo<Integer>, ZkBrokerCache.CacheListener, ZkBrokerConfigCache.CacheListener, MetadataUpdateListener, AsyncStartingBean {
 
     private final static Logger LOGGER = LoggerFactory.getLogger(ZkBrokerRepo.class);
 
@@ -67,12 +68,14 @@ public class ZkBrokerRepo extends AbstractKeyValueRepo<Integer, BrokerInfo, Brok
     private CuratorFramework curatorFramework;
 
     private ZkBrokerCache brokerCache;
+    private ZkBrokerConfigCache brokerConfigCache;
 
     private final Map<Integer, BrokerInfo> brokerInfoCache = new ConcurrentHashMap<>();
 
     @PostConstruct
     private void init() {
         initBrokerCache();
+        initBrokerConfigCache();
         subscribeOnMetadataUpdates();
 
         LOGGER.info("Initialized");
@@ -81,6 +84,7 @@ public class ZkBrokerRepo extends AbstractKeyValueRepo<Integer, BrokerInfo, Brok
     @Override
     public void startAsync() throws Exception {
         startBrokerCache();
+        startBrokerConfigCache();
 
         LOGGER.info("Started");
     }
@@ -88,12 +92,25 @@ public class ZkBrokerRepo extends AbstractKeyValueRepo<Integer, BrokerInfo, Brok
     @PreDestroy
     private void destroy() throws Exception {
         destroyBrokeCache();
+        destroyBrokerConfigCache();
 
         LOGGER.info("Destroyed");
     }
 
     private void initBrokerCache() {
         brokerCache = new ZkBrokerCache(curatorFramework, this);
+    }
+
+    private void initBrokerConfigCache() {
+        brokerConfigCache = new ZkBrokerConfigCache(curatorFramework, adminOperations, this);
+    }
+
+    private void startBrokerConfigCache() throws Exception {
+        brokerConfigCache.start();
+    }
+
+    private void destroyBrokerConfigCache() throws Exception {
+        brokerConfigCache.close();
     }
 
     private void startBrokerCache() throws Exception {
@@ -174,6 +191,20 @@ public class ZkBrokerRepo extends AbstractKeyValueRepo<Integer, BrokerInfo, Brok
     }
 
     @Override
+    public void onBrokerConfigUpdated(ZkBrokerConfigCache.BrokerConfig brokerConfig) {
+        Validate.notNull(brokerConfig, "Broker config can't be null");
+
+        removeBrokerFromInfoCache(brokerConfig.id);
+    }
+
+    @Override
+    public void onBrokerConfigRemoved(int brokerId) {
+        Validate.isTrue(brokerId >= 0, "Broker id '%d' is invalid", brokerId);
+
+        removeBrokerFromInfoCache(brokerId);
+    }
+
+    @Override
     public void onBrokerUpdated(kafka.zk.BrokerInfo broker) {
         Validate.notNull(broker, "Broker is null");
 
@@ -219,21 +250,28 @@ public class ZkBrokerRepo extends AbstractKeyValueRepo<Integer, BrokerInfo, Brok
                 brokerId,
                 key -> {
                     kafka.zk.BrokerInfo broker = brokerCache.getBroker(brokerId);
-                    return broker != null ? toEcoInfo(broker) : null;
+                    if (broker != null) {
+                        ZkBrokerConfigCache.BrokerConfig brokerConfig = brokerConfigCache.getConfig(brokerId);
+                        return toInfo(broker, brokerConfig);
+                    }
+                    return null;
                 });
     }
 
-    private BrokerInfo toEcoInfo(kafka.zk.BrokerInfo broker) {
-        List<EndPointInfo> endPoints =
-                ScalaConversions.asJavaList(broker.broker().endPoints()).stream().
-                map(endPoint -> new EndPointInfo(
-                                endPoint.securityProtocol(),
-                                endPoint.host(),
-                                endPoint.port())).
-                collect(Collectors.toList());
+    private BrokerInfo toInfo(kafka.zk.BrokerInfo broker, ZkBrokerConfigCache.BrokerConfig brokerConfig) {
+        return BrokerInfo.builder().
+                id(broker.broker().id()).
+                endPoints(toEndPointInfo(ScalaConversions.asJavaList(broker.broker().endPoints()))).
+                rack(ScalaConversions.asOptional(broker.broker().rack()).orElse(null)).
+                version(broker.version()).
+                jmxPort(broker.jmxPort()).
+                config(toConfigValues(brokerConfig)).
+                metadata(metadataRepo.get(BrokerMetadataKey.with(broker.broker().id()))).
+                build();
+    }
 
-        Config config = adminOperations.describeBrokerConfig(broker.broker().id());
-        Map<String, ConfigValue> configValues = config.entries().stream().
+    private Map<String, ConfigValue> toConfigValues(ZkBrokerConfigCache.BrokerConfig config) {
+        return config.config.entries().stream().
                 collect(Collectors.toMap(
                         ConfigEntry::name,
                         e -> new ConfigValue(
@@ -242,16 +280,16 @@ public class ZkBrokerRepo extends AbstractKeyValueRepo<Integer, BrokerInfo, Brok
                                 e.isDefault(),
                                 e.isSensitive(),
                                 e.isReadOnly())));
+    }
 
-        return BrokerInfo.builder().
-                id(broker.broker().id()).
-                endPoints(endPoints).
-                rack(ScalaConversions.asOptional(broker.broker().rack()).orElse(null)).
-                version(broker.version()).
-                jmxPort(broker.jmxPort()).
-                config(configValues).
-                metadata(metadataRepo.get(BrokerMetadataKey.with(broker.broker().id()))).
-                build();
+    private List<EndPointInfo> toEndPointInfo(List<EndPoint> endPoints) {
+        return endPoints.stream().
+                map(endPoint -> new EndPointInfo(
+                        endPoint.securityProtocol(),
+                        endPoint.host(),
+                        endPoint.port())).
+                collect(Collectors.toList());
+
     }
 
 }
