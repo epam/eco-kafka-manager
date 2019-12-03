@@ -305,18 +305,14 @@ public class TopicController {
 
     public static Map<String, String> extractConfigsFromParams(
             Map<String, String> paramsMap,
-            boolean skipNullsAndDefaults) {
+            boolean skipNulls) {
         Map<String, String> configs = new HashMap<>((int) Math.ceil(paramsMap.size() / 0.75));
         for (Entry<String, String> entry : paramsMap.entrySet()) {
             String key = entry.getKey();
             String value = entry.getValue();
             if (
                     TopicConfigDef.INSTANCE.key(key) == null ||
-                    (
-                            skipNullsAndDefaults &&
-                            (
-                                    StringUtils.isBlank(value) ||
-                                    TopicConfigDef.INSTANCE.isDefaultValue(key, value)))) {
+                    (skipNulls && StringUtils.isBlank(value))) {
                 continue;
             }
             configs.put(key, StringUtils.stripToNull(value));
