@@ -15,8 +15,6 @@
  */
 package com.epam.eco.kafkamanager.core;
 
-
-
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
@@ -62,7 +60,12 @@ public class KafkaAdminOperationsImpl implements KafkaAdminOperations {
 
     @Override
     public Config describeBrokerConfig(int brokerId) {
-        return AdminClientUtils.describeBrokerConfig(adminClient, brokerId);
+        return describeBrokerConfigs(Collections.singletonList(brokerId)).get(brokerId);
+    }
+
+    @Override
+    public Map<Integer, Config> describeBrokerConfigs(Collection<Integer> brokerIds) {
+        return AdminClientUtils.describeBrokerConfigs(adminClient, brokerIds);
     }
 
     @Override

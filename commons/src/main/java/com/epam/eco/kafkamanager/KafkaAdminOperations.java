@@ -31,6 +31,7 @@ import org.apache.kafka.common.acl.AclBindingFilter;
 public interface KafkaAdminOperations {
 
     Config describeBrokerConfig(int brokerId);
+    Map<Integer, Config> describeBrokerConfigs(Collection<Integer> brokerIds);
     Config describeTopicConfig(String topicName);
     Map<String, Config> describeTopicConfigs(Collection<String> topicNames);
     void createAcl(AclBinding aclBinding);
