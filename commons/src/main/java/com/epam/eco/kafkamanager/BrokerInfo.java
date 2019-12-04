@@ -25,6 +25,7 @@ import java.util.Optional;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
 
+import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.Validate;
 
@@ -40,7 +41,7 @@ public class BrokerInfo implements MetadataAware, Comparable<BrokerInfo> {
     private final String rack;
     private final int version;
     private final int jmxPort;
-    private final Map<String, ConfigValue> config;
+    private final Map<String, String> config;
     private final Metadata metadata;
 
     public BrokerInfo(
@@ -49,15 +50,16 @@ public class BrokerInfo implements MetadataAware, Comparable<BrokerInfo> {
             @JsonProperty("rack") String rack,
             @JsonProperty("version") int version,
             @JsonProperty("jmxPort") int jmxPort,
-            @JsonProperty("config") Map<String, ConfigValue> config,
+            @JsonProperty("config") Map<String, String> config,
             @JsonProperty("metadata") Metadata metadata) {
         Validate.isTrue(id >= 0, "Id is invalid: %d", id);
         Validate.notEmpty(endPoints, "Collection of endPoints is null or empty");
         Validate.noNullElements(endPoints, "Collection of endPoints contains null elements");
         Validate.isTrue(version >= 0, "Version is invalid: %d", version);
-        Validate.notEmpty(config, "Config map is null or empty");
-        Validate.noNullElements(config.keySet(), "Collection of config keys contains null elements");
-        Validate.noNullElements(config.values(), "Collection of config values contains null elements");
+        if (!MapUtils.isEmpty(config)) {
+            Validate.noNullElements(config.keySet(), "Collection of config keys contains null elements");
+            Validate.noNullElements(config.values(), "Collection of config values contains null elements");
+        }
 
         this.id = id;
         this.endPoints = endPoints.stream().
@@ -88,7 +90,7 @@ public class BrokerInfo implements MetadataAware, Comparable<BrokerInfo> {
     public int getJmxPort() {
         return jmxPort;
     }
-    public Map<String, ConfigValue> getConfig() {
+    public Map<String, String> getConfig() {
         return config;
     }
     @Override
@@ -152,7 +154,7 @@ public class BrokerInfo implements MetadataAware, Comparable<BrokerInfo> {
         private String rack;
         private int version = 0;
         private int jmxPort = 0;
-        private Map<String, ConfigValue> config = new HashMap<>();
+        private Map<String, String> config = new HashMap<>();
         private Metadata metadata;
 
         public Builder() {
@@ -200,11 +202,11 @@ public class BrokerInfo implements MetadataAware, Comparable<BrokerInfo> {
             this.jmxPort = jmxPort;
             return this;
         }
-        public Builder addConfig(ConfigValue config) {
-            this.config.put(config.getName(), config);
+        public Builder addConfig(String property, String value) {
+            this.config.put(property, value);
             return this;
         }
-        public Builder config(Map<String, ConfigValue> config) {
+        public Builder config(Map<String, String> config) {
             this.config.clear();
             if (config != null) {
                 this.config.putAll(config);

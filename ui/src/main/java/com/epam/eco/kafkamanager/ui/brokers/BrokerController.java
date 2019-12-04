@@ -29,6 +29,7 @@ import com.epam.eco.commons.kafka.config.BrokerConfigDef;
 import com.epam.eco.kafkamanager.BrokerInfo;
 import com.epam.eco.kafkamanager.BrokerMetadataDeleteParams;
 import com.epam.eco.kafkamanager.BrokerMetadataUpdateParams;
+import com.epam.eco.kafkamanager.KafkaAdminOperations;
 import com.epam.eco.kafkamanager.KafkaManager;
 import com.epam.eco.kafkamanager.ui.utils.MetadataWrapper;
 import com.epam.eco.kafkamanager.utils.MapperUtils;
@@ -56,6 +57,9 @@ public class BrokerController {
     private static final int PAGE_SIZE = 10;
 
     @Autowired
+    private KafkaAdminOperations kafkaAdminOperations;
+
+    @Autowired
     private KafkaManager kafkaManager;
 
     @RequestMapping(value = MAPPING_BROKERS, method = RequestMethod.GET)
@@ -70,7 +74,7 @@ public class BrokerController {
 
     @RequestMapping(value = MAPPING_BROKER, method = RequestMethod.GET)
     public String broker(@PathVariable("id") Integer brokerId, Model model) {
-        model.addAttribute(ATTR_BROKER, BrokerInfoWrapper.wrap(kafkaManager.getBroker(brokerId)));
+        model.addAttribute(ATTR_BROKER, BrokerInfoWrapper.wrap(kafkaManager.getBroker(brokerId), kafkaAdminOperations));
         model.addAttribute(ATTR_CONFIG_DEF, BrokerConfigDef.INSTANCE);
         return BROKER_VIEW;
     }
@@ -78,7 +82,7 @@ public class BrokerController {
     @RequestMapping(value = MAPPING_BROKER_METADATA, method = RequestMethod.GET)
     public String metadata(@PathVariable("id") Integer brokerId, Model model) {
         BrokerInfo brokerInfo = kafkaManager.getBroker(brokerId);
-        model.addAttribute(ATTR_BROKER, BrokerInfoWrapper.wrap(brokerInfo));
+        model.addAttribute(ATTR_BROKER, BrokerInfoWrapper.wrap(brokerInfo, kafkaAdminOperations));
         if (brokerInfo.getMetadata().isPresent()) {
             model.addAttribute(ATTR_METADATA, MetadataWrapper.wrap(brokerInfo.getMetadata().get()));
         }
@@ -105,8 +109,8 @@ public class BrokerController {
         return "redirect:" + buildBrokerUrl(brokerId);
     }
 
-    private static Page<BrokerInfoWrapper> wrap(Page<BrokerInfo> page) {
-        return page.map(BrokerInfoWrapper::wrap);
+    private Page<BrokerInfoWrapper> wrap(Page<BrokerInfo> page) {
+        return page.map(brokerInfo -> BrokerInfoWrapper.wrap(brokerInfo, kafkaAdminOperations));
     }
 
     public static String buildBrokerUrl(Integer brokerId) {
