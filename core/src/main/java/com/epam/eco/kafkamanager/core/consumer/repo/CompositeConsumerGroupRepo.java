@@ -116,6 +116,19 @@ public class CompositeConsumerGroupRepo extends AbstractKeyValueRepo<String, Con
         }
     }
 
+    @Override
+    public void deleteConsumerGroup(String groupName) {
+        Validate.notBlank(groupName, "Group name can't be blank");
+
+        if (kafkaConsumerGroupRepo.contains(groupName)) {
+            kafkaConsumerGroupRepo.deleteConsumerGroup(groupName);
+        } else if (zkConsumerGroupRepo.contains(groupName)) {
+            zkConsumerGroupRepo.deleteConsumerGroup(groupName);
+        } else {
+            throw new NotFoundException(String.format("Consumer group '%s' doesn't exist", groupName));
+        }
+    }
+
     @SuppressWarnings("unchecked")
     @Override
     public void evict(String groupName) {

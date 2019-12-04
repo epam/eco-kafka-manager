@@ -533,6 +533,17 @@ public class RestKafkaManager implements KafkaManager {
     }
 
     @Override
+    public void deleteConsumerGroup(String groupName) {
+        Validate.notBlank(groupName, "Group name can't be blank");
+
+        Map<String, Object> uriVariables = Collections.singletonMap("name", groupName);
+
+        restTemplate.delete(
+                "/api/consumer-groups/{name}",
+                uriVariables);
+    }
+
+    @Override
     public ConsumerGroupOffsetResetterTaskExecutor getConsumerGroupOffsetResetterTaskExecutor() {
         return consumerGroupOffsetResetterTaskExecutor;
     }

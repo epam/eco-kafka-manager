@@ -35,6 +35,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import com.epam.eco.commons.concurrent.ResourceSemaphores;
 import com.epam.eco.kafkamanager.ConsumerGroupInfo;
 import com.epam.eco.kafkamanager.ConsumerGroupInfo.StorageType;
 import com.epam.eco.kafkamanager.ConsumerGroupMemberInfo;
@@ -71,6 +72,8 @@ public class KafkaConsumerGroupRepo extends AbstractKeyValueRepo<String, Consume
     private KafkaConsumerGroupCache groupCache;
 
     private final Map<String, ConsumerGroupInfo> groupInfoCache = new ConcurrentHashMap<>();
+
+    private final ResourceSemaphores<String, ConsumerGroupOperation> semaphores = new ResourceSemaphores<>();
 
     @PostConstruct
     private void init() {
@@ -190,6 +193,24 @@ public class KafkaConsumerGroupRepo extends AbstractKeyValueRepo<String, Consume
     }
 
     @Override
+    public void deleteConsumerGroup(String groupName) {
+        Validate.notBlank(groupName, "Group name can't be blank");
+
+        ResourceSemaphores.ResourceSemaphore<String, ConsumerGroupOperation> semaphore = null;
+        try {
+            semaphore = groupCache.callInLock(() -> {
+                ResourceSemaphores.ResourceSemaphore<String, ConsumerGroupOperation> deleteSemaphore =
+                        semaphores.createSemaphore(groupName, ConsumerGroupOperation.DELETE);
+                adminOperations.deleteConsumerGroup(groupName);
+                return deleteSemaphore;
+            });
+            semaphore.awaitUnchecked();
+        } finally {
+            semaphores.removeSemaphore(semaphore);
+        }
+    }
+
+    @Override
     public void evict(String groupName) {
         removeGroupFromInfoCache(groupName);
     }
@@ -203,6 +224,9 @@ public class KafkaConsumerGroupRepo extends AbstractKeyValueRepo<String, Consume
 
     @Override
     public void onGroupMetadataRemoved(String groupName) {
+        Validate.notBlank(groupName, "Group name can't be blank");
+
+        semaphores.signalDoneFor(groupName, ConsumerGroupOperation.DELETE);
         removeGroupFromInfoCache(groupName);
     }
 

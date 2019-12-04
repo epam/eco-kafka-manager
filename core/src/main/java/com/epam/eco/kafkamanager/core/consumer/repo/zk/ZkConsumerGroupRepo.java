@@ -175,6 +175,11 @@ public class ZkConsumerGroupRepo extends AbstractKeyValueRepo<String, ConsumerGr
     }
 
     @Override
+    public void deleteConsumerGroup(String groupName) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public void evict(String groupName) {
         removeGroupFromInfoCache(groupName);
     }
@@ -188,6 +193,8 @@ public class ZkConsumerGroupRepo extends AbstractKeyValueRepo<String, ConsumerGr
 
     @Override
     public void onGroupRemoved(String groupName) {
+        Validate.notBlank(groupName, "Group name can't be blank");
+
         removeGroupFromInfoCache(groupName);
     }
 

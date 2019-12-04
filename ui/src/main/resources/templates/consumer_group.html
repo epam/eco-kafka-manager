@@ -59,6 +59,45 @@
                                 class="to-right btn btn-primary right-icon">
                                 Reset Offsets <span class="glyphicon glyphicon-off"></span>
                             </a>
+                            <button
+                                    type="button"
+                                    class="btn btn-danger right-icon"
+                                    data-toggle="modal"
+                                    data-target="#delete-confirm">
+                                Delete <i class="fa fa-trash"></i>
+                            </button>
+                            <div id="delete-confirm" class="modal fade" role="dialog">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <button type="button" class="close" data-dismiss="modal">&times;</button>
+                                            <h4 class="modal-title">Confirm Consumer Group Delete</h4>
+                                        </div>
+                                        <div class="modal-body">
+                                            <p>
+                                                Are you sure you want to delete the consumer group?
+                                            </p>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <form
+                                                    th:action="@{/consumer_groups/{name}/delete(name=${group.name})}"
+                                                    method="post">
+                                                <button
+                                                        type="button"
+                                                        class="btn btn-primary"
+                                                        data-dismiss="modal">
+                                                    Cancel
+                                                </button>
+                                                <button
+                                                        type="submit"
+                                                        class="btn btn-danger">
+                                                    Delete
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
         
