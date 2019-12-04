@@ -171,8 +171,8 @@ public class TopicSearchQuery implements SearchQuery<TopicInfo> {
                 (underReplicated == null || obj.hasUnderReplicatedPartitions() == underReplicated) &&
                 (
                         StringUtils.isBlank(configString) ||
-                        obj.getConfigOverrides().entrySet().containsAll(parseConfigString(configString).entrySet())) &&
-                (configMap == null || obj.getConfigOverrides().entrySet().containsAll(configMap.entrySet())) &&
+                        obj.getConfig().entrySet().containsAll(parseConfigString(configString).entrySet())) &&
+                (configMap == null || obj.getConfig().entrySet().containsAll(configMap.entrySet())) &&
                 (StringUtils.isBlank(description) || StringUtils.containsIgnoreCase(
                         obj.getMetadata().map(Metadata::getDescription).orElse(null), description));
     }

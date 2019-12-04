@@ -24,6 +24,7 @@ import java.util.Optional;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
 
+import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.Validate;
 import org.apache.kafka.common.TopicPartition;
@@ -39,8 +40,7 @@ public class TopicInfo implements MetadataAware, Comparable<TopicInfo> {
 
     private final String name;
     private final Map<TopicPartition, PartitionInfo> partitions;
-    private final Map<String, ConfigValue> config;
-    private final Map<String, String> configOverrides;
+    private final Map<String, String> config;
     private final Metadata metadata;
 
     private final List<TopicPartition> underReplicatedPartitions;
@@ -50,24 +50,27 @@ public class TopicInfo implements MetadataAware, Comparable<TopicInfo> {
     public TopicInfo(
             @JsonProperty("name") String name,
             @JsonProperty("partitions") Map<TopicPartition, PartitionInfo> partitions,
-            @JsonProperty("config") Map<String, ConfigValue> config,
+            @JsonProperty("config") Map<String, String> config,
             @JsonProperty("metadata") Metadata metadata) {
         Validate.notBlank(name, "Name is blank");
         Validate.notEmpty(partitions, "Partitions map is null or empty");
         Validate.noNullElements(partitions.keySet(), "Partitions map contains null keys");
         Validate.noNullElements(partitions.values(), "Partitions map contains null values");
-        Validate.notEmpty(config, "Config map is null or empty");
-        Validate.noNullElements(config.keySet(), "Collection of config keys contains null elements");
-        Validate.noNullElements(config.values(), "Collection of config values contains null elements");
+        if (!MapUtils.isEmpty(config)) {
+            Validate.noNullElements(config.keySet(), "Collection of config keys contains null elements");
+            Validate.noNullElements(config.values(), "Collection of config values contains null elements");
+        }
 
         this.name = name;
         this.partitions = Collections.unmodifiableMap(
                 KafkaUtils.sortedByTopicPartitionKeyMap(partitions));
-        this.config = Collections.unmodifiableMap(new TreeMap<>(config));
+        this.config =
+                !MapUtils.isEmpty(config) ?
+                Collections.unmodifiableMap(new TreeMap<>(config)) :
+                Collections.emptyMap();
         this.metadata = metadata;
 
         underReplicatedPartitions = calculateUnderReplicatedPartitions();
-        configOverrides = calculateConfigOverrides();
         partitionCount = calculatePartitionCount();
         replicationFactor = calculateReplicationFactor();
     }
@@ -87,7 +90,7 @@ public class TopicInfo implements MetadataAware, Comparable<TopicInfo> {
     public PartitionInfo getPartition(int partition) {
         return partitions.get(new TopicPartition(name, partition));
     }
-    public Map<String, ConfigValue> getConfig() {
+    public Map<String, String> getConfig() {
         return config;
     }
     public List<TopicPartition> getUnderReplicatedPartitions() {
@@ -95,9 +98,6 @@ public class TopicInfo implements MetadataAware, Comparable<TopicInfo> {
     }
     public boolean hasUnderReplicatedPartitions() {
         return !underReplicatedPartitions.isEmpty();
-    }
-    public Map<String, String> getConfigOverrides() {
-        return configOverrides;
     }
     @Override
     public Optional<Metadata> getMetadata() {
@@ -149,19 +149,6 @@ public class TopicInfo implements MetadataAware, Comparable<TopicInfo> {
                         Collections::unmodifiableList));
     }
 
-    private Map<String, String> calculateConfigOverrides() {
-        return config.values().stream().
-                filter(v -> !v.isDefault()).
-                collect(
-                        Collectors.collectingAndThen(
-                                Collectors.toMap(
-                                        ConfigValue::getName,
-                                        ConfigValue::getValue,
-                                        (v0,v1) -> v0,
-                                        TreeMap::new),
-                                Collections::unmodifiableMap));
-    }
-
     private int calculatePartitionCount() {
         return partitions.size();
     }
@@ -182,7 +169,7 @@ public class TopicInfo implements MetadataAware, Comparable<TopicInfo> {
 
         private String name;
         private Map<TopicPartition, PartitionInfo> partitions = new HashMap<>();
-        private Map<String, ConfigValue> config = new HashMap<>();
+        private Map<String, String> config = new HashMap<>();
         private Metadata metadata;
 
         public Builder() {
@@ -205,11 +192,17 @@ public class TopicInfo implements MetadataAware, Comparable<TopicInfo> {
             return this;
         }
         public Builder partitions(Map<TopicPartition, PartitionInfo> partitions) {
-            this.partitions = partitions;
+            this.partitions.clear();
+            if (partitions != null) {
+                this.partitions.putAll(partitions);
+            }
             return this;
         }
-        public Builder config(Map<String, ConfigValue> config) {
-            this.config = config;
+        public Builder config(Map<String, String> config) {
+            this.config.clear();
+            if (config != null) {
+                this.config.putAll(config);
+            }
             return this;
         }
         public Builder metadata(Metadata metadata) {

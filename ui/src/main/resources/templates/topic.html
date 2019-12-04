@@ -375,8 +375,8 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr 
-                                        th:each="config : ${topic.configValues}"
+                                    <tr
+                                        th:each="config : ${topic.allConfigEntries.values()}"
                                         th:classappend="${!config.default} ? 'info' : ''">
                                         <td>
                                             <span th:text="${config.name}"></span>
@@ -384,11 +384,11 @@
                                                 href="javascript:void(0);"
                                                 data-toggle="popover"
                                                 data-html="true"
-                                                th:attr="data-content=${configDef.doc(config.name)}">
+                                                th:attr="data-content=${config.def.documentation}">
                                                 <span class="glyphicon glyphicon-info-sign"></span>
                                             </a>
                                         </td>
-                                        <td th:text="${!config.sensitive ? config.value : '**********'}">
+                                        <td th:text="${config.valueOrMaskIfSensitive}">
                                         </td>
                                     </tr>
                                 </tbody>
