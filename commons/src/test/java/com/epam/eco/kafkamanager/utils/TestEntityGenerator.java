@@ -25,7 +25,6 @@ import org.apache.commons.lang3.Validate;
 import org.apache.kafka.common.security.auth.SecurityProtocol;
 
 import com.epam.eco.kafkamanager.BrokerInfo;
-import com.epam.eco.kafkamanager.ConfigValue;
 import com.epam.eco.kafkamanager.EndPointInfo;
 import com.epam.eco.kafkamanager.Metadata;
 
@@ -46,17 +45,13 @@ public final class TestEntityGenerator {
                 .collect(Collectors.toList());
     }
 
-    public static ConfigValue configValue(String name) {
-        return new ConfigValue(name, name + "-value");
-    }
-
-    public static Map<String, ConfigValue> brokerConfigMap(int propertiesAmount) {
+    public static Map<String, String> brokerConfigMap(int propertiesAmount) {
         Validate.isTrue(propertiesAmount >= 0, "Properties amount should be greater or equals to 0");
 
-        Map<String, ConfigValue> configs = new HashMap<>();
+        Map<String, String> configs = new HashMap<>();
         for (int i = 0; i < propertiesAmount; ++i) {
             String name = Integer.toString(i);
-            configs.put(name, configValue(name));
+            configs.put(name, name + "-value");
         }
         return configs;
     }

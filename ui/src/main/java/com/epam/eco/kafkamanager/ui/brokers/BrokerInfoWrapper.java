@@ -17,14 +17,16 @@ package com.epam.eco.kafkamanager.ui.brokers;
 
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
+import java.util.TreeMap;
 
 import org.apache.commons.lang3.Validate;
+import org.apache.kafka.clients.admin.Config;
 
 import com.epam.eco.kafkamanager.BrokerInfo;
-import com.epam.eco.kafkamanager.ConfigValue;
 import com.epam.eco.kafkamanager.EndPointInfo;
+import com.epam.eco.kafkamanager.KafkaAdminOperations;
 import com.epam.eco.kafkamanager.Metadata;
+import com.epam.eco.kafkamanager.ui.common.ConfigEntryWrapper;
 import com.epam.eco.kafkamanager.ui.utils.CollapsedCollectionIterable;
 
 /**
@@ -33,15 +35,20 @@ import com.epam.eco.kafkamanager.ui.utils.CollapsedCollectionIterable;
 public class BrokerInfoWrapper {
 
     private final BrokerInfo brokerInfo;
+    private final KafkaAdminOperations adminOperations;
 
-    public BrokerInfoWrapper(BrokerInfo brokerInfo) {
+    private Map<String, ConfigEntryWrapper> allConfigEntries;
+
+    public BrokerInfoWrapper(BrokerInfo brokerInfo, KafkaAdminOperations adminOperations) {
         Validate.notNull(brokerInfo, "Broker info is null");
+        Validate.notNull(adminOperations, "Kafka admin operations is null");
 
         this.brokerInfo = brokerInfo;
+        this.adminOperations = adminOperations;
     }
 
-    public static BrokerInfoWrapper wrap(BrokerInfo brokerInfo) {
-        return new BrokerInfoWrapper(brokerInfo);
+    public static BrokerInfoWrapper wrap(BrokerInfo brokerInfo, KafkaAdminOperations adminOperations) {
+        return new BrokerInfoWrapper(brokerInfo, adminOperations);
     }
 
     public int getId() {
@@ -62,11 +69,17 @@ public class BrokerInfoWrapper {
     public String getJmxPortDisplayString() {
         return brokerInfo.getJmxPort() > 0 ? "" + brokerInfo.getJmxPort() : "";
     }
-    public Map<String, ConfigValue> getConfig() {
+    public Map<String, String> getConfig() {
         return brokerInfo.getConfig();
     }
-    public List<ConfigValue> getConfigValues() {
-        return brokerInfo.getConfig().values().stream().collect(Collectors.toList());
+    public Map<String, ConfigEntryWrapper> getAllConfigEntries() {
+        if (allConfigEntries == null) {
+            Config config = adminOperations.describeBrokerConfig(getId());
+            allConfigEntries = new TreeMap<>();
+            config.entries().forEach(
+                    e -> allConfigEntries.put(e.name(), ConfigEntryWrapper.wrapForBroker(e)));
+        }
+        return allConfigEntries;
     }
     public String getMetadataDescription() {
         return brokerInfo.getMetadata().map(Metadata::getDescription).orElse(null);
