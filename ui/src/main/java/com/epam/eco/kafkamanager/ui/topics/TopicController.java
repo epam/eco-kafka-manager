@@ -128,7 +128,7 @@ public class TopicController {
     public String topic(@PathVariable("name") String topicName, Model model) {
         model.addAttribute(
                 ATTR_TOPIC,
-                TopicInfoWrapper.wrap(topicName, kafkaManager));
+                TopicInfoWrapper.wrap(topicName, kafkaManager, kafkaAdminOperations));
 
         String topicOffsetIncreaseUdmName = UDMetricType.TOPIC_OFFSET_INCREASE.formatName(topicName);
         model.addAttribute(ATTR_TOPIC_OFFSET_INCREASE_UDM_TYPE, UDMetricType.TOPIC_OFFSET_INCREASE);
@@ -221,7 +221,7 @@ public class TopicController {
     public String config(@PathVariable("name") String topicName, Model model) {
         model.addAttribute(
                 ATTR_TOPIC,
-                TopicInfoWrapper.wrap(topicName, kafkaManager));
+                TopicInfoWrapper.wrap(topicName, kafkaManager, kafkaAdminOperations));
         model.addAttribute(ATTR_CONFIG_DEF, TopicConfigDef.INSTANCE);
 
         return TOPIC_CONFIG_UPDATE_VIEW;
@@ -246,7 +246,7 @@ public class TopicController {
     public String partitions(@PathVariable("name") String topicName, Model model) {
         model.addAttribute(
                 ATTR_TOPIC,
-                TopicInfoWrapper.wrap(topicName, kafkaManager));
+                TopicInfoWrapper.wrap(topicName, kafkaManager, kafkaAdminOperations));
 
         return TOPIC_PARTITIONS_CREATE_VIEW;
     }
@@ -263,7 +263,7 @@ public class TopicController {
     @RequestMapping(value = MAPPING_METADATA, method = RequestMethod.GET)
     public String metadata(@PathVariable("name") String topicName, Model model) {
         TopicInfo topicInfo = kafkaManager.getTopic(topicName);
-        model.addAttribute(ATTR_TOPIC, TopicInfoWrapper.wrap(topicInfo, kafkaManager));
+        model.addAttribute(ATTR_TOPIC, TopicInfoWrapper.wrap(topicInfo, kafkaManager, kafkaAdminOperations));
         if (topicInfo.getMetadata().isPresent()) {
             model.addAttribute(ATTR_METADATA, MetadataWrapper.wrap(topicInfo.getMetadata().get()));
         }
@@ -300,7 +300,7 @@ public class TopicController {
     }
 
     private Page<TopicInfoWrapper> wrap(Page<TopicInfo> page) {
-        return page.map((topicInfo) -> TopicInfoWrapper.wrap(topicInfo, kafkaManager));
+        return page.map((topicInfo) -> TopicInfoWrapper.wrap(topicInfo, kafkaManager, kafkaAdminOperations));
     }
 
     public static Map<String, String> extractConfigOverrides(Map<String, String> paramsMap) {

@@ -17,16 +17,12 @@ package com.epam.eco.kafkamanager.core.topic.repo.zk;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.Objects;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
-import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.Validate;
 import org.apache.curator.framework.CuratorFramework;
@@ -36,14 +32,9 @@ import org.apache.curator.framework.recipes.cache.PathChildrenCache.StartMode;
 import org.apache.curator.framework.recipes.cache.PathChildrenCacheEvent;
 import org.apache.curator.framework.recipes.cache.PathChildrenCacheEvent.Type;
 import org.apache.curator.utils.ZKPaths;
-import org.apache.kafka.clients.admin.Config;
-import org.apache.kafka.clients.admin.ConfigEntry;
-import org.apache.kafka.common.config.ConfigDef.ConfigKey;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.epam.eco.commons.kafka.config.TopicConfigDef;
-import com.epam.eco.kafkamanager.KafkaAdminOperations;
 import com.epam.eco.kafkamanager.core.utils.CuratorUtils;
 import com.epam.eco.kafkamanager.utils.MapperUtils;
 
@@ -57,14 +48,10 @@ class ZkTopicConfigCache {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ZkTopicConfigCache.class);
 
-    private static final Config DEFAULT_CONFIG = createDefaultConfig();
-
     private static final String CONFIGS_PATH = ConfigEntityTypeZNode.path(ConfigType.Topic());
 
     private static final String VERSION = "version";
     private static final String CONFIG = "config";
-
-    private final KafkaAdminOperations adminOperations;
 
     private final PathChildrenCache configPathCache;
 
@@ -73,26 +60,23 @@ class ZkTopicConfigCache {
 
     private final CacheListener cacheListener;
 
+    private final CountDownLatch initializedLatch = new CountDownLatch(1);
+
     public ZkTopicConfigCache(
             CuratorFramework curatorFramework,
-            KafkaAdminOperations adminOperations,
             CacheListener cacheListener) {
         Validate.notNull(curatorFramework, "Curator framework can't be null");
-        Validate.notNull(adminOperations, "KafkaAdminOperations can't be null");
         Validate.notNull(cacheListener, "Cache Listener can't be null");
 
-        configPathCache = new PathChildrenCache(curatorFramework, CONFIGS_PATH, false);
+        configPathCache = new PathChildrenCache(curatorFramework, CONFIGS_PATH, true);
 
-        this.adminOperations = adminOperations;
         this.cacheListener = cacheListener;
     }
 
     public void start() throws Exception {
-        configPathCache.getListenable().addListener(
-                (client, event) -> handlePathEvent(event));
-        configPathCache.start(StartMode.BUILD_INITIAL_CACHE);
-
-        bootstrapCache();
+        configPathCache.getListenable().addListener((client, event) -> handlePathEvent(event));
+        configPathCache.start(StartMode.POST_INITIALIZED_EVENT);
+        awaitInitialization();
 
         LOGGER.info("Started");
     }
@@ -106,25 +90,18 @@ class ZkTopicConfigCache {
     public TopicConfig getConfig(String topicName) {
         lock.readLock().lock();
         try {
-            return configCache.getOrDefault(topicName, new TopicConfig(topicName, DEFAULT_CONFIG));
+            return configCache.get(topicName);
         } finally {
             lock.readLock().unlock();
         }
     }
 
-    private void bootstrapCache() {
-        lock.writeLock().lock();
-        try {
-            List<String> topicNames = configPathCache.getCurrentData().stream()
-                    .map(childData -> getTopicNameFromPath(childData.getPath()))
-                    .collect(Collectors.toList());
-            Map<String, TopicConfig> configMap = describeTopicConfigs(topicNames);
-            if (!configMap.isEmpty()) {
-                configCache.putAll(configMap);
-            }
-        } finally {
-            lock.writeLock().unlock();
-        }
+    private void awaitInitialization() throws InterruptedException {
+        initializedLatch.await();
+    }
+
+    private void signalInitializationDone() {
+        initializedLatch.countDown();
     }
 
     private void handlePathEvent(PathChildrenCacheEvent event) {
@@ -136,7 +113,9 @@ class ZkTopicConfigCache {
         TopicConfig updatedConfig = null;
         String topicNameOfRemovedConfig = null;
 
-        if (event.getType() == Type.CHILD_ADDED || event.getType() == Type.CHILD_UPDATED) {
+        if (event.getType() == Type.INITIALIZED) {
+            signalInitializationDone();
+        } else if (event.getType() == Type.CHILD_ADDED || event.getType() == Type.CHILD_UPDATED) {
             updatedConfig = handleConfigUpdated(event.getData());
         } else if (event.getType() == Type.CHILD_REMOVED) {
             topicNameOfRemovedConfig = handleConfigRemoved(event.getData());
@@ -149,8 +128,8 @@ class ZkTopicConfigCache {
         lock.writeLock().lock();
         try {
             String topicName = getTopicNameFromPath(childData.getPath());
-            TopicConfig topicConfig =
-                    describeTopicConfigs(Collections.singleton(topicName)).get(topicName);
+            Map<String, String> config = toConfig(topicName, childData);
+            TopicConfig topicConfig = new TopicConfig(topicName, config);
             configCache.put(topicName, topicConfig);
             return topicConfig;
         } finally {
@@ -169,16 +148,7 @@ class ZkTopicConfigCache {
         }
     }
 
-    private Map<String, TopicConfig> describeTopicConfigs(Collection<String> topicNames) {
-        Map<String, Config> configs = adminOperations.describeTopicConfigs(topicNames);
-        return configs.entrySet().stream().
-                collect(Collectors.toMap(
-                        Map.Entry::getKey,
-                        e -> new TopicConfig(e.getKey(), e.getValue())));
-    }
-
-    @SuppressWarnings("unused")
-    private Map<String, Object> toConfig(String topicName, ChildData childData) {
+    private Map<String, String> toConfig(String topicName, ChildData childData) {
         String configInfoString = new String(childData.getData(), StandardCharsets.UTF_8);
         Map<String, Object> configInfoMap = MapperUtils.jsonToMap(configInfoString);
 
@@ -192,8 +162,8 @@ class ZkTopicConfigCache {
     }
 
     @SuppressWarnings("unchecked")
-    private Map<String, Object> toConfigV1(Map<String, Object> configInfoMap) {
-        return (Map<String, Object>)configInfoMap.get(CONFIG);
+    private Map<String, String> toConfigV1(Map<String, Object> configInfoMap) {
+        return (Map<String, String>)configInfoMap.get(CONFIG);
     }
 
     private String getTopicNameFromPath(String path) {
@@ -225,31 +195,17 @@ class ZkTopicConfigCache {
         }
     }
 
-    @SuppressWarnings("deprecation")
-    private static Config createDefaultConfig() {
-        List<ConfigEntry> entries = new ArrayList<>(TopicConfigDef.INSTANCE.keys().size());
-        for (ConfigKey key : TopicConfigDef.INSTANCE.keys()) {
-            entries.add(new ConfigEntry(
-                    key.name,
-                    key.hasDefault() ? Objects.toString(key.defaultValue, null) : null,
-                    true,
-                    false,
-                    false));
-        }
-        return new Config(Collections.unmodifiableList(entries));
-    }
-
     public static class TopicConfig {
 
         public final String name;
-        public final Config config;
+        public final Map<String, String> config;
 
-        public TopicConfig(String name, Config config) {
+        public TopicConfig(String name, Map<String, String> config) {
             Validate.notBlank(name, "Topic name is blank");
             Validate.notNull(config, "Config is null");
 
             this.name = name;
-            this.config = config;
+            this.config = Collections.unmodifiableMap(config);
         }
 
     }

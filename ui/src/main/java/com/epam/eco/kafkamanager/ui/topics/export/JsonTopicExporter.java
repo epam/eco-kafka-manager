@@ -47,7 +47,7 @@ public class JsonTopicExporter implements TopicExporter {
         record.put(KEY_NAME, topicInfo.getName());
         record.put(KEY_PARTITION_COUNT, topicInfo.getPartitionCount());
         record.put(KEY_REPLICATION_FACTOR, topicInfo.getReplicationFactor());
-        record.put(KEY_CONFIG, topicInfo.getConfigOverrides());
+        record.put(KEY_CONFIG, topicInfo.getConfig());
         Metadata metadata = topicInfo.getMetadata().orElse(null);
         record.put(KEY_DESCRIPTION, metadata != null ? metadata.getDescription() : null);
 

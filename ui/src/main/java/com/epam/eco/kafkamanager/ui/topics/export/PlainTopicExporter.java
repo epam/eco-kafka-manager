@@ -40,7 +40,7 @@ public class PlainTopicExporter implements TopicExporter {
                 append(HEADER_REPLICATION_FACTOR).append(": ").
                     append("" + topicInfo.getReplicationFactor()).append(" ").
                 append(HEADER_CONFIG).append(": ").
-                    append(topicInfo.getConfig() != null ? MapperUtils.toJson(topicInfo.getConfigOverrides()) : "").append(" ").
+                    append(topicInfo.getConfig() != null ? MapperUtils.toJson(topicInfo.getConfig()) : "").append(" ").
                 append(HEADER_DESCRIPTION).append(": ").append(
                         topicInfo.getMetadata().map(Metadata::getDescription).orElse("")).append("\n");
 
