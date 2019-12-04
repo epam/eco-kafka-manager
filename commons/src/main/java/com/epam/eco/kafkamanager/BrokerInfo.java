@@ -15,9 +15,17 @@
  */
 package com.epam.eco.kafkamanager;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.TreeMap;
 import java.util.stream.Collectors;
 
+import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.Validate;
 
@@ -31,21 +39,27 @@ public class BrokerInfo implements MetadataAware, Comparable<BrokerInfo> {
     private final int id;
     private final List<EndPointInfo> endPoints;
     private final String rack;
-    private final Map<String, ConfigValue> config;
+    private final int version;
+    private final int jmxPort;
+    private final Map<String, String> config;
     private final Metadata metadata;
 
     public BrokerInfo(
             @JsonProperty("id") int id,
             @JsonProperty("endPoints") List<EndPointInfo> endPoints,
             @JsonProperty("rack") String rack,
-            @JsonProperty("config") Map<String, ConfigValue> config,
+            @JsonProperty("version") int version,
+            @JsonProperty("jmxPort") int jmxPort,
+            @JsonProperty("config") Map<String, String> config,
             @JsonProperty("metadata") Metadata metadata) {
-        Validate.isTrue(id >= 0, "Id is invalid");
+        Validate.isTrue(id >= 0, "Id is invalid: %d", id);
         Validate.notEmpty(endPoints, "Collection of endPoints is null or empty");
         Validate.noNullElements(endPoints, "Collection of endPoints contains null elements");
-        Validate.notEmpty(config, "Config map is null or empty");
-        Validate.noNullElements(config.keySet(), "Collection of config keys contains null elements");
-        Validate.noNullElements(config.values(), "Collection of config values contains null elements");
+        Validate.isTrue(version >= 0, "Version is invalid: %d", version);
+        if (!MapUtils.isEmpty(config)) {
+            Validate.noNullElements(config.keySet(), "Collection of config keys contains null elements");
+            Validate.noNullElements(config.values(), "Collection of config values contains null elements");
+        }
 
         this.id = id;
         this.endPoints = endPoints.stream().
@@ -55,6 +69,8 @@ public class BrokerInfo implements MetadataAware, Comparable<BrokerInfo> {
                                 Collectors.toList(),
                                 Collections::unmodifiableList));
         this.rack = rack;
+        this.version = version;
+        this.jmxPort = jmxPort;
         this.config = Collections.unmodifiableMap(new TreeMap<>(config));
         this.metadata = metadata;
     }
@@ -68,7 +84,13 @@ public class BrokerInfo implements MetadataAware, Comparable<BrokerInfo> {
     public String getRack() {
         return rack;
     }
-    public Map<String, ConfigValue> getConfig() {
+    public int getVersion() {
+        return version;
+    }
+    public int getJmxPort() {
+        return jmxPort;
+    }
+    public Map<String, String> getConfig() {
         return config;
     }
     @Override
@@ -94,6 +116,8 @@ public class BrokerInfo implements MetadataAware, Comparable<BrokerInfo> {
                 Objects.equals(this.id, that.id) &&
                 Objects.equals(this.endPoints, that.endPoints) &&
                 Objects.equals(this.rack, that.rack) &&
+                Objects.equals(this.version, that.version) &&
+                Objects.equals(this.jmxPort, that.jmxPort) &&
                 Objects.equals(this.config, that.config) &&
                 Objects.equals(this.metadata, that.metadata);
     }
@@ -104,6 +128,8 @@ public class BrokerInfo implements MetadataAware, Comparable<BrokerInfo> {
                 "{id: " + id +
                 ", endPoints: " + endPoints +
                 ", rack: " + rack +
+                ", version: " + version +
+                ", jmxPort: " + jmxPort +
                 ", metadata: " + metadata +
                 "}";
     }
@@ -126,7 +152,9 @@ public class BrokerInfo implements MetadataAware, Comparable<BrokerInfo> {
         private int id;
         private List<EndPointInfo> endPoints = new ArrayList<>();
         private String rack;
-        private Map<String, ConfigValue> config = new HashMap<>();
+        private int version = 0;
+        private int jmxPort = 0;
+        private Map<String, String> config = new HashMap<>();
         private Metadata metadata;
 
         public Builder() {
@@ -141,6 +169,8 @@ public class BrokerInfo implements MetadataAware, Comparable<BrokerInfo> {
             this.id = origin.id;
             this.endPoints.addAll(origin.endPoints);
             this.rack = origin.rack;
+            this.version = origin.version;
+            this.jmxPort = origin.jmxPort;
             this.config.putAll(origin.getConfig());
             this.metadata = origin.metadata;
         }
@@ -164,11 +194,19 @@ public class BrokerInfo implements MetadataAware, Comparable<BrokerInfo> {
             this.rack = rack;
             return this;
         }
-        public Builder addConfig(ConfigValue config) {
-            this.config.put(config.getName(), config);
+        public Builder version(int version) {
+            this.version = version;
             return this;
         }
-        public Builder config(Map<String, ConfigValue> config) {
+        public Builder jmxPort(int jmxPort) {
+            this.jmxPort = jmxPort;
+            return this;
+        }
+        public Builder addConfig(String property, String value) {
+            this.config.put(property, value);
+            return this;
+        }
+        public Builder config(Map<String, String> config) {
             this.config.clear();
             if (config != null) {
                 this.config.putAll(config);
@@ -181,7 +219,7 @@ public class BrokerInfo implements MetadataAware, Comparable<BrokerInfo> {
         }
 
         public BrokerInfo build() {
-            return new BrokerInfo(id, endPoints, rack, config, metadata);
+            return new BrokerInfo(id, endPoints, rack, version, jmxPort, config, metadata);
         }
 
     }

@@ -27,7 +27,6 @@ import javax.annotation.PreDestroy;
 
 import org.apache.commons.lang3.Validate;
 import org.apache.curator.framework.CuratorFramework;
-import org.apache.kafka.clients.admin.ConfigEntry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,10 +36,8 @@ import com.epam.eco.kafkamanager.BrokerInfo;
 import com.epam.eco.kafkamanager.BrokerMetadataKey;
 import com.epam.eco.kafkamanager.BrokerRepo;
 import com.epam.eco.kafkamanager.BrokerSearchQuery;
-import com.epam.eco.kafkamanager.ConfigValue;
 import com.epam.eco.kafkamanager.EndPointInfo;
 import com.epam.eco.kafkamanager.EntityType;
-import com.epam.eco.kafkamanager.KafkaAdminOperations;
 import com.epam.eco.kafkamanager.Metadata;
 import com.epam.eco.kafkamanager.MetadataKey;
 import com.epam.eco.kafkamanager.MetadataRepo;
@@ -60,8 +57,6 @@ public class ZkBrokerRepo extends AbstractKeyValueRepo<Integer, BrokerInfo, Brok
 
     private final static Logger LOGGER = LoggerFactory.getLogger(ZkBrokerRepo.class);
 
-    @Autowired
-    private KafkaAdminOperations adminOperations;
     @Autowired
     private MetadataRepo metadataRepo;
     @Autowired
@@ -102,7 +97,7 @@ public class ZkBrokerRepo extends AbstractKeyValueRepo<Integer, BrokerInfo, Brok
     }
 
     private void initBrokerConfigCache() {
-        brokerConfigCache = new ZkBrokerConfigCache(curatorFramework, adminOperations, this);
+        brokerConfigCache = new ZkBrokerConfigCache(curatorFramework, this);
     }
 
     private void startBrokerConfigCache() throws Exception {
@@ -258,26 +253,16 @@ public class ZkBrokerRepo extends AbstractKeyValueRepo<Integer, BrokerInfo, Brok
                 });
     }
 
-    private BrokerInfo toInfo(kafka.zk.BrokerInfo broker, ZkBrokerConfigCache.BrokerConfig brokerConfig) {
+    private BrokerInfo toInfo(kafka.zk.BrokerInfo broker, ZkBrokerConfigCache.BrokerConfig config) {
         return BrokerInfo.builder().
                 id(broker.broker().id()).
                 endPoints(toEndPointInfo(ScalaConversions.asJavaList(broker.broker().endPoints()))).
                 rack(ScalaConversions.asOptional(broker.broker().rack()).orElse(null)).
-                config(toConfigValues(brokerConfig)).
+                version(broker.version()).
+                jmxPort(broker.jmxPort()).
+                config(config != null ? config.config : null).
                 metadata(metadataRepo.get(BrokerMetadataKey.with(broker.broker().id()))).
                 build();
-    }
-
-    private Map<String, ConfigValue> toConfigValues(ZkBrokerConfigCache.BrokerConfig config) {
-        return config.config.entries().stream().
-                collect(Collectors.toMap(
-                        ConfigEntry::name,
-                        e -> new ConfigValue(
-                                e.name(),
-                                e.value(),
-                                e.isDefault(),
-                                e.isSensitive(),
-                                e.isReadOnly())));
     }
 
     private List<EndPointInfo> toEndPointInfo(List<EndPoint> endPoints) {
