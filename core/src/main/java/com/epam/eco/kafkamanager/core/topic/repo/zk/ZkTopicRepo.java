@@ -28,7 +28,6 @@ import javax.annotation.PreDestroy;
 
 import org.apache.commons.lang3.Validate;
 import org.apache.curator.framework.CuratorFramework;
-import org.apache.kafka.clients.admin.ConfigEntry;
 import org.apache.kafka.common.TopicPartition;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,7 +35,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import com.epam.eco.commons.concurrent.ResourceSemaphores;
 import com.epam.eco.kafkamanager.AlreadyExistsException;
-import com.epam.eco.kafkamanager.ConfigValue;
 import com.epam.eco.kafkamanager.EntityType;
 import com.epam.eco.kafkamanager.KafkaAdminOperations;
 import com.epam.eco.kafkamanager.Metadata;
@@ -116,10 +114,7 @@ public class ZkTopicRepo extends AbstractKeyValueRepo<String, TopicInfo, TopicSe
     }
 
     private void initTopicConfigCache() {
-        topicConfigCache = new ZkTopicConfigCache(
-                curatorFramework,
-                adminOperations,
-                this);
+        topicConfigCache = new ZkTopicConfigCache(curatorFramework, this);
     }
 
     private void startTopicConfigCache() throws Exception {
@@ -399,21 +394,9 @@ public class ZkTopicRepo extends AbstractKeyValueRepo<String, TopicInfo, TopicSe
         return TopicInfo.builder().
                 name(topic.name).
                 partitions(toPartitions(topic)).
-                config(toConfigValues(config)).
+                config(config != null ? config.config : null).
                 metadata(metadataRepo.get(TopicMetadataKey.with(topic.name))).
                 build();
-    }
-
-    private Map<String, ConfigValue> toConfigValues(TopicConfig config) {
-        return config.config.entries().stream().
-                collect(Collectors.toMap(
-                        ConfigEntry::name,
-                        e -> new ConfigValue(
-                                e.name(),
-                                e.value(),
-                                e.isDefault(),
-                                e.isSensitive(),
-                                e.isReadOnly())));
     }
 
     private Map<TopicPartition, PartitionInfo> toPartitions(Topic topic) {

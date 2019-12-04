@@ -21,16 +21,18 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.TreeMap;
 
 import org.apache.commons.lang3.Validate;
+import org.apache.kafka.clients.admin.Config;
 import org.apache.kafka.common.TopicPartition;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.access.AccessDeniedException;
 
 import com.epam.eco.commons.kafka.OffsetRange;
-import com.epam.eco.kafkamanager.ConfigValue;
 import com.epam.eco.kafkamanager.ConsumerGroupInfo;
+import com.epam.eco.kafkamanager.KafkaAdminOperations;
 import com.epam.eco.kafkamanager.KafkaManager;
 import com.epam.eco.kafkamanager.Metadata;
 import com.epam.eco.kafkamanager.OffsetAndMetadataInfo;
@@ -39,6 +41,7 @@ import com.epam.eco.kafkamanager.PartitionInfo;
 import com.epam.eco.kafkamanager.TopicInfo;
 import com.epam.eco.kafkamanager.TransactionInfo;
 import com.epam.eco.kafkamanager.exec.TaskResult;
+import com.epam.eco.kafkamanager.ui.common.ConfigEntryWrapper;
 import com.epam.eco.kafkamanager.ui.consumers.ConsumerGroupInfoWrapper;
 import com.epam.eco.kafkamanager.ui.utils.CollapsedCollectionIterable;
 import com.epam.eco.kafkamanager.ui.utils.WorkerUtils;
@@ -52,40 +55,59 @@ public class TopicInfoWrapper {
 
     private final TopicInfo topicInfo;
     private final KafkaManager kafkaManager;
+    private final KafkaAdminOperations adminOperations;
 
     private Map<TopicPartition, OffsetRange> offsets;
     private final Map<TopicPartition, Long> offsetRpms = new HashMap<>();
 
-    public TopicInfoWrapper(String topicName, KafkaManager kafkaManager) {
-        this(kafkaManager.getTopic(topicName), kafkaManager);
+    private Map<String, ConfigEntryWrapper> allConfigEntries;
+
+    public TopicInfoWrapper(
+            String topicName,
+            KafkaManager kafkaManager,
+            KafkaAdminOperations adminOperations) {
+        this(kafkaManager.getTopic(topicName), kafkaManager, adminOperations);
     }
 
-    public TopicInfoWrapper(TopicInfo topicInfo, KafkaManager kafkaManager) {
+    public TopicInfoWrapper(
+            TopicInfo topicInfo,
+            KafkaManager kafkaManager,
+            KafkaAdminOperations adminOperations) {
         Validate.notNull(topicInfo, "Topic info is null");
         Validate.notNull(kafkaManager, "Kafka manager can't be null");
+        Validate.notNull(adminOperations, "AdminOperations can't be null");
 
         this.topicInfo = topicInfo;
         this.kafkaManager = kafkaManager;
+        this.adminOperations = adminOperations;
     }
 
-    public static TopicInfoWrapper wrap(TopicInfo topicInfo, KafkaManager kafkaManager) {
-        return new TopicInfoWrapper(topicInfo, kafkaManager);
+    public static TopicInfoWrapper wrap(
+            TopicInfo topicInfo,
+            KafkaManager kafkaManager,
+            KafkaAdminOperations adminOperations) {
+        return new TopicInfoWrapper(topicInfo, kafkaManager, adminOperations);
     }
 
-    public static TopicInfoWrapper wrap(String topicName, KafkaManager kafkaManager) {
-        return new TopicInfoWrapper(topicName, kafkaManager);
+    public static TopicInfoWrapper wrap(
+            String topicName,
+            KafkaManager kafkaManager,
+            KafkaAdminOperations adminOperations) {
+        return new TopicInfoWrapper(topicName, kafkaManager, adminOperations);
     }
 
-    public Map<String, ConfigValue> getConfig() {
+    public Map<String, String> getConfig() {
         return topicInfo.getConfig();
     }
 
-    public List<ConfigValue> getConfigValues() {
-        return new ArrayList<>(topicInfo.getConfig().values());
-    }
-
-    public Map<String, String> getConfigOverrides() {
-        return topicInfo.getConfigOverrides();
+    public Map<String, ConfigEntryWrapper> getAllConfigEntries() {
+        if (allConfigEntries == null) {
+            Config config = adminOperations.describeTopicConfig(getName());
+            allConfigEntries = new TreeMap<>();
+            config.entries().forEach(
+                    e -> allConfigEntries.put(e.name(), ConfigEntryWrapper.wrapForTopic(e)));
+        }
+        return allConfigEntries;
     }
 
     public String getName() {
@@ -196,7 +218,7 @@ public class TopicInfoWrapper {
     }
 
     public String getConfigOverridesAsString() {
-        Map<String, String> config = topicInfo.getConfigOverrides();
+        Map<String, String> config = topicInfo.getConfig();
         if (config == null) {
             return "";
         }
