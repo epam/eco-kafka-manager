@@ -34,7 +34,7 @@ public class BrokerInfoTest {
                 .id(1)
                 .addEndPoint(new EndPointInfo(SecurityProtocol.SSL, "1.1.1.1", 123))
                 .addEndPoint(new EndPointInfo(SecurityProtocol.PLAINTEXT, "2.2.2.2", 321))
-                .addConfig(new ConfigValue("say.hello", "Hi"))
+                .addConfig("say.hello", "Hi")
                 .metadata(Metadata.builder()
                         .description("description")
                         .attribute("a", "a")
