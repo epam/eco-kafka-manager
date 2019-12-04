@@ -34,9 +34,9 @@ public class TopicInfoTest {
 
     @Test
     public void testSerializedToJsonAndBack() throws Exception {
-        Map<String, ConfigValue> config = new HashMap<>();
-        config.put("some.property", new ConfigValue("some.property", "some.value", true, true, false));
-        config.put("some.another-property", new ConfigValue("some.another-property", "some.value", true, true, false));
+        Map<String, String> config = new HashMap<>();
+        config.put("some.property", "some.value");
+        config.put("some.another-property", "some.another-value");
         Map<TopicPartition, PartitionInfo> partitions = new HashMap<>();
         partitions.put(new TopicPartition("topicName", 1), new PartitionInfo(
                 "topicName",

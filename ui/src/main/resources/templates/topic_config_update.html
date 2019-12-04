@@ -99,16 +99,15 @@
                                     </thead>
                                     <tbody>
                                         <tr 
-                                            th:each="config : ${configDef.keys()}"
-                                            th:with="value=${topic.configOverrides.get(config.name)}"
-                                            th:classappend="${value != null} ? 'info' : ''">
+                                            th:each="config : ${topic.allConfigEntries.values()}"
+                                            th:classappend="${!config.default} ? 'info' : ''">
                                             <td>
                                                 <span th:text="${config.name}"></span>
                                                 <a 
                                                     href="javascript:void(0);"
                                                     data-toggle="popover"
                                                     data-html="true"
-                                                    th:attr="data-content=${config.documentation}">
+                                                    th:attr="data-content=${config.def.documentation}">
                                                     <span class="glyphicon glyphicon-info-sign"></span>
                                                 </a>
                                             </td>
@@ -116,13 +115,13 @@
                                                 <input 
                                                     type="text" 
                                                     class="form-control config-textbox"
-                                                    th:readonly="${config.internalConfig}"
+                                                    th:readonly="${config.def.internalConfig}"
                                                     th:name="${config.name}"
-                                                    th:value="${value}"/>
+                                                    th:value="${config.valueOrNullIfDefault}"/>
                                             </td>
-                                            <td th:text="${config.defaultValue}">
+                                            <td th:text="${config.def.defaultValue}">
                                             </td>
-                                            <td th:text="${config.validator}">
+                                            <td th:text="${config.def.validator}">
                                             </td>
                                         </tr>
                                     </tbody>

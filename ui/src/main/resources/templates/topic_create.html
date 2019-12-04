@@ -142,14 +142,14 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <tr th:each="config : ${configDef.keys()}">
+                                        <tr th:each="configKey : ${configDef.keys()}">
                                             <td>
-                                                <span th:text="${config.name}"></span>
+                                                <span th:text="${configKey.name}"></span>
                                                 <a 
                                                     href="javascript:void(0);"
                                                     data-toggle="popover"
                                                     data-html="true"
-                                                    th:attr="data-content=${config.documentation}">
+                                                    th:attr="data-content=${configKey.documentation}">
                                                     <span class="glyphicon glyphicon-info-sign"></span>
                                                 </a>
                                             </td>
@@ -157,12 +157,12 @@
                                                 <input 
                                                     type="text" 
                                                     class="form-control config-textbox"
-                                                    th:readonly="${config.internalConfig}"
-                                                    th:name="${config.name}"/>
+                                                    th:readonly="${configKey.internalConfig}"
+                                                    th:name="${configKey.name}"/>
                                             </td>
-                                            <td th:text="${config.defaultValue}">
+                                            <td th:text="${configKey.defaultValue}">
                                             </td>
-                                            <td th:text="${config.validator}">
+                                            <td th:text="${configKey.validator}">
                                             </td>
                                         </tr>
                                     </tbody>

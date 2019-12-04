@@ -188,7 +188,7 @@ public class RestKafkaManagerIT {
                 .build();
         kafkaManager.updateTopic(topicConfigUpdateParams);
         someTopic = kafkaManager.getTopic(newTopicName);
-        Assert.assertEquals("compact", someTopic.getConfig().get("cleanup.policy").getValue());
+        Assert.assertEquals("compact", someTopic.getConfig().get("cleanup.policy"));
 
         TopicPartitionsCreateParams topicPartitionsCreateParams = TopicPartitionsCreateParams.builder()
                 .topicName(newTopicName)
