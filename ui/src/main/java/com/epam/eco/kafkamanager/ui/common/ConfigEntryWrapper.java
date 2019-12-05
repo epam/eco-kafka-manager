@@ -15,8 +15,11 @@
  */
 package com.epam.eco.kafkamanager.ui.common;
 
+import java.util.Collections;
+
 import org.apache.commons.lang3.Validate;
 import org.apache.kafka.clients.admin.ConfigEntry;
+import org.apache.kafka.common.config.ConfigDef;
 import org.apache.kafka.common.config.ConfigDef.ConfigKey;
 
 import com.epam.eco.commons.kafka.config.BrokerConfigDef;
@@ -53,9 +56,17 @@ public class ConfigEntryWrapper {
     public static ConfigEntryWrapper wrapForBroker(ConfigEntry entry) {
         Validate.notNull(entry, "Entry is null");
 
-        return new ConfigEntryWrapper(
-                entry,
-                BrokerConfigDef.INSTANCE.key(entry.name()));
+        ConfigKey key = BrokerConfigDef.INSTANCE.key(entry.name());
+        return new ConfigEntryWrapper(entry, key == null ? defaultConfigKey(entry.name()) : key);
+    }
+
+    private static ConfigKey defaultConfigKey(String name) {
+        Validate.notBlank(name, "Name can't be blank");
+
+        return new ConfigKey(
+                name, ConfigDef.Type.STRING, ConfigDef.NO_DEFAULT_VALUE, null, ConfigDef.Importance.MEDIUM,
+                "N/A", null, 0,  ConfigDef.Width.MEDIUM, name, Collections.emptyList(),
+                null, false);
     }
 
     public String getName() {
