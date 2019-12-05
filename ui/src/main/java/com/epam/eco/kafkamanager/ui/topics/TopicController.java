@@ -207,7 +207,7 @@ public class TopicController {
                 topicName(topicName).
                 partitionCount(partitionCount).
                 replicationFactor(replicationFactor).
-                config(extractConfigOverrides(paramsMap)).
+                config(extractConfigsFromParams(paramsMap)).
                 description(description).
                 attributes(!StringUtils.isBlank(attributes) ? MapperUtils.jsonToMap(attributes) : null).
                 build();
@@ -234,7 +234,7 @@ public class TopicController {
             @RequestParam Map<String, String> paramsMap) {
         TopicConfigUpdateParams params = TopicConfigUpdateParams.builder().
                 topicName(topicName).
-                config(extractConfigOverrides(paramsMap)).
+                config(extractConfigsFromParams(paramsMap)).
                 build();
 
         TopicInfo topicInfo = kafkaManager.updateTopic(params);
@@ -303,7 +303,7 @@ public class TopicController {
         return page.map((topicInfo) -> TopicInfoWrapper.wrap(topicInfo, kafkaManager, kafkaAdminOperations));
     }
 
-    public static Map<String, String> extractConfigOverrides(Map<String, String> paramsMap) {
+    public static Map<String, String> extractConfigsFromParams(Map<String, String> paramsMap) {
         Set<Map.Entry<String, String>> paramEntries = paramsMap.entrySet();
         Map<String, String> overrides = new HashMap<>((int) Math.ceil(paramEntries.size() / 0.75));
         for (Map.Entry<String, String> entry : paramEntries) {
@@ -314,10 +314,6 @@ public class TopicController {
 
             String value = StringUtils.stripToNull(entry.getValue());
             if (value == null) {
-                continue;
-            }
-
-            if (TopicConfigDef.INSTANCE.isDefaultValue(key, value)) {
                 continue;
             }
 
