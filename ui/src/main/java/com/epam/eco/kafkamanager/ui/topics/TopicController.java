@@ -24,6 +24,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 
 import javax.servlet.http.HttpServletResponse;
 
@@ -31,6 +33,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -38,6 +41,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.epam.eco.commons.kafka.config.TopicConfigDef;
 import com.epam.eco.kafkamanager.KafkaAdminOperations;
@@ -85,7 +89,9 @@ public class TopicController {
 
     public static final String MAPPING_TOPICS = "/topics";
     public static final String MAPPING_TOPIC = MAPPING_TOPICS + "/{name}";
+    @Deprecated
     public static final String MAPPING_RECORD_COUNTER = MAPPING_TOPIC + "/record_counter";
+    public static final String MAPPING_COUNT_RECORDS = MAPPING_TOPIC + "/count_records";
     public static final String MAPPING_EXPORT = "/topics_export";
     public static final String MAPPING_PURGER = MAPPING_TOPIC + "/purger";
     public static final String MAPPING_DELETE = MAPPING_TOPIC + "/delete";
@@ -140,11 +146,20 @@ public class TopicController {
         return TOPIC_VIEW;
     }
 
+    @Deprecated
     @PreAuthorize("@authorizer.isPermitted('TOPIC', #topicName, 'READ')")
     @RequestMapping(value=MAPPING_RECORD_COUNTER, method=RequestMethod.GET)
     public String recordCounter(@PathVariable("name") String topicName) {
         kafkaManager.getTopicRecordCounterTaskExecutor().submit(topicName);
         return "redirect:" + buildTopicUrl(topicName);
+    }
+
+    @PreAuthorize("@authorizer.isPermitted('TOPIC', #topicName, 'READ')")
+    @RequestMapping(value=MAPPING_COUNT_RECORDS, method=RequestMethod.GET)
+    public @ResponseBody ResponseEntity<?> countRecords(
+            @PathVariable("name") String topicName) throws Exception {
+        Future<Long> future = kafkaManager.getTopicRecordCounterTaskExecutor().submit(topicName);
+        return ResponseEntity.ok(future.get(30, TimeUnit.SECONDS));
     }
 
     @RequestMapping(value=MAPPING_EXPORT, method=RequestMethod.GET)
