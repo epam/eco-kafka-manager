@@ -38,7 +38,7 @@
             $('#count_records').click(function(e) {
                 e.preventDefault();
                 $('#count_records').addClass('disabled');
-                fetch(/*[[@{/topics/{name}/count_records(name=${topic.name})}]]*/)
+                fetch(/*[[@{/topics/{name}/count_records(name=${topic.name})}]]*/,{credentials: 'include'})
                 	.then(res => res.text())
                 	.then(res => $('#count_records_result').html(res))
                 	.catch(() => $('#count_records_result').html('N/A'))
