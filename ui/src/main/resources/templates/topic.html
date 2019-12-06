@@ -35,6 +35,16 @@
                 hidePopoverIfClickedOutside(e);
             });
             
+            $('#count_records').click(function(e) {
+                e.preventDefault();
+                $('#count_records').addClass('disabled');
+                fetch(/*[[@{/topics/{name}/count_records(name=${topic.name})}]]*/)
+                	.then(res => res.text())
+                	.then(res => $('#count_records_result').html(res))
+                	.catch(() => $('#count_records_result').html('N/A'))
+                	.finally(() => $('#count_records').removeClass('disabled'))
+            });
+            
         });
     </script>
 
@@ -190,11 +200,16 @@
                             <p>
                                 <b>Number Of Records:</b>
                                 <a
+                                        id="count_records"
+                                        href="#"
                                         class="btn btn-success"
-                                        th:href="@{/topics/{name}/record_counter(name=${topic.name})}"
                                         th:title="${topic.countRecordsTaskResultAsString}"
-                                        th:classappend="${topic.countRecordsTaskRunning} ? 'disable' : ''">
-                                    <span th:text="${topic.countRecordsTaskResultValueAsString}"></span> <span class="glyphicon glyphicon-refresh"></span>
+                                        th:classappend="${topic.countRecordsTaskRunning} ? 'disabled' : ''">
+                                    <span
+                                        id="count_records_result" 
+                                        th:text="${topic.countRecordsTaskResultValueAsString}">
+                                    </span> 
+                                    <span class="glyphicon glyphicon-refresh"></span>
                                 </a>
                             </p>
                             <p>
