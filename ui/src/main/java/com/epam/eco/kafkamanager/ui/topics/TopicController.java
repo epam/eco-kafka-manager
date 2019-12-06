@@ -89,8 +89,6 @@ public class TopicController {
 
     public static final String MAPPING_TOPICS = "/topics";
     public static final String MAPPING_TOPIC = MAPPING_TOPICS + "/{name}";
-    @Deprecated
-    public static final String MAPPING_RECORD_COUNTER = MAPPING_TOPIC + "/record_counter";
     public static final String MAPPING_COUNT_RECORDS = MAPPING_TOPIC + "/count_records";
     public static final String MAPPING_EXPORT = "/topics_export";
     public static final String MAPPING_PURGER = MAPPING_TOPIC + "/purger";
@@ -144,14 +142,6 @@ public class TopicController {
         model.addAttribute(ATTR_CONFIG_DEF, TopicConfigDef.INSTANCE);
 
         return TOPIC_VIEW;
-    }
-
-    @Deprecated
-    @PreAuthorize("@authorizer.isPermitted('TOPIC', #topicName, 'READ')")
-    @RequestMapping(value=MAPPING_RECORD_COUNTER, method=RequestMethod.GET)
-    public String recordCounter(@PathVariable("name") String topicName) {
-        kafkaManager.getTopicRecordCounterTaskExecutor().submit(topicName);
-        return "redirect:" + buildTopicUrl(topicName);
     }
 
     @PreAuthorize("@authorizer.isPermitted('TOPIC', #topicName, 'READ')")
