@@ -75,7 +75,7 @@
         <kafka.version>2.2.2-cp1</kafka.version>
         <cp.version>5.2.3</cp.version>
         <eco-commons.version>0.1.1</eco-commons.version>
-        <eco-commons-kafka.version>1.2.1</eco-commons-kafka.version>
+        <eco-commons-kafka.version>1.2.2</eco-commons-kafka.version>
         <ehcache.version>3.5.2</ehcache.version>
         <curator.version>4.0.1</curator.version>
         <commons-collections4.version>4.1</commons-collections4.version>
