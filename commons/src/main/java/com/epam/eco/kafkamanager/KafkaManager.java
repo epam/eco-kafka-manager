@@ -64,6 +64,7 @@ public interface KafkaManager {
     ConsumerGroupInfo updateConsumerGroup(ConsumerGroupDeleteTopicParams params);
     ConsumerGroupInfo updateConsumerGroup(ConsumerGroupMetadataUpdateParams params);
     ConsumerGroupInfo updateConsumerGroup(ConsumerGroupMetadataDeleteParams params);
+    void deleteConsumerGroup(String groupName);
     ConsumerGroupOffsetResetterTaskExecutor getConsumerGroupOffsetResetterTaskExecutor();
     ConsumerGroupTopicOffsetFetcherTaskExecutor getConsumerGroupTopicOffsetFetcherTaskExecutor();
 

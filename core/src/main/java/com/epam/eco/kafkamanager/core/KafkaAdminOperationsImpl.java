@@ -147,6 +147,11 @@ public class KafkaAdminOperationsImpl implements KafkaAdminOperations {
     }
 
     @Override
+    public void deleteConsumerGroup(String groupName) {
+        AdminClientUtils.deleteConsumerGroup(adminClient, groupName);
+    }
+
+    @Override
     public String getZkConnect() {
         String zkConnect = properties.getZkConnect();
         if (StringUtils.isBlank(zkConnect)) {

@@ -31,4 +31,7 @@ public interface ConsumerGroupRepo extends KeyValueRepo<String, ConsumerGroupInf
     @PreAuthorize("@authorizer.isPermitted('CONSUMER_GROUP', #groupName, 'READ')")
     ConsumerGroupInfo unassignGroupFromTopic(String groupName, String topicName);
 
+    @PreAuthorize("@authorizer.isPermitted('CONSUMER_GROUP', #groupName, 'DELETE')")
+    void deleteConsumerGroup(String groupName);
+
 }

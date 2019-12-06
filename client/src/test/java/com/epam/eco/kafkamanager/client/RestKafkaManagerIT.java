@@ -256,6 +256,9 @@ public class RestKafkaManagerIT {
         kafkaManager.updateConsumerGroup(updateParams);
         someConsumerGroup = kafkaManager.getConsumerGroup(consumerGroup);
         Assert.assertTrue("There is no consumer group metadata after updating it", someConsumerGroup.getMetadata().isPresent());
+
+        kafkaManager.deleteConsumerGroup(consumerGroup);
+        Assert.assertFalse("Consumer group exists after delete", kafkaManager.consumerGroupExists(consumerGroup));
     }
 
     @Test

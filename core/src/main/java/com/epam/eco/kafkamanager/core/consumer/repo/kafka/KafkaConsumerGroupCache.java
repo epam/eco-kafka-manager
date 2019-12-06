@@ -22,6 +22,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.Callable;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.stream.Collectors;
@@ -147,6 +148,21 @@ class KafkaConsumerGroupCache implements com.epam.eco.commons.kafka.cache.CacheL
         }
     }
 
+    public <T> T callInLock(Callable<T> callable) {
+        Validate.notNull(callable, "Callable can't be null");
+
+        lock.readLock().lock();
+        try {
+            try {
+                return callable.call();
+            } catch (Exception ex) {
+                throw new RuntimeException(ex);
+            }
+        } finally {
+            lock.readLock().unlock();
+        }
+    }
+
     public Map<TopicPartition, OffsetTimeSeries> getOffsetTimeSeries(String groupName) {
         lock.readLock().lock();
         try {
@@ -261,6 +277,9 @@ class KafkaConsumerGroupCache implements com.epam.eco.commons.kafka.cache.CacheL
                 offsetUpdates.forEach((groupName, update) -> {
                     try {
                         KafkaGroupMetadata groupMetadata = getGroupMetadata(groupName, false);
+                        if (groupMetadata == null && isCleanUpUpdate(update)) {
+                            return;
+                        }
                         if (groupMetadata == null) {
                             throw new RuntimeException("Group not found");
                         }
@@ -330,6 +349,15 @@ class KafkaConsumerGroupCache implements com.epam.eco.commons.kafka.cache.CacheL
             }
             groups.add(groupName);
         });
+    }
+
+    private boolean isCleanUpUpdate(Map<TopicPartition, OffsetAndMetadataAdapter> update) {
+        for (Map.Entry<TopicPartition, OffsetAndMetadataAdapter> entry : update.entrySet()){
+            if (entry.getValue() != null) {
+                return false;
+            }
+        }
+        return true;
     }
 
     private void updateTopicGroups(

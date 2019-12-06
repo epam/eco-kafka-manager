@@ -21,6 +21,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -62,6 +63,7 @@ public class ConsumerGroupController {
 
     public static final String MAPPING_GROUPS = "/consumer_groups";
     public static final String MAPPING_GROUP = MAPPING_GROUPS + "/{name}";
+    public static final String MAPPING_DELETE = MAPPING_GROUP + "/delete";
     public static final String MAPPING_GROUP_METADATA = MAPPING_GROUP + "/metadata";
 
     private static final int PAGE_SIZE = 30;
@@ -103,6 +105,13 @@ public class ConsumerGroupController {
         model.addAttribute(ATTR_GROUP_LAG_UDM, getAndWrapUdm(groupLagUdmName));
 
         return GROUP_VIEW;
+    }
+
+    @PreAuthorize("@authorizer.isPermitted('CONSUMER_GROUP', #groupName, 'DELETE')")
+    @RequestMapping(value = MAPPING_DELETE, method = RequestMethod.POST)
+    public String delete(@PathVariable("name") String groupName) {
+        kafkaManager.deleteConsumerGroup(groupName);
+        return "redirect:" + MAPPING_GROUPS;
     }
 
     @RequestMapping(value = MAPPING_GROUP_METADATA, method = RequestMethod.GET)

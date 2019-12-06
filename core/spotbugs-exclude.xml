@@ -23,6 +23,11 @@
         <Bug pattern="EXS_EXCEPTION_SOFTENING_NO_CONSTRAINTS" />
     </Match>
     <Match>
+        <Class name="com.epam.eco.kafkamanager.core.consumer.repo.kafka.KafkaConsumerGroupCache" />
+        <Method name="callInLock" />
+        <Bug pattern="EXS_EXCEPTION_SOFTENING_NO_CONSTRAINTS" />
+    </Match>
+    <Match>
         <Class name="com.epam.eco.kafkamanager.core.topic.repo.zk.ZkTopicCache" />
         <Method name="callIfTopicAbsentOrElseThrow" />
         <Bug pattern="EXS_EXCEPTION_SOFTENING_NO_CONSTRAINTS" />

@@ -56,6 +56,7 @@ public interface KafkaAdminOperations {
     int getDefaultReplicationFactor();
     Map<String, ConsumerGroupDescription> describeAllConsumerGroups();
     Map<String, Map<TopicPartition, OffsetAndMetadata>> listAllConsumerGroupOffsets();
+    void deleteConsumerGroup(String groupName);
     String getZkConnect();
 
 }
