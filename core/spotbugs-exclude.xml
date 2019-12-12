@@ -62,5 +62,10 @@
         <Method name="startBeansInPhase" />
         <Bug pattern="EXS_EXCEPTION_SOFTENING_NO_CONSTRAINTS" />
     </Match>
+    <Match>
+        <Class name="com.epam.eco.kafkamanager.core.KafkaAdminOperationsImpl" />
+        <Method name="verifyTopicConfigsAltered" />
+        <Bug pattern="EXS_EXCEPTION_SOFTENING_NO_CHECKED" />
+    </Match>
 
 </FindBugsFilter>
