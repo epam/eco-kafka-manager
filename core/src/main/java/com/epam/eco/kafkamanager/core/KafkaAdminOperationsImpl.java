@@ -23,6 +23,7 @@ import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Validate;
 import org.apache.kafka.clients.admin.AdminClient;
 import org.apache.kafka.clients.admin.Config;
 import org.apache.kafka.clients.admin.ConsumerGroupDescription;
@@ -42,6 +43,9 @@ import kafka.server.KafkaConfig;
  * @author Andrei_Tytsik
  */
 public class KafkaAdminOperationsImpl implements KafkaAdminOperations {
+
+    private static final int VERIFY_MAX_ATTEMPTS = 5;
+    private static final int VERIFY_BACKOFF = 200;
 
     @Autowired
     private KafkaManagerProperties properties;
@@ -120,6 +124,29 @@ public class KafkaAdminOperationsImpl implements KafkaAdminOperations {
     @Override
     public void alterTopicConfig(String topicName, Map<String, String> configMap) {
         AdminClientUtils.alterTopicConfig(adminClient, topicName, configMap);
+    }
+
+    @Override
+    public boolean verifyTopicConfigsAltered(String topicName, Map<String, String> configs) {
+        Validate.notBlank(topicName, "Topic name is blank");
+        Validate.notEmpty(configs, "Map of configs is null or empty");
+
+        int attempt = 0;
+        while (attempt++ < VERIFY_MAX_ATTEMPTS) {
+            Map<String, String> actualConfigs = AdminClientUtils.describeTopicConfigAsMap(adminClient, topicName);
+            if (actualConfigs.entrySet().containsAll(configs.entrySet())) {
+                return true;
+            }
+
+            try {
+                Thread.sleep(VERIFY_BACKOFF);
+            } catch (InterruptedException ie) {
+                Thread.currentThread().interrupt();
+                throw new RuntimeException(ie);
+            }
+        }
+
+        return false;
     }
 
     @Override
