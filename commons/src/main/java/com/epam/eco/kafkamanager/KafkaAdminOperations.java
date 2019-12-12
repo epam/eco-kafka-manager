@@ -41,6 +41,16 @@ public interface KafkaAdminOperations {
     void deleteTopic(String topicName);
     void deleteAllRecords(String topicName);
     void alterTopicConfig(String topicName, Map<String, String> configMap);
+
+    /**
+     * Workaround to guarantee consistency between consequent AdminClient calls.
+     *
+     * Example case that randomly fails w/o the verification:
+     *  1 alter config cleanup.policy=delete
+     *  2 delete records (AdminClient fails with PolicyViolationException as cleanup.policy != delete)
+     */
+    boolean verifyTopicConfigsAltered(String topicName, Map<String, String> configs);
+
     int getDefaultReplicationFactor();
     String getZkConnect();
 }
