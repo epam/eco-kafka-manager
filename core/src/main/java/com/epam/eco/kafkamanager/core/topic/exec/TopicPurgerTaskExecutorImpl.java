@@ -16,6 +16,7 @@
 package com.epam.eco.kafkamanager.core.topic.exec;
 
 import java.util.Collections;
+import java.util.Map;
 
 import org.apache.kafka.clients.admin.Config;
 import org.apache.kafka.clients.admin.ConfigEntry;
@@ -63,9 +64,13 @@ public class TopicPurgerTaskExecutorImpl extends AbstractTaskExecutor<String, Vo
 
     private void changePolicyForDeleteIfNeeded(String topicName, String cleanupPolicyOrig) {
         if (!CleanupPolicy.DELETE.name.equals(cleanupPolicyOrig)) {
-            adminOperations.alterTopicConfigs(
-                    topicName,
-                    Collections.singletonMap(TopicConfig.CLEANUP_POLICY_CONFIG, CleanupPolicy.DELETE.name));
+            Map<String, String> configs =
+                    Collections.singletonMap(TopicConfig.CLEANUP_POLICY_CONFIG, CleanupPolicy.DELETE.name);
+            adminOperations.alterTopicConfigs(topicName, configs);
+            if (!adminOperations.verifyTopicConfigsAltered(topicName, configs)) {
+                throw new RuntimeException(
+                        "Topic configs not altered (verification failed). Topic = " + topicName);
+            }
         }
     }
 

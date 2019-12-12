@@ -53,6 +53,15 @@ public interface KafkaAdminOperations {
 
     void alterTopicConfigs(String topicName, Map<String, String> configs);
 
+    /**
+     * Workaround to guarantee consistency between consequent AdminClient calls.
+     *
+     * Example case that randomly fails w/o the verification:
+     *  1 alter config cleanup.policy=delete
+     *  2 delete records (AdminClient fails with PolicyViolationException as cleanup.policy != delete)
+     */
+    boolean verifyTopicConfigsAltered(String topicName, Map<String, String> configs);
+
     int getDefaultReplicationFactor();
     Map<String, ConsumerGroupDescription> describeAllConsumerGroups();
     Map<String, Map<TopicPartition, OffsetAndMetadata>> listAllConsumerGroupOffsets();
