@@ -15,17 +15,24 @@
  */
 package com.epam.eco.kafkamanager.ui.brokers;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Map.Entry;
+
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import com.epam.eco.commons.kafka.config.BrokerConfigDef;
+import com.epam.eco.kafkamanager.BrokerConfigUpdateParams;
 import com.epam.eco.kafkamanager.BrokerInfo;
 import com.epam.eco.kafkamanager.BrokerMetadataDeleteParams;
 import com.epam.eco.kafkamanager.BrokerMetadataUpdateParams;
@@ -43,6 +50,7 @@ public class BrokerController {
     public static final String BROKERS_VIEW = "brokers";
     public static final String BROKER_VIEW = "broker";
     public static final String BROKER_METADATA_VIEW = "broker_metadata";
+    public static final String BROKER_CONFIG_UPDATE_VIEW = "broker_config_update";
 
     public static final String ATTR_BROKER = "broker";
     public static final String ATTR_CONFIG_DEF = "configDef";
@@ -53,6 +61,7 @@ public class BrokerController {
     public static final String MAPPING_BROKERS = "/brokers";
     public static final String MAPPING_BROKER = "/brokers/{id}";
     public static final String MAPPING_BROKER_METADATA = MAPPING_BROKER + "/metadata";
+    public static final String MAPPING_CONFIG = MAPPING_BROKER + "/config";
 
     private static final int PAGE_SIZE = 10;
 
@@ -74,8 +83,9 @@ public class BrokerController {
 
     @RequestMapping(value = MAPPING_BROKER, method = RequestMethod.GET)
     public String broker(@PathVariable("id") Integer brokerId, Model model) {
-        model.addAttribute(ATTR_BROKER, BrokerInfoWrapper.wrap(kafkaManager.getBroker(brokerId), kafkaAdminOperations));
-        model.addAttribute(ATTR_CONFIG_DEF, BrokerConfigDef.INSTANCE);
+        model.addAttribute(
+                ATTR_BROKER,
+                BrokerInfoWrapper.wrap(kafkaManager.getBroker(brokerId), kafkaAdminOperations));
         return BROKER_VIEW;
     }
 
@@ -107,6 +117,48 @@ public class BrokerController {
                 brokerId(brokerId).
                 build());
         return "redirect:" + buildBrokerUrl(brokerId);
+    }
+
+    @PreAuthorize("@authorizer.isPermitted('BROKER', #topicName, 'ALTER_CONFIG')")
+    @RequestMapping(value=MAPPING_CONFIG, method = RequestMethod.GET)
+    public String config(@PathVariable("id") Integer brokerId, Model model) {
+        model.addAttribute(
+                ATTR_BROKER,
+                BrokerInfoWrapper.wrap(kafkaManager.getBroker(brokerId), kafkaAdminOperations));
+
+        return BROKER_CONFIG_UPDATE_VIEW;
+    }
+
+    @PreAuthorize("@authorizer.isPermitted('BROKER', #paramsMap.get('topicName'), 'ALTER_CONFIG')")
+    @RequestMapping(value=MAPPING_CONFIG, method=RequestMethod.POST)
+    public String config(
+            @RequestParam Integer brokerId,
+            @RequestParam Map<String, String> paramsMap) {
+
+        BrokerConfigUpdateParams params = BrokerConfigUpdateParams.builder().
+                brokerId(brokerId).
+                config(extractConfigsFromParams(paramsMap, false)).
+                build();
+
+        BrokerInfo brokerInfo = kafkaManager.updateBroker(params);
+        return "redirect:" + buildBrokerUrl(brokerInfo.getId());
+    }
+
+    public static Map<String, String> extractConfigsFromParams(
+            Map<String, String> paramsMap,
+            boolean skipNulls) {
+        Map<String, String> configs = new HashMap<>((int) Math.ceil(paramsMap.size() / 0.75));
+        for (Entry<String, String> entry : paramsMap.entrySet()) {
+            String key = entry.getKey();
+            String value = entry.getValue();
+            if (
+                    BrokerConfigDef.INSTANCE.key(key) == null ||
+                    (skipNulls && StringUtils.isBlank(value))) {
+                continue;
+            }
+            configs.put(key, StringUtils.stripToNull(value));
+        }
+        return configs;
     }
 
     private Page<BrokerInfoWrapper> wrap(Page<BrokerInfo> page) {

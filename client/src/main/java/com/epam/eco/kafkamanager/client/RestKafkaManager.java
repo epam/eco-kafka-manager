@@ -34,7 +34,40 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import com.epam.eco.kafkamanager.*;
+import com.epam.eco.kafkamanager.BrokerConfigUpdateParams;
+import com.epam.eco.kafkamanager.BrokerInfo;
+import com.epam.eco.kafkamanager.BrokerMetadataDeleteParams;
+import com.epam.eco.kafkamanager.BrokerMetadataUpdateParams;
+import com.epam.eco.kafkamanager.BrokerSearchQuery;
+import com.epam.eco.kafkamanager.ConsumerGroupDeleteTopicParams;
+import com.epam.eco.kafkamanager.ConsumerGroupInfo;
+import com.epam.eco.kafkamanager.ConsumerGroupMetadataDeleteParams;
+import com.epam.eco.kafkamanager.ConsumerGroupMetadataUpdateParams;
+import com.epam.eco.kafkamanager.ConsumerGroupOffsetResetterTaskExecutor;
+import com.epam.eco.kafkamanager.ConsumerGroupSearchQuery;
+import com.epam.eco.kafkamanager.ConsumerGroupTopicOffsetFetcherTaskExecutor;
+import com.epam.eco.kafkamanager.KafkaManager;
+import com.epam.eco.kafkamanager.NotFoundException;
+import com.epam.eco.kafkamanager.PermissionCreateParams;
+import com.epam.eco.kafkamanager.PermissionDeleteParams;
+import com.epam.eco.kafkamanager.PermissionInfo;
+import com.epam.eco.kafkamanager.PermissionMetadataDeleteParams;
+import com.epam.eco.kafkamanager.PermissionMetadataUpdateParams;
+import com.epam.eco.kafkamanager.PermissionSearchQuery;
+import com.epam.eco.kafkamanager.TopicConfigUpdateParams;
+import com.epam.eco.kafkamanager.TopicCreateParams;
+import com.epam.eco.kafkamanager.TopicInfo;
+import com.epam.eco.kafkamanager.TopicMetadataDeleteParams;
+import com.epam.eco.kafkamanager.TopicMetadataUpdateParams;
+import com.epam.eco.kafkamanager.TopicOffsetFetcherTaskExecutor;
+import com.epam.eco.kafkamanager.TopicPartitionsCreateParams;
+import com.epam.eco.kafkamanager.TopicPurgerTaskExecutor;
+import com.epam.eco.kafkamanager.TopicRecordCounterTaskExecutor;
+import com.epam.eco.kafkamanager.TopicRecordFetcherTaskExecutor;
+import com.epam.eco.kafkamanager.TopicSearchQuery;
+import com.epam.eco.kafkamanager.TransactionInfo;
+import com.epam.eco.kafkamanager.TransactionSearchQuery;
+import com.epam.eco.kafkamanager.rest.request.BrokerConfigRequest;
 import com.epam.eco.kafkamanager.rest.request.MetadataRequest;
 import com.epam.eco.kafkamanager.rest.request.PermissionRequest;
 import com.epam.eco.kafkamanager.rest.request.TopicConfigRequest;
@@ -168,6 +201,24 @@ public class RestKafkaManager implements KafkaManager {
                 "/api/brokers/{id}/metadata",
                 HttpMethod.DELETE,
                 null,
+                BrokerInfo.class,
+                uriVariables);
+
+        return responseEntity.getBody();
+    }
+
+    @Override
+    public BrokerInfo updateBroker(BrokerConfigUpdateParams params) {
+        Validate.notNull(params, "BrokerConfigUpdateParams object can't be null");
+
+        Map<String, Object> uriVariables = Collections.singletonMap("id", params.getBrokerId());
+
+        BrokerConfigRequest request = new BrokerConfigRequest(params.getConfig());
+
+        ResponseEntity<BrokerInfo> responseEntity = restTemplate.exchange(
+                "/api/brokers/{id}/configs",
+                HttpMethod.PUT,
+                new HttpEntity<>(request),
                 BrokerInfo.class,
                 uriVariables);
 

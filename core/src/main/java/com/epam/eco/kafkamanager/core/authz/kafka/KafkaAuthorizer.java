@@ -159,6 +159,9 @@ public class KafkaAuthorizer implements Authorizer {
         } else if (EntityType.TOPIC == entityType) {
             return ResourceType$.MODULE$.fromJava(
                     org.apache.kafka.common.resource.ResourceType.TOPIC);
+        } else if (EntityType.BROKER == entityType) {
+            return ResourceType$.MODULE$.fromJava(
+                    org.apache.kafka.common.resource.ResourceType.CLUSTER);
         } else {
             return null;
         }

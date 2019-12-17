@@ -30,6 +30,11 @@
         <Bug pattern="SPRING_UNVALIDATED_REDIRECT" />
     </Match>
     <Match>
+        <Class name="com.epam.eco.kafkamanager.ui.brokers.BrokerController" />
+        <Method name="config" />
+        <Bug pattern="SPRING_UNVALIDATED_REDIRECT" />
+    </Match>
+    <Match>
         <Class name="com.epam.eco.kafkamanager.ui.consumers.ConsumerGroupController" />
         <Method name="metadata" />
         <Bug pattern="SPRING_UNVALIDATED_REDIRECT" />

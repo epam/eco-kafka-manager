@@ -156,6 +156,11 @@ public class KafkaAdminOperationsImpl implements KafkaAdminOperations {
     }
 
     @Override
+    public void alterBrokerConfigs(int brokerId, Map<String, String> configs) {
+        AdminClientUtils.alterBrokerConfigs(adminClient, brokerId, configs);
+    }
+
+    @Override
     public int getDefaultReplicationFactor() {
         return Integer.parseInt(
                 AdminClientUtils.describeAnyBrokerConfigEntry(

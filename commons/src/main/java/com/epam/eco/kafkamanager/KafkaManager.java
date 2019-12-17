@@ -34,6 +34,7 @@ public interface KafkaManager {
     Page<BrokerInfo> getBrokerPage(BrokerSearchQuery query, Pageable pageable);
     BrokerInfo updateBroker(BrokerMetadataUpdateParams params);
     BrokerInfo updateBroker(BrokerMetadataDeleteParams params);
+    BrokerInfo updateBroker(BrokerConfigUpdateParams params);
 
     int getTopicCount();
     boolean topicExists(String topicName);

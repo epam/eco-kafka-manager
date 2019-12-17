@@ -49,6 +49,11 @@
                                 Back To Brokers <i class="fa fa-long-arrow-left"></i>
                             </a>
                             <a 
+                                th:href="@{/brokers/{id}/config(id=${broker.id})}"
+                                class="btn btn-primary right-icon">
+                                Update Config <i class="fa fa-pencil"></i>
+                            </a>
+                            <a 
                                 th:href="@{/brokers/{id}/metadata(id=${broker.id})}"
                                 class="btn btn-primary">
                                 Edit Metadata 

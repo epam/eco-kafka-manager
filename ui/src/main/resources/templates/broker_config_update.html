@@ -50,31 +50,31 @@
 
                     <div class="panel panel-default">
                         <div class="panel-body">
-                            <a
-                                    th:href="@{/topics/{name}(name=${topic.name})}"
-                                    class="btn btn-primary right-icon">
-                                Back To Topic <i class="fa fa-arrow-left"></i>
+                            <a  
+                                th:href="@{/brokers/{id}(id=${broker.id})}"
+                                class="btn btn-primary">
+                                Back To Broker <span class="glyphicon glyphicon-arrow-left"></span>
                             </a>
                         </div>
                     </div>
                     
                     <form 
-                        th:action="@{/topics/{name}/config(name=${topic.name})}" 
+                        th:action="@{/brokers/{id}/config(id=${broker.id})}" 
                         method="post">
                         
                         <div class="panel panel-default">
-                            <div class="panel-heading">Topic</div>
+                            <div class="panel-heading">Broker</div>
                             <div class="panel-body">
                             
                                 <div class="form-group">
-                                    <label for="name">Name</label>
+                                    <label for="id">Id</label>
                                     <input 
                                         type="text" 
                                         class="form-control" 
-                                        id="topicName" 
-                                        name="topicName"
+                                        id="brokerId" 
+                                        name="brokerId"
                                         readonly="readonly"
-                                        th:value="${topic.name}"/>
+                                        th:value="${broker.id}"/>
                                 </div>
                                 
                             </div>
@@ -99,7 +99,7 @@
                                     </thead>
                                     <tbody>
                                         <tr 
-                                            th:each="config : ${topic.allConfigEntries.values()}"
+                                            th:each="config : ${broker.allConfigEntries.values()}"
                                             th:classappend="${!config.default} ? 'info' : ''">
                                             <td>
                                                 <span th:text="${config.name}"></span>

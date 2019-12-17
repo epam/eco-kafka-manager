@@ -93,6 +93,10 @@ public class ConfigEntryWrapper {
         return entry.isSensitive();
     }
 
+    public boolean isReadOnly() {
+        return entry.isReadOnly();
+    }
+
     public ConfigKey getDef() {
         return def;
     }

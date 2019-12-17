@@ -139,8 +139,6 @@ public class TopicController {
         model.addAttribute(ATTR_TOPIC_OFFSET_INCREASE_UDM_NAME, topicOffsetIncreaseUdmName);
         model.addAttribute(ATTR_TOPIC_OFFSET_INCREASE_UDM, getAndWrapUdm(topicOffsetIncreaseUdmName));
 
-        model.addAttribute(ATTR_CONFIG_DEF, TopicConfigDef.INSTANCE);
-
         return TOPIC_VIEW;
     }
 
@@ -227,7 +225,6 @@ public class TopicController {
         model.addAttribute(
                 ATTR_TOPIC,
                 TopicInfoWrapper.wrap(topicName, kafkaManager, kafkaAdminOperations));
-        model.addAttribute(ATTR_CONFIG_DEF, TopicConfigDef.INSTANCE);
 
         return TOPIC_CONFIG_UPDATE_VIEW;
     }

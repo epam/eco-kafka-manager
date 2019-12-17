@@ -27,12 +27,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.epam.eco.kafkamanager.BrokerConfigUpdateParams;
 import com.epam.eco.kafkamanager.BrokerInfo;
 import com.epam.eco.kafkamanager.BrokerMetadataDeleteParams;
 import com.epam.eco.kafkamanager.BrokerMetadataUpdateParams;
 import com.epam.eco.kafkamanager.BrokerSearchQuery;
 import com.epam.eco.kafkamanager.KafkaManager;
 import com.epam.eco.kafkamanager.core.utils.PageUtils;
+import com.epam.eco.kafkamanager.rest.request.BrokerConfigRequest;
 import com.epam.eco.kafkamanager.rest.request.MetadataRequest;
 
 /**
@@ -82,6 +84,17 @@ public class BrokerController {
     public BrokerInfo deletBrokerMetadata(@PathVariable("id") Integer id) {
         BrokerMetadataDeleteParams params = BrokerMetadataDeleteParams.builder()
                 .brokerId(id)
+                .build();
+        return kafkaManager.updateBroker(params);
+    }
+
+    @PutMapping("/{id}/configs")
+    public BrokerInfo putBrokerConfigs(
+            @PathVariable("id") Integer id,
+            @RequestBody BrokerConfigRequest request) {
+        BrokerConfigUpdateParams params = BrokerConfigUpdateParams.builder()
+                .brokerId(id)
+                .config(request.getConfig())
                 .build();
         return kafkaManager.updateBroker(params);
     }

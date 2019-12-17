@@ -24,7 +24,50 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import com.epam.eco.commons.kafka.ScalaConversions;
-import com.epam.eco.kafkamanager.*;
+import com.epam.eco.kafkamanager.BrokerConfigUpdateParams;
+import com.epam.eco.kafkamanager.BrokerInfo;
+import com.epam.eco.kafkamanager.BrokerMetadataDeleteParams;
+import com.epam.eco.kafkamanager.BrokerMetadataKey;
+import com.epam.eco.kafkamanager.BrokerMetadataUpdateParams;
+import com.epam.eco.kafkamanager.BrokerRepo;
+import com.epam.eco.kafkamanager.BrokerSearchQuery;
+import com.epam.eco.kafkamanager.ConsumerGroupDeleteTopicParams;
+import com.epam.eco.kafkamanager.ConsumerGroupInfo;
+import com.epam.eco.kafkamanager.ConsumerGroupMetadataDeleteParams;
+import com.epam.eco.kafkamanager.ConsumerGroupMetadataKey;
+import com.epam.eco.kafkamanager.ConsumerGroupMetadataUpdateParams;
+import com.epam.eco.kafkamanager.ConsumerGroupOffsetResetterTaskExecutor;
+import com.epam.eco.kafkamanager.ConsumerGroupRepo;
+import com.epam.eco.kafkamanager.ConsumerGroupSearchQuery;
+import com.epam.eco.kafkamanager.ConsumerGroupTopicOffsetFetcherTaskExecutor;
+import com.epam.eco.kafkamanager.KafkaManager;
+import com.epam.eco.kafkamanager.Metadata;
+import com.epam.eco.kafkamanager.MetadataRepo;
+import com.epam.eco.kafkamanager.PermissionCreateParams;
+import com.epam.eco.kafkamanager.PermissionDeleteParams;
+import com.epam.eco.kafkamanager.PermissionInfo;
+import com.epam.eco.kafkamanager.PermissionMetadataDeleteParams;
+import com.epam.eco.kafkamanager.PermissionMetadataKey;
+import com.epam.eco.kafkamanager.PermissionMetadataUpdateParams;
+import com.epam.eco.kafkamanager.PermissionRepo;
+import com.epam.eco.kafkamanager.PermissionSearchQuery;
+import com.epam.eco.kafkamanager.SecurityContextAdapter;
+import com.epam.eco.kafkamanager.TopicConfigUpdateParams;
+import com.epam.eco.kafkamanager.TopicCreateParams;
+import com.epam.eco.kafkamanager.TopicInfo;
+import com.epam.eco.kafkamanager.TopicMetadataDeleteParams;
+import com.epam.eco.kafkamanager.TopicMetadataKey;
+import com.epam.eco.kafkamanager.TopicMetadataUpdateParams;
+import com.epam.eco.kafkamanager.TopicOffsetFetcherTaskExecutor;
+import com.epam.eco.kafkamanager.TopicPartitionsCreateParams;
+import com.epam.eco.kafkamanager.TopicPurgerTaskExecutor;
+import com.epam.eco.kafkamanager.TopicRecordCounterTaskExecutor;
+import com.epam.eco.kafkamanager.TopicRecordFetcherTaskExecutor;
+import com.epam.eco.kafkamanager.TopicRepo;
+import com.epam.eco.kafkamanager.TopicSearchQuery;
+import com.epam.eco.kafkamanager.TransactionInfo;
+import com.epam.eco.kafkamanager.TransactionRepo;
+import com.epam.eco.kafkamanager.TransactionSearchQuery;
 import com.epam.eco.kafkamanager.repo.CachedRepo;
 
 import kafka.security.auth.Resource;
@@ -135,6 +178,13 @@ public class KafkaManagerImpl implements KafkaManager {
         }
 
         return brokerRepo.get(params.getBrokerId());
+    }
+
+    @Override
+    public BrokerInfo updateBroker(BrokerConfigUpdateParams params) {
+        Validate.notNull(params, "BrokerConfigUpdateParams object is null");
+
+        return brokerRepo.updateConfig(params.getBrokerId(), params.getConfig());
     }
 
     @Override

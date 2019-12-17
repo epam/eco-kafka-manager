@@ -13,20 +13,11 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package com.epam.eco.kafkamanager;
-
-import java.util.Map;
-
-import org.springframework.security.access.prepost.PreAuthorize;
-
-import com.epam.eco.kafkamanager.repo.KeyValueRepo;
+package com.epam.eco.kafkamanager.core.broker.repo.zk;
 
 /**
  * @author Andrei_Tytsik
  */
-public interface BrokerRepo extends KeyValueRepo<Integer, BrokerInfo, BrokerSearchQuery> {
-
-    @PreAuthorize("@authorizer.isPermitted('BROKER', #brokerId, 'ALTER_CONFIG')")
-    BrokerInfo updateConfig(int brokerId, Map<String, String> configs);
-
+enum BrokerOperation {
+    UPDATE
 }

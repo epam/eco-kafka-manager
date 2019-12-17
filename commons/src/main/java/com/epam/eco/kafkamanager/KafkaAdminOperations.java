@@ -62,6 +62,8 @@ public interface KafkaAdminOperations {
      */
     boolean verifyTopicConfigsAltered(String topicName, Map<String, String> configs);
 
+    void alterBrokerConfigs(int brokerId, Map<String, String> configs);
+
     int getDefaultReplicationFactor();
     Map<String, ConsumerGroupDescription> describeAllConsumerGroups();
     Map<String, Map<TopicPartition, OffsetAndMetadata>> listAllConsumerGroupOffsets();

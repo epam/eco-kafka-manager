@@ -23,6 +23,8 @@ import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.function.Function;
+import java.util.function.Supplier;
 
 import org.apache.commons.lang3.Validate;
 import org.apache.curator.framework.CuratorFramework;
@@ -115,6 +117,26 @@ class ZkBrokerCache {
         lock.readLock().lock();
         try {
             return brokerCache.get(brokerId);
+        } finally {
+            lock.readLock().unlock();
+        }
+    }
+
+    public <T, E extends Throwable> T callIfBrokerPresentOrElseThrow(
+            int brokerId,
+            Function<BrokerInfo, T> function,
+            Supplier<E> exception) throws E {
+        Validate.notNull(function, "Function can't be null");
+        Validate.notNull(exception, "Exception can't be null");
+
+        lock.readLock().lock();
+        try {
+            BrokerInfo broker = brokerCache.get(brokerId);
+            if (broker != null) {
+                return function.apply(broker);
+            } else {
+                throw exception.get();
+            }
         } finally {
             lock.readLock().unlock();
         }
