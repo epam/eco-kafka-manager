@@ -1,0 +1,135 @@
+<!--
+ * Copyright 2019 EPAM Systems
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License.  You may obtain a copy
+ * of the License at
+ * 
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ -->
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="templates :: header(~{},~{},~{})">
+</head>
+<body>
+
+<!--    <script type="text/javascript" th:inline="javascript">-->
+<!--    </script>-->
+
+    <div th:replace="templates :: navbar"></div>
+
+    <div class="main-content">
+
+        <div class="container-fluid">
+
+            <div class="row">
+        
+                <div class="col-md-10 col-md-offset-1">
+                    
+                    <div class="panel panel-default">
+                        <div class="panel-body">
+                            <a 
+                                th:href="@{/permissions}"
+                                class="btn btn-primary right-icon">
+                                Back To Permissions <i class="fa fa-arrow-left"></i>
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <form th:action="@{/permission_create}" method="post">
+                    
+                        <div class="panel panel-default">
+                            <div class="panel-heading">Permission</div>
+                            <div class="panel-body">
+
+                                <div class="row form-group">
+                                    <div class="form-group col col-md-4">
+                                        <label for="resourceType">Resource type</label>
+                                        <select title="Resource type" class="form-control" id="resourceType" name="resourceType">
+                                            <option
+                                                    th:each="type : ${T(org.apache.kafka.common.resource.ResourceType).values()}"
+                                                    th:value="${type}"
+                                                    th:text="${type}"
+                                                    th:selected="${type == defaultResourceType}">
+                                            </option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group col col-md-4">
+                                        <label for="resourceName">Resource name</label>
+                                        <input
+                                                type="text"
+                                                class="form-control"
+                                                id="resourceName"
+                                                name="resourceName"/>
+                                    </div>
+                                </div>
+
+                                <div class="row form-group">
+                                    <div class="form-group col col-md-4">
+                                        <label for="principal">Principal</label>
+                                        <input
+                                                type="text"
+                                                class="form-control"
+                                                id="principal"
+                                                name="principal"/>
+                                    </div>
+                                    <div class="form-group col col-md-4">
+                                        <label for="host">Host</label>
+                                        <input
+                                                type="text"
+                                                class="form-control"
+                                                id="host"
+                                                name="host"/>
+                                    </div>
+                                </div>
+
+                                <div class="row form-group">
+                                    <div class="form-group col col-md-4">
+                                        <label for="permissionType">Permission type</label>
+                                        <select title="Permission type" class="form-control" id="permissionType" name="permissionType">
+                                            <option
+                                                    th:each="type : ${T(org.apache.kafka.common.acl.AclPermissionType).values()}"
+                                                    th:value="${type}"
+                                                    th:text="${type}"
+                                                    th:selected="${type == defaultPermissionType}">
+                                            </option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group col col-md-4">
+                                        <label for="operation">Operation</label>
+                                        <select title="Operation" class="form-control" id="operation" name="operation">
+                                            <option
+                                                    th:each="op : ${T(org.apache.kafka.common.acl.AclOperation).values()}"
+                                                    th:value="${op}"
+                                                    th:text="${op}"
+                                                    th:selected="${op == defaultOperation}">
+                                            </option>
+                                        </select>
+                                    </div>
+                                </div>
+                                
+                            </div>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary">Create</button>
+
+                    </form>
+                
+                </div>
+        
+            </div>
+        
+        </div>
+
+    </div>
+
+    <div th:replace="templates :: footer"></div>
+    
+</body>
+</html>

@@ -78,57 +78,63 @@
                 
                     <div class="panel panel-default">
                         <div class="panel-body">
-                        
-                            <div class="btn-group">
-                                <button 
-                                    class="btn btn-default dropdown-toggle right-icon" 
-                                    type="button" 
-                                    id="exportButton" 
-                                    data-toggle="dropdown" 
-                                    aria-haspopup="true" 
-                                    aria-expanded="true">
-                                    Export <span class="glyphicon glyphicon-export"></span>
+
+                            <a
+                                    th:href="@{/permission_create}"
+                                    class="btn btn-primary right-icon">
+                                Create <i class="fa fa-plus"></i>
+                            </a>
+
+                            <div class="dropdown" style="display:inline-block;">
+                                <button
+                                        class="btn btn-primary right-icon dropdown-toggle"
+                                        type="button"
+                                        id="exportButton"
+                                        data-toggle="dropdown"
+                                        aria-haspopup="true"
+                                        aria-expanded="true">
+                                    Export <i class="fa fa-external-link"></i>
                                 </button>
                                 <ul class="dropdown-menu" aria-labelledby="exportButton">
                                     <li>
-                                        <a 
-                                            th:href="@{/permissions/export(exporterType=PLAIN, resourceType=${searchQuery.resourceType}, resourceName=${searchQuery.resourceName}, kafkaPrincipal=${searchQuery.kafkaPrincipal}, permissionType=${searchQuery.permissionType}, operation=${searchQuery.operation}, host=${searchQuery.host}, description=${searchQuery.description})}" target="_blank">
+                                        <a
+                                                th:href="@{/permissions/export(exporterType=PLAIN, resourceType=${searchQuery.resourceType}, resourceName=${searchQuery.resourceName}, kafkaPrincipal=${searchQuery.kafkaPrincipal}, permissionType=${searchQuery.permissionType}, operation=${searchQuery.operation}, host=${searchQuery.host}, description=${searchQuery.description})}" target="_blank">
                                             Plain
                                         </a>
                                     </li>
                                     <li>
-                                        <a 
-                                            th:href="@{/permissions/export(exporterType=JSON, resourceType=${searchQuery.resourceType}, resourceName=${searchQuery.resourceName}, kafkaPrincipal=${searchQuery.kafkaPrincipal}, permissionType=${searchQuery.permissionType}, operation=${searchQuery.operation}, host=${searchQuery.host}, description=${searchQuery.description})}" target="_blank">
+                                        <a
+                                                th:href="@{/permissions/export(exporterType=JSON, resourceType=${searchQuery.resourceType}, resourceName=${searchQuery.resourceName}, kafkaPrincipal=${searchQuery.kafkaPrincipal}, permissionType=${searchQuery.permissionType}, operation=${searchQuery.operation}, host=${searchQuery.host}, description=${searchQuery.description})}" target="_blank">
                                             Json
                                         </a>
                                     </li>
                                     <li>
-                                        <a 
-                                            th:href="@{/permissions/export(exporterType=CSV, resourceType=${searchQuery.resourceType}, resourceName=${searchQuery.resourceName}, kafkaPrincipal=${searchQuery.kafkaPrincipal}, permissionType=${searchQuery.permissionType}, operation=${searchQuery.operation}, host=${searchQuery.host}, description=${searchQuery.description})}" target="_blank">
+                                        <a
+                                                th:href="@{/permissions/export(exporterType=CSV, resourceType=${searchQuery.resourceType}, resourceName=${searchQuery.resourceName}, kafkaPrincipal=${searchQuery.kafkaPrincipal}, permissionType=${searchQuery.permissionType}, operation=${searchQuery.operation}, host=${searchQuery.host}, description=${searchQuery.description})}" target="_blank">
                                             Csv
                                         </a>
                                     </li>
                                     <li>
-                                        <a 
-                                            th:href="@{/permissions/export(exporterType=GROUPED_BY_RESOURCE_PLAIN, resourceType=${searchQuery.resourceType}, resourceName=${searchQuery.resourceName}, kafkaPrincipal=${searchQuery.kafkaPrincipal}, permissionType=${searchQuery.permissionType}, operation=${searchQuery.operation}, host=${searchQuery.host}, description=${searchQuery.description})}" target="_blank">
+                                        <a
+                                                th:href="@{/permissions/export(exporterType=GROUPED_BY_RESOURCE_PLAIN, resourceType=${searchQuery.resourceType}, resourceName=${searchQuery.resourceName}, kafkaPrincipal=${searchQuery.kafkaPrincipal}, permissionType=${searchQuery.permissionType}, operation=${searchQuery.operation}, host=${searchQuery.host}, description=${searchQuery.description})}" target="_blank">
                                             Grouped By Resource (Plain)
                                         </a>
                                     </li>
                                     <li>
-                                        <a 
-                                            th:href="@{/permissions/export(exporterType=GROUPED_BY_RESOURCE_JSON, resourceType=${searchQuery.resourceType}, resourceName=${searchQuery.resourceName}, kafkaPrincipal=${searchQuery.kafkaPrincipal}, permissionType=${searchQuery.permissionType}, operation=${searchQuery.operation}, host=${searchQuery.host}, description=${searchQuery.description})}" target="_blank">
+                                        <a
+                                                th:href="@{/permissions/export(exporterType=GROUPED_BY_RESOURCE_JSON, resourceType=${searchQuery.resourceType}, resourceName=${searchQuery.resourceName}, kafkaPrincipal=${searchQuery.kafkaPrincipal}, permissionType=${searchQuery.permissionType}, operation=${searchQuery.operation}, host=${searchQuery.host}, description=${searchQuery.description})}" target="_blank">
                                             Grouped By Resource (Json)
                                         </a>
                                     </li>
                                     <li>
-                                        <a 
-                                            th:href="@{/permissions/export(exporterType=GROUPED_BY_PRINCIPAL_PLAIN, resourceType=${searchQuery.resourceType}, resourceName=${searchQuery.resourceName}, kafkaPrincipal=${searchQuery.kafkaPrincipal}, permissionType=${searchQuery.permissionType}, operation=${searchQuery.operation}, host=${searchQuery.host}, description=${searchQuery.description})}" target="_blank">
+                                        <a
+                                                th:href="@{/permissions/export(exporterType=GROUPED_BY_PRINCIPAL_PLAIN, resourceType=${searchQuery.resourceType}, resourceName=${searchQuery.resourceName}, kafkaPrincipal=${searchQuery.kafkaPrincipal}, permissionType=${searchQuery.permissionType}, operation=${searchQuery.operation}, host=${searchQuery.host}, description=${searchQuery.description})}" target="_blank">
                                             Grouped By Principal (Plain)
                                         </a>
                                     </li>
                                     <li>
-                                        <a 
-                                            th:href="@{/permissions/export(exporterType=GROUPED_BY_PRINCIPAL_JSON, resourceType=${searchQuery.resourceType}, resourceName=${searchQuery.resourceName}, kafkaPrincipal=${searchQuery.kafkaPrincipal}, permissionType=${searchQuery.permissionType}, operation=${searchQuery.operation}, host=${searchQuery.host}, description=${searchQuery.description})}" target="_blank">
+                                        <a
+                                                th:href="@{/permissions/export(exporterType=GROUPED_BY_PRINCIPAL_JSON, resourceType=${searchQuery.resourceType}, resourceName=${searchQuery.resourceName}, kafkaPrincipal=${searchQuery.kafkaPrincipal}, permissionType=${searchQuery.permissionType}, operation=${searchQuery.operation}, host=${searchQuery.host}, description=${searchQuery.description})}" target="_blank">
                                             Grouped By Principal (Json)
                                         </a>
                                     </li>
@@ -215,10 +221,11 @@
                                     <td>Operation</td>
                                     <td>Host</td>
                                     <td>Description</td>
+                                    <td></td>
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr th:each="permission : ${page.content}">
+                                <tr th:each="permission,iter : ${page.content}">
                                     <td th:text="${permission.resourceType}"></td>
                                     <td>
                                         <a 
@@ -233,6 +240,47 @@
                                     <td 
                                         th:text="${permission.metadataDescription}" 
                                         style="word-wrap:break-word;max-width:150px">
+                                    </td>
+                                    <td>
+                                        <button
+                                                type="button"
+                                                class="btn btn-danger right-icon"
+                                                data-toggle="modal"
+                                                th:data-target="${'#delete-confirm-' + iter.index}">
+                                            Delete <i class="fa fa-trash"></i>
+                                        </button>
+                                        <div th:id="${'delete-confirm-' + iter.index}" class="modal fade" role="dialog">
+                                            <div class="modal-dialog">
+                                                <div class="modal-content">
+                                                    <div class="modal-header">
+                                                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                                                        <h4 class="modal-title">Confirm Permission Delete</h4>
+                                                    </div>
+                                                    <div class="modal-body">
+                                                        <p>
+                                                            Are you sure you want to delete the permission?
+                                                        </p>
+                                                    </div>
+                                                    <div class="modal-footer">
+                                                        <form
+                                                                th:action="@{/permissions/{resourceType}/{resourceName}/{permissionType}/{operation}/{principal}/{host}/delete(resourceType=${permission.resourceType},resourceName=${permission.resourceName},permissionType=${permission.permissionType},operation=${permission.operation},principal=${permission.kafkaPrincipal},host=${permission.host})}"
+                                                                method="post">
+                                                            <button
+                                                                    type="button"
+                                                                    class="btn btn-primary"
+                                                                    data-dismiss="modal">
+                                                                Cancel
+                                                            </button>
+                                                            <button
+                                                                    type="submit"
+                                                                    class="btn btn-danger">
+                                                                Delete
+                                                            </button>
+                                                        </form>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
                                     </td>
                                 </tr>
                             </tbody>
