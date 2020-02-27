@@ -31,6 +31,8 @@ import org.apache.kafka.common.TopicPartition;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import com.epam.eco.commons.kafka.TopicPartitionComparator;
+
 /**
  * @author Andrei_Tytsik
  */
@@ -66,7 +68,7 @@ public class ConsumerGroupMemberInfo implements Comparable<ConsumerGroupMemberIn
         this.assignment =
                 !CollectionUtils.isEmpty(assignment) ?
                 assignment.stream().
-                        sorted().
+                        sorted(TopicPartitionComparator.INSTANCE).
                         collect(
                                 Collectors.collectingAndThen(
                                         Collectors.toList(),
