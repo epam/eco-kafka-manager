@@ -216,7 +216,7 @@ public class UDMetricManagerImpl implements UDMetricManager, UpdateListener {
             Set<Id> ids = new HashSet<>();
             nameIdsMapping.put(udm.getName(), ids);
             udm.getMetrics().forEach(metric -> {
-                Gauge gauge = Gauge.builder(udm.getName(), metric, m -> m.value()).
+                Gauge gauge = Gauge.builder(udm.getType().name().toLowerCase(), metric, Metric::value).
                         tags(metric.getTags()).
                         strongReference(true).
                         register(meterRegistry);
