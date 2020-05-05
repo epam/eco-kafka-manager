@@ -51,9 +51,21 @@
                                 <b>Resource Type:</b>
                                 <span th:text="${resourceType}"></span>
                             </p>
-                            <p>
+                            <p th:switch="${resourceType}">
                                 <b>Resource Name:</b>
-                                <span th:text="${resourceName}"></span>
+                                <a th:case="${T(org.apache.kafka.common.resource.ResourceType).TOPIC}"
+                                   th:href="@{/topics/{name}/(name=${resourceName})}"
+                                   th:text="${resourceName}">
+                                </a>
+                                <a th:case="${T(org.apache.kafka.common.resource.ResourceType).GROUP}"
+                                   th:href="@{/consumer_groups/{name}/(name=${resourceName})}"
+                                   th:text="${resourceName}">
+                                </a>
+                                <a th:case="${T(org.apache.kafka.common.resource.ResourceType).TRANSACTIONAL_ID}"
+                                   th:href="@{/transactions/{id}/(id=${resourceName})}"
+                                   th:text="${resourceName}">
+                                </a>
+                                <span th:case="*" th:text="${resourceName}"></span>
                             </p>
                             <p>
                                 <b>Kafka Principal:</b>

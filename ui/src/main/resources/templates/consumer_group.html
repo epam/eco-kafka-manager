@@ -44,7 +44,7 @@
                 
                     <div class="panel panel-default">
                         <div class="panel-body panel-flex">
-                            <a 
+                            <a
                                 th:href="@{/consumer_groups}" 
                                 class="btn btn-primary right-icon">
                                 Back To Consumer Groups <span class="glyphicon glyphicon-arrow-left"></span>
@@ -54,6 +54,12 @@
                                 class="btn btn-primary right-icon">
                                 Edit Metadata <span class="glyphicon glyphicon-tags"></span>
                             </a>
+                            <a
+                                th:href="@{/permissions/(resourceType=${T(org.apache.kafka.common.resource.ResourceType).GROUP}, resourceName=${group.name})}"
+                                 class="btn btn-primary right-icon">
+                                Edit Permissions <span class="glyphicon glyphicon-list"></span>
+                            </a>
+
                             <a
                                 th:href="@{/consumer_groups/{name}/offset_resetter(name=${group.name})}"
                                 class="to-right btn btn-primary right-icon">
