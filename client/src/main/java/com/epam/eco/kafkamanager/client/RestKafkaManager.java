@@ -54,6 +54,7 @@ import com.epam.eco.kafkamanager.PermissionInfo;
 import com.epam.eco.kafkamanager.PermissionMetadataDeleteParams;
 import com.epam.eco.kafkamanager.PermissionMetadataUpdateParams;
 import com.epam.eco.kafkamanager.PermissionSearchQuery;
+import com.epam.eco.kafkamanager.ResourcePermissionDeleteParams;
 import com.epam.eco.kafkamanager.TopicConfigUpdateParams;
 import com.epam.eco.kafkamanager.TopicCreateParams;
 import com.epam.eco.kafkamanager.TopicInfo;
@@ -666,9 +667,7 @@ public class RestKafkaManager implements KafkaManager {
                 params.getPrincipal(),
                 params.getPermissionType(),
                 params.getOperation(),
-                params.getHost(),
-                params.getDescription(),
-                params.getAttributes());
+                params.getHost());
 
         restTemplate.postForLocation(
                 "/api/permissions",
@@ -722,6 +721,20 @@ public class RestKafkaManager implements KafkaManager {
 
         restTemplate.delete(
                 "/api/permissions/{resourceType}/{resourceName}/{principal}/{permissionType}/{operation}/{host}",
+                uriVariables);
+    }
+
+    @Override
+    public void deletePermissions(ResourcePermissionDeleteParams params) {
+        Validate.notNull(params, "PermissionDeleteParams object can't be null");
+
+        Map<String, Object> uriVariables = new HashMap<>();
+        uriVariables.put("resourceName", params.getResourceName());
+        uriVariables.put("resourceType", params.getResourceType());
+        uriVariables.put("principal", params.getPrincipal());
+
+        restTemplate.delete(
+                "/api/permissions/{resourceType}/{resourceName}/{principal}",
                 uriVariables);
     }
 

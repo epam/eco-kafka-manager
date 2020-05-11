@@ -15,14 +15,10 @@
  */
 package com.epam.eco.kafkamanager;
 
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
 import org.apache.commons.lang3.Validate;
-import org.apache.kafka.common.acl.AclOperation;
-import org.apache.kafka.common.acl.AclPermissionType;
 import org.apache.kafka.common.resource.ResourceType;
 import org.apache.kafka.common.security.auth.KafkaPrincipal;
 import org.apache.kafka.common.utils.SecurityUtils;
@@ -34,117 +30,79 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.epam.eco.kafkamanager.utils.MapperUtils;
 
 /**
- * @author Andrei_Tytsik
+ * @author Naira_Tamrazyan
  */
-public class PermissionCreateParams {
+public class ResourcePermissionDeleteParams {
 
     private final ResourceType resourceType;
     private final String resourceName;
     private final String principal;
     private final KafkaPrincipal principalObject;
-    private final AclPermissionType permissionType;
-    private final AclOperation operation;
-    private final String host;
 
     @JsonCreator
-    public PermissionCreateParams(
+    public ResourcePermissionDeleteParams(
             @JsonProperty("resourceType") ResourceType resourceType,
             @JsonProperty("resourceName") String resourceName,
-            @JsonProperty("principal") String principal,
-            @JsonProperty("permissionType") AclPermissionType permissionType,
-            @JsonProperty("operation") AclOperation operation,
-            @JsonProperty("host") String host) {
+            @JsonProperty("principal") String principal) {
         this(
                 resourceType,
                 resourceName,
                 principal,
-                SecurityUtils.parseKafkaPrincipal(principal),
-                permissionType,
-                operation,
-                host);
+                SecurityUtils.parseKafkaPrincipal(principal));
     }
 
-    public PermissionCreateParams(
+    public ResourcePermissionDeleteParams(
             ResourceType resourceType,
             String resourceName,
-            KafkaPrincipal principal,
-            AclPermissionType permissionType,
-            AclOperation operation,
-            String host) {
+            KafkaPrincipal principal) {
         this(
                 resourceType,
                 resourceName,
                 principal != null ? principal.toString() : null,
-                principal,
-                permissionType,
-                operation,
-                host);
+                principal);
     }
 
-    private PermissionCreateParams(
+    private ResourcePermissionDeleteParams(
             ResourceType resourceType,
             String resourceName,
             String principal,
-            KafkaPrincipal principalObject,
-            AclPermissionType permissionType,
-            AclOperation operation,
-            String host) {
+            KafkaPrincipal principalObject) {
         Validate.notNull(resourceType, "Resource Type is null");
         Validate.notBlank(resourceName, "Resource Name is blank");
-        Validate.notBlank(principal,  "Principal is blank");
+        Validate.notBlank(principal, "Principal is blank");
         Validate.notNull(principalObject, "Principal Object is null");
-        Validate.notNull(permissionType, "Permission Type is null");
-        Validate.notNull(operation, "Operation is null");
-        Validate.notBlank(host, "Host is null");
 
         this.resourceType = resourceType;
         this.resourceName = resourceName;
         this.principal = principal;
         this.principalObject = principalObject;
-        this.permissionType = permissionType;
-        this.operation = operation;
-        this.host = host;
     }
 
     public ResourceType getResourceType() {
         return resourceType;
     }
+
     public String getResourceName() {
         return resourceName;
     }
+
     public String getPrincipal() {
         return principal;
     }
+
     @JsonIgnore
     public KafkaPrincipal getPrincipalObject() {
         return principalObject;
     }
-    public AclPermissionType getPermissionType() {
-        return permissionType;
-    }
-    public AclOperation getOperation() {
-        return operation;
-    }
-    public String getHost() {
-        return host;
-    }
 
     @Override
-    public boolean equals(Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (obj == null || getClass() != obj.getClass()) {
-            return false;
-        }
-        PermissionCreateParams that = (PermissionCreateParams) obj;
-        return
-                Objects.equals(this.resourceType, that.resourceType) &&
-                Objects.equals(this.resourceName, that.resourceName) &&
-                Objects.equals(this.principal, that.principal) &&
-                Objects.equals(this.permissionType, that.permissionType) &&
-                Objects.equals(this.operation, that.operation) &&
-                Objects.equals(this.host, that.host);
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ResourcePermissionDeleteParams that = (ResourcePermissionDeleteParams) o;
+        return resourceType == that.resourceType &&
+                Objects.equals(resourceName, that.resourceName) &&
+                Objects.equals(principal, that.principal);
     }
 
     @Override
@@ -152,22 +110,16 @@ public class PermissionCreateParams {
         return Objects.hash(
                 resourceType,
                 resourceName,
-                principal,
-                permissionType,
-                operation,
-                host);
+                principal);
     }
 
     @Override
     public String toString() {
         return
                 "{resourceType: " + resourceType +
-                ", resourceName: " + resourceName +
-                ", principal: " + principal +
-                ", permissionType: " + permissionType +
-                ", operation: " + operation +
-                ", host: " + host +
-                "}";
+                        ", resourceName: " + resourceName +
+                        ", principal: " + principal +
+                        "}";
     }
 
     public Builder toBuilder() {
@@ -178,20 +130,20 @@ public class PermissionCreateParams {
         return builder(null);
     }
 
-    public static Builder builder(PermissionCreateParams origin) {
+    public static Builder builder(ResourcePermissionDeleteParams origin) {
         return new Builder(origin);
     }
 
-    public static PermissionCreateParams fromJson(Map<String, ?> map) {
+    public static PermissionDeleteParams fromJson(Map<String, ?> map) {
         Validate.notNull(map, "JSON map is null");
 
-        return MapperUtils.convert(map, PermissionCreateParams.class);
+        return MapperUtils.convert(map, PermissionDeleteParams.class);
     }
 
-    public static PermissionCreateParams fromJson(String json) {
+    public static PermissionDeleteParams fromJson(String json) {
         Validate.notNull(json, "JSON is null");
 
-        return MapperUtils.jsonToBean(json, PermissionCreateParams.class);
+        return MapperUtils.jsonToBean(json, PermissionDeleteParams.class);
     }
 
     public static class Builder {
@@ -200,11 +152,8 @@ public class PermissionCreateParams {
         private String resourceName;
         private String principal;
         private KafkaPrincipal principalObject;
-        private AclPermissionType permissionType;
-        private AclOperation operation;
-        private String host;
 
-        private Builder(PermissionCreateParams origin) {
+        private Builder(ResourcePermissionDeleteParams origin) {
             if (origin == null) {
                 return;
             }
@@ -212,9 +161,6 @@ public class PermissionCreateParams {
             this.resourceType = origin.resourceType;
             this.resourceName = origin.resourceName;
             this.principal = origin.principal;
-            this.permissionType = origin.permissionType;
-            this.operation = origin.operation;
-            this.host = origin.host;
         }
 
         public Builder resourceType(ResourceType resourceType) {
@@ -239,32 +185,13 @@ public class PermissionCreateParams {
             return this;
         }
 
-        public Builder permissionType(AclPermissionType permissionType) {
-            this.permissionType = permissionType;
-            return this;
-        }
-
-        public Builder operation(AclOperation operation) {
-            this.operation = operation;
-            return this;
-        }
-
-        public Builder host(String host) {
-            this.host = host;
-            return this;
-        }
-
-        public PermissionCreateParams build() {
-            return new PermissionCreateParams(
+        public ResourcePermissionDeleteParams build() {
+            return new ResourcePermissionDeleteParams(
                     resourceType,
                     resourceName,
                     principal,
-                    principalObject,
-                    permissionType,
-                    operation,
-                    host);
+                    principalObject);
         }
-
     }
 
 }

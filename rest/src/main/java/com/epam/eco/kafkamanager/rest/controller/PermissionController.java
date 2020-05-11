@@ -36,6 +36,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.epam.eco.kafkamanager.KafkaManager;
 import com.epam.eco.kafkamanager.PermissionCreateParams;
 import com.epam.eco.kafkamanager.PermissionDeleteParams;
+import com.epam.eco.kafkamanager.ResourcePermissionDeleteParams;
 import com.epam.eco.kafkamanager.PermissionInfo;
 import com.epam.eco.kafkamanager.PermissionMetadataDeleteParams;
 import com.epam.eco.kafkamanager.PermissionMetadataUpdateParams;
@@ -88,8 +89,6 @@ public class PermissionController {
                 .permissionType(request.getPermissionType())
                 .operation(request.getOperation())
                 .host(request.getHost())
-                .description(request.getDescription())
-                .attributes(request.getAttributes())
                 .build();
         kafkaManager.createPermission(params);
     }
@@ -112,6 +111,20 @@ public class PermissionController {
                 .host(host)
                 .build();
         kafkaManager.deletePermission(params);
+    }
+
+    @DeleteMapping("/{resourceType}/{resourceName}/{principal}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deletePermissions(
+            @PathVariable("resourceType") ResourceType resourceType,
+            @PathVariable("resourceName") String resourceName,
+            @PathVariable("principal") String principal) {
+        ResourcePermissionDeleteParams params = ResourcePermissionDeleteParams.builder()
+                .resourceType(resourceType)
+                .resourceName(resourceName)
+                .principal(principal)
+                .build();
+        kafkaManager.deletePermissions(params);
     }
 
     @PutMapping("/{resourceType}/{resourceName}/{principal}/metadata")

@@ -288,8 +288,6 @@ public class RestKafkaManagerIT {
                 .permissionType(AclPermissionType.ALLOW)
                 .operation(AclOperation.DESCRIBE)
                 .host("*")
-                .description("description")
-                .attributes(Collections.singletonMap("a", "a"))
                 .build();
         kafkaManager.createPermission(permissionCreateParams);
 

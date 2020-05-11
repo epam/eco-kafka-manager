@@ -42,10 +42,6 @@ public class PermissionCreateParamsTest {
                 permissionType(AclPermissionType.ALLOW).
                 operation(AclOperation.CREATE).
                 host("host").
-                description("description").
-                appendAttribute("attr1", "value1").
-                appendAttribute("attr2", "value2").
-                appendAttribute("attr3", "value3").
                 build();
 
         ObjectMapper mapper = TestObjectMapperSingleton.getObjectMapper();
@@ -69,12 +65,6 @@ public class PermissionCreateParamsTest {
         json.put("permissionType", AclPermissionType.ALLOW);
         json.put("operation", AclOperation.READ);
         json.put("host", "host");
-        Map<String, Object> attributes = new HashMap<>();
-        attributes.put("attr1", "value1");
-        attributes.put("attr2", "value2");
-        attributes.put("attr3", "value3");
-        json.put("attributes", attributes);
-        json.put("description", "description");
 
         PermissionCreateParams query = PermissionCreateParams.fromJson(json);
         Assert.assertNotNull(query);
@@ -84,8 +74,6 @@ public class PermissionCreateParamsTest {
         Assert.assertEquals(AclPermissionType.ALLOW, query.getPermissionType());
         Assert.assertEquals(AclOperation.READ, query.getOperation());
         Assert.assertEquals("host", query.getHost());
-        Assert.assertEquals(attributes, query.getAttributes());
-        Assert.assertEquals("description", query.getDescription());
     }
 
     @Test
@@ -98,8 +86,6 @@ public class PermissionCreateParamsTest {
                 ", \"permissionType\": \"ALLOW\"" +
                 ", \"operation\": \"READ\"" +
                 ", \"host\": \"host\"" +
-                ", \"attributes\": {\"attr1\":\"value1\",\"attr2\":\"value2\",\"attr3\":\"value3\"}" +
-                ", \"description\": \"description\"" +
                 "}";
 
         PermissionCreateParams query = PermissionCreateParams.fromJson(json);
@@ -110,12 +96,6 @@ public class PermissionCreateParamsTest {
         Assert.assertEquals(AclPermissionType.ALLOW, query.getPermissionType());
         Assert.assertEquals(AclOperation.READ, query.getOperation());
         Assert.assertEquals("host", query.getHost());
-        Map<String, Object> attributes = new HashMap<>();
-        attributes.put("attr1", "value1");
-        attributes.put("attr2", "value2");
-        attributes.put("attr3", "value3");
-        Assert.assertEquals(attributes, query.getAttributes());
-        Assert.assertEquals("description", query.getDescription());
     }
 
 }

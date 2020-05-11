@@ -76,7 +76,7 @@ public class PermissionController {
     @Autowired
     private KafkaManager kafkaManager;
 
-    @RequestMapping(value = MAPPING, method = RequestMethod.GET) // TODO: what about not PatternType.LITERAL permissions?
+    @RequestMapping(value = MAPPING, method = RequestMethod.GET)
     public String permissions(
             @RequestParam(required = false) Integer page,
             @RequestParam Map<String, Object> paramsMap,
@@ -127,7 +127,7 @@ public class PermissionController {
         return PERMISSION_CREATE_VIEW;
     }
 
-    @RequestMapping(value = MAPPING_CREATE, method = RequestMethod.POST) // TODO: permissions metadata crud is not so intuitive.
+    @RequestMapping(value = MAPPING_CREATE, method = RequestMethod.POST)
     public String create(
             @RequestParam ResourceType resourceType,
             @RequestParam String resourceName,
@@ -143,17 +143,7 @@ public class PermissionController {
                 .operation(operation)
                 .principal(kafkaPrincipal)
                 .host(host);
-        PermissionSearchQuery query = PermissionSearchQuery.builder()
-                .resourceType(resourceType)
-                .resourceName(resourceName)
-                .kafkaPrincipal(principal)
-                .build();
-        Page<PermissionInfo> permissionPage = kafkaManager.getPermissionPage(query, PageRequest.of(0, 1)); // TODO: silly workaround, it is not correct.
-        if (!permissionPage.isEmpty()) {
-            Optional<Metadata> metadata = permissionPage.iterator().next().getMetadata();
-            metadata.ifPresent(value ->
-                    createParamsBuilder.description(value.getDescription()).attributes(value.getAttributes()));
-        }
+
         kafkaManager.createPermission(createParamsBuilder.build());
         return "redirect:" + ResourcePermissionController.buildResourcePermissionUrl(
                 resourceType, resourceName, kafkaPrincipal);
@@ -166,7 +156,7 @@ public class PermissionController {
             @PathVariable("permissionType") AclPermissionType permissionType,
             @PathVariable("operation") AclOperation operation,
             @PathVariable("principal") String principal,
-            @PathVariable("host") String host) { // TODO: it also deletes metadata that is not correct in many cases.
+            @PathVariable("host") String host) {
         PermissionDeleteParams deleteParams = PermissionDeleteParams.builder()
                 .resourceType(resourceType)
                 .resourceName(resourceName)
@@ -182,5 +172,4 @@ public class PermissionController {
     private Page<PermissionInfoWrapper> wrap(Page<PermissionInfo> page) {
         return page.map(PermissionInfoWrapper::wrap);
     }
-
 }

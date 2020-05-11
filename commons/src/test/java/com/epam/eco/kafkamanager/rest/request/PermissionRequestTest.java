@@ -40,9 +40,7 @@ public class PermissionRequestTest {
                 "User:John_Doe@acme.com",
                 AclPermissionType.ALLOW,
                 AclOperation.DESCRIBE,
-                "*",
-                "description",
-                Collections.singletonMap("a", "a"));
+                "*");
 
         ObjectMapper mapper = TestObjectMapperSingleton.getObjectMapper();
 

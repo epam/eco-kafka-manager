@@ -60,6 +60,11 @@
         <Bug pattern="SPRING_UNVALIDATED_REDIRECT" />
     </Match>
     <Match>
+        <Class name="com.epam.eco.kafkamanager.ui.permissions.PermissionController" />
+        <Method name="create" />
+        <Bug pattern="SPRING_UNVALIDATED_REDIRECT" />
+    </Match>
+    <Match>
         <Class name="com.epam.eco.kafkamanager.ui.topics.TopicController" />
         <Or>
             <Method name="recordCounter" />

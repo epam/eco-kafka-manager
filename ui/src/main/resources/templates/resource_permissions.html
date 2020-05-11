@@ -41,6 +41,49 @@
                                     class="btn btn-primary right-icon">
                                 Edit Metadata <span class="glyphicon glyphicon-tags"></span>
                             </a>
+
+
+                            <button style="float:right;"
+                                    type="button"
+                                    class="btn btn-danger right-icon"
+                                    data-toggle="modal"
+                                    data-target="#delete-permissions-confirm">
+                                Delete Permissions <i class="fa fa-trash"></i>
+                            </button>
+                            <div id="delete-permissions-confirm" class="modal fade" role="dialog">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <button type="button" class="close" data-dismiss="modal">&times;</button>
+                                            <h4 class="modal-title">Confirm Resource Permission Delete</h4>
+                                        </div>
+                                        <div class="modal-body">
+                                            <p>
+                                                Are you sure you want to delete all permissions for "[[${resourceName}]]" "[[${resourceType}]]" of "[[${kafkaPrincipal}]]"?
+                                            </p>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <form
+                                                    th:action="@{/permissions/resource/{resourceType}/{resourceName}/{principal}/delete(resourceType=${resourceType},resourceName=${resourceName},principal=${kafkaPrincipal})}"
+                                                    method="post">
+                                                <button
+                                                        type="button"
+                                                        class="btn btn-primary"
+                                                        data-dismiss="modal">
+                                                    Cancel
+                                                </button>
+                                                <button
+                                                        type="submit"
+                                                        class="btn btn-danger">
+                                                    Delete
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+
                         </div>
                     </div>
         
@@ -77,11 +120,12 @@
                                 <td>Permission Type</td>
                                 <td>Operation</td>
                                 <td>Host</td>
+                                <td></td>
                             </tr>
                         </thead>
                         <tbody>
                             <tr style="background-color: #FFFFFF; text-align:center;">
-                                <td colspan="6">
+                                <td colspan="7">
                                     Permissions to <span th:text="${resourceType + ' (' + resourceName + ')'}" style="font-weight:bold"></span>:
                                 </td>
                             </tr>
@@ -100,10 +144,51 @@
                                 <td th:text="${permission.permissionType}"></td>
                                 <td th:text="${permission.operation}"></td>
                                 <td th:text="${permission.host}"></td>
+                                <td>
+                                    <button
+                                            type="button"
+                                            class="btn btn-danger right-icon"
+                                            data-toggle="modal"
+                                            th:data-target="${'#delete-permission-confirm'}">
+                                        Delete <i class="fa fa-trash"></i>
+                                    </button>
+                                    <div th:id="${'delete-permission-confirm'}" class="modal fade" role="dialog">
+                                        <div class="modal-dialog">
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+                                                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                                                    <h4 class="modal-title">Confirm Permission Delete</h4>
+                                                </div>
+                                                <div class="modal-body">
+                                                    <p>
+                                                        Are you sure you want to delete the permission?
+                                                    </p>
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <form
+                                                            th:action="@{/permissions/{resourceType}/{resourceName}/{permissionType}/{operation}/{principal}/{host}/delete(resourceType=${permission.resourceType},resourceName=${permission.resourceName},permissionType=${permission.permissionType},operation=${permission.operation},principal=${permission.kafkaPrincipal},host=${permission.host})}"
+                                                            method="post">
+                                                        <button
+                                                                type="button"
+                                                                class="btn btn-primary"
+                                                                data-dismiss="modal">
+                                                            Cancel
+                                                        </button>
+                                                        <button
+                                                                type="submit"
+                                                                class="btn btn-danger">
+                                                            Delete
+                                                        </button>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </td>
                             </tr>
         
                             <tr style="background-color: #FFFFFF; text-align:center;">
-                                <td colspan="6">
+                                <td colspan="7">
                                     Other <span th:text="${kafkaPrincipal}" style="font-weight:bold"></span>'s permissions:
                                 </td>
                             </tr>
@@ -122,6 +207,47 @@
                                 <td th:text="${permission.permissionType}"></td>
                                 <td th:text="${permission.operation}"></td>
                                 <td th:text="${permission.host}"></td>
+                                <td>
+                                    <button
+                                            type="button"
+                                            class="btn btn-danger right-icon"
+                                            data-toggle="modal"
+                                            th:data-target="${'#delete-other-permission-confirm'}">
+                                        Delete <i class="fa fa-trash"></i>
+                                    </button>
+                                    <div th:id="${'delete-other-permission-confirm'}" class="modal fade" role="dialog">
+                                        <div class="modal-dialog">
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+                                                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                                                    <h4 class="modal-title">Confirm Permission Delete</h4>
+                                                </div>
+                                                <div class="modal-body">
+                                                    <p>
+                                                        Are you sure you want to delete the permission?
+                                                    </p>
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <form
+                                                            th:action="@{/permissions/{resourceType}/{resourceName}/{permissionType}/{operation}/{principal}/{host}/delete(resourceType=${permission.resourceType},resourceName=${permission.resourceName},permissionType=${permission.permissionType},operation=${permission.operation},principal=${permission.kafkaPrincipal},host=${permission.host})}"
+                                                            method="post">
+                                                        <button
+                                                                type="button"
+                                                                class="btn btn-primary"
+                                                                data-dismiss="modal">
+                                                            Cancel
+                                                        </button>
+                                                        <button
+                                                                type="submit"
+                                                                class="btn btn-danger">
+                                                            Delete
+                                                        </button>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </td>
                             </tr>
                                         
                         </tbody>

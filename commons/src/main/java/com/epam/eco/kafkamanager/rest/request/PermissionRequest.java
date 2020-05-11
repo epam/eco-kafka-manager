@@ -35,8 +35,6 @@ public class PermissionRequest {
     private final AclPermissionType permissionType;
     private final AclOperation operation;
     private final String host;
-    private final String description;
-    private final Map<String, Object> attributes;
 
     public PermissionRequest(
             @JsonProperty("resourceType") ResourceType resourceType,
@@ -44,17 +42,13 @@ public class PermissionRequest {
             @JsonProperty("principal") String principal,
             @JsonProperty("permissionType") AclPermissionType permissionType,
             @JsonProperty("operation") AclOperation operation,
-            @JsonProperty("host") String host,
-            @JsonProperty("description") String description,
-            @JsonProperty("attributes") Map<String, Object> attributes) {
+            @JsonProperty("host") String host) {
         this.resourceType = resourceType;
         this.resourceName = resourceName;
         this.principal = principal;
         this.permissionType = permissionType;
         this.operation = operation;
         this.host = host;
-        this.description = description;
-        this.attributes = attributes;
     }
 
     public ResourceType getResourceType() {
@@ -81,14 +75,6 @@ public class PermissionRequest {
         return host;
     }
 
-    public String getDescription() {
-        return description;
-    }
-
-    public Map<String, Object> getAttributes() {
-        return attributes;
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -99,14 +85,12 @@ public class PermissionRequest {
                 Objects.equals(principal, that.principal) &&
                 permissionType == that.permissionType &&
                 operation == that.operation &&
-                Objects.equals(host, that.host) &&
-                Objects.equals(description, that.description) &&
-                Objects.equals(attributes, that.attributes);
+                Objects.equals(host, that.host);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(resourceType, resourceName, principal, permissionType, operation, host, description, attributes);
+        return Objects.hash(resourceType, resourceName, principal, permissionType, operation, host);
     }
 
     @Override
@@ -117,9 +101,7 @@ public class PermissionRequest {
                 ", principal='" + principal + '\'' +
                 ", permissionType=" + permissionType +
                 ", operation=" + operation +
-                ", host='" + host + '\'' +
-                ", description='" + description + '\'' +
-                ", attributes=" + attributes +
+                ", host='" + host +
                 '}';
     }
 }

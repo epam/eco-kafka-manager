@@ -78,6 +78,7 @@ public interface KafkaManager {
     void updatePermission(PermissionMetadataUpdateParams params);
     void updatePermission(PermissionMetadataDeleteParams params);
     void deletePermission(PermissionDeleteParams params);
+    void deletePermissions(ResourcePermissionDeleteParams params);
 
     int getTransactionCount();
     boolean transactionExists(String transactionalId);
