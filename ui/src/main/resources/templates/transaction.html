@@ -31,10 +31,15 @@
                 
                     <div class="panel panel-default">
                         <div class="panel-body panel-flex">
-                            <a 
+                            <a
                                 th:href="@{/transactions}" 
                                 class="btn btn-primary right-icon">
                                 Back To Transactions <i class="fa fa-arrow-left"></i>
+                            </a>
+                            <a
+                                th:href="@{/permissions/(resourceType=${T(org.apache.kafka.common.resource.ResourceType).TRANSACTIONAL_ID}, resourceName=${transaction.transactionalId})}"
+                                class="btn btn-primary right-icon">
+                                Edit Permissions <span class="glyphicon glyphicon-list"></span>
                             </a>
                         </div>
                     </div>
