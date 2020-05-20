@@ -15,6 +15,10 @@
  */
 package com.epam.eco.kafkamanager.ui.topics.browser;
 
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -25,6 +29,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import org.apache.commons.collections4.ListUtils;
+import org.apache.commons.lang3.Validate;
 
 import com.epam.eco.kafkamanager.RecordFetchRequest;
 import com.epam.eco.kafkamanager.RecordFetchRequest.DataFormat;
@@ -44,9 +49,12 @@ public class RecordFetchParams extends HashMap<String, Object> {
     public static final String PARTITION_OFFSET = "p_%d";
     public static final String PARTITION_ENABLED = "pe_%d";
     public static final String COLUMN_ENABLED = "ce_%s";
+    public static final String PARTITION_TIMESTAMP = "time_%d";
+    public static final String FETCH_BY_TIMESTAMP = "fetchByTimestamp";
 
     private static final Pattern PARTITION_OFFSET_PATTERN = Pattern.compile("^p_(0|[1-9]\\d*)$");
     private static final Pattern COLUMN_ENABLED_PATTERN = Pattern.compile("^ce_(.+)$");
+    private static final DateTimeFormatter DATE_TIME_FORMATTER_PATTERN = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm");
 
     public RecordFetchParams(Map<String, Object> requestParams) {
         if (requestParams != null) {
@@ -72,6 +80,14 @@ public class RecordFetchParams extends HashMap<String, Object> {
 
     public void setKeyFormat(String keyFormat) {
         put(KEY_FORMAT, keyFormat);
+    }
+
+    public Boolean getFetchByTimestamp() {
+        return isFetchByTimestampEnabled();
+    }
+
+    public void setFetchByTimestamp(Boolean fetchByTimestamp) {
+        put(FETCH_BY_TIMESTAMP, fetchByTimestamp);
     }
 
     public void setKeyFormatIfMissing(DataFormat keyFormat) {
@@ -163,13 +179,34 @@ public class RecordFetchParams extends HashMap<String, Object> {
         put(formatPartitionEnabledKey(partition), enabled);
     }
 
+    public boolean isFetchByTimestampEnabled() {
+        Boolean enabled = getAsBoolean(FETCH_BY_TIMESTAMP);
+        return enabled != null ? enabled : false;
+    }
+
     public long getPartitionOffset(int partition) {
         Long offset = getAsLong(formatPartitionOffsetKey(partition));
         return offset != null ? offset : 0L;
     }
 
+    public String getPartitionTimestamp(int partition) {
+        return (String) get(formatTimestampKey(partition));
+    }
+
+    public long getPartitionTimestampAsLong(int partition) {
+        if (getFetchByTimestamp()) {
+            Long offset = getDateAsLong(formatTimestampKey(partition));
+            return offset != null ? offset : 0L;
+        }
+        return 0L;
+    }
+
     public void addPartitionOffset(int partition, long offset) {
         put(formatPartitionOffsetKey(partition), offset);
+    }
+
+    public void addPartitionTimestamp(int partition, String date) {
+        put(formatTimestampKey(partition), date);
     }
 
     public void addPartitionOffsetOnCondition(int partition, long offset, Predicate<Long> condition) {
@@ -186,6 +223,10 @@ public class RecordFetchParams extends HashMap<String, Object> {
     public boolean containsPartition(int partition) {
         Long offset = getAsLong(formatPartitionOffsetKey(partition));
         return offset != null;
+    }
+
+    public boolean containsPartitionTimestamp(int partition) {
+        return get(formatTimestampKey(partition)) != null;
     }
 
     public List<Integer> listPartitions() {
@@ -206,6 +247,14 @@ public class RecordFetchParams extends HashMap<String, Object> {
                 collect(Collectors.toMap(
                         Function.identity(),
                         this::getPartitionOffset));
+    }
+
+    public Map<Integer, Long> getPartitionTimestamps(){
+        return listPartitions().stream().
+                filter(this::isPartitionEnabled).
+                collect(Collectors.toMap(
+                        Function.identity(),
+                        this::getPartitionTimestampAsLong));
     }
 
     private DataFormat getAsDataFormat(String key) {
@@ -236,6 +285,26 @@ public class RecordFetchParams extends HashMap<String, Object> {
             return ((Number)value).longValue();
         } else if (value instanceof String) {
             return Long.valueOf((String)value);
+        } else {
+            throw new RuntimeException(
+                    String.format(
+                            "Can't convert %s to %s",
+                            value.getClass().getName(), Long.class.getName()));
+        }
+    }
+
+    private Long getDateAsLong(String key) {
+        Object value = get(key);
+        if (value == null) {
+            return null;
+        }
+
+        if (value instanceof String) {
+            Validate.notBlank((String) value, "Timestamp cannot be blank");
+
+            LocalDateTime localDateTime = LocalDateTime.parse((String) value, DATE_TIME_FORMATTER_PATTERN);
+            ZonedDateTime zdt = ZonedDateTime.of(localDateTime, ZoneId.systemDefault());
+            return zdt.toInstant().toEpochMilli();
         } else {
             throw new RuntimeException(
                     String.format(
@@ -279,6 +348,10 @@ public class RecordFetchParams extends HashMap<String, Object> {
 
     private String formatPartitionOffsetKey(int partition) {
         return String.format(PARTITION_OFFSET, partition);
+    }
+
+    private String formatTimestampKey(int partition) {
+        return String.format(PARTITION_TIMESTAMP, partition);
     }
 
     private int extractPartitionFromOffsetKey(String key) {

@@ -61,7 +61,19 @@ public class TopicRecordFetcherTaskExecutorImpl<K, V> extends AbstractTaskExecut
         TopicRecordFetcher<K, V> recordFetcher = TopicRecordFetcher.
                 with(buildConsumerConfig(request));
 
-        return recordFetcher.fetch(
+        //search by timestamps
+        if(request.getFetchByTimestamp()) {
+            return recordFetcher.fetchByTimestamps(
+                    request.getPartitionTimestamps().entrySet().stream().
+                            collect(Collectors.toMap(
+                                    e -> new TopicPartition(topicName, e.getKey()),
+                                    e -> e.getValue())),
+                    request.getLimit(),
+                    request.getTimeoutInMs());
+        }
+
+        //search by offsets
+        return recordFetcher.fetchByOffsets(
                 request.getOffsets().entrySet().stream().
                     collect(Collectors.toMap(
                             e -> new TopicPartition(topicName, e.getKey()),

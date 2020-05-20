@@ -123,8 +123,10 @@ public class TopicBrowserController {
                 fetchParams.getKeyFormat(),
                 fetchParams.getValueFormat(),
                 fetchParams.getPartitionOffsets(),
+                fetchParams.getPartitionTimestamps(),
                 fetchParams.getLimit(),
-                fetchParams.getTimeout() > 0 ? fetchParams.getTimeout() : DEFAULT_FETCH_TIMEOUT);
+                fetchParams.getTimeout() > 0 ? fetchParams.getTimeout() : DEFAULT_FETCH_TIMEOUT,
+                fetchParams.getFetchByTimestamp());
     }
 
     private Map<Integer, OffsetRange> fetchOffsetRanges(String topicName) {

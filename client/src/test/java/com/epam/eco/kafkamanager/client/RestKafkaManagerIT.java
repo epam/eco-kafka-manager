@@ -102,8 +102,8 @@ public class RestKafkaManagerIT {
                 RecordFetchRequest.DataFormat.STRING,
                 RecordFetchRequest.DataFormat.STRING,
                 offsets,
-                10L,
-                10000L);
+                null, 10L,
+                10000L, false);
         RecordFetchResult<String, String> recordFetchResult =
                 kafkaManager.<String, String>getTopicRecordFetcherTaskExecutor()
                 .execute(topicName, recordFetchRequest);

@@ -34,6 +34,7 @@
                 var enabled = $(this).is(':checked');
                 $('#pe_' + partition).val(enabled ? '1' : '0');
                 $('#p_' + partition).prop('disabled', !enabled);
+                $('#time_' + partition).prop('disabled', !enabled);
             });
             
             $('#next-offsets-link').click(function(e) {
@@ -85,7 +86,18 @@
             $('#valueFormat').change(function () {
                 showHideColumnSelectorDependingOnFormatSelected(fetchedValueFormat);
             });
-            
+
+            $('input[type=radio][name=fetchByTimestamp]').change(function() {
+                if (this.value == 'true') {
+                    $("input[id^='p_']").hide();
+                    $("input[id^='time_']").show();
+                }
+                else if (this.value == 'false') {
+                    $("input[id^='p_']").show();
+                    $("input[id^='time_']").hide();
+                }
+            });
+
             $('#fetch-form').submit(function () {
                 removeColumnSelectorIfFormatNotEqualToFecthedOne(fetchedValueFormat);
                 storeOrApplySelectedColumns();
@@ -96,9 +108,30 @@
             $(document).on('click', function (e) {
                 hidePopoverIfClickedOutside(e);
             });
+
+            $("input[id^='time_']").datetimepicker({
+                changeMonth: true,
+                changeYear: true,
+                showOn: "button",
+                buttonImage: "images/calendar.gif",
+                buttonImageOnly: true,
+                buttonText: "Select timestamp"
+            });
         
         });
-       
+
+         $(document).ready(function() {
+            var fetchByTimestamps = [[${fetchParams.fetchByTimestamp}]];
+            if(fetchByTimestamps === "true") {
+                var fetchByTimeRadio =  $('input[type=radio][id=fetchByTimestamp]');
+                fetchByTimeRadio.prop("checked", true);
+                fetchByTimeRadio.trigger("change");
+            } else {
+                var fetchByOffsetRadio = $('input[type=radio][id=fetchByOffset]');
+                fetchByOffsetRadio.prop("checked", true);
+                fetchByOffsetRadio.trigger("change");
+            }
+         });
     </script>
     
     
@@ -161,7 +194,16 @@
                                         </select>
                                     </div>                    
                                 </div>
-                                
+
+                                <div style="margin:20px;margin-left:0px;">
+                                    <input type="radio" id="fetchByOffset" name="fetchByTimestamp" class="custom-control-input"
+                                           th:value="false" th:checked="true">
+                                    <label class="custom-control-label" for="fetchByOffset">Fetch by Offsets</label>
+                                    <input type="radio" id="fetchByTimestamp" name="fetchByTimestamp" class="custom-control-input"
+                                           th:value="true">
+                                    <label class="custom-control-label" for="fetchByTimestamp">Fetch by Timestamps</label>
+                                </div>
+
                                 <a id="all-partitions-link" href="#" class="btn btn-default transparent right-icon small">
                                     All <span class="glyphicon glyphicon-ok-circle"></span>
                                 </a>
@@ -192,6 +234,15 @@
                                                     th:id="${'p_' + partition}" 
                                                     th:name="${'p_' + partition}" 
                                                     th:value="${offset}"/>
+
+                                                <input th:id="${'time_' + partition}"
+                                                       th:name="${'time_' + partition}"
+                                                       th:value="${fetchParams.getPartitionTimestamp(partition)}"
+                                                       th:disabled="${!enabled}"
+                                                       autocomplete="off"
+                                                       class="form-control"
+                                                       style="display:none;">
+
                                                 <span class="input-group-addon" th:text="${range.largest + (range.largestInclusive ? ']' : ')')}"></span>
                                                 <input 
                                                     type="hidden" 

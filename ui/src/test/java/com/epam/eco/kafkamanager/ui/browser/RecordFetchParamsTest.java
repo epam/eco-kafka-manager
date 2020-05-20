@@ -38,11 +38,19 @@ public class RecordFetchParamsTest {
         Assert.assertEquals(null, params.getTopicName());
         Assert.assertEquals(null, params.getKeyFormat());
         Assert.assertEquals(null, params.getValueFormat());
+        Assert.assertEquals(false, params.getFetchByTimestamp());
         Assert.assertNotNull(params.getPartitionOffsets());
+        Assert.assertNotNull(params.getPartitionTimestamps());
+
         Assert.assertTrue(params.getLimit() > 0);
         Assert.assertEquals(0, params.getPartitionOffset(0));
         Assert.assertEquals(0, params.getPartitionOffset(1));
         Assert.assertEquals(0, params.getPartitionOffset(2));
+
+        Assert.assertEquals(null, params.getPartitionTimestamp(0));
+        Assert.assertEquals(null, params.getPartitionTimestamp(1));
+        Assert.assertEquals(null, params.getPartitionTimestamp(2));
+
         Assert.assertEquals(true, params.isPartitionEnabled(0));
         Assert.assertEquals(true, params.isPartitionEnabled(1));
         Assert.assertEquals(true, params.isPartitionEnabled(2));
@@ -99,6 +107,13 @@ public class RecordFetchParamsTest {
         Assert.assertTrue(params.containsPartition(0));
         Assert.assertFalse(params.containsPartition(1));
         Assert.assertEquals(999, params.getPartitionOffset(0));
+
+        //test partition timestamps
+        params.setFetchByTimestamp(true);
+        String date = "2020/05/23 15:15";
+        params.addPartitionTimestamp(0, date);
+        Assert.assertTrue(params.containsPartitionTimestamp(0));
+        Assert.assertEquals(1590232500000L, params.getPartitionTimestampAsLong(0));
 
         List<Integer> partitions = params.listPartitions();
         Assert.assertNotNull(partitions);
