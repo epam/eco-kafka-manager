@@ -195,13 +195,17 @@
                                     </div>                    
                                 </div>
 
-                                <div style="margin:20px;margin-left:0px;">
-                                    <input type="radio" id="fetchByOffset" name="fetchByTimestamp" class="custom-control-input"
-                                           th:value="false" th:checked="true">
-                                    <label class="custom-control-label" for="fetchByOffset">Fetch by Offsets</label>
-                                    <input type="radio" id="fetchByTimestamp" name="fetchByTimestamp" class="custom-control-input"
-                                           th:value="true">
-                                    <label class="custom-control-label" for="fetchByTimestamp">Fetch by Timestamps</label>
+                                <div class="radio">
+                                    <label class="radio-inline" style="font-weight:700;" for="fetchByOffset">
+                                        <input type="radio" id="fetchByOffset" name="fetchByTimestamp" th:value="false"
+                                               th:checked="true">
+                                        Fetch by Offsets
+                                    </label>
+                                    <label class="radio-inline" style="font-weight:700;" for="fetchByTimestamp">
+                                        <input type="radio" id="fetchByTimestamp" name="fetchByTimestamp"
+                                               th:value="true">
+                                        Fetch by Timestamps
+                                    </label>
                                 </div>
 
                                 <a id="all-partitions-link" href="#" class="btn btn-default transparent right-icon small">
