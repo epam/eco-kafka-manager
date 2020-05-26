@@ -24,12 +24,12 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 
-import com.epam.eco.kafkamanager.SearchQuery;
+import com.epam.eco.kafkamanager.SearchCriteria;
 
 /**
  * @author Andrei_Tytsik
  */
-public abstract class AbstractValueRepo<V, Q extends SearchQuery<V>> implements ValueRepo<V, Q> {
+public abstract class AbstractValueRepo<V, Q extends SearchCriteria<V>> implements ValueRepo<V, Q> {
 
     @Override
     public Page<V> page(Pageable pageable) {

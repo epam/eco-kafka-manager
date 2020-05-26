@@ -29,11 +29,11 @@ import com.epam.eco.kafkamanager.udmetrics.utils.TestObjectMapperSingleton;
 /**
  * @author Andrei_Tytsik
  */
-public class UDMetricConfigSearchQueryTest {
+public class UDMetricConfigSearchCriteriaTest {
 
     @Test
     public void testSerializedToJsonAndBack() throws Exception {
-        UDMetricConfigSearchQuery origin = UDMetricConfigSearchQuery.builder().
+        UDMetricConfigSearchCriteria origin = UDMetricConfigSearchCriteria.builder().
                 type(UDMetricType.TOPIC_OFFSET_INCREASE).
                 resourceName("resource1").
                 build();
@@ -43,9 +43,9 @@ public class UDMetricConfigSearchQueryTest {
         String json = mapper.writeValueAsString(origin);
         Assert.assertNotNull(json);
 
-        UDMetricConfigSearchQuery deserialized = mapper.readValue(
+        UDMetricConfigSearchCriteria deserialized = mapper.readValue(
                 json,
-                UDMetricConfigSearchQuery.class);
+                UDMetricConfigSearchCriteria.class);
         Assert.assertNotNull(deserialized);
         Assert.assertEquals(origin, deserialized);
     }
@@ -56,7 +56,7 @@ public class UDMetricConfigSearchQueryTest {
         json.put("type", "CONSUMER_GROUP_LAG");
         json.put("resourceName", "resource3");
 
-        UDMetricConfigSearchQuery query = UDMetricConfigSearchQuery.fromJson(json);
+        UDMetricConfigSearchCriteria query = UDMetricConfigSearchCriteria.fromJson(json);
         Assert.assertNotNull(query);
         Assert.assertEquals(UDMetricType.CONSUMER_GROUP_LAG, query.getType());
         Assert.assertEquals("resource3", query.getResourceName());
@@ -70,7 +70,7 @@ public class UDMetricConfigSearchQueryTest {
                 ", \"resourceName\": \"resource3\"" +
                 "}";
 
-        UDMetricConfigSearchQuery query = UDMetricConfigSearchQuery.fromJson(json);
+        UDMetricConfigSearchCriteria query = UDMetricConfigSearchCriteria.fromJson(json);
         Assert.assertNotNull(query);
         Assert.assertEquals(UDMetricType.CONSUMER_GROUP_LAG, query.getType());
         Assert.assertEquals("resource3", query.getResourceName());

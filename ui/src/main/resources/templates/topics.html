@@ -101,13 +101,13 @@
                                 <ul class="dropdown-menu" aria-labelledby="exportButton">
                                     <li>
                                         <a 
-                                            th:href="@{/topics_export(exporterType=PLAIN, topicName=${searchQuery.topicName}, minPartitionCount=${searchQuery.minPartitionCount}, maxPartitionCount=${searchQuery.maxPartitionCount}, minReplicationFactor=${searchQuery.minReplicationFactor}, maxReplicationFactor=${searchQuery.maxReplicationFactor}, minConsumerCount=${searchQuery.minConsumerCount}, maxConsumerCount=${searchQuery.maxConsumerCount}, replicationState=${searchQuery.replicationState}, configString=${searchQuery.configString}, description=${searchQuery.description})}" target="_blank">
+                                            th:href="@{/topics_export(exporterType=PLAIN, topicName=${searchCriteria.topicName}, minPartitionCount=${searchCriteria.minPartitionCount}, maxPartitionCount=${searchCriteria.maxPartitionCount}, minReplicationFactor=${searchCriteria.minReplicationFactor}, maxReplicationFactor=${searchCriteria.maxReplicationFactor}, minConsumerCount=${searchCriteria.minConsumerCount}, maxConsumerCount=${searchCriteria.maxConsumerCount}, replicationState=${searchCriteria.replicationState}, configString=${searchCriteria.configString}, description=${searchCriteria.description})}" target="_blank">
                                             Plain
                                         </a>
                                     </li>
                                     <li>
                                         <a 
-                                            th:href="@{/topics_export(exporterType=JSON, topicName=${searchQuery.topicName}, minPartitionCount=${searchQuery.minPartitionCount}, maxPartitionCount=${searchQuery.maxPartitionCount}, minReplicationFactor=${searchQuery.minReplicationFactor}, maxReplicationFactor=${searchQuery.maxReplicationFactor}, minConsumerCount=${searchQuery.minConsumerCount}, maxConsumerCount=${searchQuery.maxConsumerCount}, replicationState=${searchQuery.replicationState}, configString=${searchQuery.configString}, description=${searchQuery.description})}" target="_blank">
+                                            th:href="@{/topics_export(exporterType=JSON, topicName=${searchCriteria.topicName}, minPartitionCount=${searchCriteria.minPartitionCount}, maxPartitionCount=${searchCriteria.maxPartitionCount}, minReplicationFactor=${searchCriteria.minReplicationFactor}, maxReplicationFactor=${searchCriteria.maxReplicationFactor}, minConsumerCount=${searchCriteria.minConsumerCount}, maxConsumerCount=${searchCriteria.maxConsumerCount}, replicationState=${searchCriteria.replicationState}, configString=${searchCriteria.configString}, description=${searchCriteria.description})}" target="_blank">
                                             Json
                                         </a>
                                     </li>
@@ -123,55 +123,55 @@
                             class="form-control" 
                             id="topicName" 
                             placeholder="Topic Name"
-                            th:value="${searchQuery.topicName}"/>
+                            th:value="${searchCriteria.topicName}"/>
                         <input
                             type="number"
                             class="form-control"
                             min="1"
                             id="minPartitionCount" 
                             placeholder="Min Partition Count"
-                            th:value="${searchQuery.minPartitionCount}"/>
+                            th:value="${searchCriteria.minPartitionCount}"/>
                         <input 
                             type="number"
                             class="form-control"
                             min="1"
                             id="maxPartitionCount" 
                             placeholder="Max Partition Count"
-                            th:value="${searchQuery.maxPartitionCount}"/>
+                            th:value="${searchCriteria.maxPartitionCount}"/>
                         <input 
                             type="number"
                             class="form-control"
                             min="1"
                             id="minReplicationFactor" 
                             placeholder="Min Replication Factor"
-                            th:value="${searchQuery.minReplicationFactor}"/>
+                            th:value="${searchCriteria.minReplicationFactor}"/>
                         <input 
                             type="number"
                             class="form-control"
                             min="1"
                             id="maxReplicationFactor" 
                             placeholder="Max Replication Factor"
-                            th:value="${searchQuery.maxReplicationFactor}"/>
+                            th:value="${searchCriteria.maxReplicationFactor}"/>
                         <input 
                             type="number"
                             class="form-control"
                             min="1"
                             id="minConsumerCount" 
                             placeholder="Min Consumer Count"
-                            th:value="${searchQuery.minConsumerCount}"/>
+                            th:value="${searchCriteria.minConsumerCount}"/>
                         <input 
                             type="number"
                             class="form-control"
                             min="1"
                             id="maxConsumerCount" 
                             placeholder="Max Consumer Count"
-                            th:value="${searchQuery.maxConsumerCount}"/>
+                            th:value="${searchCriteria.maxConsumerCount}"/>
                         <select title="Replication State" class="form-control" id="replicationState">
                             <option 
-                                th:each="state : ${T(com.epam.eco.kafkamanager.TopicSearchQuery$ReplicationState).values()}"
+                                th:each="state : ${T(com.epam.eco.kafkamanager.TopicSearchCriteria$ReplicationState).values()}"
                                 th:value="${state}" 
                                 th:text="${state}"
-                                th:selected="${state == searchQuery.replicationState}">
+                                th:selected="${state == searchCriteria.replicationState}">
                             </option>
                         </select>
                         <input
@@ -179,13 +179,13 @@
                             class="form-control" 
                             id="configString" 
                             placeholder="Config: Value;..."
-                            th:value="${searchQuery.configString}"/>
+                            th:value="${searchCriteria.configString}"/>
                         <input
                             type="text"
                             class="form-control"
                             id="description" 
                             placeholder="Description"
-                            th:value="${searchQuery.description}"/>
+                            th:value="${searchCriteria.description}"/>
                         <button
                             type="submit"
                             class="btn btn-primary">

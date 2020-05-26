@@ -36,7 +36,7 @@ import com.epam.eco.commons.kafka.ScalaConversions;
 import com.epam.eco.kafkamanager.BrokerInfo;
 import com.epam.eco.kafkamanager.BrokerMetadataKey;
 import com.epam.eco.kafkamanager.BrokerRepo;
-import com.epam.eco.kafkamanager.BrokerSearchQuery;
+import com.epam.eco.kafkamanager.BrokerSearchCriteria;
 import com.epam.eco.kafkamanager.EndPointInfo;
 import com.epam.eco.kafkamanager.EntityType;
 import com.epam.eco.kafkamanager.KafkaAdminOperations;
@@ -55,7 +55,7 @@ import kafka.cluster.EndPoint;
 /**
  * @author Andrei_Tytsik
  */
-public class ZkBrokerRepo extends AbstractKeyValueRepo<Integer, BrokerInfo, BrokerSearchQuery> implements BrokerRepo, CachedRepo<Integer>, ZkBrokerCache.CacheListener, ZkBrokerConfigCache.CacheListener, MetadataUpdateListener, AsyncStartingBean {
+public class ZkBrokerRepo extends AbstractKeyValueRepo<Integer, BrokerInfo, BrokerSearchCriteria> implements BrokerRepo, CachedRepo<Integer>, ZkBrokerCache.CacheListener, ZkBrokerConfigCache.CacheListener, MetadataUpdateListener, AsyncStartingBean {
 
     private final static Logger LOGGER = LoggerFactory.getLogger(ZkBrokerRepo.class);
 

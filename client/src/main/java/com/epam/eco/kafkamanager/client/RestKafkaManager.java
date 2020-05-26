@@ -38,13 +38,13 @@ import com.epam.eco.kafkamanager.BrokerConfigUpdateParams;
 import com.epam.eco.kafkamanager.BrokerInfo;
 import com.epam.eco.kafkamanager.BrokerMetadataDeleteParams;
 import com.epam.eco.kafkamanager.BrokerMetadataUpdateParams;
-import com.epam.eco.kafkamanager.BrokerSearchQuery;
+import com.epam.eco.kafkamanager.BrokerSearchCriteria;
 import com.epam.eco.kafkamanager.ConsumerGroupDeleteTopicParams;
 import com.epam.eco.kafkamanager.ConsumerGroupInfo;
 import com.epam.eco.kafkamanager.ConsumerGroupMetadataDeleteParams;
 import com.epam.eco.kafkamanager.ConsumerGroupMetadataUpdateParams;
 import com.epam.eco.kafkamanager.ConsumerGroupOffsetResetterTaskExecutor;
-import com.epam.eco.kafkamanager.ConsumerGroupSearchQuery;
+import com.epam.eco.kafkamanager.ConsumerGroupSearchCriteria;
 import com.epam.eco.kafkamanager.ConsumerGroupTopicOffsetFetcherTaskExecutor;
 import com.epam.eco.kafkamanager.KafkaManager;
 import com.epam.eco.kafkamanager.NotFoundException;
@@ -53,7 +53,7 @@ import com.epam.eco.kafkamanager.PermissionDeleteParams;
 import com.epam.eco.kafkamanager.PermissionInfo;
 import com.epam.eco.kafkamanager.PermissionMetadataDeleteParams;
 import com.epam.eco.kafkamanager.PermissionMetadataUpdateParams;
-import com.epam.eco.kafkamanager.PermissionSearchQuery;
+import com.epam.eco.kafkamanager.PermissionSearchCriteria;
 import com.epam.eco.kafkamanager.TopicConfigUpdateParams;
 import com.epam.eco.kafkamanager.TopicCreateParams;
 import com.epam.eco.kafkamanager.TopicInfo;
@@ -64,9 +64,9 @@ import com.epam.eco.kafkamanager.TopicPartitionsCreateParams;
 import com.epam.eco.kafkamanager.TopicPurgerTaskExecutor;
 import com.epam.eco.kafkamanager.TopicRecordCounterTaskExecutor;
 import com.epam.eco.kafkamanager.TopicRecordFetcherTaskExecutor;
-import com.epam.eco.kafkamanager.TopicSearchQuery;
+import com.epam.eco.kafkamanager.TopicSearchCriteria;
 import com.epam.eco.kafkamanager.TransactionInfo;
-import com.epam.eco.kafkamanager.TransactionSearchQuery;
+import com.epam.eco.kafkamanager.TransactionSearchCriteria;
 import com.epam.eco.kafkamanager.rest.request.BrokerConfigRequest;
 import com.epam.eco.kafkamanager.rest.request.MetadataRequest;
 import com.epam.eco.kafkamanager.rest.request.PermissionRequest;
@@ -136,17 +136,17 @@ public class RestKafkaManager implements KafkaManager {
     }
 
     @Override
-    public List<BrokerInfo> getBrokers(BrokerSearchQuery query) {
+    public List<BrokerInfo> getBrokers(BrokerSearchCriteria query) {
         return getBrokerPage(query, PageRequest.of(0, Integer.MAX_VALUE)).getContent();
     }
 
     @Override
     public Page<BrokerInfo> getBrokerPage(Pageable pageable) {
-        return getBrokerPage(BrokerSearchQuery.builder().build(), pageable);
+        return getBrokerPage(BrokerSearchCriteria.builder().build(), pageable);
     }
 
     @Override
-    public Page<BrokerInfo> getBrokerPage(BrokerSearchQuery query, Pageable pageable) {
+    public Page<BrokerInfo> getBrokerPage(BrokerSearchCriteria query, Pageable pageable) {
         Validate.notNull(query, "Query can't be null");
         Validate.notNull(pageable, "Pageable can't be null");
 
@@ -264,17 +264,17 @@ public class RestKafkaManager implements KafkaManager {
     }
 
     @Override
-    public List<TopicInfo> getTopics(TopicSearchQuery query) {
+    public List<TopicInfo> getTopics(TopicSearchCriteria query) {
         return getTopicPage(query, PageRequest.of(0, Integer.MAX_VALUE)).getContent();
     }
 
     @Override
     public Page<TopicInfo> getTopicPage(Pageable pageable) {
-        return getTopicPage(TopicSearchQuery.builder().build(), pageable);
+        return getTopicPage(TopicSearchCriteria.builder().build(), pageable);
     }
 
     @Override
-    public Page<TopicInfo> getTopicPage(TopicSearchQuery query, Pageable pageable) {
+    public Page<TopicInfo> getTopicPage(TopicSearchCriteria query, Pageable pageable) {
         Validate.notNull(query, "Query can't be null");
         Validate.notNull(pageable, "Pageable can't be null");
 
@@ -474,19 +474,19 @@ public class RestKafkaManager implements KafkaManager {
     }
 
     @Override
-    public List<ConsumerGroupInfo> getConsumerGroups(ConsumerGroupSearchQuery query) {
+    public List<ConsumerGroupInfo> getConsumerGroups(ConsumerGroupSearchCriteria query) {
         return getConsumerGroupPage(
-                ConsumerGroupSearchQuery.builder().build(),
+                ConsumerGroupSearchCriteria.builder().build(),
                 PageRequest.of(0, Integer.MAX_VALUE)).getContent();
     }
 
     @Override
     public Page<ConsumerGroupInfo> getConsumerGroupPage(Pageable pageable) {
-        return getConsumerGroupPage(ConsumerGroupSearchQuery.builder().build(), pageable);
+        return getConsumerGroupPage(ConsumerGroupSearchCriteria.builder().build(), pageable);
     }
 
     @Override
-    public Page<ConsumerGroupInfo> getConsumerGroupPage(ConsumerGroupSearchQuery query, Pageable pageable) {
+    public Page<ConsumerGroupInfo> getConsumerGroupPage(ConsumerGroupSearchCriteria query, Pageable pageable) {
         Validate.notNull(query, "Query can't be null");
         Validate.notNull(pageable, "Pageable can't be null");
 
@@ -615,17 +615,17 @@ public class RestKafkaManager implements KafkaManager {
     }
 
     @Override
-    public List<PermissionInfo> getPermissions(PermissionSearchQuery query) {
+    public List<PermissionInfo> getPermissions(PermissionSearchCriteria query) {
         return getPermissionPage(query, PageRequest.of(0, Integer.MAX_VALUE)).getContent();
     }
 
     @Override
     public Page<PermissionInfo> getPermissionPage(Pageable pageable) {
-        return getPermissionPage(PermissionSearchQuery.builder().build(), pageable);
+        return getPermissionPage(PermissionSearchCriteria.builder().build(), pageable);
     }
 
     @Override
-    public Page<PermissionInfo> getPermissionPage(PermissionSearchQuery query, Pageable pageable) {
+    public Page<PermissionInfo> getPermissionPage(PermissionSearchCriteria query, Pageable pageable) {
         Validate.notNull(query, "Query can't be null");
         Validate.notNull(pageable, "Pageable can't be null");
 
@@ -764,18 +764,18 @@ public class RestKafkaManager implements KafkaManager {
     }
 
     @Override
-    public List<TransactionInfo> getTransactions(TransactionSearchQuery query) {
+    public List<TransactionInfo> getTransactions(TransactionSearchCriteria query) {
         return getTransactionPage(query, PageRequest.of(0, Integer.MAX_VALUE)).getContent();
     }
 
     @Override
     public Page<TransactionInfo> getTransactionPage(Pageable pageable) {
-        return getTransactionPage(TransactionSearchQuery.builder().build(), pageable);
+        return getTransactionPage(TransactionSearchCriteria.builder().build(), pageable);
     }
 
     @Override
     public Page<TransactionInfo> getTransactionPage(
-            TransactionSearchQuery query,
+            TransactionSearchCriteria query,
             Pageable pageable) {
         Validate.notNull(query, "Query can't be null");
         Validate.notNull(pageable, "Pageable can't be null");

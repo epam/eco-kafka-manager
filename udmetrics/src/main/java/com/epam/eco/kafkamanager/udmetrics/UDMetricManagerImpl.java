@@ -121,7 +121,7 @@ public class UDMetricManagerImpl implements UDMetricManager, UpdateListener {
     }
 
     @Override
-    public Page<UDMetric> page(UDMetricSearchQuery query, Pageable pageable) {
+    public Page<UDMetric> page(UDMetricSearchCriteria query, Pageable pageable) {
         Validate.notNull(pageable, "Pageable is null");
 
         List<UDMetric> allUdms = applyQueryIfPresented(listAll(), query);
@@ -161,7 +161,7 @@ public class UDMetricManagerImpl implements UDMetricManager, UpdateListener {
         }
     }
 
-    protected List<UDMetric> applyQueryIfPresented(List<UDMetric> values, UDMetricSearchQuery query) {
+    protected List<UDMetric> applyQueryIfPresented(List<UDMetric> values, UDMetricSearchCriteria query) {
         if (query == null) {
             return values;
         }

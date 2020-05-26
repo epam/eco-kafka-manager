@@ -23,17 +23,17 @@ import org.junit.Test;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import com.epam.eco.kafkamanager.udmetrics.UDMetricSearchQuery.Status;
+import com.epam.eco.kafkamanager.udmetrics.UDMetricSearchCriteria.Status;
 import com.epam.eco.kafkamanager.udmetrics.utils.TestObjectMapperSingleton;
 
 /**
  * @author Andrei_Tytsik
  */
-public class UDMetricSearchQueryTest {
+public class UDMetricSearchCriteriaTest {
 
     @Test
     public void testSerializedToJsonAndBack() throws Exception {
-        UDMetricSearchQuery origin = UDMetricSearchQuery.builder().
+        UDMetricSearchCriteria origin = UDMetricSearchCriteria.builder().
                 type(UDMetricType.TOPIC_OFFSET_INCREASE).
                 resourceName("resource1").
                 status(Status.OK).
@@ -44,9 +44,9 @@ public class UDMetricSearchQueryTest {
         String json = mapper.writeValueAsString(origin);
         Assert.assertNotNull(json);
 
-        UDMetricSearchQuery deserialized = mapper.readValue(
+        UDMetricSearchCriteria deserialized = mapper.readValue(
                 json,
-                UDMetricSearchQuery.class);
+                UDMetricSearchCriteria.class);
         Assert.assertNotNull(deserialized);
         Assert.assertEquals(origin, deserialized);
     }
@@ -58,7 +58,7 @@ public class UDMetricSearchQueryTest {
         json.put("resourceName", "resource3");
         json.put("status", "OK");
 
-        UDMetricSearchQuery query = UDMetricSearchQuery.fromJson(json);
+        UDMetricSearchCriteria query = UDMetricSearchCriteria.fromJson(json);
         Assert.assertNotNull(query);
         Assert.assertEquals(UDMetricType.CONSUMER_GROUP_LAG, query.getType());
         Assert.assertEquals("resource3", query.getResourceName());
@@ -74,7 +74,7 @@ public class UDMetricSearchQueryTest {
                 ", \"status\": \"FAILED\"" +
                 "}";
 
-        UDMetricSearchQuery query = UDMetricSearchQuery.fromJson(json);
+        UDMetricSearchCriteria query = UDMetricSearchCriteria.fromJson(json);
         Assert.assertNotNull(query);
         Assert.assertEquals(UDMetricType.CONSUMER_GROUP_LAG, query.getType());
         Assert.assertEquals("resource3", query.getResourceName());

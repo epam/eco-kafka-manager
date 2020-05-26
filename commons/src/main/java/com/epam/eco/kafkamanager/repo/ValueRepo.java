@@ -20,12 +20,12 @@ import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
-import com.epam.eco.kafkamanager.SearchQuery;
+import com.epam.eco.kafkamanager.SearchCriteria;
 
 /**
  * @author Andrei_Tytsik
  */
-public interface ValueRepo<V, Q extends SearchQuery<V>> {
+public interface ValueRepo<V, Q extends SearchCriteria<V>> {
     int size();
     List<V> values();
     List<V> values(Q query);

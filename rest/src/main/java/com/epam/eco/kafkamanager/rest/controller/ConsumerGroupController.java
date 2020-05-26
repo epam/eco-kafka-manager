@@ -33,7 +33,7 @@ import com.epam.eco.kafkamanager.ConsumerGroupDeleteTopicParams;
 import com.epam.eco.kafkamanager.ConsumerGroupInfo;
 import com.epam.eco.kafkamanager.ConsumerGroupMetadataDeleteParams;
 import com.epam.eco.kafkamanager.ConsumerGroupMetadataUpdateParams;
-import com.epam.eco.kafkamanager.ConsumerGroupSearchQuery;
+import com.epam.eco.kafkamanager.ConsumerGroupSearchCriteria;
 import com.epam.eco.kafkamanager.KafkaManager;
 import com.epam.eco.kafkamanager.core.utils.PageUtils;
 import com.epam.eco.kafkamanager.rest.request.MetadataRequest;
@@ -56,7 +56,7 @@ public class ConsumerGroupController {
             @RequestParam(value = "page", required = false) Integer page,
             @RequestParam(value = "pageSize", required = false) Integer pageSize) {
         Pageable pageable = PageUtils.buildPageableWithDefaultsIfNull(page, pageSize);
-        ConsumerGroupSearchQuery query = ConsumerGroupSearchQuery.builder()
+        ConsumerGroupSearchCriteria query = ConsumerGroupSearchCriteria.builder()
                 .groupName(groupName)
                 .storageType(storageType)
                 .description(description)

@@ -31,7 +31,7 @@ import com.epam.eco.kafkamanager.BrokerConfigUpdateParams;
 import com.epam.eco.kafkamanager.BrokerInfo;
 import com.epam.eco.kafkamanager.BrokerMetadataDeleteParams;
 import com.epam.eco.kafkamanager.BrokerMetadataUpdateParams;
-import com.epam.eco.kafkamanager.BrokerSearchQuery;
+import com.epam.eco.kafkamanager.BrokerSearchCriteria;
 import com.epam.eco.kafkamanager.KafkaManager;
 import com.epam.eco.kafkamanager.core.utils.PageUtils;
 import com.epam.eco.kafkamanager.rest.request.BrokerConfigRequest;
@@ -55,7 +55,7 @@ public class BrokerController {
             @RequestParam(value = "page", required = false) Integer page,
             @RequestParam(value = "pageSize", required = false) Integer pageSize) {
         Pageable pageable = PageUtils.buildPageableWithDefaultsIfNull(page, pageSize);
-        BrokerSearchQuery query = BrokerSearchQuery.builder()
+        BrokerSearchCriteria query = BrokerSearchCriteria.builder()
                 .brokerId(brokerId)
                 .rack(rack)
                 .description(description)

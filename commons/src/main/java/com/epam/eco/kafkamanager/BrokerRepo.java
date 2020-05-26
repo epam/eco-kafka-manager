@@ -24,7 +24,7 @@ import com.epam.eco.kafkamanager.repo.KeyValueRepo;
 /**
  * @author Andrei_Tytsik
  */
-public interface BrokerRepo extends KeyValueRepo<Integer, BrokerInfo, BrokerSearchQuery> {
+public interface BrokerRepo extends KeyValueRepo<Integer, BrokerInfo, BrokerSearchCriteria> {
 
     @PreAuthorize("@authorizer.isPermitted('BROKER', #brokerId, 'ALTER_CONFIG')")
     BrokerInfo updateConfig(int brokerId, Map<String, String> configs);

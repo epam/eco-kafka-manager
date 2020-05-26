@@ -24,7 +24,7 @@ import com.epam.eco.kafkamanager.repo.KeyValueRepo;
 /**
  * @author Andrei_Tytsik
  */
-public interface ConsumerGroupRepo extends KeyValueRepo<String, ConsumerGroupInfo, ConsumerGroupSearchQuery> {
+public interface ConsumerGroupRepo extends KeyValueRepo<String, ConsumerGroupInfo, ConsumerGroupSearchCriteria> {
 
     List<ConsumerGroupInfo> groupsForTopic(String topicName);
 

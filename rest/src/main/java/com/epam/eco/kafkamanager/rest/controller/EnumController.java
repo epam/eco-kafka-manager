@@ -26,7 +26,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.epam.eco.commons.kafka.TransactionState;
 import com.epam.eco.kafkamanager.ConsumerGroupInfo;
 import com.epam.eco.kafkamanager.RecordFetchRequest;
-import com.epam.eco.kafkamanager.TopicSearchQuery;
+import com.epam.eco.kafkamanager.TopicSearchCriteria;
 
 /**
  * @author Raman_Babich
@@ -56,8 +56,8 @@ public class EnumController {
     }
 
     @GetMapping("/replication-state")
-    public TopicSearchQuery.ReplicationState[] replicationStates() {
-        return TopicSearchQuery.ReplicationState.values();
+    public TopicSearchCriteria.ReplicationState[] replicationStates() {
+        return TopicSearchCriteria.ReplicationState.values();
     }
 
     @GetMapping("/data-format")

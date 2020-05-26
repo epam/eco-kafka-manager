@@ -31,7 +31,7 @@ import com.epam.eco.kafkamanager.utils.MapperUtils;
 /**
  * @author Andrei_Tytsik
  */
-public class PermissionSearchQuery implements SearchQuery<PermissionInfo> {
+public class PermissionSearchCriteria implements SearchCriteria<PermissionInfo> {
 
     private final String kafkaPrincipal;
     private final ResourceType resourceType;
@@ -41,7 +41,7 @@ public class PermissionSearchQuery implements SearchQuery<PermissionInfo> {
     private final String host;
     private final String description;
 
-    public PermissionSearchQuery(
+    public PermissionSearchCriteria(
             @JsonProperty("kafkaPrincipal") String kafkaPrincipal,
             @JsonProperty("resourceType") ResourceType resourceType,
             @JsonProperty("resourceName") String resourceName,
@@ -108,7 +108,7 @@ public class PermissionSearchQuery implements SearchQuery<PermissionInfo> {
         if (obj == null || getClass() != obj.getClass()) {
             return false;
         }
-        PermissionSearchQuery that = (PermissionSearchQuery) obj;
+        PermissionSearchCriteria that = (PermissionSearchCriteria) obj;
         return
                 Objects.equals(this.kafkaPrincipal, that.kafkaPrincipal) &&
                 Objects.equals(this.resourceType, that.resourceType) &&
@@ -152,20 +152,20 @@ public class PermissionSearchQuery implements SearchQuery<PermissionInfo> {
         return builder(null);
     }
 
-    public static Builder builder(PermissionSearchQuery origin) {
+    public static Builder builder(PermissionSearchCriteria origin) {
         return new Builder(origin);
     }
 
-    public static PermissionSearchQuery fromJson(Map<String, ?> map) {
+    public static PermissionSearchCriteria fromJson(Map<String, ?> map) {
         Validate.notNull(map, "JSON map is null");
 
-        return MapperUtils.convert(map, PermissionSearchQuery.class);
+        return MapperUtils.convert(map, PermissionSearchCriteria.class);
     }
 
-    public static PermissionSearchQuery fromJson(String json) {
+    public static PermissionSearchCriteria fromJson(String json) {
         Validate.notNull(json, "JSON is null");
 
-        return MapperUtils.jsonToBean(json, PermissionSearchQuery.class);
+        return MapperUtils.jsonToBean(json, PermissionSearchCriteria.class);
     }
 
     public static class Builder {
@@ -178,7 +178,7 @@ public class PermissionSearchQuery implements SearchQuery<PermissionInfo> {
         private String host;
         private String description;
 
-        private Builder(PermissionSearchQuery origin) {
+        private Builder(PermissionSearchCriteria origin) {
             if (origin == null) {
                 return;
             }
@@ -227,8 +227,8 @@ public class PermissionSearchQuery implements SearchQuery<PermissionInfo> {
             return this;
         }
 
-        public PermissionSearchQuery build() {
-            return new PermissionSearchQuery(
+        public PermissionSearchCriteria build() {
+            return new PermissionSearchCriteria(
                     kafkaPrincipal,
                     resourceType,
                     resourceName,

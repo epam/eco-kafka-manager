@@ -31,11 +31,11 @@ import com.epam.eco.kafkamanager.utils.TestObjectMapperSingleton;
 /**
  * @author Andrei_Tytsik
  */
-public class PermissionSearchQueryTest {
+public class PermissionSearchCriteriaTest {
 
     @Test
     public void testSerializedToJsonAndBack() throws Exception {
-        PermissionSearchQuery origin = PermissionSearchQuery.builder().
+        PermissionSearchCriteria origin = PermissionSearchCriteria.builder().
                 kafkaPrincipal("user1").
                 resourceType(ResourceType.GROUP).
                 resourceName("gorup1").
@@ -50,9 +50,9 @@ public class PermissionSearchQueryTest {
         String json = mapper.writeValueAsString(origin);
         Assert.assertNotNull(json);
 
-        PermissionSearchQuery deserialized = mapper.readValue(
+        PermissionSearchCriteria deserialized = mapper.readValue(
                 json,
-                PermissionSearchQuery.class);
+                PermissionSearchCriteria.class);
         Assert.assertNotNull(deserialized);
         Assert.assertEquals(origin, deserialized);
     }
@@ -68,7 +68,7 @@ public class PermissionSearchQueryTest {
         json.put("host", "host");
         json.put("description", "description");
 
-        PermissionSearchQuery query = PermissionSearchQuery.fromJson(json);
+        PermissionSearchCriteria query = PermissionSearchCriteria.fromJson(json);
         Assert.assertNotNull(query);
         Assert.assertEquals("user1", query.getKafkaPrincipal());
         Assert.assertEquals(ResourceType.GROUP, query.getResourceType());
@@ -92,7 +92,7 @@ public class PermissionSearchQueryTest {
                 ", \"description\": \"description\"" +
                 "}";
 
-        PermissionSearchQuery query = PermissionSearchQuery.fromJson(json);
+        PermissionSearchCriteria query = PermissionSearchCriteria.fromJson(json);
         Assert.assertNotNull(query);
         Assert.assertEquals("user1", query.getKafkaPrincipal());
         Assert.assertEquals(ResourceType.GROUP, query.getResourceType());

@@ -62,7 +62,7 @@ public class RestKafkaManagerIT {
         Assert.assertTrue("Broker does't exist", kafkaManager.brokerExists(brokers.get(0).getId()));
 
         Page<BrokerInfo> brokerPage = kafkaManager.getBrokerPage(
-                BrokerSearchQuery.builder().build(),
+                BrokerSearchCriteria.builder().build(),
                 PageRequest.of(0, 10));
         Assert.assertNotNull(brokerPage);
         Assert.assertTrue("There is no brokers", brokerPage.getContent().size() > 0);
@@ -143,7 +143,7 @@ public class RestKafkaManagerIT {
         Assert.assertTrue("Topic doesn't exist", kafkaManager.topicExists(topicName));
 
         Page<TopicInfo> topicPage = kafkaManager.getTopicPage(
-                TopicSearchQuery.builder().build(),
+                TopicSearchCriteria.builder().build(),
                 PageRequest.of(0, 10));
         Assert.assertNotNull(topicPage);
         Assert.assertTrue("There is no topics", topicPage.getContent().size() > 0);
@@ -236,7 +236,7 @@ public class RestKafkaManagerIT {
         Assert.assertTrue("Consumer group doesn't exist", kafkaManager.consumerGroupExists(consumerGroup));
 
         Page<ConsumerGroupInfo> topicPage = kafkaManager.getConsumerGroupPage(
-                ConsumerGroupSearchQuery.builder().build(),
+                ConsumerGroupSearchCriteria.builder().build(),
                 PageRequest.of(0, 10));
         Assert.assertNotNull(topicPage);
         Assert.assertTrue("There is no consumer groups", topicPage.getContent().size() > 0);
@@ -272,13 +272,13 @@ public class RestKafkaManagerIT {
         Assert.assertFalse("There is no permissions", permissionInfoList.isEmpty());
 
         Page<PermissionInfo> permissionPage = kafkaManager.getPermissionPage(
-                PermissionSearchQuery.builder().build(),
+                PermissionSearchCriteria.builder().build(),
                 PageRequest.of(0, 10));
         Assert.assertNotNull(permissionPage);
         Assert.assertTrue("There is no permissions", permissionPage.getContent().size() > 0);
 
         List<PermissionInfo> principalPermissions = kafkaManager.getPermissions(
-                PermissionSearchQuery.builder()
+                PermissionSearchCriteria.builder()
                         .kafkaPrincipal(principal)
                         .build());
         PermissionCreateParams permissionCreateParams = PermissionCreateParams.builder()
@@ -309,7 +309,7 @@ public class RestKafkaManagerIT {
                 .build();
         kafkaManager.updatePermission(permissionMetadataDeleteParams);
         List<PermissionInfo> newPrincipalPermissions = kafkaManager.getPermissions(
-                PermissionSearchQuery.builder()
+                PermissionSearchCriteria.builder()
                         .kafkaPrincipal(principal)
                         .build());
         Assert.assertEquals(principalPermissions.size() + 1, newPrincipalPermissions.size());
@@ -324,7 +324,7 @@ public class RestKafkaManagerIT {
                 .build();
         kafkaManager.deletePermission(permissionDeleteParams);
         newPrincipalPermissions = kafkaManager.getPermissions(
-                PermissionSearchQuery.builder()
+                PermissionSearchCriteria.builder()
                         .kafkaPrincipal(principal)
                         .build());
         Assert.assertEquals(principalPermissions.size(), newPrincipalPermissions.size());
@@ -343,7 +343,7 @@ public class RestKafkaManagerIT {
         Assert.assertNotNull(someTransaction);
 
         Page<TransactionInfo> transactionPage = kafkaManager.getTransactionPage(
-                TransactionSearchQuery.builder().build(),
+                TransactionSearchCriteria.builder().build(),
                 PageRequest.of(0, 10));
         Assert.assertNotNull(transactionPage);
         Assert.assertTrue("There is no transactions", transactionPage.getContent().size() > 0);

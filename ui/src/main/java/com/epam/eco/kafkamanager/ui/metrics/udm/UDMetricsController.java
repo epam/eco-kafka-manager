@@ -26,7 +26,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.epam.eco.kafkamanager.udmetrics.UDMetric;
-import com.epam.eco.kafkamanager.udmetrics.UDMetricSearchQuery;
+import com.epam.eco.kafkamanager.udmetrics.UDMetricSearchCriteria;
 
 
 /**
@@ -41,7 +41,7 @@ public class UDMetricsController extends UDMAbstractController {
 
     public static final String ATTR_PAGE = "page";
     public static final String ATTR_UDM_NAME = "udmName";
-    public static final String ATTR_SEARCH_QUERY = "searchQuery";
+    public static final String ATTR_SEARCH_QUERY = "searchCriteria";
     public static final String ATTR_TOTAL_COUNT = "totalCount";
 
     public static final String MAPPING = "/udmetrics";
@@ -55,14 +55,14 @@ public class UDMetricsController extends UDMAbstractController {
             return VIEW_UDM_DISABLED;
         }
 
-        UDMetricSearchQuery searchQuery = UDMetricSearchQuery.fromJson(paramsMap);
+        UDMetricSearchCriteria searchCriteria = UDMetricSearchCriteria.fromJson(paramsMap);
         page = page != null && page > 0 ? page -1 : 0;
 
         Page<UDMetric> metricPage = udMetricManager.page(
-                searchQuery,
+                searchCriteria,
                 PageRequest.of(page, PAGE_SIZE));
 
-        model.addAttribute(ATTR_SEARCH_QUERY, searchQuery);
+        model.addAttribute(ATTR_SEARCH_QUERY, searchCriteria);
         model.addAttribute(ATTR_PAGE, wrap(metricPage));
         model.addAttribute(ATTR_TOTAL_COUNT, udMetricManager.getCount());
 

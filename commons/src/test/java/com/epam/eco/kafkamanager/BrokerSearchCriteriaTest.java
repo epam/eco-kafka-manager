@@ -28,11 +28,11 @@ import com.epam.eco.kafkamanager.utils.TestObjectMapperSingleton;
 /**
  * @author Andrei_Tytsik
  */
-public class BrokerSearchQueryTest {
+public class BrokerSearchCriteriaTest {
 
     @Test
     public void testSerializedToJsonAndBack() throws Exception {
-        BrokerSearchQuery origin = BrokerSearchQuery.builder().
+        BrokerSearchCriteria origin = BrokerSearchCriteria.builder().
                 brokerId(42).
                 rack("default").
                 description("description").
@@ -43,9 +43,9 @@ public class BrokerSearchQueryTest {
         String json = mapper.writeValueAsString(origin);
         Assert.assertNotNull(json);
 
-        BrokerSearchQuery deserialized = mapper.readValue(
+        BrokerSearchCriteria deserialized = mapper.readValue(
                 json,
-                BrokerSearchQuery.class);
+                BrokerSearchCriteria.class);
         Assert.assertNotNull(deserialized);
         Assert.assertEquals(origin, deserialized);
     }
@@ -57,7 +57,7 @@ public class BrokerSearchQueryTest {
         json.put("rack", "default");
         json.put("description", "description");
 
-        BrokerSearchQuery query = BrokerSearchQuery.fromJson(json);
+        BrokerSearchCriteria query = BrokerSearchCriteria.fromJson(json);
         Assert.assertNotNull(query);
         Assert.assertEquals(Integer.valueOf(42), query.getBrokerId());
         Assert.assertEquals("default", query.getRack());
@@ -73,7 +73,7 @@ public class BrokerSearchQueryTest {
                 ", \"description\": \"description\"" +
                 "}";
 
-        BrokerSearchQuery query = BrokerSearchQuery.fromJson(json);
+        BrokerSearchCriteria query = BrokerSearchCriteria.fromJson(json);
         Assert.assertNotNull(query);
         Assert.assertEquals(Integer.valueOf(42), query.getBrokerId());
         Assert.assertEquals("default", query.getRack());

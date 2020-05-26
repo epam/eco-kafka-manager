@@ -27,7 +27,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.epam.eco.commons.kafka.TransactionState;
 import com.epam.eco.kafkamanager.KafkaManager;
 import com.epam.eco.kafkamanager.TransactionInfo;
-import com.epam.eco.kafkamanager.TransactionSearchQuery;
+import com.epam.eco.kafkamanager.TransactionSearchCriteria;
 import com.epam.eco.kafkamanager.core.utils.PageUtils;
 
 /**
@@ -48,7 +48,7 @@ public class TransactionController {
             @RequestParam(value = "page", required = false) Integer page,
             @RequestParam(value = "pageSize", required = false) Integer pageSize) {
         Pageable pageable = PageUtils.buildPageableWithDefaultsIfNull(page, pageSize);
-        TransactionSearchQuery query = TransactionSearchQuery.builder()
+        TransactionSearchCriteria query = TransactionSearchCriteria.builder()
                 .transactionalId(transactionId)
                 .topicName(topicName)
                 .state(state)

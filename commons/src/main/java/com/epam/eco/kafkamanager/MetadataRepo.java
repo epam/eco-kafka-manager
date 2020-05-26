@@ -22,7 +22,7 @@ import com.epam.eco.kafkamanager.repo.KeyValueRepo;
 /**
  * @author Andrei_Tytsik
  */
-public interface MetadataRepo extends KeyValueRepo<MetadataKey, Metadata, MetadataSearchQuery> {
+public interface MetadataRepo extends KeyValueRepo<MetadataKey, Metadata, MetadataSearchCriteria> {
 
     @PreAuthorize("@authorizer.isPermitted(#key.entityType, #key.entityId, 'ALTER_METADATA')")
     void createOrReplace(MetadataKey key, Metadata metadata);
