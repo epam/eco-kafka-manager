@@ -175,7 +175,7 @@
                                         <label for="keyFormat">Key Format</label>
                                         <select class="form-control" name="keyFormat" id="keyFormat">
                                             <option 
-                                                th:each="format : ${T(com.epam.eco.kafkamanager.RecordFetchRequest$DataFormat).values()}"
+                                                th:each="format : ${T(com.epam.eco.kafkamanager.TopicRecordFetchParams$DataFormat).values()}"
                                                 th:value="${format}" 
                                                 th:text="${format}"
                                                 th:selected="${fetchParams.getKeyFormat() == format}">
@@ -186,7 +186,7 @@
                                         <label for="valueFormat">Value Format</label>
                                         <select class="form-control" name="valueFormat" id="valueFormat">
                                             <option 
-                                                th:each="format : ${T(com.epam.eco.kafkamanager.RecordFetchRequest$DataFormat).values()}"
+                                                th:each="format : ${T(com.epam.eco.kafkamanager.TopicRecordFetchParams$DataFormat).values()}"
                                                 th:value="${format}" 
                                                 th:text="${format}"
                                                 th:selected="${fetchParams.getValueFormat() == format}">

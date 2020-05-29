@@ -31,4 +31,12 @@
         <Method name="createContextual" />
         <Bug pattern="NP_NULL_ON_SOME_PATH" />
     </Match>
+    <Match>
+        <Class name="com.epam.eco.kafkamanager.TopicRecordFetchByOffsetsParam" />
+        <Bug pattern="FCCD_FIND_CLASS_CIRCULAR_DEPENDENCY" />
+    </Match>
+    <Match>
+        <Class name="com.epam.eco.kafkamanager.TopicRecordFetchParams" />
+        <Bug pattern="FCCD_FIND_CLASS_CIRCULAR_DEPENDENCY" />
+    </Match>
 </FindBugsFilter>

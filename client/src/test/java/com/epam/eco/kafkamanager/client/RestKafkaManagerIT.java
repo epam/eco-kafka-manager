@@ -98,15 +98,17 @@ public class RestKafkaManagerIT {
                 .collect(Collectors.toMap(
                         entry -> entry.getKey().partition(),
                         entry -> entry.getValue().getSmallest()));
-        RecordFetchRequest recordFetchRequest = new RecordFetchRequest(
-                RecordFetchRequest.DataFormat.STRING,
-                RecordFetchRequest.DataFormat.STRING,
-                offsets,
-                null, 10L,
-                10000L, false);
+
+        TopicRecordFetchParams recordFetchParams = TopicRecordFetchParams.byOffsets(
+                TopicRecordFetchParams.DataFormat.STRING,
+                TopicRecordFetchParams.DataFormat.STRING,
+                10L,
+                10000L,
+                offsets);
+
         RecordFetchResult<String, String> recordFetchResult =
                 kafkaManager.<String, String>getTopicRecordFetcherTaskExecutor()
-                .execute(topicName, recordFetchRequest);
+                .execute(topicName, recordFetchParams);
         Assert.assertNotNull(recordFetchResult);
         Assert.assertFalse("Fetched record list is empty", recordFetchResult.getRecords().isEmpty());
 

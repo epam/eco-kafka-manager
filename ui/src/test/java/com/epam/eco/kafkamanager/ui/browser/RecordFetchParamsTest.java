@@ -22,7 +22,7 @@ import java.util.List;
 import org.junit.Assert;
 import org.junit.Test;
 
-import com.epam.eco.kafkamanager.RecordFetchRequest.DataFormat;
+import com.epam.eco.kafkamanager.TopicRecordFetchParams.DataFormat;
 import com.epam.eco.kafkamanager.ui.topics.browser.RecordFetchParams;
 
 /**

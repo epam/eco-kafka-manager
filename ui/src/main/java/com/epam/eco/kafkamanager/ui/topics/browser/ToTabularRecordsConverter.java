@@ -22,7 +22,7 @@ import org.apache.commons.lang3.Validate;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 
 import com.epam.eco.commons.kafka.helpers.RecordFetchResult;
-import com.epam.eco.kafkamanager.RecordFetchRequest.DataFormat;
+import com.epam.eco.kafkamanager.TopicRecordFetchParams.DataFormat;
 import com.epam.eco.kafkamanager.ui.topics.browser.TabularRecords.Record;
 
 /**

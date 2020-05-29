@@ -113,7 +113,7 @@ public class TaskController {
             try {
                 TaskResult<RecordFetchResult<Object, Object>> result =
                         kafkaManager.getTopicRecordFetcherTaskExecutor()
-                        .executeDetailed(request.getTopicName(), request.getFetchRequest());
+                        .executeDetailed(request.getTopicName(), request.getFetchParams());
                 if (result.isSuccessful()) {
                     response.setResult(result);
                 } else {

@@ -28,10 +28,8 @@ import com.epam.eco.commons.kafka.helpers.RecordFetchResult;
 import com.epam.eco.commons.kafka.helpers.TopicRecordFetcher;
 import com.epam.eco.commons.kafka.serde.HexStringDeserializer;
 import com.epam.eco.commons.kafka.serde.JsonStringDeserializer;
-import com.epam.eco.kafkamanager.KafkaManager;
-import com.epam.eco.kafkamanager.RecordFetchRequest;
-import com.epam.eco.kafkamanager.RecordFetchRequest.DataFormat;
-import com.epam.eco.kafkamanager.TopicRecordFetcherTaskExecutor;
+import com.epam.eco.kafkamanager.*;
+import com.epam.eco.kafkamanager.TopicRecordFetchParams.DataFormat;
 import com.epam.eco.kafkamanager.core.autoconfigure.KafkaManagerProperties;
 import com.epam.eco.kafkamanager.exec.AbstractTaskExecutor;
 import com.epam.eco.kafkamanager.exec.TaskResult;
@@ -41,7 +39,7 @@ import io.confluent.kafka.serializers.KafkaAvroDeserializer;
 /**
  * @author Andrei_Tytsik
  */
-public class TopicRecordFetcherTaskExecutorImpl<K, V> extends AbstractTaskExecutor<String, RecordFetchRequest, RecordFetchResult<K, V>> implements TopicRecordFetcherTaskExecutor<K, V> {
+public class TopicRecordFetcherTaskExecutorImpl<K, V> extends AbstractTaskExecutor<String, TopicRecordFetchParams, RecordFetchResult<K, V>> implements TopicRecordFetcherTaskExecutor<K, V> {
 
     @Autowired
     private KafkaManager kafkaManager;
@@ -49,11 +47,11 @@ public class TopicRecordFetcherTaskExecutorImpl<K, V> extends AbstractTaskExecut
     protected KafkaManagerProperties properties;
 
     @Override
-    protected TaskResult<RecordFetchResult<K, V>> doExecute(String resourceKey, RecordFetchRequest input) {
+    protected TaskResult<RecordFetchResult<K, V>> doExecute(String resourceKey, TopicRecordFetchParams input) {
         return TaskResult.of(() -> executeInternal(resourceKey, input));
     }
 
-    public RecordFetchResult<K, V> executeInternal(String topicName, RecordFetchRequest request) {
+    public RecordFetchResult<K, V> executeInternal(String topicName, TopicRecordFetchParams request) {
         Validate.notNull(request, "Request is null");
 
         kafkaManager.getTopic(topicName); // sanity check just for case topic doesn't exist
@@ -61,10 +59,10 @@ public class TopicRecordFetcherTaskExecutorImpl<K, V> extends AbstractTaskExecut
         TopicRecordFetcher<K, V> recordFetcher = TopicRecordFetcher.
                 with(buildConsumerConfig(request));
 
-        //search by timestamps
-        if(request.getFetchByTimestamp()) {
+        //fetch by timestamps
+        if (request instanceof TopicRecordFetchByTimestampsParams) {
             return recordFetcher.fetchByTimestamps(
-                    request.getPartitionTimestamps().entrySet().stream().
+                    ((TopicRecordFetchByTimestampsParams) request).getPartitionTimestamps().entrySet().stream().
                             collect(Collectors.toMap(
                                     e -> new TopicPartition(topicName, e.getKey()),
                                     e -> e.getValue())),
@@ -72,17 +70,17 @@ public class TopicRecordFetcherTaskExecutorImpl<K, V> extends AbstractTaskExecut
                     request.getTimeoutInMs());
         }
 
-        //search by offsets
+        //fetch by offsets
         return recordFetcher.fetchByOffsets(
-                request.getOffsets().entrySet().stream().
-                    collect(Collectors.toMap(
-                            e -> new TopicPartition(topicName, e.getKey()),
-                            e -> e.getValue())),
+                ((TopicRecordFetchByOffsetsParam) request).getOffsets().entrySet().stream().
+                        collect(Collectors.toMap(
+                                e -> new TopicPartition(topicName, e.getKey()),
+                                e -> e.getValue())),
                 request.getLimit(),
                 request.getTimeoutInMs());
     }
 
-    private Map<String, Object> buildConsumerConfig(RecordFetchRequest request) {
+    private Map<String, Object> buildConsumerConfig(TopicRecordFetchParams request) {
         return properties.buildCommonConsumerConfig(builder -> {
             initDeserializerConfig(builder, request.getKeyDataFormat(), true);
             initDeserializerConfig(builder, request.getValueDataFormat(), false);

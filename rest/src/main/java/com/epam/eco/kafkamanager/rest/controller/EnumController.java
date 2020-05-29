@@ -25,7 +25,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.epam.eco.commons.kafka.TransactionState;
 import com.epam.eco.kafkamanager.ConsumerGroupInfo;
-import com.epam.eco.kafkamanager.RecordFetchRequest;
+import com.epam.eco.kafkamanager.TopicRecordFetchParams;
 import com.epam.eco.kafkamanager.TopicSearchQuery;
 
 /**
@@ -61,8 +61,8 @@ public class EnumController {
     }
 
     @GetMapping("/data-format")
-    public RecordFetchRequest.DataFormat[] dataFormats() {
-        return RecordFetchRequest.DataFormat.values();
+    public TopicRecordFetchParams.DataFormat[] dataFormats() {
+        return TopicRecordFetchParams.DataFormat.values();
     }
 
     @GetMapping("/security-protocol")

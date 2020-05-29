@@ -35,10 +35,10 @@ import com.epam.eco.commons.kafka.OffsetRange;
 import com.epam.eco.commons.kafka.helpers.PartitionRecordFetchResult;
 import com.epam.eco.commons.kafka.helpers.RecordFetchResult;
 import com.epam.eco.kafkamanager.KafkaManager;
-import com.epam.eco.kafkamanager.RecordFetchRequest;
-import com.epam.eco.kafkamanager.RecordFetchRequest.DataFormat;
+import com.epam.eco.kafkamanager.TopicRecordFetchParams;
 import com.epam.eco.kafkamanager.exec.TaskResult;
 import com.epam.eco.kafkamanager.ui.topics.TopicController;
+
 
 /**
  * @author Andrei_Tytsik
@@ -104,7 +104,7 @@ public class TopicBrowserController {
     }
 
     private void handleFetchRequest(RecordFetchParams fetchParams, BiConsumer<String, Object> modelAttributes) {
-        RecordFetchRequest fetchRequest = toFetchRequest(fetchParams);
+        TopicRecordFetchParams fetchRequest = toFetchRequest(fetchParams);
 
         TaskResult<RecordFetchResult<Object, Object>> taskResult = kafkaManager.getTopicRecordFetcherTaskExecutor()
                 .executeDetailed(fetchParams.getTopicName(), fetchRequest);
@@ -118,15 +118,23 @@ public class TopicBrowserController {
         modelAttributes.accept(ATTR_NEXT_OFFSETS, getNextOffsetsOrNullIfEndOfTopic(fetchResult));
     }
 
-    private RecordFetchRequest toFetchRequest(RecordFetchParams fetchParams) {
-        return new RecordFetchRequest(
-                fetchParams.getKeyFormat(),
-                fetchParams.getValueFormat(),
-                fetchParams.getPartitionOffsets(),
-                fetchParams.getPartitionTimestamps(),
-                fetchParams.getLimit(),
-                fetchParams.getTimeout() > 0 ? fetchParams.getTimeout() : DEFAULT_FETCH_TIMEOUT,
-                fetchParams.getFetchByTimestamp());
+    private TopicRecordFetchParams toFetchRequest(RecordFetchParams fetchParams) {
+        if (fetchParams.getFetchByTimestamp()) {
+            return TopicRecordFetchParams.byTimestamps(
+                    fetchParams.getKeyFormat(),
+                    fetchParams.getValueFormat(),
+                    fetchParams.getLimit(),
+                    fetchParams.getTimeout() > 0 ? fetchParams.getTimeout() : DEFAULT_FETCH_TIMEOUT,
+                    fetchParams.getPartitionTimestamps());
+
+        } else {
+            return TopicRecordFetchParams.byOffsets(
+                    fetchParams.getKeyFormat(),
+                    fetchParams.getValueFormat(),
+                    fetchParams.getLimit(),
+                    fetchParams.getTimeout() > 0 ? fetchParams.getTimeout() : DEFAULT_FETCH_TIMEOUT,
+                    fetchParams.getPartitionOffsets());
+        }
     }
 
     private Map<Integer, OffsetRange> fetchOffsetRanges(String topicName) {
@@ -160,8 +168,8 @@ public class TopicBrowserController {
     }
 
     private void setDefaultDataFormatsIfMissing(RecordFetchParams fetchParams) {
-        fetchParams.setKeyFormatIfMissing(DataFormat.STRING);
-        fetchParams.setValueFormatIfMissing(DataFormat.STRING);
+        fetchParams.setKeyFormatIfMissing(TopicRecordFetchParams.DataFormat.STRING);
+        fetchParams.setValueFormatIfMissing(TopicRecordFetchParams.DataFormat.STRING);
     }
 
     private void populateMissingAndFixInvalidOffsets(

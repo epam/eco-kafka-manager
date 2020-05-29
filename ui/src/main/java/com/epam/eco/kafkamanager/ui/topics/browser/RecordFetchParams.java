@@ -31,8 +31,8 @@ import java.util.stream.Collectors;
 import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.lang3.Validate;
 
-import com.epam.eco.kafkamanager.RecordFetchRequest;
-import com.epam.eco.kafkamanager.RecordFetchRequest.DataFormat;
+import com.epam.eco.kafkamanager.TopicRecordFetchParams;
+import com.epam.eco.kafkamanager.TopicRecordFetchParams.DataFormat;
 
 /**
  * @author Andrei_Tytsik
@@ -154,7 +154,7 @@ public class RecordFetchParams extends HashMap<String, Object> {
 
     public long getLimit() {
         Long limit = getAsLong(LIMIT);
-        return limit != null ? limit : RecordFetchRequest.MAX_LIMIT;
+        return limit != null ? limit : TopicRecordFetchParams.MAX_LIMIT;
     }
 
     public void setLimit(long limit) {
