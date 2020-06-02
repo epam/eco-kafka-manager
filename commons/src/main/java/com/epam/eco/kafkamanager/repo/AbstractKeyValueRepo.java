@@ -20,5 +20,5 @@ import com.epam.eco.kafkamanager.SearchCriteria;
 /**
  * @author Andrei_Tytsik
  */
-public abstract class AbstractKeyValueRepo<K, V, Q extends SearchCriteria<V>> extends AbstractValueRepo<V, Q> implements KeyValueRepo<K, V, Q> {
+public abstract class AbstractKeyValueRepo<K, V, SC extends SearchCriteria<V>> extends AbstractValueRepo<V, SC> implements KeyValueRepo<K, V, SC> {
 }

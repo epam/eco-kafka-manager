@@ -58,11 +58,11 @@ public class UDMetricSearchCriteriaTest {
         json.put("resourceName", "resource3");
         json.put("status", "OK");
 
-        UDMetricSearchCriteria query = UDMetricSearchCriteria.fromJson(json);
-        Assert.assertNotNull(query);
-        Assert.assertEquals(UDMetricType.CONSUMER_GROUP_LAG, query.getType());
-        Assert.assertEquals("resource3", query.getResourceName());
-        Assert.assertEquals(Status.OK, query.getStatus());
+        UDMetricSearchCriteria criteria = UDMetricSearchCriteria.fromJson(json);
+        Assert.assertNotNull(criteria);
+        Assert.assertEquals(UDMetricType.CONSUMER_GROUP_LAG, criteria.getType());
+        Assert.assertEquals("resource3", criteria.getResourceName());
+        Assert.assertEquals(Status.OK, criteria.getStatus());
     }
 
     @Test
@@ -74,11 +74,11 @@ public class UDMetricSearchCriteriaTest {
                 ", \"status\": \"FAILED\"" +
                 "}";
 
-        UDMetricSearchCriteria query = UDMetricSearchCriteria.fromJson(json);
-        Assert.assertNotNull(query);
-        Assert.assertEquals(UDMetricType.CONSUMER_GROUP_LAG, query.getType());
-        Assert.assertEquals("resource3", query.getResourceName());
-        Assert.assertEquals(Status.FAILED, query.getStatus());
+        UDMetricSearchCriteria criteria = UDMetricSearchCriteria.fromJson(json);
+        Assert.assertNotNull(criteria);
+        Assert.assertEquals(UDMetricType.CONSUMER_GROUP_LAG, criteria.getType());
+        Assert.assertEquals("resource3", criteria.getResourceName());
+        Assert.assertEquals(Status.FAILED, criteria.getStatus());
     }
 
 }

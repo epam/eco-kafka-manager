@@ -71,19 +71,19 @@ public class TopicSearchCriteriaTest {
         json.put("configString", "key2:value2;key3:value3");
         json.put("description", "description");
 
-        TopicSearchCriteria query = TopicSearchCriteria.fromJson(json);
-        Assert.assertNotNull(query);
-        Assert.assertEquals("topic1", query.getTopicName());
-        Assert.assertEquals(Integer.valueOf(1), query.getMinPartitionCount());
-        Assert.assertEquals(Integer.valueOf(10), query.getMaxPartitionCount());
-        Assert.assertEquals(Integer.valueOf(1), query.getMinReplicationFactor());
-        Assert.assertEquals(Integer.valueOf(11), query.getMaxReplicationFactor());
-        Assert.assertEquals(ReplicationState.UNDER_REPLICATED, query.getReplicationState());
+        TopicSearchCriteria criteria = TopicSearchCriteria.fromJson(json);
+        Assert.assertNotNull(criteria);
+        Assert.assertEquals("topic1", criteria.getTopicName());
+        Assert.assertEquals(Integer.valueOf(1), criteria.getMinPartitionCount());
+        Assert.assertEquals(Integer.valueOf(10), criteria.getMaxPartitionCount());
+        Assert.assertEquals(Integer.valueOf(1), criteria.getMinReplicationFactor());
+        Assert.assertEquals(Integer.valueOf(11), criteria.getMaxReplicationFactor());
+        Assert.assertEquals(ReplicationState.UNDER_REPLICATED, criteria.getReplicationState());
         Map<String, Object> config = new HashMap<>();
         config.put("key1", "value1");
-        Assert.assertEquals(config, query.getConfigMap());
-        Assert.assertEquals("key2:value2;key3:value3", query.getConfigString());
-        Assert.assertEquals("description", query.getDescription());
+        Assert.assertEquals(config, criteria.getConfigMap());
+        Assert.assertEquals("key2:value2;key3:value3", criteria.getConfigString());
+        Assert.assertEquals("description", criteria.getDescription());
     }
 
     @Test
@@ -101,19 +101,19 @@ public class TopicSearchCriteriaTest {
                 ", \"description\": \"description\"" +
                 "}";
 
-        TopicSearchCriteria query = TopicSearchCriteria.fromJson(json);
-        Assert.assertNotNull(query);
-        Assert.assertEquals("topic1", query.getTopicName());
-        Assert.assertEquals(Integer.valueOf(1), query.getMinPartitionCount());
-        Assert.assertEquals(Integer.valueOf(10), query.getMaxPartitionCount());
-        Assert.assertEquals(Integer.valueOf(1), query.getMinReplicationFactor());
-        Assert.assertEquals(Integer.valueOf(11), query.getMaxReplicationFactor());
-        Assert.assertEquals(ReplicationState.UNDER_REPLICATED, query.getReplicationState());
+        TopicSearchCriteria criteria = TopicSearchCriteria.fromJson(json);
+        Assert.assertNotNull(criteria);
+        Assert.assertEquals("topic1", criteria.getTopicName());
+        Assert.assertEquals(Integer.valueOf(1), criteria.getMinPartitionCount());
+        Assert.assertEquals(Integer.valueOf(10), criteria.getMaxPartitionCount());
+        Assert.assertEquals(Integer.valueOf(1), criteria.getMinReplicationFactor());
+        Assert.assertEquals(Integer.valueOf(11), criteria.getMaxReplicationFactor());
+        Assert.assertEquals(ReplicationState.UNDER_REPLICATED, criteria.getReplicationState());
         Map<String, Object> config = new HashMap<>();
         config.put("key1", "value1");
-        Assert.assertEquals(config, query.getConfigMap());
-        Assert.assertEquals("key2:value2;key3:value3", query.getConfigString());
-        Assert.assertEquals("description", query.getDescription());
+        Assert.assertEquals(config, criteria.getConfigMap());
+        Assert.assertEquals("key2:value2;key3:value3", criteria.getConfigString());
+        Assert.assertEquals("description", criteria.getDescription());
     }
 
     @Test

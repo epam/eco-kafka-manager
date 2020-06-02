@@ -29,9 +29,9 @@ public interface KafkaManager {
     boolean brokerExists(int brokerId);
     BrokerInfo getBroker(int brokerId);
     List<BrokerInfo> getAllBrokers();
-    List<BrokerInfo> getBrokers(BrokerSearchCriteria query);
+    List<BrokerInfo> getBrokers(BrokerSearchCriteria criteria);
     Page<BrokerInfo> getBrokerPage(Pageable pageable);
-    Page<BrokerInfo> getBrokerPage(BrokerSearchCriteria query, Pageable pageable);
+    Page<BrokerInfo> getBrokerPage(BrokerSearchCriteria criteria, Pageable pageable);
     BrokerInfo updateBroker(BrokerMetadataUpdateParams params);
     BrokerInfo updateBroker(BrokerMetadataDeleteParams params);
     BrokerInfo updateBroker(BrokerConfigUpdateParams params);
@@ -40,9 +40,9 @@ public interface KafkaManager {
     boolean topicExists(String topicName);
     TopicInfo getTopic(String topicName);
     List<TopicInfo> getAllTopics();
-    List<TopicInfo> getTopics(TopicSearchCriteria query);
+    List<TopicInfo> getTopics(TopicSearchCriteria criteria);
     Page<TopicInfo> getTopicPage(Pageable pageable);
-    Page<TopicInfo> getTopicPage(TopicSearchCriteria query, Pageable pageable);
+    Page<TopicInfo> getTopicPage(TopicSearchCriteria criteria, Pageable pageable);
     TopicInfo createTopic(TopicCreateParams params);
     TopicInfo updateTopic(TopicConfigUpdateParams params);
     TopicInfo updateTopic(TopicPartitionsCreateParams params);
@@ -58,9 +58,9 @@ public interface KafkaManager {
     boolean consumerGroupExists(String groupName);
     ConsumerGroupInfo getConsumerGroup(String groupName);
     List<ConsumerGroupInfo> getAllConsumerGroups();
-    List<ConsumerGroupInfo> getConsumerGroups(ConsumerGroupSearchCriteria query);
+    List<ConsumerGroupInfo> getConsumerGroups(ConsumerGroupSearchCriteria criteria);
     Page<ConsumerGroupInfo> getConsumerGroupPage(Pageable pageable);
-    Page<ConsumerGroupInfo> getConsumerGroupPage(ConsumerGroupSearchCriteria query, Pageable pageable);
+    Page<ConsumerGroupInfo> getConsumerGroupPage(ConsumerGroupSearchCriteria criteria, Pageable pageable);
     List<ConsumerGroupInfo> getConsumerGroupsForTopic(String topicName);
     ConsumerGroupInfo updateConsumerGroup(ConsumerGroupDeleteTopicParams params);
     ConsumerGroupInfo updateConsumerGroup(ConsumerGroupMetadataUpdateParams params);
@@ -71,9 +71,9 @@ public interface KafkaManager {
 
     int getPermissionCount();
     List<PermissionInfo> getAllPermissions();
-    List<PermissionInfo> getPermissions(PermissionSearchCriteria query);
+    List<PermissionInfo> getPermissions(PermissionSearchCriteria criteria);
     Page<PermissionInfo> getPermissionPage(Pageable pageable);
-    Page<PermissionInfo> getPermissionPage(PermissionSearchCriteria query, Pageable pageable);
+    Page<PermissionInfo> getPermissionPage(PermissionSearchCriteria criteria, Pageable pageable);
     void createPermission(PermissionCreateParams params);
     void updatePermission(PermissionMetadataUpdateParams params);
     void updatePermission(PermissionMetadataDeleteParams params);
@@ -83,9 +83,9 @@ public interface KafkaManager {
     boolean transactionExists(String transactionalId);
     TransactionInfo getTransaction(String transactionalId);
     List<TransactionInfo> getAllTransactions();
-    List<TransactionInfo> getTransactions(TransactionSearchCriteria query);
+    List<TransactionInfo> getTransactions(TransactionSearchCriteria criteria);
     Page<TransactionInfo> getTransactionPage(Pageable pageable);
-    Page<TransactionInfo> getTransactionPage(TransactionSearchCriteria query, Pageable pageable);
+    Page<TransactionInfo> getTransactionPage(TransactionSearchCriteria criteria, Pageable pageable);
     List<TransactionInfo> getTransactionsForTopic(String topicName);
 
 }

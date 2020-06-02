@@ -55,12 +55,12 @@ public class BrokerController {
             @RequestParam(value = "page", required = false) Integer page,
             @RequestParam(value = "pageSize", required = false) Integer pageSize) {
         Pageable pageable = PageUtils.buildPageableWithDefaultsIfNull(page, pageSize);
-        BrokerSearchCriteria query = BrokerSearchCriteria.builder()
+        BrokerSearchCriteria criteria = BrokerSearchCriteria.builder()
                 .brokerId(brokerId)
                 .rack(rack)
                 .description(description)
                 .build();
-        return kafkaManager.getBrokerPage(query, pageable);
+        return kafkaManager.getBrokerPage(criteria, pageable);
     }
 
     @GetMapping("/{id}")

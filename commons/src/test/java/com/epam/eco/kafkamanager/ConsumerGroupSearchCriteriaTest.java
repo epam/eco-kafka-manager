@@ -61,12 +61,12 @@ public class ConsumerGroupSearchCriteriaTest {
         json.put("storageType", "KAFKA");
         json.put("description", "description");
 
-        ConsumerGroupSearchCriteria query = ConsumerGroupSearchCriteria.fromJson(json);
-        Assert.assertNotNull(query);
-        Assert.assertEquals("group1", query.getGroupName());
-        Assert.assertEquals(ConsumerGroupState.EMPTY, query.getState());
-        Assert.assertEquals(StorageType.KAFKA, query.getStorageType());
-        Assert.assertEquals("description", query.getDescription());
+        ConsumerGroupSearchCriteria criteria = ConsumerGroupSearchCriteria.fromJson(json);
+        Assert.assertNotNull(criteria);
+        Assert.assertEquals("group1", criteria.getGroupName());
+        Assert.assertEquals(ConsumerGroupState.EMPTY, criteria.getState());
+        Assert.assertEquals(StorageType.KAFKA, criteria.getStorageType());
+        Assert.assertEquals("description", criteria.getDescription());
     }
 
     @Test
@@ -79,12 +79,12 @@ public class ConsumerGroupSearchCriteriaTest {
                 ", \"description\": \"description\"" +
                 "}";
 
-        ConsumerGroupSearchCriteria query = ConsumerGroupSearchCriteria.fromJson(json);
-        Assert.assertNotNull(query);
-        Assert.assertEquals("group1", query.getGroupName());
-        Assert.assertEquals(ConsumerGroupState.COMPLETING_REBALANCE, query.getState());
-        Assert.assertEquals(StorageType.KAFKA, query.getStorageType());
-        Assert.assertEquals("description", query.getDescription());
+        ConsumerGroupSearchCriteria criteria = ConsumerGroupSearchCriteria.fromJson(json);
+        Assert.assertNotNull(criteria);
+        Assert.assertEquals("group1", criteria.getGroupName());
+        Assert.assertEquals(ConsumerGroupState.COMPLETING_REBALANCE, criteria.getState());
+        Assert.assertEquals(StorageType.KAFKA, criteria.getStorageType());
+        Assert.assertEquals("description", criteria.getDescription());
     }
 
 }

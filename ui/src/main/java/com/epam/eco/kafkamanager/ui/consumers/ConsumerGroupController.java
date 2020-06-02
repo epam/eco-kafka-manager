@@ -54,7 +54,7 @@ public class ConsumerGroupController {
     public static final String ATTR_PAGE = "page";
 
     public static final String ATTR_GROUP = "group";
-    public static final String ATTR_SEARCH_QUERY = "searchCriteria";
+    public static final String ATTR_SEARCH_CRITERIA = "searchCriteria";
     public static final String ATTR_GROUP_LAG_UDM_TYPE = "groupLagUdmType";
     public static final String ATTR_GROUP_LAG_UDM_NAME = "groupLagUdmName";
     public static final String ATTR_GROUP_LAG_UDM = "groupLagUdm";
@@ -86,7 +86,7 @@ public class ConsumerGroupController {
                 searchCriteria,
                 PageRequest.of(page, PAGE_SIZE));
 
-        model.addAttribute(ATTR_SEARCH_QUERY, searchCriteria);
+        model.addAttribute(ATTR_SEARCH_CRITERIA, searchCriteria);
         model.addAttribute(ATTR_PAGE, wrap(groupPage));
         model.addAttribute(ATTR_TOTAL_COUNT, kafkaManager.getConsumerGroupCount());
 

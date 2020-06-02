@@ -67,10 +67,10 @@ public class BrokerConfigUpdateParamsTest {
         json.put("attributes", attributes);
         json.put("description", "description");
 
-        BrokerConfigUpdateParams query = BrokerConfigUpdateParams.fromJson(json);
-        Assert.assertNotNull(query);
-        Assert.assertEquals(42, query.getBrokerId());
-        Assert.assertEquals(config, query.getConfig());
+        BrokerConfigUpdateParams params = BrokerConfigUpdateParams.fromJson(json);
+        Assert.assertNotNull(params);
+        Assert.assertEquals(42, params.getBrokerId());
+        Assert.assertEquals(config, params.getConfig());
     }
 
     @Test
@@ -81,14 +81,14 @@ public class BrokerConfigUpdateParamsTest {
                 ", \"config\": {\"config1\":\"value1\",\"config2\":\"value2\",\"config3\":\"value3\"}" +
                 "}";
 
-        BrokerConfigUpdateParams query = BrokerConfigUpdateParams.fromJson(json);
-        Assert.assertNotNull(query);
-        Assert.assertEquals(1, query.getBrokerId());
+        BrokerConfigUpdateParams params = BrokerConfigUpdateParams.fromJson(json);
+        Assert.assertNotNull(params);
+        Assert.assertEquals(1, params.getBrokerId());
         Map<String, Object> config = new HashMap<>();
         config.put("config1", "value1");
         config.put("config2", "value2");
         config.put("config3", "value3");
-        Assert.assertEquals(config, query.getConfig());
+        Assert.assertEquals(config, params.getConfig());
     }
 
 }

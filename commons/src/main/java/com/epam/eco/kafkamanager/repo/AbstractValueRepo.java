@@ -29,7 +29,7 @@ import com.epam.eco.kafkamanager.SearchCriteria;
 /**
  * @author Andrei_Tytsik
  */
-public abstract class AbstractValueRepo<V, Q extends SearchCriteria<V>> implements ValueRepo<V, Q> {
+public abstract class AbstractValueRepo<V, SC extends SearchCriteria<V>> implements ValueRepo<V, SC> {
 
     @Override
     public Page<V> page(Pageable pageable) {
@@ -37,10 +37,10 @@ public abstract class AbstractValueRepo<V, Q extends SearchCriteria<V>> implemen
     }
 
     @Override
-    public Page<V> page(Q query, Pageable pageable) {
+    public Page<V> page(SC criteria, Pageable pageable) {
         Validate.notNull(pageable, "Pageable is null");
 
-        List<V> allValues = applyQueryIfPresented(values(), query);
+        List<V> allValues = applyCriteriaIfPresented(values(), criteria);
         List<V> pageValues = new ArrayList<>();
         int idx = 0;
         for (V value : allValues) {
@@ -56,16 +56,16 @@ public abstract class AbstractValueRepo<V, Q extends SearchCriteria<V>> implemen
     }
 
     @Override
-    public List<V> values(Q query) {
-        return applyQueryIfPresented(values(), query);
+    public List<V> values(SC criteria) {
+        return applyCriteriaIfPresented(values(), criteria);
     }
 
-    protected List<V> applyQueryIfPresented(List<V> values, Q query) {
-        if (query == null) {
+    protected List<V> applyCriteriaIfPresented(List<V> values, SC criteria) {
+        if (criteria == null) {
             return values;
         }
 
-        return values.stream().filter(query::matches).collect(Collectors.toList());
+        return values.stream().filter(criteria::matches).collect(Collectors.toList());
     }
 
 }

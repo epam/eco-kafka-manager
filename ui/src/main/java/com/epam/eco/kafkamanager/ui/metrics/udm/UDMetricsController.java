@@ -41,7 +41,7 @@ public class UDMetricsController extends UDMAbstractController {
 
     public static final String ATTR_PAGE = "page";
     public static final String ATTR_UDM_NAME = "udmName";
-    public static final String ATTR_SEARCH_QUERY = "searchCriteria";
+    public static final String ATTR_SEARCH_CRITERIA = "searchCriteria";
     public static final String ATTR_TOTAL_COUNT = "totalCount";
 
     public static final String MAPPING = "/udmetrics";
@@ -62,7 +62,7 @@ public class UDMetricsController extends UDMAbstractController {
                 searchCriteria,
                 PageRequest.of(page, PAGE_SIZE));
 
-        model.addAttribute(ATTR_SEARCH_QUERY, searchCriteria);
+        model.addAttribute(ATTR_SEARCH_CRITERIA, searchCriteria);
         model.addAttribute(ATTR_PAGE, wrap(metricPage));
         model.addAttribute(ATTR_TOTAL_COUNT, udMetricManager.getCount());
 

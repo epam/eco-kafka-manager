@@ -63,11 +63,11 @@ public class ConsumerGroupMetadataUpdateParamsTest {
         json.put("attributes", attributes);
         json.put("description", "description");
 
-        ConsumerGroupMetadataUpdateParams query = ConsumerGroupMetadataUpdateParams.fromJson(json);
-        Assert.assertNotNull(query);
-        Assert.assertEquals("group1", query.getGroupName());
-        Assert.assertEquals(attributes, query.getAttributes());
-        Assert.assertEquals("description", query.getDescription());
+        ConsumerGroupMetadataUpdateParams params = ConsumerGroupMetadataUpdateParams.fromJson(json);
+        Assert.assertNotNull(params);
+        Assert.assertEquals("group1", params.getGroupName());
+        Assert.assertEquals(attributes, params.getAttributes());
+        Assert.assertEquals("description", params.getDescription());
     }
 
     @Test
@@ -79,15 +79,15 @@ public class ConsumerGroupMetadataUpdateParamsTest {
                 ", \"description\": \"description\"" +
                 "}";
 
-        ConsumerGroupMetadataUpdateParams query = ConsumerGroupMetadataUpdateParams.fromJson(json);
-        Assert.assertNotNull(query);
-        Assert.assertEquals("group1", query.getGroupName());
+        ConsumerGroupMetadataUpdateParams params = ConsumerGroupMetadataUpdateParams.fromJson(json);
+        Assert.assertNotNull(params);
+        Assert.assertEquals("group1", params.getGroupName());
         Map<String, Object> attributes = new HashMap<>();
         attributes.put("attr1", "value1");
         attributes.put("attr2", "value2");
         attributes.put("attr3", "value3");
-        Assert.assertEquals(attributes, query.getAttributes());
-        Assert.assertEquals("description", query.getDescription());
+        Assert.assertEquals(attributes, params.getAttributes());
+        Assert.assertEquals("description", params.getDescription());
     }
 
 }

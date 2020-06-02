@@ -56,10 +56,10 @@ public class UDMetricConfigSearchCriteriaTest {
         json.put("type", "CONSUMER_GROUP_LAG");
         json.put("resourceName", "resource3");
 
-        UDMetricConfigSearchCriteria query = UDMetricConfigSearchCriteria.fromJson(json);
-        Assert.assertNotNull(query);
-        Assert.assertEquals(UDMetricType.CONSUMER_GROUP_LAG, query.getType());
-        Assert.assertEquals("resource3", query.getResourceName());
+        UDMetricConfigSearchCriteria criteria = UDMetricConfigSearchCriteria.fromJson(json);
+        Assert.assertNotNull(criteria);
+        Assert.assertEquals(UDMetricType.CONSUMER_GROUP_LAG, criteria.getType());
+        Assert.assertEquals("resource3", criteria.getResourceName());
     }
 
     @Test
@@ -70,10 +70,10 @@ public class UDMetricConfigSearchCriteriaTest {
                 ", \"resourceName\": \"resource3\"" +
                 "}";
 
-        UDMetricConfigSearchCriteria query = UDMetricConfigSearchCriteria.fromJson(json);
-        Assert.assertNotNull(query);
-        Assert.assertEquals(UDMetricType.CONSUMER_GROUP_LAG, query.getType());
-        Assert.assertEquals("resource3", query.getResourceName());
+        UDMetricConfigSearchCriteria criteria = UDMetricConfigSearchCriteria.fromJson(json);
+        Assert.assertNotNull(criteria);
+        Assert.assertEquals(UDMetricType.CONSUMER_GROUP_LAG, criteria.getType());
+        Assert.assertEquals("resource3", criteria.getResourceName());
     }
 
 }

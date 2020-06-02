@@ -56,12 +56,12 @@ public class ConsumerGroupController {
             @RequestParam(value = "page", required = false) Integer page,
             @RequestParam(value = "pageSize", required = false) Integer pageSize) {
         Pageable pageable = PageUtils.buildPageableWithDefaultsIfNull(page, pageSize);
-        ConsumerGroupSearchCriteria query = ConsumerGroupSearchCriteria.builder()
+        ConsumerGroupSearchCriteria criteria = ConsumerGroupSearchCriteria.builder()
                 .groupName(groupName)
                 .storageType(storageType)
                 .description(description)
                 .build();
-        return kafkaManager.getConsumerGroupPage(query, pageable);
+        return kafkaManager.getConsumerGroupPage(criteria, pageable);
     }
 
     @GetMapping("/{groupName}")

@@ -57,11 +57,11 @@ public class BrokerSearchCriteriaTest {
         json.put("rack", "default");
         json.put("description", "description");
 
-        BrokerSearchCriteria query = BrokerSearchCriteria.fromJson(json);
-        Assert.assertNotNull(query);
-        Assert.assertEquals(Integer.valueOf(42), query.getBrokerId());
-        Assert.assertEquals("default", query.getRack());
-        Assert.assertEquals("description", query.getDescription());
+        BrokerSearchCriteria criteria = BrokerSearchCriteria.fromJson(json);
+        Assert.assertNotNull(criteria);
+        Assert.assertEquals(Integer.valueOf(42), criteria.getBrokerId());
+        Assert.assertEquals("default", criteria.getRack());
+        Assert.assertEquals("description", criteria.getDescription());
     }
 
     @Test
@@ -73,11 +73,11 @@ public class BrokerSearchCriteriaTest {
                 ", \"description\": \"description\"" +
                 "}";
 
-        BrokerSearchCriteria query = BrokerSearchCriteria.fromJson(json);
-        Assert.assertNotNull(query);
-        Assert.assertEquals(Integer.valueOf(42), query.getBrokerId());
-        Assert.assertEquals("default", query.getRack());
-        Assert.assertEquals("description", query.getDescription());
+        BrokerSearchCriteria criteria = BrokerSearchCriteria.fromJson(json);
+        Assert.assertNotNull(criteria);
+        Assert.assertEquals(Integer.valueOf(42), criteria.getBrokerId());
+        Assert.assertEquals("default", criteria.getRack());
+        Assert.assertEquals("description", criteria.getDescription());
     }
 
 }

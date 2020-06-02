@@ -63,11 +63,11 @@ public class BrokerMetadataUpdateParamsTest {
         json.put("attributes", attributes);
         json.put("description", "description");
 
-        BrokerMetadataUpdateParams query = BrokerMetadataUpdateParams.fromJson(json);
-        Assert.assertNotNull(query);
-        Assert.assertEquals(42, query.getBrokerId());
-        Assert.assertEquals(attributes, query.getAttributes());
-        Assert.assertEquals("description", query.getDescription());
+        BrokerMetadataUpdateParams params = BrokerMetadataUpdateParams.fromJson(json);
+        Assert.assertNotNull(params);
+        Assert.assertEquals(42, params.getBrokerId());
+        Assert.assertEquals(attributes, params.getAttributes());
+        Assert.assertEquals("description", params.getDescription());
     }
 
     @Test
@@ -79,15 +79,15 @@ public class BrokerMetadataUpdateParamsTest {
                 ", \"description\": \"description\"" +
                 "}";
 
-        BrokerMetadataUpdateParams query = BrokerMetadataUpdateParams.fromJson(json);
-        Assert.assertNotNull(query);
-        Assert.assertEquals(42, query.getBrokerId());
+        BrokerMetadataUpdateParams params = BrokerMetadataUpdateParams.fromJson(json);
+        Assert.assertNotNull(params);
+        Assert.assertEquals(42, params.getBrokerId());
         Map<String, Object> attributes = new HashMap<>();
         attributes.put("attr1", "value1");
         attributes.put("attr2", "value2");
         attributes.put("attr3", "value3");
-        Assert.assertEquals(attributes, query.getAttributes());
-        Assert.assertEquals("description", query.getDescription());
+        Assert.assertEquals(attributes, params.getAttributes());
+        Assert.assertEquals("description", params.getDescription());
     }
 
 }

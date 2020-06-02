@@ -49,7 +49,7 @@ public class PermissionController {
 
     public static final String VIEW = "permissions";
     public static final String ATTR_PAGE = "page";
-    public static final String ATTR_SEARCH_QUERY = "searchCriteria";
+    public static final String ATTR_SEARCH_CRITERIA = "searchCriteria";
     public static final String ATTR_TOTAL_COUNT = "totalCount";
 
     public static final String MAPPING = "/permissions";
@@ -70,7 +70,7 @@ public class PermissionController {
                 searchCriteria,
                 PageRequest.of(page, PAGE_SIZE));
 
-        model.addAttribute(ATTR_SEARCH_QUERY, searchCriteria);
+        model.addAttribute(ATTR_SEARCH_CRITERIA, searchCriteria);
         model.addAttribute(ATTR_PAGE, wrap(permissionPage));
         model.addAttribute(ATTR_TOTAL_COUNT, kafkaManager.getPermissionCount());
 

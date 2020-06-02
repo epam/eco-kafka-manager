@@ -68,15 +68,15 @@ public class PermissionSearchCriteriaTest {
         json.put("host", "host");
         json.put("description", "description");
 
-        PermissionSearchCriteria query = PermissionSearchCriteria.fromJson(json);
-        Assert.assertNotNull(query);
-        Assert.assertEquals("user1", query.getKafkaPrincipal());
-        Assert.assertEquals(ResourceType.GROUP, query.getResourceType());
-        Assert.assertEquals("group1", query.getResourceName());
-        Assert.assertEquals(AclPermissionType.ALLOW, query.getPermissionType());
-        Assert.assertEquals(AclOperation.READ, query.getOperation());
-        Assert.assertEquals("host", query.getHost());
-        Assert.assertEquals("description", query.getDescription());
+        PermissionSearchCriteria criteria = PermissionSearchCriteria.fromJson(json);
+        Assert.assertNotNull(criteria);
+        Assert.assertEquals("user1", criteria.getKafkaPrincipal());
+        Assert.assertEquals(ResourceType.GROUP, criteria.getResourceType());
+        Assert.assertEquals("group1", criteria.getResourceName());
+        Assert.assertEquals(AclPermissionType.ALLOW, criteria.getPermissionType());
+        Assert.assertEquals(AclOperation.READ, criteria.getOperation());
+        Assert.assertEquals("host", criteria.getHost());
+        Assert.assertEquals("description", criteria.getDescription());
     }
 
     @Test
@@ -92,15 +92,15 @@ public class PermissionSearchCriteriaTest {
                 ", \"description\": \"description\"" +
                 "}";
 
-        PermissionSearchCriteria query = PermissionSearchCriteria.fromJson(json);
-        Assert.assertNotNull(query);
-        Assert.assertEquals("user1", query.getKafkaPrincipal());
-        Assert.assertEquals(ResourceType.GROUP, query.getResourceType());
-        Assert.assertEquals("group1", query.getResourceName());
-        Assert.assertEquals(AclPermissionType.ALLOW, query.getPermissionType());
-        Assert.assertEquals(AclOperation.READ, query.getOperation());
-        Assert.assertEquals("host", query.getHost());
-        Assert.assertEquals("description", query.getDescription());
+        PermissionSearchCriteria criteria = PermissionSearchCriteria.fromJson(json);
+        Assert.assertNotNull(criteria);
+        Assert.assertEquals("user1", criteria.getKafkaPrincipal());
+        Assert.assertEquals(ResourceType.GROUP, criteria.getResourceType());
+        Assert.assertEquals("group1", criteria.getResourceName());
+        Assert.assertEquals(AclPermissionType.ALLOW, criteria.getPermissionType());
+        Assert.assertEquals(AclOperation.READ, criteria.getOperation());
+        Assert.assertEquals("host", criteria.getHost());
+        Assert.assertEquals("description", criteria.getDescription());
     }
 
 }

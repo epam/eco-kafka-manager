@@ -77,7 +77,7 @@ public class TopicController {
     public static final String ATTR_PAGE = "page";
     public static final String ATTR_TOPIC = "topic";
     public static final String ATTR_CONFIG_DEF = "configDef";
-    public static final String ATTR_SEARCH_QUERY = "searchCriteria";
+    public static final String ATTR_SEARCH_CRITERIA = "searchCriteria";
     public static final String ATTR_TOPIC_OFFSET_INCREASE_UDM_TYPE = "topicOffsetIncreaseUdmType";
     public static final String ATTR_TOPIC_OFFSET_INCREASE_UDM_NAME = "topicOffsetIncreaseUdmName";
     public static final String ATTR_TOPIC_OFFSET_INCREASE_UDM = "topicOffsetIncreaseUdm";
@@ -121,7 +121,7 @@ public class TopicController {
                 searchCriteria,
                 PageRequest.of(page, PAGE_SIZE));
 
-        model.addAttribute(ATTR_SEARCH_QUERY, searchCriteria);
+        model.addAttribute(ATTR_SEARCH_CRITERIA, searchCriteria);
         model.addAttribute(ATTR_PAGE, wrap(topicPage));
         model.addAttribute(ATTR_TOTAL_COUNT, kafkaManager.getTopicCount());
 

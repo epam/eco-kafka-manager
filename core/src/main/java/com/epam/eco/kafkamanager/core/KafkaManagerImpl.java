@@ -125,8 +125,8 @@ public class KafkaManagerImpl implements KafkaManager {
     }
 
     @Override
-    public List<BrokerInfo> getBrokers(BrokerSearchCriteria query) {
-        return brokerRepo.values(query);
+    public List<BrokerInfo> getBrokers(BrokerSearchCriteria criteria) {
+        return brokerRepo.values(criteria);
     }
 
     @Override
@@ -208,8 +208,8 @@ public class KafkaManagerImpl implements KafkaManager {
     }
 
     @Override
-    public List<TopicInfo> getTopics(TopicSearchCriteria query) {
-        return topicRepo.values(query);
+    public List<TopicInfo> getTopics(TopicSearchCriteria criteria) {
+        return topicRepo.values(criteria);
     }
 
     @Override
@@ -218,8 +218,8 @@ public class KafkaManagerImpl implements KafkaManager {
     }
 
     @Override
-    public Page<TopicInfo> getTopicPage(TopicSearchCriteria query, Pageable pageable) {
-        return topicRepo.page(query, pageable);
+    public Page<TopicInfo> getTopicPage(TopicSearchCriteria criteria, Pageable pageable) {
+        return topicRepo.page(criteria, pageable);
     }
 
     @SuppressWarnings("unchecked")
@@ -357,8 +357,8 @@ public class KafkaManagerImpl implements KafkaManager {
     }
 
     @Override
-    public List<ConsumerGroupInfo> getConsumerGroups(ConsumerGroupSearchCriteria query) {
-        return consumerGroupRepo.values(query);
+    public List<ConsumerGroupInfo> getConsumerGroups(ConsumerGroupSearchCriteria criteria) {
+        return consumerGroupRepo.values(criteria);
     }
 
     @Override
@@ -367,8 +367,8 @@ public class KafkaManagerImpl implements KafkaManager {
     }
 
     @Override
-    public Page<ConsumerGroupInfo> getConsumerGroupPage(ConsumerGroupSearchCriteria query, Pageable pageable) {
-        return consumerGroupRepo.page(query, pageable);
+    public Page<ConsumerGroupInfo> getConsumerGroupPage(ConsumerGroupSearchCriteria criteria, Pageable pageable) {
+        return consumerGroupRepo.page(criteria, pageable);
     }
 
     @Override
@@ -456,8 +456,8 @@ public class KafkaManagerImpl implements KafkaManager {
     }
 
     @Override
-    public List<PermissionInfo> getPermissions(PermissionSearchCriteria query) {
-        return permissionRepo.values(query);
+    public List<PermissionInfo> getPermissions(PermissionSearchCriteria criteria) {
+        return permissionRepo.values(criteria);
     }
 
     @Override
@@ -466,8 +466,8 @@ public class KafkaManagerImpl implements KafkaManager {
     }
 
     @Override
-    public Page<PermissionInfo> getPermissionPage(PermissionSearchCriteria query, Pageable pageable) {
-        return permissionRepo.page(query, pageable);
+    public Page<PermissionInfo> getPermissionPage(PermissionSearchCriteria criteria, Pageable pageable) {
+        return permissionRepo.page(criteria, pageable);
     }
 
     @SuppressWarnings("unchecked")
@@ -588,8 +588,8 @@ public class KafkaManagerImpl implements KafkaManager {
     }
 
     @Override
-    public List<TransactionInfo> getTransactions(TransactionSearchCriteria query) {
-        return transactionRepo.values(query);
+    public List<TransactionInfo> getTransactions(TransactionSearchCriteria criteria) {
+        return transactionRepo.values(criteria);
     }
 
     @Override
@@ -599,9 +599,9 @@ public class KafkaManagerImpl implements KafkaManager {
 
     @Override
     public Page<TransactionInfo> getTransactionPage(
-            TransactionSearchCriteria query,
+            TransactionSearchCriteria criteria,
             Pageable pageable) {
-        return transactionRepo.page(query, pageable);
+        return transactionRepo.page(criteria, pageable);
     }
 
     @Override

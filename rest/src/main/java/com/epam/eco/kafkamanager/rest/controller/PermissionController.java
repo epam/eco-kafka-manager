@@ -66,7 +66,7 @@ public class PermissionController {
             @RequestParam(value = "page", required = false) Integer page,
             @RequestParam(value = "pageSize", required = false) Integer pageSize) {
         Pageable pageable = PageUtils.buildPageableWithDefaultsIfNull(page, pageSize);
-        PermissionSearchCriteria query = PermissionSearchCriteria.builder()
+        PermissionSearchCriteria criteria = PermissionSearchCriteria.builder()
                 .kafkaPrincipal(kafkaPrincipal)
                 .resourceType(resourceType)
                 .resourceName(resourceName)
@@ -76,7 +76,7 @@ public class PermissionController {
                 .description(description)
                 .build();
 
-        return kafkaManager.getPermissionPage(query, pageable);
+        return kafkaManager.getPermissionPage(criteria, pageable);
     }
 
     @PostMapping
