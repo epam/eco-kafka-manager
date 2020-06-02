@@ -87,7 +87,7 @@
                                 th:each="type : ${T(com.epam.eco.kafkamanager.udmetrics.UDMetricType).values()}"
                                 th:value="${type}" 
                                 th:text="${type}"
-                                th:selected="${type == searchQuery.type}">
+                                th:selected="${type == searchCriteria.type}">
                             </option>
                         </select>
                         <input 
@@ -95,14 +95,14 @@
                             class="form-control"
                             id="resourceName" 
                             placeholder="Resource Name"
-                            th:value="${searchQuery.resourceName}"/>
+                            th:value="${searchCriteria.resourceName}"/>
                         <select title="Status" class="form-control" id="status">
                             <option value="">-</option>
                             <option 
-                                th:each="status : ${T(com.epam.eco.kafkamanager.udmetrics.UDMetricSearchQuery$Status).values()}"
+                                th:each="status : ${T(com.epam.eco.kafkamanager.udmetrics.UDMetricSearchCriteria$Status).values()}"
                                 th:value="${status}" 
                                 th:text="${status}"
-                                th:selected="${status == searchQuery.status}">
+                                th:selected="${status == searchCriteria.status}">
                             </option>
                         </select>
                         <button 

@@ -18,6 +18,6 @@ package com.epam.eco.kafkamanager;
 /**
  * @author Andrei_Tytsik
  */
-public interface SearchQuery<T> {
+public interface SearchCriteria<T> {
     boolean matches(T obj);
 }

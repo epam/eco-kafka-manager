@@ -30,11 +30,11 @@ import com.epam.eco.kafkamanager.utils.TestObjectMapperSingleton;
 /**
  * @author Andrei_Tytsik
  */
-public class ConsumerGroupSearchQueryTest {
+public class ConsumerGroupSearchCriteriaTest {
 
     @Test
     public void testSerializedToJsonAndBack() throws Exception {
-        ConsumerGroupSearchQuery origin = ConsumerGroupSearchQuery.builder().
+        ConsumerGroupSearchCriteria origin = ConsumerGroupSearchCriteria.builder().
                 groupName("group1").
                 state(ConsumerGroupState.STABLE).
                 storageType(StorageType.KAFKA).
@@ -46,9 +46,9 @@ public class ConsumerGroupSearchQueryTest {
         String json = mapper.writeValueAsString(origin);
         Assert.assertNotNull(json);
 
-        ConsumerGroupSearchQuery deserialized = mapper.readValue(
+        ConsumerGroupSearchCriteria deserialized = mapper.readValue(
                 json,
-                ConsumerGroupSearchQuery.class);
+                ConsumerGroupSearchCriteria.class);
         Assert.assertNotNull(deserialized);
         Assert.assertEquals(origin, deserialized);
     }
@@ -61,12 +61,12 @@ public class ConsumerGroupSearchQueryTest {
         json.put("storageType", "KAFKA");
         json.put("description", "description");
 
-        ConsumerGroupSearchQuery query = ConsumerGroupSearchQuery.fromJson(json);
-        Assert.assertNotNull(query);
-        Assert.assertEquals("group1", query.getGroupName());
-        Assert.assertEquals(ConsumerGroupState.EMPTY, query.getState());
-        Assert.assertEquals(StorageType.KAFKA, query.getStorageType());
-        Assert.assertEquals("description", query.getDescription());
+        ConsumerGroupSearchCriteria criteria = ConsumerGroupSearchCriteria.fromJson(json);
+        Assert.assertNotNull(criteria);
+        Assert.assertEquals("group1", criteria.getGroupName());
+        Assert.assertEquals(ConsumerGroupState.EMPTY, criteria.getState());
+        Assert.assertEquals(StorageType.KAFKA, criteria.getStorageType());
+        Assert.assertEquals("description", criteria.getDescription());
     }
 
     @Test
@@ -79,12 +79,12 @@ public class ConsumerGroupSearchQueryTest {
                 ", \"description\": \"description\"" +
                 "}";
 
-        ConsumerGroupSearchQuery query = ConsumerGroupSearchQuery.fromJson(json);
-        Assert.assertNotNull(query);
-        Assert.assertEquals("group1", query.getGroupName());
-        Assert.assertEquals(ConsumerGroupState.COMPLETING_REBALANCE, query.getState());
-        Assert.assertEquals(StorageType.KAFKA, query.getStorageType());
-        Assert.assertEquals("description", query.getDescription());
+        ConsumerGroupSearchCriteria criteria = ConsumerGroupSearchCriteria.fromJson(json);
+        Assert.assertNotNull(criteria);
+        Assert.assertEquals("group1", criteria.getGroupName());
+        Assert.assertEquals(ConsumerGroupState.COMPLETING_REBALANCE, criteria.getState());
+        Assert.assertEquals(StorageType.KAFKA, criteria.getStorageType());
+        Assert.assertEquals("description", criteria.getDescription());
     }
 
 }

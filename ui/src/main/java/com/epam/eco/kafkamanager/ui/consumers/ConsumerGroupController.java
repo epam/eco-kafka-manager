@@ -32,7 +32,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import com.epam.eco.kafkamanager.ConsumerGroupInfo;
 import com.epam.eco.kafkamanager.ConsumerGroupMetadataDeleteParams;
 import com.epam.eco.kafkamanager.ConsumerGroupMetadataUpdateParams;
-import com.epam.eco.kafkamanager.ConsumerGroupSearchQuery;
+import com.epam.eco.kafkamanager.ConsumerGroupSearchCriteria;
 import com.epam.eco.kafkamanager.KafkaManager;
 import com.epam.eco.kafkamanager.udmetrics.UDMetric;
 import com.epam.eco.kafkamanager.udmetrics.UDMetricManager;
@@ -54,7 +54,7 @@ public class ConsumerGroupController {
     public static final String ATTR_PAGE = "page";
 
     public static final String ATTR_GROUP = "group";
-    public static final String ATTR_SEARCH_QUERY = "searchQuery";
+    public static final String ATTR_SEARCH_CRITERIA = "searchCriteria";
     public static final String ATTR_GROUP_LAG_UDM_TYPE = "groupLagUdmType";
     public static final String ATTR_GROUP_LAG_UDM_NAME = "groupLagUdmName";
     public static final String ATTR_GROUP_LAG_UDM = "groupLagUdm";
@@ -79,14 +79,14 @@ public class ConsumerGroupController {
             @RequestParam(required=false) Integer page,
             @RequestParam Map<String, Object> paramsMap,
             Model model) {
-        ConsumerGroupSearchQuery searchQuery = ConsumerGroupSearchQuery.fromJson(paramsMap);
+        ConsumerGroupSearchCriteria searchCriteria = ConsumerGroupSearchCriteria.fromJson(paramsMap);
         page = page != null && page > 0 ? page -1 : 0;
 
         Page<ConsumerGroupInfo> groupPage = kafkaManager.getConsumerGroupPage(
-                searchQuery,
+                searchCriteria,
                 PageRequest.of(page, PAGE_SIZE));
 
-        model.addAttribute(ATTR_SEARCH_QUERY, searchQuery);
+        model.addAttribute(ATTR_SEARCH_CRITERIA, searchCriteria);
         model.addAttribute(ATTR_PAGE, wrap(groupPage));
         model.addAttribute(ATTR_TOTAL_COUNT, kafkaManager.getConsumerGroupCount());
 

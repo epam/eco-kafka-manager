@@ -55,10 +55,10 @@ public class TopicPartitionsCreateParamsTest {
         json.put("topicName", "topic1");
         json.put("newPartitionCount", 42);
 
-        TopicPartitionsCreateParams query = TopicPartitionsCreateParams.fromJson(json);
-        Assert.assertNotNull(query);
-        Assert.assertEquals("topic1", query.getTopicName());
-        Assert.assertEquals(42, query.getNewPartitionCount());
+        TopicPartitionsCreateParams params = TopicPartitionsCreateParams.fromJson(json);
+        Assert.assertNotNull(params);
+        Assert.assertEquals("topic1", params.getTopicName());
+        Assert.assertEquals(42, params.getNewPartitionCount());
     }
 
     @Test
@@ -69,10 +69,10 @@ public class TopicPartitionsCreateParamsTest {
                 ", \"newPartitionCount\": 42" +
                 "}";
 
-        TopicPartitionsCreateParams query = TopicPartitionsCreateParams.fromJson(json);
-        Assert.assertNotNull(query);
-        Assert.assertEquals("topic1", query.getTopicName());
-        Assert.assertEquals(42, query.getNewPartitionCount());
+        TopicPartitionsCreateParams params = TopicPartitionsCreateParams.fromJson(json);
+        Assert.assertNotNull(params);
+        Assert.assertEquals("topic1", params.getTopicName());
+        Assert.assertEquals(42, params.getNewPartitionCount());
     }
 
 }

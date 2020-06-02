@@ -23,19 +23,20 @@ import org.junit.Test;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import com.epam.eco.kafkamanager.udmetrics.UDMetricSearchCriteria.Status;
 import com.epam.eco.kafkamanager.udmetrics.utils.TestObjectMapperSingleton;
-
 
 /**
  * @author Andrei_Tytsik
  */
-public class UDMetricConfigSearchQueryTest {
+public class UDMetricSearchCriteriaTest {
 
     @Test
     public void testSerializedToJsonAndBack() throws Exception {
-        UDMetricConfigSearchQuery origin = UDMetricConfigSearchQuery.builder().
+        UDMetricSearchCriteria origin = UDMetricSearchCriteria.builder().
                 type(UDMetricType.TOPIC_OFFSET_INCREASE).
                 resourceName("resource1").
+                status(Status.OK).
                 build();
 
         ObjectMapper mapper = TestObjectMapperSingleton.getObjectMapper();
@@ -43,9 +44,9 @@ public class UDMetricConfigSearchQueryTest {
         String json = mapper.writeValueAsString(origin);
         Assert.assertNotNull(json);
 
-        UDMetricConfigSearchQuery deserialized = mapper.readValue(
+        UDMetricSearchCriteria deserialized = mapper.readValue(
                 json,
-                UDMetricConfigSearchQuery.class);
+                UDMetricSearchCriteria.class);
         Assert.assertNotNull(deserialized);
         Assert.assertEquals(origin, deserialized);
     }
@@ -55,11 +56,13 @@ public class UDMetricConfigSearchQueryTest {
         Map<String, Object> json = new HashMap<>();
         json.put("type", "CONSUMER_GROUP_LAG");
         json.put("resourceName", "resource3");
+        json.put("status", "OK");
 
-        UDMetricConfigSearchQuery query = UDMetricConfigSearchQuery.fromJson(json);
-        Assert.assertNotNull(query);
-        Assert.assertEquals(UDMetricType.CONSUMER_GROUP_LAG, query.getType());
-        Assert.assertEquals("resource3", query.getResourceName());
+        UDMetricSearchCriteria criteria = UDMetricSearchCriteria.fromJson(json);
+        Assert.assertNotNull(criteria);
+        Assert.assertEquals(UDMetricType.CONSUMER_GROUP_LAG, criteria.getType());
+        Assert.assertEquals("resource3", criteria.getResourceName());
+        Assert.assertEquals(Status.OK, criteria.getStatus());
     }
 
     @Test
@@ -68,12 +71,14 @@ public class UDMetricConfigSearchQueryTest {
                 "{" +
                 "\"type\": \"CONSUMER_GROUP_LAG\"" +
                 ", \"resourceName\": \"resource3\"" +
+                ", \"status\": \"FAILED\"" +
                 "}";
 
-        UDMetricConfigSearchQuery query = UDMetricConfigSearchQuery.fromJson(json);
-        Assert.assertNotNull(query);
-        Assert.assertEquals(UDMetricType.CONSUMER_GROUP_LAG, query.getType());
-        Assert.assertEquals("resource3", query.getResourceName());
+        UDMetricSearchCriteria criteria = UDMetricSearchCriteria.fromJson(json);
+        Assert.assertNotNull(criteria);
+        Assert.assertEquals(UDMetricType.CONSUMER_GROUP_LAG, criteria.getType());
+        Assert.assertEquals("resource3", criteria.getResourceName());
+        Assert.assertEquals(Status.FAILED, criteria.getStatus());
     }
 
 }

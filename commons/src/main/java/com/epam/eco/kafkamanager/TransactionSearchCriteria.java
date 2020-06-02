@@ -29,13 +29,13 @@ import com.epam.eco.kafkamanager.utils.MapperUtils;
 /**
  * @author Andrei_Tytsik
  */
-public class TransactionSearchQuery implements SearchQuery<TransactionInfo> {
+public class TransactionSearchCriteria implements SearchCriteria<TransactionInfo> {
 
     private final String transactionalId;
     private final TransactionState state;
     private final String topicName;
 
-    public TransactionSearchQuery(
+    public TransactionSearchCriteria(
             @JsonProperty("transactionalId") String transactionalId,
             @JsonProperty("state") TransactionState state,
             @JsonProperty("topicName") String topicName) {
@@ -76,7 +76,7 @@ public class TransactionSearchQuery implements SearchQuery<TransactionInfo> {
         if (obj == null || getClass() != obj.getClass()) {
             return false;
         }
-        TransactionSearchQuery that = (TransactionSearchQuery) obj;
+        TransactionSearchCriteria that = (TransactionSearchCriteria) obj;
         return
                 Objects.equals(this.transactionalId, that.transactionalId) &&
                 Objects.equals(this.state, that.state) &&
@@ -105,20 +105,20 @@ public class TransactionSearchQuery implements SearchQuery<TransactionInfo> {
         return builder(null);
     }
 
-    public static Builder builder(TransactionSearchQuery origin) {
+    public static Builder builder(TransactionSearchCriteria origin) {
         return new Builder(origin);
     }
 
-    public static TransactionSearchQuery fromJson(Map<String, ?> map) {
+    public static TransactionSearchCriteria fromJson(Map<String, ?> map) {
         Validate.notNull(map, "JSON map is null");
 
-        return MapperUtils.convert(map, TransactionSearchQuery.class);
+        return MapperUtils.convert(map, TransactionSearchCriteria.class);
     }
 
-    public static TransactionSearchQuery fromJson(String json) {
+    public static TransactionSearchCriteria fromJson(String json) {
         Validate.notNull(json, "JSON is null");
 
-        return MapperUtils.jsonToBean(json, TransactionSearchQuery.class);
+        return MapperUtils.jsonToBean(json, TransactionSearchCriteria.class);
     }
 
     public static class Builder {
@@ -127,7 +127,7 @@ public class TransactionSearchQuery implements SearchQuery<TransactionInfo> {
         private TransactionState state;
         private String topicName;
 
-        private Builder(TransactionSearchQuery origin) {
+        private Builder(TransactionSearchCriteria origin) {
             if (origin == null) {
                 return;
             }
@@ -150,8 +150,8 @@ public class TransactionSearchQuery implements SearchQuery<TransactionInfo> {
             return this;
         }
 
-        public TransactionSearchQuery build() {
-            return new TransactionSearchQuery(transactionalId, state, topicName);
+        public TransactionSearchCriteria build() {
+            return new TransactionSearchCriteria(transactionalId, state, topicName);
         }
 
     }

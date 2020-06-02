@@ -55,7 +55,7 @@ import com.epam.eco.kafkamanager.MetadataUpdateListener;
 import com.epam.eco.kafkamanager.PermissionInfo;
 import com.epam.eco.kafkamanager.PermissionMetadataKey;
 import com.epam.eco.kafkamanager.PermissionRepo;
-import com.epam.eco.kafkamanager.PermissionSearchQuery;
+import com.epam.eco.kafkamanager.PermissionSearchCriteria;
 import com.epam.eco.kafkamanager.core.permission.repo.zk.ZkAclCache.ACL;
 import com.epam.eco.kafkamanager.core.spring.AsyncStartingBean;
 import com.epam.eco.kafkamanager.repo.AbstractValueRepo;
@@ -67,7 +67,7 @@ import kafka.security.auth.Resource;
 /**
  * @author Andrei_Tytsik
  */
-public class ZkPermissionRepo extends AbstractValueRepo<PermissionInfo, PermissionSearchQuery> implements PermissionRepo, CachedRepo<Resource>, ZkAclCache.CacheListener, MetadataUpdateListener, AsyncStartingBean {
+public class ZkPermissionRepo extends AbstractValueRepo<PermissionInfo, PermissionSearchCriteria> implements PermissionRepo, CachedRepo<Resource>, ZkAclCache.CacheListener, MetadataUpdateListener, AsyncStartingBean {
 
     private final static Logger LOGGER = LoggerFactory.getLogger(ZkPermissionRepo.class);
 

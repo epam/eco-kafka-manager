@@ -76,16 +76,16 @@ public class PermissionCreateParamsTest {
         json.put("attributes", attributes);
         json.put("description", "description");
 
-        PermissionCreateParams query = PermissionCreateParams.fromJson(json);
-        Assert.assertNotNull(query);
-        Assert.assertEquals(ResourceType.GROUP, query.getResourceType());
-        Assert.assertEquals("group1", query.getResourceName());
-        Assert.assertEquals("user:user1", query.getPrincipal());
-        Assert.assertEquals(AclPermissionType.ALLOW, query.getPermissionType());
-        Assert.assertEquals(AclOperation.READ, query.getOperation());
-        Assert.assertEquals("host", query.getHost());
-        Assert.assertEquals(attributes, query.getAttributes());
-        Assert.assertEquals("description", query.getDescription());
+        PermissionCreateParams params = PermissionCreateParams.fromJson(json);
+        Assert.assertNotNull(params);
+        Assert.assertEquals(ResourceType.GROUP, params.getResourceType());
+        Assert.assertEquals("group1", params.getResourceName());
+        Assert.assertEquals("user:user1", params.getPrincipal());
+        Assert.assertEquals(AclPermissionType.ALLOW, params.getPermissionType());
+        Assert.assertEquals(AclOperation.READ, params.getOperation());
+        Assert.assertEquals("host", params.getHost());
+        Assert.assertEquals(attributes, params.getAttributes());
+        Assert.assertEquals("description", params.getDescription());
     }
 
     @Test
@@ -102,20 +102,20 @@ public class PermissionCreateParamsTest {
                 ", \"description\": \"description\"" +
                 "}";
 
-        PermissionCreateParams query = PermissionCreateParams.fromJson(json);
-        Assert.assertNotNull(query);
-        Assert.assertEquals(ResourceType.GROUP, query.getResourceType());
-        Assert.assertEquals("group1", query.getResourceName());
-        Assert.assertEquals("user:user1", query.getPrincipal());
-        Assert.assertEquals(AclPermissionType.ALLOW, query.getPermissionType());
-        Assert.assertEquals(AclOperation.READ, query.getOperation());
-        Assert.assertEquals("host", query.getHost());
+        PermissionCreateParams params = PermissionCreateParams.fromJson(json);
+        Assert.assertNotNull(params);
+        Assert.assertEquals(ResourceType.GROUP, params.getResourceType());
+        Assert.assertEquals("group1", params.getResourceName());
+        Assert.assertEquals("user:user1", params.getPrincipal());
+        Assert.assertEquals(AclPermissionType.ALLOW, params.getPermissionType());
+        Assert.assertEquals(AclOperation.READ, params.getOperation());
+        Assert.assertEquals("host", params.getHost());
         Map<String, Object> attributes = new HashMap<>();
         attributes.put("attr1", "value1");
         attributes.put("attr2", "value2");
         attributes.put("attr3", "value3");
-        Assert.assertEquals(attributes, query.getAttributes());
-        Assert.assertEquals("description", query.getDescription());
+        Assert.assertEquals(attributes, params.getAttributes());
+        Assert.assertEquals("description", params.getDescription());
     }
 
 }

@@ -36,7 +36,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import com.epam.eco.kafkamanager.KafkaManager;
 import com.epam.eco.kafkamanager.PermissionInfo;
-import com.epam.eco.kafkamanager.PermissionSearchQuery;
+import com.epam.eco.kafkamanager.PermissionSearchCriteria;
 import com.epam.eco.kafkamanager.ui.permissions.export.PermissionExporterType;
 
 /**
@@ -49,7 +49,7 @@ public class PermissionController {
 
     public static final String VIEW = "permissions";
     public static final String ATTR_PAGE = "page";
-    public static final String ATTR_SEARCH_QUERY = "searchQuery";
+    public static final String ATTR_SEARCH_CRITERIA = "searchCriteria";
     public static final String ATTR_TOTAL_COUNT = "totalCount";
 
     public static final String MAPPING = "/permissions";
@@ -63,14 +63,14 @@ public class PermissionController {
             @RequestParam(required=false) Integer page,
             @RequestParam Map<String, Object> paramsMap,
             Model model) {
-        PermissionSearchQuery searchQuery = PermissionSearchQuery.fromJson(paramsMap);
+        PermissionSearchCriteria searchCriteria = PermissionSearchCriteria.fromJson(paramsMap);
         page = page != null && page > 0 ? page -1 : 0;
 
         Page<PermissionInfo> permissionPage = kafkaManager.getPermissionPage(
-                searchQuery,
+                searchCriteria,
                 PageRequest.of(page, PAGE_SIZE));
 
-        model.addAttribute(ATTR_SEARCH_QUERY, searchQuery);
+        model.addAttribute(ATTR_SEARCH_CRITERIA, searchCriteria);
         model.addAttribute(ATTR_PAGE, wrap(permissionPage));
         model.addAttribute(ATTR_TOTAL_COUNT, kafkaManager.getPermissionCount());
 
@@ -82,9 +82,9 @@ public class PermissionController {
             @RequestParam PermissionExporterType exporterType,
             @RequestParam Map<String, Object> paramsMap,
             HttpServletResponse response) throws IOException {
-        PermissionSearchQuery searchQuery = PermissionSearchQuery.fromJson(paramsMap);
+        PermissionSearchCriteria searchCriteria = PermissionSearchCriteria.fromJson(paramsMap);
 
-        List<PermissionInfo> permissionInfos = kafkaManager.getPermissions(searchQuery);
+        List<PermissionInfo> permissionInfos = kafkaManager.getPermissions(searchCriteria);
 
         response.setContentType(exporterType.contentType());
         response.setHeader(

@@ -30,14 +30,14 @@ import com.epam.eco.kafkamanager.utils.MapperUtils;
 /**
  * @author Andrei_Tytsik
  */
-public class ConsumerGroupSearchQuery implements SearchQuery<ConsumerGroupInfo> {
+public class ConsumerGroupSearchCriteria implements SearchCriteria<ConsumerGroupInfo> {
 
     private final String groupName;
     private final ConsumerGroupState state;
     private final StorageType storageType;
     private final String description;
 
-    public ConsumerGroupSearchQuery(
+    public ConsumerGroupSearchCriteria(
             @JsonProperty("groupName") String groupName,
             @JsonProperty("state") ConsumerGroupState state,
             @JsonProperty("storageType") StorageType storageType,
@@ -83,7 +83,7 @@ public class ConsumerGroupSearchQuery implements SearchQuery<ConsumerGroupInfo> 
         if (obj == null || getClass() != obj.getClass()) {
             return false;
         }
-        ConsumerGroupSearchQuery that = (ConsumerGroupSearchQuery) obj;
+        ConsumerGroupSearchCriteria that = (ConsumerGroupSearchCriteria) obj;
         return
                 Objects.equals(this.groupName, that.groupName) &&
                 Objects.equals(this.state, that.state) &&
@@ -114,20 +114,20 @@ public class ConsumerGroupSearchQuery implements SearchQuery<ConsumerGroupInfo> 
         return builder(null);
     }
 
-    public static Builder builder(ConsumerGroupSearchQuery origin) {
+    public static Builder builder(ConsumerGroupSearchCriteria origin) {
         return new Builder(origin);
     }
 
-    public static ConsumerGroupSearchQuery fromJson(Map<String, ?> map) {
+    public static ConsumerGroupSearchCriteria fromJson(Map<String, ?> map) {
         Validate.notNull(map, "JSON map is null");
 
-        return MapperUtils.convert(map, ConsumerGroupSearchQuery.class);
+        return MapperUtils.convert(map, ConsumerGroupSearchCriteria.class);
     }
 
-    public static ConsumerGroupSearchQuery fromJson(String json) {
+    public static ConsumerGroupSearchCriteria fromJson(String json) {
         Validate.notNull(json, "JSON is null");
 
-        return MapperUtils.jsonToBean(json, ConsumerGroupSearchQuery.class);
+        return MapperUtils.jsonToBean(json, ConsumerGroupSearchCriteria.class);
     }
 
     public static class Builder {
@@ -137,7 +137,7 @@ public class ConsumerGroupSearchQuery implements SearchQuery<ConsumerGroupInfo> 
         private StorageType storageType;
         private String description;
 
-        private Builder(ConsumerGroupSearchQuery origin) {
+        private Builder(ConsumerGroupSearchCriteria origin) {
             if (origin == null) {
                 return;
             }
@@ -168,8 +168,8 @@ public class ConsumerGroupSearchQuery implements SearchQuery<ConsumerGroupInfo> 
             return this;
         }
 
-        public ConsumerGroupSearchQuery build() {
-            return new ConsumerGroupSearchQuery(groupName, state, storageType, description);
+        public ConsumerGroupSearchCriteria build() {
+            return new ConsumerGroupSearchCriteria(groupName, state, storageType, description);
         }
 
     }

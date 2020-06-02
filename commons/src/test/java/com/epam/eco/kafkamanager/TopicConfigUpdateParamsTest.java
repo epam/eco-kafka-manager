@@ -67,10 +67,10 @@ public class TopicConfigUpdateParamsTest {
         json.put("attributes", attributes);
         json.put("description", "description");
 
-        TopicConfigUpdateParams query = TopicConfigUpdateParams.fromJson(json);
-        Assert.assertNotNull(query);
-        Assert.assertEquals("topic1", query.getTopicName());
-        Assert.assertEquals(config, query.getConfig());
+        TopicConfigUpdateParams params = TopicConfigUpdateParams.fromJson(json);
+        Assert.assertNotNull(params);
+        Assert.assertEquals("topic1", params.getTopicName());
+        Assert.assertEquals(config, params.getConfig());
     }
 
     @Test
@@ -81,14 +81,14 @@ public class TopicConfigUpdateParamsTest {
                 ", \"config\": {\"config1\":\"value1\",\"config2\":\"value2\",\"config3\":\"value3\"}" +
                 "}";
 
-        TopicConfigUpdateParams query = TopicConfigUpdateParams.fromJson(json);
-        Assert.assertNotNull(query);
-        Assert.assertEquals("topic1", query.getTopicName());
+        TopicConfigUpdateParams params = TopicConfigUpdateParams.fromJson(json);
+        Assert.assertNotNull(params);
+        Assert.assertEquals("topic1", params.getTopicName());
         Map<String, Object> config = new HashMap<>();
         config.put("config1", "value1");
         config.put("config2", "value2");
         config.put("config3", "value3");
-        Assert.assertEquals(config, query.getConfig());
+        Assert.assertEquals(config, params.getConfig());
     }
 
 }

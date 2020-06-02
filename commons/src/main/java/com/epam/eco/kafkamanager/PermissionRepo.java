@@ -26,7 +26,7 @@ import com.epam.eco.kafkamanager.repo.ValueRepo;
 /**
  * @author Andrei_Tytsik
  */
-public interface PermissionRepo extends ValueRepo<PermissionInfo, PermissionSearchQuery> {
+public interface PermissionRepo extends ValueRepo<PermissionInfo, PermissionSearchCriteria> {
 
     @PreAuthorize("@authorizer.isPermitted('PERMISSION', null, 'WRITE')")
     void create(ResourceType resourceType,

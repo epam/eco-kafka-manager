@@ -21,7 +21,7 @@ import com.epam.eco.kafkamanager.repo.KeyValueRepo;
 /**
  * @author Andrei_Tytsik
  */
-public interface UDMetricConfigRepo extends KeyValueRepo<String, UDMetricConfig, UDMetricConfigSearchQuery> {
+public interface UDMetricConfigRepo extends KeyValueRepo<String, UDMetricConfig, UDMetricConfigSearchCriteria> {
 
     void createOrReplace(UDMetricConfig config);
     void remove(String name);

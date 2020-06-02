@@ -38,13 +38,13 @@ import com.epam.eco.kafkamanager.BrokerConfigUpdateParams;
 import com.epam.eco.kafkamanager.BrokerInfo;
 import com.epam.eco.kafkamanager.BrokerMetadataDeleteParams;
 import com.epam.eco.kafkamanager.BrokerMetadataUpdateParams;
-import com.epam.eco.kafkamanager.BrokerSearchQuery;
+import com.epam.eco.kafkamanager.BrokerSearchCriteria;
 import com.epam.eco.kafkamanager.ConsumerGroupDeleteTopicParams;
 import com.epam.eco.kafkamanager.ConsumerGroupInfo;
 import com.epam.eco.kafkamanager.ConsumerGroupMetadataDeleteParams;
 import com.epam.eco.kafkamanager.ConsumerGroupMetadataUpdateParams;
 import com.epam.eco.kafkamanager.ConsumerGroupOffsetResetterTaskExecutor;
-import com.epam.eco.kafkamanager.ConsumerGroupSearchQuery;
+import com.epam.eco.kafkamanager.ConsumerGroupSearchCriteria;
 import com.epam.eco.kafkamanager.ConsumerGroupTopicOffsetFetcherTaskExecutor;
 import com.epam.eco.kafkamanager.KafkaManager;
 import com.epam.eco.kafkamanager.NotFoundException;
@@ -53,7 +53,7 @@ import com.epam.eco.kafkamanager.PermissionDeleteParams;
 import com.epam.eco.kafkamanager.PermissionInfo;
 import com.epam.eco.kafkamanager.PermissionMetadataDeleteParams;
 import com.epam.eco.kafkamanager.PermissionMetadataUpdateParams;
-import com.epam.eco.kafkamanager.PermissionSearchQuery;
+import com.epam.eco.kafkamanager.PermissionSearchCriteria;
 import com.epam.eco.kafkamanager.TopicConfigUpdateParams;
 import com.epam.eco.kafkamanager.TopicCreateParams;
 import com.epam.eco.kafkamanager.TopicInfo;
@@ -64,9 +64,9 @@ import com.epam.eco.kafkamanager.TopicPartitionsCreateParams;
 import com.epam.eco.kafkamanager.TopicPurgerTaskExecutor;
 import com.epam.eco.kafkamanager.TopicRecordCounterTaskExecutor;
 import com.epam.eco.kafkamanager.TopicRecordFetcherTaskExecutor;
-import com.epam.eco.kafkamanager.TopicSearchQuery;
+import com.epam.eco.kafkamanager.TopicSearchCriteria;
 import com.epam.eco.kafkamanager.TransactionInfo;
-import com.epam.eco.kafkamanager.TransactionSearchQuery;
+import com.epam.eco.kafkamanager.TransactionSearchCriteria;
 import com.epam.eco.kafkamanager.rest.request.BrokerConfigRequest;
 import com.epam.eco.kafkamanager.rest.request.MetadataRequest;
 import com.epam.eco.kafkamanager.rest.request.PermissionRequest;
@@ -136,26 +136,26 @@ public class RestKafkaManager implements KafkaManager {
     }
 
     @Override
-    public List<BrokerInfo> getBrokers(BrokerSearchQuery query) {
-        return getBrokerPage(query, PageRequest.of(0, Integer.MAX_VALUE)).getContent();
+    public List<BrokerInfo> getBrokers(BrokerSearchCriteria criteria) {
+        return getBrokerPage(criteria, PageRequest.of(0, Integer.MAX_VALUE)).getContent();
     }
 
     @Override
     public Page<BrokerInfo> getBrokerPage(Pageable pageable) {
-        return getBrokerPage(BrokerSearchQuery.builder().build(), pageable);
+        return getBrokerPage(BrokerSearchCriteria.builder().build(), pageable);
     }
 
     @Override
-    public Page<BrokerInfo> getBrokerPage(BrokerSearchQuery query, Pageable pageable) {
-        Validate.notNull(query, "Query can't be null");
+    public Page<BrokerInfo> getBrokerPage(BrokerSearchCriteria criteria, Pageable pageable) {
+        Validate.notNull(criteria, "Criteria can't be null");
         Validate.notNull(pageable, "Pageable can't be null");
 
         HashMap<String, Object> params = new HashMap<>();
         params.put("page", pageable.getPageNumber());
         params.put("pageSize", pageable.getPageSize());
-        params.put("brokerId", query.getBrokerId());
-        params.put("rack", query.getRack());
-        params.put("description", query.getDescription());
+        params.put("brokerId", criteria.getBrokerId());
+        params.put("rack", criteria.getRack());
+        params.put("description", criteria.getDescription());
 
         UriComponentsBuilder builder = UriComponentsBuilder.fromUriString("/api/brokers");
         for (Map.Entry<String, Object> entry : params.entrySet()) {
@@ -264,34 +264,34 @@ public class RestKafkaManager implements KafkaManager {
     }
 
     @Override
-    public List<TopicInfo> getTopics(TopicSearchQuery query) {
-        return getTopicPage(query, PageRequest.of(0, Integer.MAX_VALUE)).getContent();
+    public List<TopicInfo> getTopics(TopicSearchCriteria criteria) {
+        return getTopicPage(criteria, PageRequest.of(0, Integer.MAX_VALUE)).getContent();
     }
 
     @Override
     public Page<TopicInfo> getTopicPage(Pageable pageable) {
-        return getTopicPage(TopicSearchQuery.builder().build(), pageable);
+        return getTopicPage(TopicSearchCriteria.builder().build(), pageable);
     }
 
     @Override
-    public Page<TopicInfo> getTopicPage(TopicSearchQuery query, Pageable pageable) {
-        Validate.notNull(query, "Query can't be null");
+    public Page<TopicInfo> getTopicPage(TopicSearchCriteria criteria, Pageable pageable) {
+        Validate.notNull(criteria, "Criteria can't be null");
         Validate.notNull(pageable, "Pageable can't be null");
 
         HashMap<String, Object> params = new HashMap<>();
         params.put("page", pageable.getPageNumber());
         params.put("pageSize", pageable.getPageSize());
-        params.put("topicName", query.getTopicName());
-        params.put("minPartitionCount", query.getMinPartitionCount());
-        params.put("minReplicationFactor", query.getMinReplicationFactor());
-        params.put("maxReplicationFactor", query.getMaxReplicationFactor());
-        params.put("minConsumerCount", query.getMinConsumerCount());
-        params.put("maxConsumerCount", query.getMaxConsumerCount());
-        params.put("maxPartitionCount", query.getMaxPartitionCount());
-        params.put("replicationState", query.getReplicationState());
-        params.put("configString", query.getConfigString());
-        params.put("configMap", query.getConfigMap());
-        params.put("description", query.getDescription());
+        params.put("topicName", criteria.getTopicName());
+        params.put("minPartitionCount", criteria.getMinPartitionCount());
+        params.put("minReplicationFactor", criteria.getMinReplicationFactor());
+        params.put("maxReplicationFactor", criteria.getMaxReplicationFactor());
+        params.put("minConsumerCount", criteria.getMinConsumerCount());
+        params.put("maxConsumerCount", criteria.getMaxConsumerCount());
+        params.put("maxPartitionCount", criteria.getMaxPartitionCount());
+        params.put("replicationState", criteria.getReplicationState());
+        params.put("configString", criteria.getConfigString());
+        params.put("configMap", criteria.getConfigMap());
+        params.put("description", criteria.getDescription());
 
         UriComponentsBuilder builder = UriComponentsBuilder.fromUriString("/api/topics");
         for (Map.Entry<String, Object> entry : params.entrySet()) {
@@ -474,28 +474,26 @@ public class RestKafkaManager implements KafkaManager {
     }
 
     @Override
-    public List<ConsumerGroupInfo> getConsumerGroups(ConsumerGroupSearchQuery query) {
-        return getConsumerGroupPage(
-                ConsumerGroupSearchQuery.builder().build(),
-                PageRequest.of(0, Integer.MAX_VALUE)).getContent();
+    public List<ConsumerGroupInfo> getConsumerGroups(ConsumerGroupSearchCriteria criteria) {
+        return getConsumerGroupPage(criteria, PageRequest.of(0, Integer.MAX_VALUE)).getContent();
     }
 
     @Override
     public Page<ConsumerGroupInfo> getConsumerGroupPage(Pageable pageable) {
-        return getConsumerGroupPage(ConsumerGroupSearchQuery.builder().build(), pageable);
+        return getConsumerGroupPage(ConsumerGroupSearchCriteria.builder().build(), pageable);
     }
 
     @Override
-    public Page<ConsumerGroupInfo> getConsumerGroupPage(ConsumerGroupSearchQuery query, Pageable pageable) {
-        Validate.notNull(query, "Query can't be null");
+    public Page<ConsumerGroupInfo> getConsumerGroupPage(ConsumerGroupSearchCriteria criteria, Pageable pageable) {
+        Validate.notNull(criteria, "Criteria can't be null");
         Validate.notNull(pageable, "Pageable can't be null");
 
         HashMap<String, Object> params = new HashMap<>();
         params.put("page", pageable.getPageNumber());
         params.put("pageSize", pageable.getPageSize());
-        params.put("groupName", query.getGroupName());
-        params.put("storageType", query.getStorageType());
-        params.put("description", query.getDescription());
+        params.put("groupName", criteria.getGroupName());
+        params.put("storageType", criteria.getStorageType());
+        params.put("description", criteria.getDescription());
 
         UriComponentsBuilder builder = UriComponentsBuilder.fromUriString("/api/consumer-groups");
         for (Map.Entry<String, Object> entry : params.entrySet()) {
@@ -615,30 +613,30 @@ public class RestKafkaManager implements KafkaManager {
     }
 
     @Override
-    public List<PermissionInfo> getPermissions(PermissionSearchQuery query) {
-        return getPermissionPage(query, PageRequest.of(0, Integer.MAX_VALUE)).getContent();
+    public List<PermissionInfo> getPermissions(PermissionSearchCriteria criteria) {
+        return getPermissionPage(criteria, PageRequest.of(0, Integer.MAX_VALUE)).getContent();
     }
 
     @Override
     public Page<PermissionInfo> getPermissionPage(Pageable pageable) {
-        return getPermissionPage(PermissionSearchQuery.builder().build(), pageable);
+        return getPermissionPage(PermissionSearchCriteria.builder().build(), pageable);
     }
 
     @Override
-    public Page<PermissionInfo> getPermissionPage(PermissionSearchQuery query, Pageable pageable) {
-        Validate.notNull(query, "Query can't be null");
+    public Page<PermissionInfo> getPermissionPage(PermissionSearchCriteria criteria, Pageable pageable) {
+        Validate.notNull(criteria, "Criteria can't be null");
         Validate.notNull(pageable, "Pageable can't be null");
 
         HashMap<String, Object> params = new HashMap<>();
         params.put("page", pageable.getPageNumber());
         params.put("pageSize", pageable.getPageSize());
-        params.put("resourceName", query.getResourceName());
-        params.put("resourceType", query.getResourceType());
-        params.put("kafkaPrincipal", query.getKafkaPrincipal());
-        params.put("host", query.getHost());
-        params.put("operation", query.getOperation());
-        params.put("permissionType", query.getPermissionType());
-        params.put("description", query.getDescription());
+        params.put("resourceName", criteria.getResourceName());
+        params.put("resourceType", criteria.getResourceType());
+        params.put("kafkaPrincipal", criteria.getKafkaPrincipal());
+        params.put("host", criteria.getHost());
+        params.put("operation", criteria.getOperation());
+        params.put("permissionType", criteria.getPermissionType());
+        params.put("description", criteria.getDescription());
 
         UriComponentsBuilder builder = UriComponentsBuilder.fromUriString("/api/permissions");
         for (Map.Entry<String, Object> entry : params.entrySet()) {
@@ -764,28 +762,28 @@ public class RestKafkaManager implements KafkaManager {
     }
 
     @Override
-    public List<TransactionInfo> getTransactions(TransactionSearchQuery query) {
-        return getTransactionPage(query, PageRequest.of(0, Integer.MAX_VALUE)).getContent();
+    public List<TransactionInfo> getTransactions(TransactionSearchCriteria criteria) {
+        return getTransactionPage(criteria, PageRequest.of(0, Integer.MAX_VALUE)).getContent();
     }
 
     @Override
     public Page<TransactionInfo> getTransactionPage(Pageable pageable) {
-        return getTransactionPage(TransactionSearchQuery.builder().build(), pageable);
+        return getTransactionPage(TransactionSearchCriteria.builder().build(), pageable);
     }
 
     @Override
     public Page<TransactionInfo> getTransactionPage(
-            TransactionSearchQuery query,
+            TransactionSearchCriteria criteria,
             Pageable pageable) {
-        Validate.notNull(query, "Query can't be null");
+        Validate.notNull(criteria, "Criteria can't be null");
         Validate.notNull(pageable, "Pageable can't be null");
 
         HashMap<String, Object> params = new HashMap<>();
         params.put("page", pageable.getPageNumber());
         params.put("pageSize", pageable.getPageSize());
-        params.put("transactionId", query.getTransactionalId());
-        params.put("topicName", query.getTopicName());
-        params.put("state", query.getState());
+        params.put("transactionId", criteria.getTransactionalId());
+        params.put("topicName", criteria.getTopicName());
+        params.put("state", criteria.getState());
 
         UriComponentsBuilder builder = UriComponentsBuilder.fromUriString("/api/transactions");
         for (Map.Entry<String, Object> entry : params.entrySet()) {

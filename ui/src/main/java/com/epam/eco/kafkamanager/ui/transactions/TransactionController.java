@@ -29,7 +29,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import com.epam.eco.kafkamanager.KafkaManager;
 import com.epam.eco.kafkamanager.TransactionInfo;
-import com.epam.eco.kafkamanager.TransactionSearchQuery;
+import com.epam.eco.kafkamanager.TransactionSearchCriteria;
 
 /**
  * @author Andrei_Tytsik
@@ -42,7 +42,7 @@ public class TransactionController {
 
     public static final String ATTR_TRANSACTION = "transaction";
     public static final String ATTR_PAGE = "page";
-    public static final String ATTR_SEARCH_QUERY = "searchQuery";
+    public static final String ATTR_SEARCH_CRITERIA = "searchCriteria";
     public static final String ATTR_TOTAL_COUNT = "totalCount";
 
     public static final String MAPPING_TRANSACTIONS = "/transactions";
@@ -58,14 +58,14 @@ public class TransactionController {
             @RequestParam(required=false) Integer page,
             @RequestParam Map<String, Object> paramsMap,
             Model model) {
-        TransactionSearchQuery searchQuery = TransactionSearchQuery.fromJson(paramsMap);
+        TransactionSearchCriteria searchCriteria = TransactionSearchCriteria.fromJson(paramsMap);
         page = page != null && page > 0 ? page -1 : 0;
 
         Page<TransactionInfo> transactionPage = kafkaManager.getTransactionPage(
-                searchQuery,
+                searchCriteria,
                 PageRequest.of(page, PAGE_SIZE));
 
-        model.addAttribute(ATTR_SEARCH_QUERY, searchQuery);
+        model.addAttribute(ATTR_SEARCH_CRITERIA, searchCriteria);
         model.addAttribute(ATTR_PAGE, wrap(transactionPage));
         model.addAttribute(ATTR_TOTAL_COUNT, kafkaManager.getTransactionCount());
 

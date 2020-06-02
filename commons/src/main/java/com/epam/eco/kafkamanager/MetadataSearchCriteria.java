@@ -18,7 +18,7 @@ package com.epam.eco.kafkamanager;
 /**
  * @author Andrei_Tytsik
  */
-public class MetadataSearchQuery implements SearchQuery<Metadata> {
+public class MetadataSearchCriteria implements SearchCriteria<Metadata> {
 
     @Override
     public boolean matches(Metadata obj) {

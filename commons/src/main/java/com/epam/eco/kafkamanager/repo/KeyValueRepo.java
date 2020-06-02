@@ -17,12 +17,12 @@ package com.epam.eco.kafkamanager.repo;
 
 import java.util.List;
 
-import com.epam.eco.kafkamanager.SearchQuery;
+import com.epam.eco.kafkamanager.SearchCriteria;
 
 /**
  * @author Andrei_Tytsik
  */
-public interface KeyValueRepo<K, V, Q extends SearchQuery<V>> extends ValueRepo<V, Q>  {
+public interface KeyValueRepo<K, V, SC extends SearchCriteria<V>> extends ValueRepo<V, SC>  {
     boolean contains(K key);
     V get(K key);
     List<V> values(List<K> keys);

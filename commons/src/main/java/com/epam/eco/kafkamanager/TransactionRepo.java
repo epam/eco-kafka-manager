@@ -22,7 +22,7 @@ import com.epam.eco.kafkamanager.repo.KeyValueRepo;
 /**
  * @author Andrei_Tytsik
  */
-public interface TransactionRepo extends KeyValueRepo<String, TransactionInfo, TransactionSearchQuery> {
+public interface TransactionRepo extends KeyValueRepo<String, TransactionInfo, TransactionSearchCriteria> {
 
     List<TransactionInfo> transactionsForTopic(String topicName);
 

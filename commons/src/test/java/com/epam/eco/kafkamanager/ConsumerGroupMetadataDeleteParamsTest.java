@@ -53,9 +53,9 @@ public class ConsumerGroupMetadataDeleteParamsTest {
         Map<String, Object> json = new HashMap<>();
         json.put("groupName", "group1");
 
-        ConsumerGroupMetadataDeleteParams query = ConsumerGroupMetadataDeleteParams.fromJson(json);
-        Assert.assertNotNull(query);
-        Assert.assertEquals("group1", query.getGroupName());
+        ConsumerGroupMetadataDeleteParams params = ConsumerGroupMetadataDeleteParams.fromJson(json);
+        Assert.assertNotNull(params);
+        Assert.assertEquals("group1", params.getGroupName());
     }
 
     @Test
@@ -65,9 +65,9 @@ public class ConsumerGroupMetadataDeleteParamsTest {
                 "\"groupName\": \"group1\"" +
                 "}";
 
-        ConsumerGroupMetadataDeleteParams query = ConsumerGroupMetadataDeleteParams.fromJson(json);
-        Assert.assertNotNull(query);
-        Assert.assertEquals("group1", query.getGroupName());
+        ConsumerGroupMetadataDeleteParams params = ConsumerGroupMetadataDeleteParams.fromJson(json);
+        Assert.assertNotNull(params);
+        Assert.assertEquals("group1", params.getGroupName());
     }
 
 }

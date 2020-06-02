@@ -79,14 +79,14 @@
                             class="form-control" 
                             id="groupName" 
                             placeholder="Group Name"
-                            th:value="${searchQuery.groupName}"/>
+                            th:value="${searchCriteria.groupName}"/>
                         <select title="State" class="form-control" id="state">
                             <option value="">-</option>
                             <option 
                                 th:each="state : ${T(org.apache.kafka.common.ConsumerGroupState).values()}"
                                 th:value="${state.name()}" 
                                 th:text="${state}"
-                                th:selected="${state == searchQuery.state}">
+                                th:selected="${state == searchCriteria.state}">
                             </option>
                         </select>
                         <select title="Storage Type" class="form-control" id="storageType">
@@ -95,7 +95,7 @@
                                 th:each="type : ${T(com.epam.eco.kafkamanager.ConsumerGroupInfo$StorageType).values()}"
                                 th:value="${type}" 
                                 th:text="${type}"
-                                th:selected="${type == searchQuery.storageType}">
+                                th:selected="${type == searchCriteria.storageType}">
                             </option>
                         </select>
                         <input 
@@ -103,7 +103,7 @@
                             class="form-control"
                             id="description" 
                             placeholder="Description"
-                            th:value="${searchQuery.description}"/>
+                            th:value="${searchCriteria.description}"/>
                         <button 
                             type="submit"
                             class="btn btn-primary">

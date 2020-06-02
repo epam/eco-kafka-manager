@@ -32,7 +32,7 @@ public interface UDMetricManager {
     void remove(String name);
     UDMetric get(String name);
     Page<UDMetric> page(Pageable pageable);
-    Page<UDMetric> page(UDMetricSearchQuery query, Pageable pageable);
+    Page<UDMetric> page(UDMetricSearchCriteria criteria, Pageable pageable);
     List<UDMetric> listAll();
     int getCount();
 }

@@ -53,9 +53,9 @@ public class TopicMetadataDeleteParamsTest {
         Map<String, Object> json = new HashMap<>();
         json.put("topicName", "topic1");
 
-        TopicMetadataDeleteParams query = TopicMetadataDeleteParams.fromJson(json);
-        Assert.assertNotNull(query);
-        Assert.assertEquals("topic1", query.getTopicName());
+        TopicMetadataDeleteParams params = TopicMetadataDeleteParams.fromJson(json);
+        Assert.assertNotNull(params);
+        Assert.assertEquals("topic1", params.getTopicName());
     }
 
     @Test
@@ -65,9 +65,9 @@ public class TopicMetadataDeleteParamsTest {
                 "\"topicName\": \"topic1\"" +
                 "}";
 
-        TopicMetadataDeleteParams query = TopicMetadataDeleteParams.fromJson(json);
-        Assert.assertNotNull(query);
-        Assert.assertEquals("topic1", query.getTopicName());
+        TopicMetadataDeleteParams params = TopicMetadataDeleteParams.fromJson(json);
+        Assert.assertNotNull(params);
+        Assert.assertEquals("topic1", params.getTopicName());
     }
 
 }

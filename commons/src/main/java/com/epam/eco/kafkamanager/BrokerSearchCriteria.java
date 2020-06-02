@@ -28,13 +28,13 @@ import com.epam.eco.kafkamanager.utils.MapperUtils;
 /**
  * @author Andrei_Tytsik
  */
-public class BrokerSearchQuery implements SearchQuery<BrokerInfo> {
+public class BrokerSearchCriteria implements SearchCriteria<BrokerInfo> {
 
     private final Integer brokerId;
     private final String rack;
     private final String description;
 
-    public BrokerSearchQuery(
+    public BrokerSearchCriteria(
             @JsonProperty("brokerId") Integer brokerId,
             @JsonProperty("rack") String rack,
             @JsonProperty("description") String description) {
@@ -74,7 +74,7 @@ public class BrokerSearchQuery implements SearchQuery<BrokerInfo> {
         if (obj == null || getClass() != obj.getClass()) {
             return false;
         }
-        BrokerSearchQuery that = (BrokerSearchQuery) obj;
+        BrokerSearchCriteria that = (BrokerSearchCriteria) obj;
         return
                 Objects.equals(this.brokerId, that.brokerId) &&
                 Objects.equals(this.rack, that.rack) &&
@@ -103,20 +103,20 @@ public class BrokerSearchQuery implements SearchQuery<BrokerInfo> {
         return builder(null);
     }
 
-    public static Builder builder(BrokerSearchQuery origin) {
+    public static Builder builder(BrokerSearchCriteria origin) {
         return new Builder(origin);
     }
 
-    public static BrokerSearchQuery fromJson(Map<String, ?> map) {
+    public static BrokerSearchCriteria fromJson(Map<String, ?> map) {
         Validate.notNull(map, "JSON map is null");
 
-        return MapperUtils.convert(map, BrokerSearchQuery.class);
+        return MapperUtils.convert(map, BrokerSearchCriteria.class);
     }
 
-    public static BrokerSearchQuery fromJson(String json) {
+    public static BrokerSearchCriteria fromJson(String json) {
         Validate.notNull(json, "JSON is null");
 
-        return MapperUtils.jsonToBean(json, BrokerSearchQuery.class);
+        return MapperUtils.jsonToBean(json, BrokerSearchCriteria.class);
     }
 
     public static class Builder {
@@ -125,7 +125,7 @@ public class BrokerSearchQuery implements SearchQuery<BrokerInfo> {
         private String rack;
         private String description;
 
-        private Builder(BrokerSearchQuery origin) {
+        private Builder(BrokerSearchCriteria origin) {
             if (origin == null) {
                 return;
             }
@@ -150,8 +150,8 @@ public class BrokerSearchQuery implements SearchQuery<BrokerInfo> {
             return this;
         }
 
-        public BrokerSearchQuery build() {
-            return new BrokerSearchQuery(brokerId, rack, description);
+        public BrokerSearchCriteria build() {
+            return new BrokerSearchCriteria(brokerId, rack, description);
         }
 
     }

@@ -76,7 +76,7 @@
                             class="form-control" 
                             id="transactionalId" 
                             placeholder="Transactional Id"
-                            th:value="${searchQuery.transactionalId}"/>
+                            th:value="${searchCriteria.transactionalId}"/>
 
                         <select title="State" class="form-control" id="state">
                             <option value="">-</option>
@@ -84,7 +84,7 @@
                                 th:each="state : ${T(com.epam.eco.commons.kafka.TransactionState).values()}"
                                 th:value="${state}" 
                                 th:text="${state}"
-                                th:selected="${state == searchQuery.state}">
+                                th:selected="${state == searchCriteria.state}">
                             </option>
                         </select>
 
@@ -93,7 +93,7 @@
                             class="form-control" 
                             id="topicName" 
                             placeholder="Topic Name"
-                            th:value="${searchQuery.topicName}"
+                            th:value="${searchCriteria.topicName}"
                         />
 
                         <button

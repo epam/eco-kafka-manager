@@ -13,7 +13,7 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package com.epam.eco.kafkamanager.udmetrics;
+package com.epam.eco.kafkamanager;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -23,20 +23,19 @@ import org.junit.Test;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import com.epam.eco.kafkamanager.udmetrics.UDMetricSearchQuery.Status;
-import com.epam.eco.kafkamanager.udmetrics.utils.TestObjectMapperSingleton;
+import com.epam.eco.kafkamanager.utils.TestObjectMapperSingleton;
 
 /**
  * @author Andrei_Tytsik
  */
-public class UDMetricSearchQueryTest {
+public class BrokerSearchCriteriaTest {
 
     @Test
     public void testSerializedToJsonAndBack() throws Exception {
-        UDMetricSearchQuery origin = UDMetricSearchQuery.builder().
-                type(UDMetricType.TOPIC_OFFSET_INCREASE).
-                resourceName("resource1").
-                status(Status.OK).
+        BrokerSearchCriteria origin = BrokerSearchCriteria.builder().
+                brokerId(42).
+                rack("default").
+                description("description").
                 build();
 
         ObjectMapper mapper = TestObjectMapperSingleton.getObjectMapper();
@@ -44,9 +43,9 @@ public class UDMetricSearchQueryTest {
         String json = mapper.writeValueAsString(origin);
         Assert.assertNotNull(json);
 
-        UDMetricSearchQuery deserialized = mapper.readValue(
+        BrokerSearchCriteria deserialized = mapper.readValue(
                 json,
-                UDMetricSearchQuery.class);
+                BrokerSearchCriteria.class);
         Assert.assertNotNull(deserialized);
         Assert.assertEquals(origin, deserialized);
     }
@@ -54,31 +53,31 @@ public class UDMetricSearchQueryTest {
     @Test
     public void testDeserializedFromJson1() throws Exception {
         Map<String, Object> json = new HashMap<>();
-        json.put("type", "CONSUMER_GROUP_LAG");
-        json.put("resourceName", "resource3");
-        json.put("status", "OK");
+        json.put("brokerId", "42");
+        json.put("rack", "default");
+        json.put("description", "description");
 
-        UDMetricSearchQuery query = UDMetricSearchQuery.fromJson(json);
-        Assert.assertNotNull(query);
-        Assert.assertEquals(UDMetricType.CONSUMER_GROUP_LAG, query.getType());
-        Assert.assertEquals("resource3", query.getResourceName());
-        Assert.assertEquals(Status.OK, query.getStatus());
+        BrokerSearchCriteria criteria = BrokerSearchCriteria.fromJson(json);
+        Assert.assertNotNull(criteria);
+        Assert.assertEquals(Integer.valueOf(42), criteria.getBrokerId());
+        Assert.assertEquals("default", criteria.getRack());
+        Assert.assertEquals("description", criteria.getDescription());
     }
 
     @Test
     public void testDeserializedFromJson2() throws Exception {
         String json =
                 "{" +
-                "\"type\": \"CONSUMER_GROUP_LAG\"" +
-                ", \"resourceName\": \"resource3\"" +
-                ", \"status\": \"FAILED\"" +
+                "\"brokerId\": 42" +
+                ", \"rack\": \"default\"" +
+                ", \"description\": \"description\"" +
                 "}";
 
-        UDMetricSearchQuery query = UDMetricSearchQuery.fromJson(json);
-        Assert.assertNotNull(query);
-        Assert.assertEquals(UDMetricType.CONSUMER_GROUP_LAG, query.getType());
-        Assert.assertEquals("resource3", query.getResourceName());
-        Assert.assertEquals(Status.FAILED, query.getStatus());
+        BrokerSearchCriteria criteria = BrokerSearchCriteria.fromJson(json);
+        Assert.assertNotNull(criteria);
+        Assert.assertEquals(Integer.valueOf(42), criteria.getBrokerId());
+        Assert.assertEquals("default", criteria.getRack());
+        Assert.assertEquals("description", criteria.getDescription());
     }
 
 }
