@@ -135,8 +135,8 @@ public class KafkaManagerImpl implements KafkaManager {
     }
 
     @Override
-    public Page<BrokerInfo> getBrokerPage(BrokerSearchCriteria query, Pageable pageable) {
-        return brokerRepo.page(query, pageable);
+    public Page<BrokerInfo> getBrokerPage(BrokerSearchCriteria criteria, Pageable pageable) {
+        return brokerRepo.page(criteria, pageable);
     }
 
     @SuppressWarnings("unchecked")
