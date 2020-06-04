@@ -28,8 +28,8 @@ import com.epam.eco.kafkamanager.exec.TaskResult;
 /**
  * @author Andrei_Tytsik
  */
-@Deprecated
-public interface TopicOffsetFetcherTaskExecutor extends AsyncStatefullTaskExecutor<String, Map<TopicPartition, OffsetRange>> {
+public interface TopicOffsetRangeFetcherTaskExecutor extends
+        AsyncStatefullTaskExecutor<String, Map<TopicPartition, OffsetRange>> {
 
     @Override
     Map<TopicPartition, OffsetRange> execute(String topicName);

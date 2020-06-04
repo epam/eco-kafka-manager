@@ -32,10 +32,10 @@ import org.apache.kafka.common.TopicPartition;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.epam.eco.commons.kafka.OffsetRange;
-import com.epam.eco.commons.kafka.helpers.TopicOffsetFetcher;
+import com.epam.eco.commons.kafka.helpers.TopicOffsetRangeFetcher;
 import com.epam.eco.kafkamanager.KafkaManager;
 import com.epam.eco.kafkamanager.OffsetTimeSeries;
-import com.epam.eco.kafkamanager.TopicOffsetFetcherTaskExecutor;
+import com.epam.eco.kafkamanager.TopicOffsetRangeFetcherTaskExecutor;
 import com.epam.eco.kafkamanager.core.autoconfigure.KafkaManagerProperties;
 import com.epam.eco.kafkamanager.exec.AbstractAsyncStatefullTaskExecutor;
 import com.epam.eco.kafkamanager.exec.TaskResult;
@@ -44,8 +44,9 @@ import com.epam.eco.kafkamanager.exec.TaskResult;
  * @author Andrei_Tytsik
  *
  */
-@Deprecated
-public class TopicOffsetFetcherTaskExecutorImpl extends AbstractAsyncStatefullTaskExecutor<String, Map<TopicPartition, OffsetRange>> implements TopicOffsetFetcherTaskExecutor {
+public class TopicOffsetRangeFetcherTaskExecutorImpl extends
+        AbstractAsyncStatefullTaskExecutor<String, Map<TopicPartition, OffsetRange>> implements
+        TopicOffsetRangeFetcherTaskExecutor {
 
     @Autowired
     private KafkaManager kafkaManager;
@@ -55,11 +56,11 @@ public class TopicOffsetFetcherTaskExecutorImpl extends AbstractAsyncStatefullTa
     private final Map<String, Map<TopicPartition, OffsetTimeSeries>> offsetTimeSeries =
             new ConcurrentHashMap<>();
 
-    public TopicOffsetFetcherTaskExecutorImpl(CacheManager cacheManager) {
+    public TopicOffsetRangeFetcherTaskExecutorImpl(CacheManager cacheManager) {
         super(cacheManager);
     }
 
-    public TopicOffsetFetcherTaskExecutorImpl(ExecutorService executor, CacheManager cacheManager) {
+    public TopicOffsetRangeFetcherTaskExecutorImpl(ExecutorService executor, CacheManager cacheManager) {
         super(executor, cacheManager);
     }
 
@@ -74,7 +75,7 @@ public class TopicOffsetFetcherTaskExecutorImpl extends AbstractAsyncStatefullTa
             // sanity check just for case topic doesn't exist
             kafkaManager.getTopic(topicName);
 
-            return TopicOffsetFetcher.
+            return TopicOffsetRangeFetcher.
                     with(properties.getCommonConsumerConfig()).
                     fetchForTopics(topicName);
         });
@@ -90,10 +91,10 @@ public class TopicOffsetFetcherTaskExecutorImpl extends AbstractAsyncStatefullTa
                 offsetTimeSeries.get(topicName);
         return
                 topicTimeSeries != null ?
-                topicTimeSeries.entrySet().stream().collect(Collectors.toMap(
-                        Entry::getKey,
-                        e -> e.getValue().unmodifiableCopy())) :
-                Collections.emptyMap();
+                        topicTimeSeries.entrySet().stream().collect(Collectors.toMap(
+                                Entry::getKey,
+                                e -> e.getValue().unmodifiableCopy())) :
+                        Collections.emptyMap();
     }
 
     private void updateOffsetTimeSeries(

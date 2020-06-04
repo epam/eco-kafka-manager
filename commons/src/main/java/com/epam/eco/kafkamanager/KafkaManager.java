@@ -50,7 +50,10 @@ public interface KafkaManager {
     TopicInfo updateTopic(TopicMetadataDeleteParams params);
     void deleteTopic(String topicName);
     TopicRecordCounterTaskExecutor getTopicRecordCounterTaskExecutor();
+    @Deprecated
     TopicOffsetFetcherTaskExecutor getTopicOffsetFetcherTaskExecutor();
+    TopicOffsetRangeFetcherTaskExecutor getTopicOffsetRangeFetcherTaskExecutor();
+    TopicOffsetForTimeFetcherTaskExecutor getTopicOffsetForTimeFetcherTaskExecutor();
     TopicPurgerTaskExecutor getTopicPurgerTaskExecutor();
     <K, V> TopicRecordFetcherTaskExecutor<K, V> getTopicRecordFetcherTaskExecutor();
 

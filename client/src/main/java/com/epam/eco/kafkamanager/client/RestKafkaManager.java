@@ -64,6 +64,8 @@ import com.epam.eco.kafkamanager.TopicPartitionsCreateParams;
 import com.epam.eco.kafkamanager.TopicPurgerTaskExecutor;
 import com.epam.eco.kafkamanager.TopicRecordCounterTaskExecutor;
 import com.epam.eco.kafkamanager.TopicRecordFetcherTaskExecutor;
+import com.epam.eco.kafkamanager.TopicOffsetForTimeFetcherTaskExecutor;
+import com.epam.eco.kafkamanager.TopicOffsetRangeFetcherTaskExecutor;
 import com.epam.eco.kafkamanager.TopicSearchCriteria;
 import com.epam.eco.kafkamanager.TransactionInfo;
 import com.epam.eco.kafkamanager.TransactionSearchCriteria;
@@ -88,6 +90,11 @@ public class RestKafkaManager implements KafkaManager {
 
     @Autowired
     private TopicOffsetFetcherTaskExecutor topicOffsetFetcherTaskExecutor;
+
+    @Autowired
+    private TopicOffsetRangeFetcherTaskExecutor topicOffsetRangeFetcherTaskExecutor;
+    @Autowired
+    private TopicOffsetForTimeFetcherTaskExecutor topicOffsetForTimeFetcherTaskExecutor;
 
     @Autowired
     private TopicPurgerTaskExecutor topicPurgerTaskExecutor;
@@ -419,9 +426,20 @@ public class RestKafkaManager implements KafkaManager {
         return topicRecordCounterTaskExecutor;
     }
 
+    @Deprecated
     @Override
     public TopicOffsetFetcherTaskExecutor getTopicOffsetFetcherTaskExecutor() {
         return topicOffsetFetcherTaskExecutor;
+    }
+
+    @Override
+    public TopicOffsetRangeFetcherTaskExecutor getTopicOffsetRangeFetcherTaskExecutor() {
+        return topicOffsetRangeFetcherTaskExecutor;
+    }
+
+    @Override
+    public TopicOffsetForTimeFetcherTaskExecutor getTopicOffsetForTimeFetcherTaskExecutor() {
+        return topicOffsetForTimeFetcherTaskExecutor;
     }
 
     @Override
