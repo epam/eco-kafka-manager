@@ -24,11 +24,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
  * @author Andrei_Tytsik
- *
- * @deprecated use {@link TopicRecordFetchParams} instead
  */
-@Deprecated
-public class RecordFetchRequest {
+public class TopicRecordFetchParams {
 
     public static final long MIN_LIMIT = 1;
     public static final long MAX_LIMIT = 100;
@@ -39,7 +36,7 @@ public class RecordFetchRequest {
     private final Long timeoutInMs;
     private final Long limit;
 
-    public RecordFetchRequest(
+    public TopicRecordFetchParams(
             @JsonProperty("keyDataFormat") DataFormat keyDataFormat,
             @JsonProperty("valueDataFormat") DataFormat valueDataFormat,
             @JsonProperty("offsets") Map<Integer, Long> offsets,

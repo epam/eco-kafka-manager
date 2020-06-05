@@ -117,7 +117,7 @@ public class TopicPartitionOffsetIncreaseMetric implements Metric, ScheduleCalcu
 
     private OffsetRange getTopicOffsetRange() {
         TaskResult<Map<TopicPartition, OffsetRange>> currentResult =
-                kafkaManager.getTopicOffsetFetcherTaskExecutor().
+                kafkaManager.getTopicOffsetRangeFetcherTaskExecutor().
                 getResult(topicPartition.topic()).
                 orElse(null);
         return
@@ -127,7 +127,7 @@ public class TopicPartitionOffsetIncreaseMetric implements Metric, ScheduleCalcu
     }
 
     private void prefetchTopicOffsets() {
-        kafkaManager.getTopicOffsetFetcherTaskExecutor().submit(topicPartition.topic());
+        kafkaManager.getTopicOffsetRangeFetcherTaskExecutor().submit(topicPartition.topic());
     }
 
     private boolean checkTopicExists() {

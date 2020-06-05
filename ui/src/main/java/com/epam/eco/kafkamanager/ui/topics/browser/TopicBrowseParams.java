@@ -26,13 +26,13 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.collections4.ListUtils;
 
-import com.epam.eco.kafkamanager.RecordFetchRequest;
-import com.epam.eco.kafkamanager.RecordFetchRequest.DataFormat;
+import com.epam.eco.kafkamanager.TopicRecordFetchParams;
+import com.epam.eco.kafkamanager.TopicRecordFetchParams.DataFormat;
 
 /**
  * @author Andrei_Tytsik
  */
-public class RecordFetchParams extends HashMap<String, Object> {
+public class TopicBrowseParams extends HashMap<String, Object> {
 
     private static final long serialVersionUID = 1L;
 
@@ -48,7 +48,7 @@ public class RecordFetchParams extends HashMap<String, Object> {
     private static final Pattern PARTITION_OFFSET_PATTERN = Pattern.compile("^p_(0|[1-9]\\d*)$");
     private static final Pattern COLUMN_ENABLED_PATTERN = Pattern.compile("^ce_(.+)$");
 
-    public RecordFetchParams(Map<String, Object> requestParams) {
+    public TopicBrowseParams(Map<String, Object> requestParams) {
         if (requestParams != null) {
             putAll(requestParams);
         }
@@ -138,7 +138,7 @@ public class RecordFetchParams extends HashMap<String, Object> {
 
     public long getLimit() {
         Long limit = getAsLong(LIMIT);
-        return limit != null ? limit : RecordFetchRequest.MAX_LIMIT;
+        return limit != null ? limit : TopicRecordFetchParams.MAX_LIMIT;
     }
 
     public void setLimit(long limit) {
@@ -302,8 +302,8 @@ public class RecordFetchParams extends HashMap<String, Object> {
         return matcher.group(1);
     }
 
-    public static RecordFetchParams with(Map<String, Object> requestParams) {
-        return new RecordFetchParams(requestParams);
+    public static TopicBrowseParams with(Map<String, Object> requestParams) {
+        return new TopicBrowseParams(requestParams);
     }
 
 }

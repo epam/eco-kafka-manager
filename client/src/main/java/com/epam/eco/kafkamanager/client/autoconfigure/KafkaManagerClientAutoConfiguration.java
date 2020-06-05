@@ -52,14 +52,16 @@ import com.epam.eco.kafkamanager.ConsumerGroupOffsetResetterTaskExecutor;
 import com.epam.eco.kafkamanager.ConsumerGroupTopicOffsetFetcherTaskExecutor;
 import com.epam.eco.kafkamanager.KafkaManager;
 import com.epam.eco.kafkamanager.NotFoundException;
-import com.epam.eco.kafkamanager.TopicOffsetFetcherTaskExecutor;
+import com.epam.eco.kafkamanager.TopicOffsetForTimeFetcherTaskExecutor;
+import com.epam.eco.kafkamanager.TopicOffsetRangeFetcherTaskExecutor;
 import com.epam.eco.kafkamanager.TopicPurgerTaskExecutor;
 import com.epam.eco.kafkamanager.TopicRecordCounterTaskExecutor;
 import com.epam.eco.kafkamanager.TopicRecordFetcherTaskExecutor;
 import com.epam.eco.kafkamanager.client.RestKafkaManager;
 import com.epam.eco.kafkamanager.client.consumer.exec.RestConsumerGroupOffsetResetterTaskExecutor;
 import com.epam.eco.kafkamanager.client.consumer.exec.RestConsumerGroupTopicOffsetFetcherTaskExecutor;
-import com.epam.eco.kafkamanager.client.topic.exec.RestTopicOffsetFetcherTaskExecutor;
+import com.epam.eco.kafkamanager.client.topic.exec.RestTopicOffsetForTimeFetcherTaskExecutor;
+import com.epam.eco.kafkamanager.client.topic.exec.RestTopicOffsetRangeFetcherTaskExecutor;
 import com.epam.eco.kafkamanager.client.topic.exec.RestTopicPurgerTaskExecutor;
 import com.epam.eco.kafkamanager.client.topic.exec.RestTopicRecordCounterTaskExecutor;
 import com.epam.eco.kafkamanager.client.topic.exec.RestTopicRecordFetcherTaskExecutor;
@@ -113,8 +115,13 @@ public class KafkaManagerClientAutoConfiguration {
     }
 
     @Bean
-    public TopicOffsetFetcherTaskExecutor topicOffsetFetcherTaskExecutor() {
-        return new RestTopicOffsetFetcherTaskExecutor(cacheManager());
+    public TopicOffsetRangeFetcherTaskExecutor topicOffsetRangeFetcherTaskExecutor() {
+        return new RestTopicOffsetRangeFetcherTaskExecutor(cacheManager());
+    }
+
+    @Bean
+    public TopicOffsetForTimeFetcherTaskExecutor topicOffsetForTimeRangeFetcherTaskExecutor() {
+        return new RestTopicOffsetForTimeFetcherTaskExecutor();
     }
 
     @Bean

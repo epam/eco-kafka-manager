@@ -24,7 +24,7 @@
         
         /*<![CDATA[*/
         var nextOffsets = [[${nextOffsets}]];
-        var fetchedValueFormat = [[${fetchParams.getValueFormat() != null ? fetchParams.getValueFormat().name() : null}]];
+        var fetchedValueFormat = [[${browseParams.getValueFormat() != null ? browseParams.getValueFormat().name() : null}]];
         /*]]>*/
 
         $(function() {
@@ -116,7 +116,7 @@
                     <div class="panel panel-default">
                         <div class="panel-body">
                             <a
-                                    th:href="@{/topics/{name}(name=${fetchParams.topicName})}"
+                                    th:href="@{/topics/{name}(name=${browseParams.topicName})}"
                                     class="btn btn-primary right-icon">
                                 Back To Topic <i class="fa fa-arrow-left"></i>
                             </a>
@@ -129,12 +129,12 @@
         
                             <form 
                                 id="fetch-form" 
-                                th:action="@{/topics/{name}/browser(name=${fetchParams.topicName})}"
+                                th:action="@{/topics/{name}/browser(name=${browseParams.topicName})}"
                                 method="post">
         
                                 <div class="form-group">
                                     <label for="topicName">Topic</label>
-                                    <input type="text" class="form-control" id="topicName" name="topicName" th:value="${fetchParams.topicName}" readonly="readonly"/>
+                                    <input type="text" class="form-control" id="topicName" name="topicName" th:value="${browseParams.topicName}" readonly="readonly"/>
                                 </div>
         
                                 <div class="row">
@@ -142,10 +142,10 @@
                                         <label for="keyFormat">Key Format</label>
                                         <select class="form-control" name="keyFormat" id="keyFormat">
                                             <option 
-                                                th:each="format : ${T(com.epam.eco.kafkamanager.RecordFetchRequest$DataFormat).values()}"
+                                                th:each="format : ${T(com.epam.eco.kafkamanager.TopicRecordFetchParams$DataFormat).values()}"
                                                 th:value="${format}" 
                                                 th:text="${format}"
-                                                th:selected="${fetchParams.getKeyFormat() == format}">
+                                                th:selected="${browseParams.getKeyFormat() == format}">
                                             </option>
                                         </select>
                                     </div>
@@ -153,13 +153,13 @@
                                         <label for="valueFormat">Value Format</label>
                                         <select class="form-control" name="valueFormat" id="valueFormat">
                                             <option 
-                                                th:each="format : ${T(com.epam.eco.kafkamanager.RecordFetchRequest$DataFormat).values()}"
+                                                th:each="format : ${T(com.epam.eco.kafkamanager.TopicRecordFetchParams$DataFormat).values()}"
                                                 th:value="${format}" 
                                                 th:text="${format}"
-                                                th:selected="${fetchParams.getValueFormat() == format}">
+                                                th:selected="${browseParams.getValueFormat() == format}">
                                             </option>
                                         </select>
-                                    </div>                    
+                                    </div>
                                 </div>
                                 
                                 <a id="all-partitions-link" href="#" class="btn btn-default transparent right-icon small">
@@ -168,10 +168,10 @@
                                 <a id="none-partitions-link" href="#" class="btn btn-default transparent right-icon small">
                                     None <span class="glyphicon glyphicon-ban-circle"></span>
                                 </a>
-                                <div class="row" th:each="batch : ${fetchParams.listPartitionBatches(3)}">
+                                <div class="row" th:each="batch : ${browseParams.listPartitionBatches(3)}">
                                     <th:block 
                                         th:each="partition : ${batch}" 
-                                        th:with="enabled=${fetchParams.isPartitionEnabled(partition)},offset=${fetchParams.getPartitionOffset(partition)},range=${offsetRanges.get(partition)}">
+                                        th:with="enabled=${browseParams.isPartitionEnabled(partition)},offset=${browseParams.getPartitionOffset(partition)},range=${offsetRanges.get(partition)}">
                                         <div class="form-group col col-md-4">
                                             <div class="input-group">
                                                 <span class="input-group-addon" th:text="${partition}"></span>
@@ -238,7 +238,7 @@
                                                                         type="checkbox" 
                                                                         th:name="${'ce_' + column.name}" 
                                                                         th:attr="data-column=${column.name}"
-                                                                        th:checked="${fetchParams.isColumnEnabled(column.name)}"/>
+                                                                        th:checked="${browseParams.isColumnEnabled(column.name)}"/>
                                                                     <span th:text="${column.name}"></span>
                                                                 </label>
                                                             </div>
@@ -260,7 +260,7 @@
                                             max="300000"
                                             id="timeout" 
                                             name="timeout" 
-                                            th:value="${fetchParams.timeout}"/>
+                                            th:value="${browseParams.timeout}"/>
                                     </div>
                                     <div class="form-group col col-md-1">
                                         <label for="limit">Limit</label>
@@ -272,7 +272,7 @@
                                             max="100"
                                             id="limit" 
                                             name="limit" 
-                                            th:value="${fetchParams.limit}"/>
+                                            th:value="${browseParams.limit}"/>
                                     </div>
                                 </div>
         

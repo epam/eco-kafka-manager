@@ -37,7 +37,8 @@ import com.epam.eco.kafkamanager.exec.TaskResult;
 import com.epam.eco.kafkamanager.rest.config.KafkaManagerRestProperties;
 import com.epam.eco.kafkamanager.rest.request.ConsumerGroupOffsetResetRequest;
 import com.epam.eco.kafkamanager.rest.request.ConsumerGroupTopicOffsetFetchRequest;
-import com.epam.eco.kafkamanager.rest.request.TopicOffsetFetchRequest;
+import com.epam.eco.kafkamanager.rest.request.TopicOffsetForTimeFetchRequest;
+import com.epam.eco.kafkamanager.rest.request.TopicOffsetRangeFetchRequest;
 import com.epam.eco.kafkamanager.rest.request.TopicPurgeRequest;
 import com.epam.eco.kafkamanager.rest.request.TopicRecordCountRequest;
 import com.epam.eco.kafkamanager.rest.request.TopicRecordFetchRequest;
@@ -76,16 +77,30 @@ public class TaskController {
         return response;
     }
 
+    @Deprecated
     @PostMapping("/topic-offset-fetcher")
     public DeferredResult<TaskResult<Map<TopicPartition, OffsetRange>>> topicOffsetFetch(
-            @RequestBody TopicOffsetFetchRequest request) {
+            @RequestBody TopicOffsetRangeFetchRequest request) {
+        return topicOffsetRangeFetch(request);
+    }
+
+    @Deprecated
+    @GetMapping("/topic-offset-fetcher/{topicName}")
+    public Map<TopicPartition, OffsetTimeSeries> topicOffsetFetcher(
+            @PathVariable("topicName") String topicName) {
+        return topicOffsetRangeFetcher(topicName);
+    }
+
+    @PostMapping("/topic-offset-range-fetcher")
+    public DeferredResult<TaskResult<Map<TopicPartition, OffsetRange>>> topicOffsetRangeFetch(
+            @RequestBody TopicOffsetRangeFetchRequest request) {
         DeferredResult<TaskResult<Map<TopicPartition, OffsetRange>>> response =
                 new DeferredResult<>(properties.getAsyncRequestTimeoutInMs());
         ForkJoinPool.commonPool().submit(DelegatingSecurityContextRunnable.create(() -> {
             try {
                 TaskResult<Map<TopicPartition, OffsetRange>> result =
-                        kafkaManager.getTopicOffsetFetcherTaskExecutor()
-                        .executeDetailed(request.getTopicName());
+                        kafkaManager.getTopicOffsetRangeFetcherTaskExecutor()
+                                .executeDetailed(request.getTopicName());
                 if (result.isSuccessful()) {
                     response.setResult(result);
                 } else {
@@ -98,10 +113,32 @@ public class TaskController {
         return response;
     }
 
-    @GetMapping("/topic-offset-fetcher/{topicName}")
-    public Map<TopicPartition, OffsetTimeSeries> topicOffsetFetcher(
+    @GetMapping("/topic-offset-range-fetcher/{topicName}")
+    public Map<TopicPartition, OffsetTimeSeries> topicOffsetRangeFetcher(
             @PathVariable("topicName") String topicName) {
-        return kafkaManager.getTopicOffsetFetcherTaskExecutor().getOffsetTimeSeries(topicName);
+        return kafkaManager.getTopicOffsetRangeFetcherTaskExecutor().getOffsetTimeSeries(topicName);
+    }
+
+    @PostMapping("/topic-offset-time-fetcher")
+    public DeferredResult<TaskResult<Map<TopicPartition, Long>>> topicOffsetForTimeFetch(
+            @RequestBody TopicOffsetForTimeFetchRequest request) {
+        DeferredResult<TaskResult<Map<TopicPartition, Long>>> response =
+                new DeferredResult<>(properties.getAsyncRequestTimeoutInMs());
+        ForkJoinPool.commonPool().submit(DelegatingSecurityContextRunnable.create(() -> {
+            try {
+                TaskResult<Map<TopicPartition, Long>> result =
+                        kafkaManager.getTopicOffsetForTimeFetcherTaskExecutor()
+                                .executeDetailed(request.getTopicName(), request.getTimestamp());
+                if (result.isSuccessful()) {
+                    response.setResult(result);
+                } else {
+                    response.setErrorResult(result.getError());
+                }
+            } catch (Exception ex) {
+                response.setErrorResult(ex);
+            }
+        }, null));
+        return response;
     }
 
     @PostMapping("/topic-record-fetcher")
@@ -113,7 +150,7 @@ public class TaskController {
             try {
                 TaskResult<RecordFetchResult<Object, Object>> result =
                         kafkaManager.getTopicRecordFetcherTaskExecutor()
-                        .executeDetailed(request.getTopicName(), request.getFetchRequest());
+                        .executeDetailed(request.getTopicName(), request.getFetchParams());
                 if (result.isSuccessful()) {
                     response.setResult(result);
                 } else {

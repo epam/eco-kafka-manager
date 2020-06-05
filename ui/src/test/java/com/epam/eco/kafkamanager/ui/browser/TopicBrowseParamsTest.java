@@ -22,17 +22,17 @@ import java.util.List;
 import org.junit.Assert;
 import org.junit.Test;
 
-import com.epam.eco.kafkamanager.RecordFetchRequest.DataFormat;
-import com.epam.eco.kafkamanager.ui.topics.browser.RecordFetchParams;
+import com.epam.eco.kafkamanager.TopicRecordFetchParams.DataFormat;
+import com.epam.eco.kafkamanager.ui.topics.browser.TopicBrowseParams;
 
 /**
  * @author Andrei_Tytsik
  */
-public class RecordFetchParamsTest {
+public class TopicBrowseParamsTest {
 
     @Test
     public void testAccessorsGetDefaultsOnEmptyMap() throws Exception {
-        RecordFetchParams params = RecordFetchParams.with(null);
+        TopicBrowseParams params = TopicBrowseParams.with(null);
 
         Assert.assertNotNull(params);
         Assert.assertEquals(null, params.getTopicName());
@@ -54,7 +54,7 @@ public class RecordFetchParamsTest {
 
     @Test
     public void testAccessorsSetAndGetValues() throws Exception {
-        RecordFetchParams params = RecordFetchParams.with(null);
+        TopicBrowseParams params = TopicBrowseParams.with(null);
 
         params.setTopicName("topic");
         Assert.assertEquals("topic", params.getTopicName());

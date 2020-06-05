@@ -29,16 +29,16 @@ public class TopicOffsetFetchRequestTest {
 
     @Test
     public void testSerializedToJsonAndBack() throws Exception {
-        TopicOffsetFetchRequest origin = new TopicOffsetFetchRequest("topic");
+        TopicOffsetRangeFetchRequest origin = new TopicOffsetRangeFetchRequest("topic");
 
         ObjectMapper mapper = TestObjectMapperSingleton.getObjectMapper();
 
         String json = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(origin);
         Assert.assertNotNull(json);
 
-        TopicOffsetFetchRequest deserialized = mapper.readValue(
+        TopicOffsetRangeFetchRequest deserialized = mapper.readValue(
                 json,
-                TopicOffsetFetchRequest.class);
+                TopicOffsetRangeFetchRequest.class);
         Assert.assertNotNull(deserialized);
         Assert.assertEquals(deserialized, origin);
     }

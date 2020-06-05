@@ -19,49 +19,39 @@ import java.util.Objects;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import com.epam.eco.kafkamanager.TopicRecordFetchParams;
-
 /**
  * @author Raman_Babich
  */
-public class TopicRecordFetchRequest {
+public class TopicOffsetRangeFetchRequest {
 
     private final String topicName;
-    private final TopicRecordFetchParams fetchParams;
 
-    public TopicRecordFetchRequest(
-            @JsonProperty("topicName") String topicName,
-            @JsonProperty("fetchParams") TopicRecordFetchParams fetchParams) {
+    public TopicOffsetRangeFetchRequest(
+            @JsonProperty("topicName") String topicName) {
         this.topicName = topicName;
-        this.fetchParams = fetchParams;
     }
 
     public String getTopicName() {
         return topicName;
-    }
-    public TopicRecordFetchParams getFetchParams() {
-        return fetchParams;
     }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        TopicRecordFetchRequest that = (TopicRecordFetchRequest) o;
-        return Objects.equals(topicName, that.topicName) &&
-                Objects.equals(fetchParams, that.fetchParams);
+        TopicOffsetRangeFetchRequest that = (TopicOffsetRangeFetchRequest) o;
+        return Objects.equals(topicName, that.topicName);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(topicName, fetchParams);
+        return Objects.hash(topicName);
     }
 
     @Override
     public String toString() {
-        return "TopicRecordFetchRequest{" +
+        return "TopicOffsetFetchRequest{" +
                 "topicName='" + topicName + '\'' +
-                ", fetchParams=" + fetchParams +
                 '}';
     }
 

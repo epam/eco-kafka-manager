@@ -15,23 +15,23 @@
  */
 package com.epam.eco.kafkamanager;
 
-import org.springframework.security.access.prepost.PreAuthorize;
+import java.util.Map;
+
+import org.apache.kafka.common.TopicPartition;
 import org.springframework.security.core.parameters.P;
 
-import com.epam.eco.commons.kafka.helpers.RecordFetchResult;
 import com.epam.eco.kafkamanager.exec.TaskExecutor;
 import com.epam.eco.kafkamanager.exec.TaskResult;
 
 /**
- * @author Andrei_Tytsik
+ * @author Naira_Tamrazyan
  */
-@PreAuthorize("@authorizer.isPermitted('TOPIC', #resourceKey, 'READ')")
-public interface TopicRecordFetcherTaskExecutor<K, V> extends TaskExecutor<String, TopicRecordFetchParams, RecordFetchResult<K, V>> {
+public interface TopicOffsetForTimeFetcherTaskExecutor extends TaskExecutor<String, Long, Map<TopicPartition, Long>> {
 
     @Override
-    RecordFetchResult<K, V> execute(@P("resourceKey") String topicName, TopicRecordFetchParams params);
+    Map<TopicPartition, Long> execute(@P("resourceKey") String topicName, Long timestamp);
 
     @Override
-    TaskResult<RecordFetchResult<K, V>> executeDetailed(@P("resourceKey") String topicName, TopicRecordFetchParams params);
+    TaskResult<Map<TopicPartition, Long>> executeDetailed(@P("resourceKey") String topicName, Long timestamp);
 
 }

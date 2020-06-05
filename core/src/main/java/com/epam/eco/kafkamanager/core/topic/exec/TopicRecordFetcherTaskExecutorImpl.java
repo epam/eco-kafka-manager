@@ -29,8 +29,8 @@ import com.epam.eco.commons.kafka.helpers.TopicRecordFetcher;
 import com.epam.eco.commons.kafka.serde.HexStringDeserializer;
 import com.epam.eco.commons.kafka.serde.JsonStringDeserializer;
 import com.epam.eco.kafkamanager.KafkaManager;
-import com.epam.eco.kafkamanager.RecordFetchRequest;
-import com.epam.eco.kafkamanager.RecordFetchRequest.DataFormat;
+import com.epam.eco.kafkamanager.TopicRecordFetchParams;
+import com.epam.eco.kafkamanager.TopicRecordFetchParams.DataFormat;
 import com.epam.eco.kafkamanager.TopicRecordFetcherTaskExecutor;
 import com.epam.eco.kafkamanager.core.autoconfigure.KafkaManagerProperties;
 import com.epam.eco.kafkamanager.exec.AbstractTaskExecutor;
@@ -41,7 +41,7 @@ import io.confluent.kafka.serializers.KafkaAvroDeserializer;
 /**
  * @author Andrei_Tytsik
  */
-public class TopicRecordFetcherTaskExecutorImpl<K, V> extends AbstractTaskExecutor<String, RecordFetchRequest, RecordFetchResult<K, V>> implements TopicRecordFetcherTaskExecutor<K, V> {
+public class TopicRecordFetcherTaskExecutorImpl<K, V> extends AbstractTaskExecutor<String, TopicRecordFetchParams, RecordFetchResult<K, V>> implements TopicRecordFetcherTaskExecutor<K, V> {
 
     @Autowired
     private KafkaManager kafkaManager;
@@ -49,31 +49,31 @@ public class TopicRecordFetcherTaskExecutorImpl<K, V> extends AbstractTaskExecut
     protected KafkaManagerProperties properties;
 
     @Override
-    protected TaskResult<RecordFetchResult<K, V>> doExecute(String resourceKey, RecordFetchRequest input) {
+    protected TaskResult<RecordFetchResult<K, V>> doExecute(String resourceKey, TopicRecordFetchParams input) {
         return TaskResult.of(() -> executeInternal(resourceKey, input));
     }
 
-    public RecordFetchResult<K, V> executeInternal(String topicName, RecordFetchRequest request) {
-        Validate.notNull(request, "Request is null");
+    public RecordFetchResult<K, V> executeInternal(String topicName, TopicRecordFetchParams params) {
+        Validate.notNull(params, "Params object is null");
 
         kafkaManager.getTopic(topicName); // sanity check just for case topic doesn't exist
 
         TopicRecordFetcher<K, V> recordFetcher = TopicRecordFetcher.
-                with(buildConsumerConfig(request));
+                with(buildConsumerConfig(params));
 
-        return recordFetcher.fetch(
-                request.getOffsets().entrySet().stream().
+        return recordFetcher.fetchByOffsets(
+                params.getOffsets().entrySet().stream().
                     collect(Collectors.toMap(
                             e -> new TopicPartition(topicName, e.getKey()),
                             e -> e.getValue())),
-                request.getLimit(),
-                request.getTimeoutInMs());
+                params.getLimit(),
+                params.getTimeoutInMs());
     }
 
-    private Map<String, Object> buildConsumerConfig(RecordFetchRequest request) {
+    private Map<String, Object> buildConsumerConfig(TopicRecordFetchParams params) {
         return properties.buildCommonConsumerConfig(builder -> {
-            initDeserializerConfig(builder, request.getKeyDataFormat(), true);
-            initDeserializerConfig(builder, request.getValueDataFormat(), false);
+            initDeserializerConfig(builder, params.getKeyDataFormat(), true);
+            initDeserializerConfig(builder, params.getValueDataFormat(), false);
         });
     }
 

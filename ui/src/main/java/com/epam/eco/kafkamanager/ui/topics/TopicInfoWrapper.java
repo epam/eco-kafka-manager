@@ -140,7 +140,7 @@ public class TopicInfoWrapper {
 
     public Map<TopicPartition, OffsetRange> getOffsets() {
         if (offsets == null) {
-            offsets = kafkaManager.getTopicOffsetFetcherTaskExecutor().
+            offsets = kafkaManager.getTopicOffsetRangeFetcherTaskExecutor().
                     getResultIfActualOrRefresh(topicInfo.getName()).
                     getValue();
         }
@@ -280,7 +280,7 @@ public class TopicInfoWrapper {
     }
 
     private Long calculateOffsetRpm(TopicPartition topicPartition) {
-        OffsetTimeSeries timeSeries = kafkaManager.getTopicOffsetFetcherTaskExecutor().
+        OffsetTimeSeries timeSeries = kafkaManager.getTopicOffsetRangeFetcherTaskExecutor().
                 getOffsetTimeSeries(topicInfo.getName()).
                 get(topicPartition);
         return timeSeries != null ? timeSeries.currentRatePerMinute() : null;
