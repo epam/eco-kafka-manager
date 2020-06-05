@@ -15,13 +15,20 @@
  */
 package com.epam.eco.kafkamanager.ui.topics.browser;
 
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 import java.util.function.BiConsumer;
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.Validate;
 import org.apache.kafka.common.TopicPartition;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -29,6 +36,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.epam.eco.commons.kafka.OffsetRange;
@@ -49,6 +57,7 @@ public class TopicBrowserController {
     public static final String VIEW = "topic_browser";
 
     public static final String MAPPING = TopicController.MAPPING_TOPIC + "/browser";
+    public static final String MAPPING_OFFSETS_FOR_TIMES = MAPPING + "/offsets_for_times";
 
     public static final String ATTR_TOPIC_NAME = "topicName";
     public static final String ATTR_BROWSE_PARAMS = "browseParams";
@@ -56,8 +65,10 @@ public class TopicBrowserController {
     public static final String ATTR_FETCHED_RECORDS = "fetchedRecords";
     public static final String ATTR_FETCH_SUMMARY = "fetchSummary";
     public static final String ATTR_NEXT_OFFSETS = "nextOffsets";
+    public static final String ATTR_OFFSETS_FOR_TIMES = "offsetsForTimes";
 
     private static final long DEFAULT_FETCH_TIMEOUT = 30_000;
+    private static final DateTimeFormatter DATE_TIME_FORMATTER_PATTERN = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm");
 
     @Autowired
     private KafkaManager kafkaManager;
@@ -91,6 +102,28 @@ public class TopicBrowserController {
         handleFetchRequest(browseParams, redirectAttrs::addFlashAttribute);
 
         return "redirect:" + buildBrowserUrl(topicName);
+    }
+
+    @RequestMapping(value=MAPPING_OFFSETS_FOR_TIMES, method=RequestMethod.GET)
+    public @ResponseBody
+    ResponseEntity<?> fetchOffsetsForTimes(
+            @PathVariable("name") String topicName,
+            @RequestParam("timestamp") String timestamp) {
+        Map<TopicPartition, Long> offsetsForTimes = kafkaManager.getTopicOffsetForTimeFetcherTaskExecutor().
+                execute(topicName, convertTimestampToMilliseconds(timestamp));
+
+        Map<Integer, Long> offsets = offsetsForTimes.entrySet().stream()
+                .collect(Collectors.toMap(
+                        entry -> entry.getKey().partition(),
+                        entry -> entry.getValue()));
+        return ResponseEntity.ok().body(offsets);
+    }
+
+    private Long convertTimestampToMilliseconds(String timestamp) {
+        Validate.notBlank(timestamp, "Timestamp cannot be empty");
+        LocalDateTime localDateTime = LocalDateTime.parse(timestamp, DATE_TIME_FORMATTER_PATTERN);
+        ZonedDateTime zdt = ZonedDateTime.of(localDateTime, ZoneId.systemDefault());
+        return zdt.toInstant().toEpochMilli();
     }
 
     private void handleParamsRequest(

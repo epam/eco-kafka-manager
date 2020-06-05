@@ -96,7 +96,44 @@
             $(document).on('click', function (e) {
                 hidePopoverIfClickedOutside(e);
             });
-        
+
+            $("input[id='offsets-for-times']").datetimepicker({
+                changeMonth: true,
+                changeYear: true,
+                showOn: "button",
+                buttonImage: "images/calendar.gif",
+                buttonImageOnly: true,
+                buttonText: "Select timestamp"
+            });
+
+            $("input[id='offsets-for-times']").change(function(e) {
+               e.preventDefault();
+                $(this).addClass('disabled');
+                var dateTime = $(this).val();
+                var url = /*[[@{/topics/{name}/browser/offsets_for_times(name=${browseParams.topicName})}]]*/;
+
+                if (dateTime != '') {
+                    url = url + '?timestamp=' + dateTime;
+
+                    fetch(url, {credentials: 'include'})
+                        .then(res => res.json())
+                        .then(res => {
+                             $('.partition-checkbox').each(function(idx, elem) {
+                                if ($(elem).is(':checked')) {
+                                    var partition = $(elem).data('partition');
+                                    var offset = res[partition];
+                                     if (offset != undefined) {
+                                        $('#p_' + partition).val(offset);
+                                     }
+                                }
+                            });
+                        })
+                        .catch(() => {
+
+                         })
+                        .finally(() => $(this).removeClass('disabled'))
+                 }
+            });
         });
        
     </script>
@@ -168,6 +205,12 @@
                                 <a id="none-partitions-link" href="#" class="btn btn-default transparent right-icon small">
                                     None <span class="glyphicon glyphicon-ban-circle"></span>
                                 </a>
+
+                                <input id="offsets-for-times"
+                                       name="offsets-for-times"
+                                       autocomplete="off"
+                                       class="form-control">
+
                                 <div class="row" th:each="batch : ${browseParams.listPartitionBatches(3)}">
                                     <th:block 
                                         th:each="partition : ${batch}" 
