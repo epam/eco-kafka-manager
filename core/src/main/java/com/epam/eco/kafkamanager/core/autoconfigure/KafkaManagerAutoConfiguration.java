@@ -38,7 +38,6 @@ import com.epam.eco.kafkamanager.KafkaManager;
 import com.epam.eco.kafkamanager.MetadataRepo;
 import com.epam.eco.kafkamanager.PermissionRepo;
 import com.epam.eco.kafkamanager.SecurityContextAdapter;
-import com.epam.eco.kafkamanager.TopicOffsetFetcherTaskExecutor;
 import com.epam.eco.kafkamanager.TopicOffsetForTimeFetcherTaskExecutor;
 import com.epam.eco.kafkamanager.TopicOffsetRangeFetcherTaskExecutor;
 import com.epam.eco.kafkamanager.TopicPurgerTaskExecutor;
@@ -60,7 +59,6 @@ import com.epam.eco.kafkamanager.core.consumer.repo.zk.ZkConsumerGroupRepo;
 import com.epam.eco.kafkamanager.core.metadata.repo.kafka.KafkaMetadataRepo;
 import com.epam.eco.kafkamanager.core.permission.repo.zk.ZkPermissionRepo;
 import com.epam.eco.kafkamanager.core.spring.AsyncStartingBeanProcessor;
-import com.epam.eco.kafkamanager.core.topic.exec.TopicOffsetFetcherTaskExecutorImpl;
 import com.epam.eco.kafkamanager.core.topic.exec.TopicOffsetForTimeFetcherTaskExecutorImpl;
 import com.epam.eco.kafkamanager.core.topic.exec.TopicOffsetRangeFetcherTaskExecutorImpl;
 import com.epam.eco.kafkamanager.core.topic.exec.TopicPurgerTaskExecutorImpl;
@@ -98,12 +96,6 @@ public class KafkaManagerAutoConfiguration {
     @Bean
     public TopicRecordCounterTaskExecutor topicRecordCounterTaskExecutor() {
         return new TopicRecordCounterTaskExecutorImpl(cacheManager());
-    }
-
-    @Deprecated
-    @Bean
-    public TopicOffsetFetcherTaskExecutor topicOffsetFetcherTaskExecutor() {
-        return new TopicOffsetFetcherTaskExecutorImpl(cacheManager());
     }
 
     @Bean

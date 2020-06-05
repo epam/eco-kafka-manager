@@ -26,7 +26,7 @@ import org.apache.kafka.common.TopicPartition;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.epam.eco.commons.kafka.OffsetRange;
-import com.epam.eco.commons.kafka.helpers.TopicOffsetFetcher;
+import com.epam.eco.commons.kafka.helpers.TopicOffsetRangeFetcher;
 import com.epam.eco.kafkamanager.ConsumerGroupInfo;
 import com.epam.eco.kafkamanager.ConsumerGroupTopicOffsetFetcherTaskExecutor;
 import com.epam.eco.kafkamanager.KafkaManager;
@@ -66,7 +66,7 @@ public class ConsumerGroupTopicOffsetFetcherTaskExecutorImpl extends AbstractAsy
             if (groupInfo.getTopicNames().isEmpty()) {
                 return Collections.emptyMap();
             }
-            return TopicOffsetFetcher.
+            return TopicOffsetRangeFetcher.
                     with(properties.getCommonConsumerConfig()).
                     fetchForTopics(groupInfo.getTopicNames());
         });

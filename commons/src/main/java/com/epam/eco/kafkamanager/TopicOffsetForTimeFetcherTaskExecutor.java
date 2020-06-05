@@ -23,6 +23,9 @@ import org.springframework.security.core.parameters.P;
 import com.epam.eco.kafkamanager.exec.TaskExecutor;
 import com.epam.eco.kafkamanager.exec.TaskResult;
 
+/**
+ * @author Naira_Tamrazyan
+ */
 public interface TopicOffsetForTimeFetcherTaskExecutor extends TaskExecutor<String, Long, Map<TopicPartition, Long>> {
 
     @Override
@@ -30,4 +33,5 @@ public interface TopicOffsetForTimeFetcherTaskExecutor extends TaskExecutor<Stri
 
     @Override
     TaskResult<Map<TopicPartition, Long>> executeDetailed(@P("resourceKey") String topicName, Long timestamp);
+
 }

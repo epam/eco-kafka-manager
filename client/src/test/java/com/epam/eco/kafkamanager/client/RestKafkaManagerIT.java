@@ -36,7 +36,32 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 import com.epam.eco.commons.kafka.OffsetRange;
 import com.epam.eco.commons.kafka.helpers.RecordFetchResult;
-import com.epam.eco.kafkamanager.*;
+import com.epam.eco.kafkamanager.BrokerInfo;
+import com.epam.eco.kafkamanager.BrokerMetadataDeleteParams;
+import com.epam.eco.kafkamanager.BrokerMetadataUpdateParams;
+import com.epam.eco.kafkamanager.BrokerSearchCriteria;
+import com.epam.eco.kafkamanager.ConsumerGroupInfo;
+import com.epam.eco.kafkamanager.ConsumerGroupMetadataDeleteParams;
+import com.epam.eco.kafkamanager.ConsumerGroupMetadataUpdateParams;
+import com.epam.eco.kafkamanager.ConsumerGroupSearchCriteria;
+import com.epam.eco.kafkamanager.KafkaManager;
+import com.epam.eco.kafkamanager.OffsetTimeSeries;
+import com.epam.eco.kafkamanager.PermissionCreateParams;
+import com.epam.eco.kafkamanager.PermissionDeleteParams;
+import com.epam.eco.kafkamanager.PermissionInfo;
+import com.epam.eco.kafkamanager.PermissionMetadataDeleteParams;
+import com.epam.eco.kafkamanager.PermissionMetadataUpdateParams;
+import com.epam.eco.kafkamanager.PermissionSearchCriteria;
+import com.epam.eco.kafkamanager.TopicConfigUpdateParams;
+import com.epam.eco.kafkamanager.TopicCreateParams;
+import com.epam.eco.kafkamanager.TopicInfo;
+import com.epam.eco.kafkamanager.TopicMetadataDeleteParams;
+import com.epam.eco.kafkamanager.TopicMetadataUpdateParams;
+import com.epam.eco.kafkamanager.TopicPartitionsCreateParams;
+import com.epam.eco.kafkamanager.TopicRecordFetchParams;
+import com.epam.eco.kafkamanager.TopicSearchCriteria;
+import com.epam.eco.kafkamanager.TransactionInfo;
+import com.epam.eco.kafkamanager.TransactionSearchCriteria;
 import com.epam.eco.kafkamanager.exec.TaskResult;
 
 /**
@@ -90,7 +115,7 @@ public class RestKafkaManagerIT {
 
         Assert.assertTrue("Topic doesn't exist", kafkaManager.topicExists(topicName));
 
-        Map<TopicPartition, OffsetRange> offsetMap = kafkaManager.getTopicOffsetFetcherTaskExecutor().execute(topicName);
+        Map<TopicPartition, OffsetRange> offsetMap = kafkaManager.getTopicOffsetRangeFetcherTaskExecutor().execute(topicName);
         Assert.assertNotNull(offsetMap);
         Assert.assertFalse("Offset map is empty", offsetMap.isEmpty());
 
@@ -98,19 +123,19 @@ public class RestKafkaManagerIT {
                 .collect(Collectors.toMap(
                         entry -> entry.getKey().partition(),
                         entry -> entry.getValue().getSmallest()));
-        RecordFetchRequest recordFetchRequest = new RecordFetchRequest(
-                RecordFetchRequest.DataFormat.STRING,
-                RecordFetchRequest.DataFormat.STRING,
+        TopicRecordFetchParams recordFetchParams = new TopicRecordFetchParams(
+                TopicRecordFetchParams.DataFormat.STRING,
+                TopicRecordFetchParams.DataFormat.STRING,
                 offsets,
                 10L,
                 10000L);
         RecordFetchResult<String, String> recordFetchResult =
                 kafkaManager.<String, String>getTopicRecordFetcherTaskExecutor()
-                .execute(topicName, recordFetchRequest);
+                .execute(topicName, recordFetchParams);
         Assert.assertNotNull(recordFetchResult);
         Assert.assertFalse("Fetched record list is empty", recordFetchResult.getRecords().isEmpty());
 
-        Map<TopicPartition, OffsetTimeSeries> offsetTimeSeries = kafkaManager.getTopicOffsetFetcherTaskExecutor()
+        Map<TopicPartition, OffsetTimeSeries> offsetTimeSeries = kafkaManager.getTopicOffsetRangeFetcherTaskExecutor()
                 .getOffsetTimeSeries(topicName);
         Assert.assertNotNull(offsetTimeSeries);
         Assert.assertFalse("Offset time series is empty", offsetTimeSeries.isEmpty());

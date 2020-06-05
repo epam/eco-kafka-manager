@@ -22,14 +22,13 @@ import java.util.concurrent.Future;
 import org.apache.kafka.common.TopicPartition;
 
 import com.epam.eco.commons.kafka.OffsetRange;
-import com.epam.eco.kafkamanager.exec.AsyncStatefullTaskExecutor;
 import com.epam.eco.kafkamanager.exec.TaskResult;
 
 /**
  * @author Andrei_Tytsik
  */
-public interface TopicOffsetRangeFetcherTaskExecutor extends
-        AsyncStatefullTaskExecutor<String, Map<TopicPartition, OffsetRange>> {
+@SuppressWarnings("deprecation")
+public interface TopicOffsetRangeFetcherTaskExecutor extends TopicOffsetFetcherTaskExecutor {
 
     @Override
     Map<TopicPartition, OffsetRange> execute(String topicName);

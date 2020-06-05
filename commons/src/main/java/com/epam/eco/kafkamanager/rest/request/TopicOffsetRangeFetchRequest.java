@@ -22,11 +22,11 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 /**
  * @author Raman_Babich
  */
-public class TopicOffsetFetchRequest {
+public class TopicOffsetRangeFetchRequest {
 
     private final String topicName;
 
-    public TopicOffsetFetchRequest(
+    public TopicOffsetRangeFetchRequest(
             @JsonProperty("topicName") String topicName) {
         this.topicName = topicName;
     }
@@ -39,7 +39,7 @@ public class TopicOffsetFetchRequest {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        TopicOffsetFetchRequest that = (TopicOffsetFetchRequest) o;
+        TopicOffsetRangeFetchRequest that = (TopicOffsetRangeFetchRequest) o;
         return Objects.equals(topicName, that.topicName);
     }
 
@@ -54,4 +54,5 @@ public class TopicOffsetFetchRequest {
                 "topicName='" + topicName + '\'' +
                 '}';
     }
+
 }

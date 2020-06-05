@@ -59,19 +59,15 @@ public class TopicRecordFetchParams {
     public DataFormat getKeyDataFormat() {
         return keyDataFormat;
     }
-
     public DataFormat getValueDataFormat() {
         return valueDataFormat;
     }
-
     public Map<Integer, Long> getOffsets() {
         return offsets;
     }
-
     public Long getLimit() {
         return limit;
     }
-
     public Long getTimeoutInMs() {
         return timeoutInMs;
     }

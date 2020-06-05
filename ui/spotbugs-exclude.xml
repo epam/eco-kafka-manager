@@ -10,7 +10,7 @@
         <Bug pattern="RFI_SET_ACCESSIBLE" />
     </Match>
     <Match>
-        <Class name="com.epam.eco.kafkamanager.ui.topics.browser.RecordFetchParams" />
+        <Class name="com.epam.eco.kafkamanager.ui.topics.browser.TopicBrowseParams" />
         <Method name="getAsBoolean" />
         <Bug pattern="NP_BOOLEAN_RETURN_NULL,TBP_TRISTATE_BOOLEAN_PATTERN" />
     </Match>

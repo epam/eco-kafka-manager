@@ -28,10 +28,9 @@ import com.epam.eco.kafkamanager.exec.AbstractTaskExecutor;
 import com.epam.eco.kafkamanager.exec.TaskResult;
 
 /**
- * @author Andrei_Tytsik
+ * @author Naira_Tamrazyan
  */
-public class TopicOffsetForTimeFetcherTaskExecutorImpl extends
-        AbstractTaskExecutor<String, Long, Map<TopicPartition, Long>> implements TopicOffsetForTimeFetcherTaskExecutor {
+public class TopicOffsetForTimeFetcherTaskExecutorImpl extends AbstractTaskExecutor<String, Long, Map<TopicPartition, Long>> implements TopicOffsetForTimeFetcherTaskExecutor {
 
     @Autowired
     private KafkaManager kafkaManager;
@@ -39,18 +38,17 @@ public class TopicOffsetForTimeFetcherTaskExecutorImpl extends
     protected KafkaManagerProperties properties;
 
     @Override
-    protected TaskResult doExecute(String topicName, Long timestamp) {
+    protected TaskResult<Map<TopicPartition, Long>> doExecute(String topicName, Long timestamp) {
         return TaskResult.of(() -> executeInternal(topicName, timestamp));
     }
 
-    private TaskResult<Map<TopicPartition, Long>> executeInternal(String topicName, Long timestamp) {
-        return TaskResult.of(() -> {
-            // sanity check just for case topic doesn't exist
-            kafkaManager.getTopic(topicName);
+    private Map<TopicPartition, Long> executeInternal(String topicName, Long timestamp) {
+        // sanity check just for case topic doesn't exist
+        kafkaManager.getTopic(topicName);
 
-            return TopicOffsetForTimeFetcher.
-                    with(properties.getCommonConsumerConfig()).
-                    fetchForTopic(topicName, timestamp);
-        });
+        return TopicOffsetForTimeFetcher.
+                with(properties.getCommonConsumerConfig()).
+                fetchForTopic(topicName, timestamp);
     }
+
 }

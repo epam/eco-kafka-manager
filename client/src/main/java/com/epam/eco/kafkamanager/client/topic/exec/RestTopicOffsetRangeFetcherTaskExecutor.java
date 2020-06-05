@@ -37,14 +37,19 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import com.epam.eco.commons.kafka.OffsetRange;
 import com.epam.eco.kafkamanager.OffsetTimeSeries;
+import com.epam.eco.kafkamanager.TopicOffsetFetcherTaskExecutor;
 import com.epam.eco.kafkamanager.TopicOffsetRangeFetcherTaskExecutor;
 import com.epam.eco.kafkamanager.exec.AbstractAsyncStatefullTaskExecutor;
 import com.epam.eco.kafkamanager.exec.TaskResult;
-import com.epam.eco.kafkamanager.rest.request.TopicOffsetFetchRequest;
+import com.epam.eco.kafkamanager.rest.request.TopicOffsetRangeFetchRequest;
 
+/**
+ * @author Raman_Babich
+ */
+@SuppressWarnings("deprecation")
 public class RestTopicOffsetRangeFetcherTaskExecutor extends
         AbstractAsyncStatefullTaskExecutor<String, Map<TopicPartition, OffsetRange>> implements
-        TopicOffsetRangeFetcherTaskExecutor {
+        TopicOffsetRangeFetcherTaskExecutor, TopicOffsetFetcherTaskExecutor {
 
     @Autowired
     @Qualifier("KafkaManagerRestTemplate")
@@ -70,7 +75,7 @@ public class RestTopicOffsetRangeFetcherTaskExecutor extends
             ResponseEntity<TaskResult<Map<TopicPartition, OffsetRange>>> response = restTemplate.exchange(
                     "/api/tasks/topic-offset-range-fetcher",
                     HttpMethod.POST,
-                    new HttpEntity<>(new TopicOffsetFetchRequest(resourceKey)),
+                    new HttpEntity<>(new TopicOffsetRangeFetchRequest(resourceKey)),
                     new ParameterizedTypeReference<TaskResult<Map<TopicPartition, OffsetRange>>>() {});
             return response.getBody();
         } catch (RestClientException ex) {

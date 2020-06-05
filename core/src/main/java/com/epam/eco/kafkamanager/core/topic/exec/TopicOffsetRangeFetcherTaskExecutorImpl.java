@@ -42,11 +42,8 @@ import com.epam.eco.kafkamanager.exec.TaskResult;
 
 /**
  * @author Andrei_Tytsik
- *
  */
-public class TopicOffsetRangeFetcherTaskExecutorImpl extends
-        AbstractAsyncStatefullTaskExecutor<String, Map<TopicPartition, OffsetRange>> implements
-        TopicOffsetRangeFetcherTaskExecutor {
+public class TopicOffsetRangeFetcherTaskExecutorImpl extends AbstractAsyncStatefullTaskExecutor<String, Map<TopicPartition, OffsetRange>> implements TopicOffsetRangeFetcherTaskExecutor {
 
     @Autowired
     private KafkaManager kafkaManager;

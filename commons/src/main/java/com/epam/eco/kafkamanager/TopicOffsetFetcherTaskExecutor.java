@@ -27,6 +27,8 @@ import com.epam.eco.kafkamanager.exec.TaskResult;
 
 /**
  * @author Andrei_Tytsik
+ *
+ * @deprecated use {@link TopicOffsetRangeFetcherTaskExecutor} instead
  */
 @Deprecated
 public interface TopicOffsetFetcherTaskExecutor extends AsyncStatefullTaskExecutor<String, Map<TopicPartition, OffsetRange>> {

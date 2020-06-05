@@ -60,12 +60,12 @@ import com.epam.eco.kafkamanager.TopicInfo;
 import com.epam.eco.kafkamanager.TopicMetadataDeleteParams;
 import com.epam.eco.kafkamanager.TopicMetadataUpdateParams;
 import com.epam.eco.kafkamanager.TopicOffsetFetcherTaskExecutor;
+import com.epam.eco.kafkamanager.TopicOffsetForTimeFetcherTaskExecutor;
+import com.epam.eco.kafkamanager.TopicOffsetRangeFetcherTaskExecutor;
 import com.epam.eco.kafkamanager.TopicPartitionsCreateParams;
 import com.epam.eco.kafkamanager.TopicPurgerTaskExecutor;
 import com.epam.eco.kafkamanager.TopicRecordCounterTaskExecutor;
 import com.epam.eco.kafkamanager.TopicRecordFetcherTaskExecutor;
-import com.epam.eco.kafkamanager.TopicOffsetForTimeFetcherTaskExecutor;
-import com.epam.eco.kafkamanager.TopicOffsetRangeFetcherTaskExecutor;
 import com.epam.eco.kafkamanager.TopicSearchCriteria;
 import com.epam.eco.kafkamanager.TransactionInfo;
 import com.epam.eco.kafkamanager.TransactionSearchCriteria;
@@ -79,6 +79,7 @@ import com.epam.eco.kafkamanager.rest.request.TopicRequest;
 /**
  * @author Raman_Babich
  */
+@SuppressWarnings("deprecation")
 public class RestKafkaManager implements KafkaManager {
 
     @Autowired
@@ -89,10 +90,8 @@ public class RestKafkaManager implements KafkaManager {
     private TopicRecordCounterTaskExecutor topicRecordCounterTaskExecutor;
 
     @Autowired
-    private TopicOffsetFetcherTaskExecutor topicOffsetFetcherTaskExecutor;
-
-    @Autowired
     private TopicOffsetRangeFetcherTaskExecutor topicOffsetRangeFetcherTaskExecutor;
+
     @Autowired
     private TopicOffsetForTimeFetcherTaskExecutor topicOffsetForTimeFetcherTaskExecutor;
 
@@ -429,7 +428,7 @@ public class RestKafkaManager implements KafkaManager {
     @Deprecated
     @Override
     public TopicOffsetFetcherTaskExecutor getTopicOffsetFetcherTaskExecutor() {
-        return topicOffsetFetcherTaskExecutor;
+        return topicOffsetRangeFetcherTaskExecutor;
     }
 
     @Override

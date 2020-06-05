@@ -24,6 +24,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
  * @author Andrei_Tytsik
+ *
+ * @deprecated use {@link TopicRecordFetchParams} instead
  */
 @Deprecated
 public class RecordFetchRequest {

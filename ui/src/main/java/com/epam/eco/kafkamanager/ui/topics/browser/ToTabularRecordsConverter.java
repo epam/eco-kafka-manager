@@ -22,7 +22,7 @@ import org.apache.commons.lang3.Validate;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 
 import com.epam.eco.commons.kafka.helpers.RecordFetchResult;
-import com.epam.eco.kafkamanager.RecordFetchRequest.DataFormat;
+import com.epam.eco.kafkamanager.TopicRecordFetchParams.DataFormat;
 import com.epam.eco.kafkamanager.ui.topics.browser.TabularRecords.Record;
 
 /**
@@ -31,12 +31,12 @@ import com.epam.eco.kafkamanager.ui.topics.browser.TabularRecords.Record;
 public class ToTabularRecordsConverter {
 
     public static TabularRecords from(
-            RecordFetchParams fetchParams,
+            TopicBrowseParams browseParams,
             RecordFetchResult<?, ?> fetchResult) {
-        Validate.notNull(fetchParams, "Params object is null");
+        Validate.notNull(browseParams, "Params object is null");
         Validate.notNull(fetchResult, "Result is null");
 
-        RecordValueTabulator<?> valueTabulator = determineValueTabulator(fetchParams);
+        RecordValueTabulator<?> valueTabulator = determineValueTabulator(browseParams);
 
         TabularRecords.Builder builder = TabularRecords.builder();
         for (ConsumerRecord<?, ?> record : fetchResult) {
@@ -44,7 +44,7 @@ public class ToTabularRecordsConverter {
             builder.addRecord(tabularRecord);
         }
 
-        List<String> selectedColumns = fetchParams.listColumns();
+        List<String> selectedColumns = browseParams.listColumns();
         if (selectedColumns != null && !selectedColumns.isEmpty()) {
             builder.addSelectedColumnNames(selectedColumns);
         }
@@ -64,8 +64,8 @@ public class ToTabularRecordsConverter {
     }
 
     private static RecordValueTabulator<?> determineValueTabulator(
-            RecordFetchParams fetchParams) {
-        DataFormat dataFormat = fetchParams.getValueFormat();
+            TopicBrowseParams browseParams) {
+        DataFormat dataFormat = browseParams.getValueFormat();
         if (DataFormat.AVRO == dataFormat) {
             return new AvroRecordValueTabulator();
         } else if (

@@ -26,12 +26,12 @@ import com.epam.eco.kafkamanager.exec.TaskResult;
  * @author Andrei_Tytsik
  */
 @PreAuthorize("@authorizer.isPermitted('TOPIC', #resourceKey, 'READ')")
-public interface TopicRecordFetcherTaskExecutor<K, V> extends TaskExecutor<String, RecordFetchRequest, RecordFetchResult<K, V>> {
+public interface TopicRecordFetcherTaskExecutor<K, V> extends TaskExecutor<String, TopicRecordFetchParams, RecordFetchResult<K, V>> {
 
     @Override
-    RecordFetchResult<K, V> execute(@P("resourceKey") String topicName, RecordFetchRequest request);
+    RecordFetchResult<K, V> execute(@P("resourceKey") String topicName, TopicRecordFetchParams params);
 
     @Override
-    TaskResult<RecordFetchResult<K, V>> executeDetailed(@P("resourceKey") String topicName, RecordFetchRequest request);
+    TaskResult<RecordFetchResult<K, V>> executeDetailed(@P("resourceKey") String topicName, TopicRecordFetchParams params);
 
 }
