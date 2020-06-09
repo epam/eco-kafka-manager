@@ -15,17 +15,11 @@
  */
 package com.epam.eco.kafkamanager.ui.topics.browser;
 
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 import java.util.function.BiConsumer;
 import java.util.stream.Collectors;
 
-import org.apache.commons.lang3.Validate;
 import org.apache.kafka.common.TopicPartition;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -68,7 +62,6 @@ public class TopicBrowserController {
     public static final String ATTR_OFFSETS_FOR_TIMES = "offsetsForTimes";
 
     private static final long DEFAULT_FETCH_TIMEOUT = 30_000;
-    private static final DateTimeFormatter DATE_TIME_FORMATTER_PATTERN = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm");
 
     @Autowired
     private KafkaManager kafkaManager;
@@ -108,22 +101,15 @@ public class TopicBrowserController {
     public @ResponseBody
     ResponseEntity<?> fetchOffsetsForTimes(
             @PathVariable("name") String topicName,
-            @RequestParam("timestamp") String timestamp) {
-        Map<TopicPartition, Long> offsetsForTimes = kafkaManager.getTopicOffsetForTimeFetcherTaskExecutor().
-                execute(topicName, convertTimestampToMilliseconds(timestamp));
-
-        Map<Integer, Long> offsets = offsetsForTimes.entrySet().stream()
-                .collect(Collectors.toMap(
+            @RequestParam(name="timestamp", required=true) Long timestamp) {
+        Map<TopicPartition, Long> offsetsForTimes =
+                kafkaManager.getTopicOffsetForTimeFetcherTaskExecutor().execute(topicName, timestamp);
+        Map<Integer, Long> offsets = offsetsForTimes.entrySet().stream().
+                filter(e -> e.getValue() != null).
+                collect(Collectors.toMap(
                         entry -> entry.getKey().partition(),
                         entry -> entry.getValue()));
         return ResponseEntity.ok().body(offsets);
-    }
-
-    private Long convertTimestampToMilliseconds(String timestamp) {
-        Validate.notBlank(timestamp, "Timestamp cannot be empty");
-        LocalDateTime localDateTime = LocalDateTime.parse(timestamp, DATE_TIME_FORMATTER_PATTERN);
-        ZonedDateTime zdt = ZonedDateTime.of(localDateTime, ZoneId.systemDefault());
-        return zdt.toInstant().toEpochMilli();
     }
 
     private void handleParamsRequest(

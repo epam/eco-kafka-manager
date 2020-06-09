@@ -25,16 +25,20 @@
     <link rel="stylesheet" type="text/css" th:href="@{/bootstrap-multiselect/css/bootstrap-multiselect.css}" />
     <link rel="stylesheet" type="text/css" th:href="@{/styles/fonts/font-awesome/css/font-awesome.min.css}" />
     <link rel="stylesheet" type="text/css" th:href="@{/styles/index.css}" />
-    <link rel="stylesheet" type="text/css" th:href="@{/components/datetimepicker/jquery.datetimepicker.css}" />
+    <link rel="stylesheet" type="text/css" th:href="@{/bootstrap-datetimepicker/css/bootstrap-datetimepicker.min.css}" />
+    
     <th:block th:replace="${links}" />
     
     <script type="text/javascript" th:src="@{/jquery/jquery-3.1.1.min.js}"></script>
-    <script type="text/javascript" th:src="@{/jquery/datetimepicker/jquery.datetimepicker.full.min.js}"></script>
+    <script type="text/javascript" th:src="@{/moment/moment-2.26.min.js}"></script>
+    <script type="text/javascript" th:src="@{/moment/moment-timezone-with-data.min.js}"></script>
     <script type="text/javascript" th:src="@{/bootstrap/js/bootstrap.min.js}"></script>
     <script type="text/javascript" th:src="@{/jquery-twbsPagination/jquery.twbsPagination.min.js}"></script>
     <script type="text/javascript" th:src="@{/bootstrap-multiselect/js/bootstrap-multiselect.js}"></script>
     <script type="text/javascript" th:src="@{/bootstrap/js/bootstrap-select.min.js}"></script>
+    <script type="text/javascript" th:src="@{/bootstrap-datetimepicker/js/bootstrap-datetimepicker.min.js}"></script>
     <script type="text/javascript" th:src="@{/ui_lib.js}"></script>
+    
     <th:block th:replace="${scripts}" />
     
     <th:block th:if="${gaTrackingId != null}">
