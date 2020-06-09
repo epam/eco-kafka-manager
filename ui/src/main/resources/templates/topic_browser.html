@@ -81,6 +81,42 @@
                     $(elem).trigger('change');
                 });
             });
+
+            $('#search-offsets-for-time-link').click(function(e) {
+                e.preventDefault();
+                var date = $('#offsets-timestamp').data('DateTimePicker').date();
+                if (date) {
+                	var url = /*[[@{/topics/{name}/browser/offsets_for_times(name=${browseParams.topicName})}]]*/;
+                	url = url + '?timestamp=' + date.unix() * 1000;
+                	
+                	$(this).addClass('disabled');
+                	fetch(url, {credentials: 'include'})
+                		.then(res => res.json())
+                		.then(res => {
+                			$('.partition-checkbox').each(function(idx, elem) {
+                            	var partition = $(elem).data('partition');
+                                var offset = res[partition];
+                                if (offset) {
+                                	$('#p_' + partition).val(offset);
+                                    $(elem).prop('checked', true);
+                                    $(elem).trigger('change');
+                                } else {
+                                    $(elem).prop('checked', false);
+                                    $(elem).trigger('change');
+                                }
+							});
+						})
+					.catch(() => {})
+                	.finally(() => $(this).removeClass('disabled'))
+                }
+            });
+            
+            $('#offsets-timestamp').datetimepicker({
+                sideBySide: true,
+                format: 'DD/MM/YYYY hh:mm:ss A',
+                timeZone: 'UTC'
+            });
+            
             
             $('#valueFormat').change(function () {
                 showHideColumnSelectorDependingOnFormatSelected(fetchedValueFormat);
@@ -96,12 +132,10 @@
             $(document).on('click', function (e) {
                 hidePopoverIfClickedOutside(e);
             });
-        
+            
         });
        
     </script>
-    
-    
 
     <div th:replace="templates :: navbar"></div>
     
@@ -161,13 +195,37 @@
                                         </select>
                                     </div>
                                 </div>
-                                
-                                <a id="all-partitions-link" href="#" class="btn btn-default transparent right-icon small">
-                                    All <span class="glyphicon glyphicon-ok-circle"></span>
-                                </a>
-                                <a id="none-partitions-link" href="#" class="btn btn-default transparent right-icon small">
-                                    None <span class="glyphicon glyphicon-ban-circle"></span>
-                                </a>
+
+                                <div class="row">
+                                    <div class="form-group col col-md-2">
+                                        <a id="all-partitions-link" href="#" class="btn btn-default transparent right-icon small">
+                                            All <span class="glyphicon glyphicon-ok-circle"></span>
+                                        </a>
+                                        <a id="none-partitions-link" href="#" class="btn btn-default transparent right-icon small">
+                                            None <span class="glyphicon glyphicon-ban-circle"></span>
+                                        </a>
+                                    </div>
+                                    <div class="form-group col col-md-2">
+                                        <div class="input-group">
+                                            <input 
+                                                id="offsets-timestamp" 
+                                                type="text" 
+                                                name="offsetsTimestamp" 
+                                                th:value="${browseParams.offsetsTimestamp}"
+                                                class="form-control" 
+                                                title="Search offsets for time"/>
+                                            <span class="input-group-btn">
+                                                <a 
+                                                    id="search-offsets-for-time-link" href="#" 
+                                                    class="btn btn-primary"
+                                                    title="Search offsets for time">
+                                                    <span class="glyphicon glyphicon-search"></span>
+                                                </a>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+
                                 <div class="row" th:each="batch : ${browseParams.listPartitionBatches(3)}">
                                     <th:block 
                                         th:each="partition : ${batch}" 
@@ -302,7 +360,7 @@
                                     <tr>
                                         <td class="sticky-col">Partition</td>
                                         <td class="sticky-col">Offset</td>
-                                        <td class="sticky-col">Timestamp</td>
+                                        <td class="sticky-col">Timestamp (UTC)</td>
                                         <td class="sticky-col">Key/Value Size</td>
                                         <td class="sticky-col">Key</td>
                                         <td class="sticky-col">Attributes</td>

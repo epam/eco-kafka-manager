@@ -39,6 +39,7 @@ public class TopicBrowseParams extends HashMap<String, Object> {
     public static final String TOPIC_NAME = "topicName";
     public static final String KEY_FORMAT = "keyFormat";
     public static final String VALUE_FORMAT = "valueFormat";
+    public static final String OFFSETS_TIMESTAMP = "offsetsTimestamp";
     public static final String TIMEOUT = "timeout";
     public static final String LIMIT = "limit";
     public static final String PARTITION_OFFSET = "p_%d";
@@ -116,6 +117,14 @@ public class TopicBrowseParams extends HashMap<String, Object> {
         if (getValueFormat() == null) {
             setValueFormat(valueFormat);
         }
+    }
+
+    public String getOffsetsTimestamp() {
+        return (String)get(OFFSETS_TIMESTAMP);
+    }
+
+    public void setOffsetsTimestamp(String offsetsTimestamp) {
+        put(OFFSETS_TIMESTAMP, offsetsTimestamp);
     }
 
     public List<String> listColumns() {
