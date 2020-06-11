@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 EPAM Systems
+ * Copyright 2020 EPAM Systems
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License.  You may obtain a copy
@@ -18,26 +18,23 @@ package com.epam.eco.kafkamanager;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.kafka.common.ConsumerGroupState;
 import org.junit.Assert;
 import org.junit.Test;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import com.epam.eco.kafkamanager.ConsumerGroupInfo.StorageType;
 import com.epam.eco.kafkamanager.utils.TestObjectMapperSingleton;
 
 /**
  * @author Andrei_Tytsik
  */
-public class ConsumerGroupSearchQueryTest {
+public class BrokerSearchCriteriaTest {
 
     @Test
     public void testSerializedToJsonAndBack() throws Exception {
-        ConsumerGroupSearchQuery origin = ConsumerGroupSearchQuery.builder().
-                groupName("group1").
-                state(ConsumerGroupState.STABLE).
-                storageType(StorageType.KAFKA).
+        BrokerSearchCriteria origin = BrokerSearchCriteria.builder().
+                brokerId(42).
+                rack("default").
                 description("description").
                 build();
 
@@ -46,9 +43,9 @@ public class ConsumerGroupSearchQueryTest {
         String json = mapper.writeValueAsString(origin);
         Assert.assertNotNull(json);
 
-        ConsumerGroupSearchQuery deserialized = mapper.readValue(
+        BrokerSearchCriteria deserialized = mapper.readValue(
                 json,
-                ConsumerGroupSearchQuery.class);
+                BrokerSearchCriteria.class);
         Assert.assertNotNull(deserialized);
         Assert.assertEquals(origin, deserialized);
     }
@@ -56,35 +53,31 @@ public class ConsumerGroupSearchQueryTest {
     @Test
     public void testDeserializedFromJson1() throws Exception {
         Map<String, Object> json = new HashMap<>();
-        json.put("groupName", "group1");
-        json.put("state", "EMPTY");
-        json.put("storageType", "KAFKA");
+        json.put("brokerId", "42");
+        json.put("rack", "default");
         json.put("description", "description");
 
-        ConsumerGroupSearchQuery query = ConsumerGroupSearchQuery.fromJson(json);
-        Assert.assertNotNull(query);
-        Assert.assertEquals("group1", query.getGroupName());
-        Assert.assertEquals(ConsumerGroupState.EMPTY, query.getState());
-        Assert.assertEquals(StorageType.KAFKA, query.getStorageType());
-        Assert.assertEquals("description", query.getDescription());
+        BrokerSearchCriteria criteria = BrokerSearchCriteria.fromJson(json);
+        Assert.assertNotNull(criteria);
+        Assert.assertEquals(Integer.valueOf(42), criteria.getBrokerId());
+        Assert.assertEquals("default", criteria.getRack());
+        Assert.assertEquals("description", criteria.getDescription());
     }
 
     @Test
     public void testDeserializedFromJson2() throws Exception {
         String json =
                 "{" +
-                "\"groupName\": \"group1\"" +
-                ", \"state\": \"COMPLETING_REBALANCE\"" +
-                ", \"storageType\": \"KAFKA\"" +
+                "\"brokerId\": 42" +
+                ", \"rack\": \"default\"" +
                 ", \"description\": \"description\"" +
                 "}";
 
-        ConsumerGroupSearchQuery query = ConsumerGroupSearchQuery.fromJson(json);
-        Assert.assertNotNull(query);
-        Assert.assertEquals("group1", query.getGroupName());
-        Assert.assertEquals(ConsumerGroupState.COMPLETING_REBALANCE, query.getState());
-        Assert.assertEquals(StorageType.KAFKA, query.getStorageType());
-        Assert.assertEquals("description", query.getDescription());
+        BrokerSearchCriteria criteria = BrokerSearchCriteria.fromJson(json);
+        Assert.assertNotNull(criteria);
+        Assert.assertEquals(Integer.valueOf(42), criteria.getBrokerId());
+        Assert.assertEquals("default", criteria.getRack());
+        Assert.assertEquals("description", criteria.getDescription());
     }
 
 }

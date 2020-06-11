@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 EPAM Systems
+ * Copyright 2020 EPAM Systems
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License.  You may obtain a copy
@@ -37,7 +37,7 @@ import com.epam.eco.kafkamanager.Statistics;
 import com.epam.eco.kafkamanager.TransactionInfo;
 import com.epam.eco.kafkamanager.TransactionMetadataInfo;
 import com.epam.eco.kafkamanager.TransactionRepo;
-import com.epam.eco.kafkamanager.TransactionSearchQuery;
+import com.epam.eco.kafkamanager.TransactionSearchCriteria;
 import com.epam.eco.kafkamanager.TransactionTimeSeries;
 import com.epam.eco.kafkamanager.core.autoconfigure.KafkaManagerProperties;
 import com.epam.eco.kafkamanager.core.spring.AsyncStartingBean;
@@ -49,7 +49,7 @@ import kafka.coordinator.transaction.TransactionMetadata;
 /**
  * @author Andrei_Tytsik
  */
-public class KafkaTransactionRepo extends AbstractKeyValueRepo<String, TransactionInfo, TransactionSearchQuery> implements TransactionRepo, CachedRepo<String>, KafkaTransactionCache.CacheListener, AsyncStartingBean {
+public class KafkaTransactionRepo extends AbstractKeyValueRepo<String, TransactionInfo, TransactionSearchCriteria> implements TransactionRepo, CachedRepo<String>, KafkaTransactionCache.CacheListener, AsyncStartingBean {
 
     private final static Logger LOGGER = LoggerFactory.getLogger(KafkaTransactionRepo.class);
 

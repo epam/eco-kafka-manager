@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 EPAM Systems
+ * Copyright 2020 EPAM Systems
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License.  You may obtain a copy
@@ -37,7 +37,7 @@ import com.epam.eco.commons.kafka.serde.JsonSerializer;
 import com.epam.eco.kafkamanager.Metadata;
 import com.epam.eco.kafkamanager.MetadataKey;
 import com.epam.eco.kafkamanager.MetadataRepo;
-import com.epam.eco.kafkamanager.MetadataSearchQuery;
+import com.epam.eco.kafkamanager.MetadataSearchCriteria;
 import com.epam.eco.kafkamanager.MetadataUpdateListener;
 import com.epam.eco.kafkamanager.core.autoconfigure.KafkaManagerProperties;
 import com.epam.eco.kafkamanager.core.spring.AsyncStartingBean;
@@ -46,7 +46,7 @@ import com.epam.eco.kafkamanager.repo.AbstractKeyValueRepo;
 /**
  * @author Andrei_Tytsik
  */
-public class KafkaMetadataRepo extends AbstractKeyValueRepo<MetadataKey, Metadata, MetadataSearchQuery> implements MetadataRepo, CacheListener<MetadataKey, Metadata>, AsyncStartingBean {
+public class KafkaMetadataRepo extends AbstractKeyValueRepo<MetadataKey, Metadata, MetadataSearchCriteria> implements MetadataRepo, CacheListener<MetadataKey, Metadata>, AsyncStartingBean {
 
     private final static Logger LOGGER = LoggerFactory.getLogger(KafkaMetadataRepo.class);
 

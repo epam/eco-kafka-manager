@@ -15,7 +15,12 @@
         <Bug pattern="EXS_EXCEPTION_SOFTENING_NO_CONSTRAINTS" />
     </Match>
     <Match>
-        <Class name="com.epam.eco.kafkamanager.client.topic.exec.RestTopicOffsetFetcherTaskExecutor" />
+        <Class name="com.epam.eco.kafkamanager.client.topic.exec.RestTopicOffsetRangeFetcherTaskExecutor" />
+        <Method name="doExecute" />
+        <Bug pattern="EXS_EXCEPTION_SOFTENING_NO_CONSTRAINTS" />
+    </Match>
+    <Match>
+        <Class name="com.epam.eco.kafkamanager.client.topic.exec.RestTopicOffsetForTimeFetcherTaskExecutor" />
         <Method name="doExecute" />
         <Bug pattern="EXS_EXCEPTION_SOFTENING_NO_CONSTRAINTS" />
     </Match>

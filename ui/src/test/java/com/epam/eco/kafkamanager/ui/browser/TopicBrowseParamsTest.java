@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 EPAM Systems
+ * Copyright 2020 EPAM Systems
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License.  You may obtain a copy
@@ -22,17 +22,17 @@ import java.util.List;
 import org.junit.Assert;
 import org.junit.Test;
 
-import com.epam.eco.kafkamanager.RecordFetchRequest.DataFormat;
-import com.epam.eco.kafkamanager.ui.topics.browser.RecordFetchParams;
+import com.epam.eco.kafkamanager.TopicRecordFetchParams.DataFormat;
+import com.epam.eco.kafkamanager.ui.topics.browser.TopicBrowseParams;
 
 /**
  * @author Andrei_Tytsik
  */
-public class RecordFetchParamsTest {
+public class TopicBrowseParamsTest {
 
     @Test
     public void testAccessorsGetDefaultsOnEmptyMap() throws Exception {
-        RecordFetchParams params = RecordFetchParams.with(null);
+        TopicBrowseParams params = TopicBrowseParams.with(null);
 
         Assert.assertNotNull(params);
         Assert.assertEquals(null, params.getTopicName());
@@ -54,7 +54,7 @@ public class RecordFetchParamsTest {
 
     @Test
     public void testAccessorsSetAndGetValues() throws Exception {
-        RecordFetchParams params = RecordFetchParams.with(null);
+        TopicBrowseParams params = TopicBrowseParams.with(null);
 
         params.setTopicName("topic");
         Assert.assertEquals("topic", params.getTopicName());

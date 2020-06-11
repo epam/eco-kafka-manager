@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 EPAM Systems
+ * Copyright 2020 EPAM Systems
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License.  You may obtain a copy
@@ -19,7 +19,7 @@ import java.util.Objects;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import com.epam.eco.kafkamanager.RecordFetchRequest;
+import com.epam.eco.kafkamanager.TopicRecordFetchParams;
 
 /**
  * @author Raman_Babich
@@ -27,21 +27,20 @@ import com.epam.eco.kafkamanager.RecordFetchRequest;
 public class TopicRecordFetchRequest {
 
     private final String topicName;
-    private final RecordFetchRequest fetchRequest;
+    private final TopicRecordFetchParams fetchParams;
 
     public TopicRecordFetchRequest(
             @JsonProperty("topicName") String topicName,
-            @JsonProperty("fetchRequest") RecordFetchRequest fetchRequest) {
+            @JsonProperty("fetchParams") TopicRecordFetchParams fetchParams) {
         this.topicName = topicName;
-        this.fetchRequest = fetchRequest;
+        this.fetchParams = fetchParams;
     }
 
     public String getTopicName() {
         return topicName;
     }
-
-    public RecordFetchRequest getFetchRequest() {
-        return fetchRequest;
+    public TopicRecordFetchParams getFetchParams() {
+        return fetchParams;
     }
 
     @Override
@@ -50,19 +49,20 @@ public class TopicRecordFetchRequest {
         if (o == null || getClass() != o.getClass()) return false;
         TopicRecordFetchRequest that = (TopicRecordFetchRequest) o;
         return Objects.equals(topicName, that.topicName) &&
-                Objects.equals(fetchRequest, that.fetchRequest);
+                Objects.equals(fetchParams, that.fetchParams);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(topicName, fetchRequest);
+        return Objects.hash(topicName, fetchParams);
     }
 
     @Override
     public String toString() {
         return "TopicRecordFetchRequest{" +
                 "topicName='" + topicName + '\'' +
-                ", fetchRequest=" + fetchRequest +
+                ", fetchParams=" + fetchParams +
                 '}';
     }
+
 }

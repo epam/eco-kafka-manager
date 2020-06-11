@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 EPAM Systems
+ * Copyright 2020 EPAM Systems
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License.  You may obtain a copy
@@ -53,9 +53,9 @@ public class TopicMetadataDeleteParamsTest {
         Map<String, Object> json = new HashMap<>();
         json.put("topicName", "topic1");
 
-        TopicMetadataDeleteParams query = TopicMetadataDeleteParams.fromJson(json);
-        Assert.assertNotNull(query);
-        Assert.assertEquals("topic1", query.getTopicName());
+        TopicMetadataDeleteParams params = TopicMetadataDeleteParams.fromJson(json);
+        Assert.assertNotNull(params);
+        Assert.assertEquals("topic1", params.getTopicName());
     }
 
     @Test
@@ -65,9 +65,9 @@ public class TopicMetadataDeleteParamsTest {
                 "\"topicName\": \"topic1\"" +
                 "}";
 
-        TopicMetadataDeleteParams query = TopicMetadataDeleteParams.fromJson(json);
-        Assert.assertNotNull(query);
-        Assert.assertEquals("topic1", query.getTopicName());
+        TopicMetadataDeleteParams params = TopicMetadataDeleteParams.fromJson(json);
+        Assert.assertNotNull(params);
+        Assert.assertEquals("topic1", params.getTopicName());
     }
 
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 EPAM Systems
+ * Copyright 2020 EPAM Systems
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License.  You may obtain a copy
@@ -117,7 +117,7 @@ public class TopicPartitionOffsetIncreaseMetric implements Metric, ScheduleCalcu
 
     private OffsetRange getTopicOffsetRange() {
         TaskResult<Map<TopicPartition, OffsetRange>> currentResult =
-                kafkaManager.getTopicOffsetFetcherTaskExecutor().
+                kafkaManager.getTopicOffsetRangeFetcherTaskExecutor().
                 getResult(topicPartition.topic()).
                 orElse(null);
         return
@@ -127,7 +127,7 @@ public class TopicPartitionOffsetIncreaseMetric implements Metric, ScheduleCalcu
     }
 
     private void prefetchTopicOffsets() {
-        kafkaManager.getTopicOffsetFetcherTaskExecutor().submit(topicPartition.topic());
+        kafkaManager.getTopicOffsetRangeFetcherTaskExecutor().submit(topicPartition.topic());
     }
 
     private boolean checkTopicExists() {

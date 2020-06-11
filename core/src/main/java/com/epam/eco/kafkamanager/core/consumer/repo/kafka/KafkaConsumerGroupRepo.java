@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 EPAM Systems
+ * Copyright 2020 EPAM Systems
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License.  You may obtain a copy
@@ -41,7 +41,7 @@ import com.epam.eco.kafkamanager.ConsumerGroupInfo.StorageType;
 import com.epam.eco.kafkamanager.ConsumerGroupMemberInfo;
 import com.epam.eco.kafkamanager.ConsumerGroupMetadataKey;
 import com.epam.eco.kafkamanager.ConsumerGroupRepo;
-import com.epam.eco.kafkamanager.ConsumerGroupSearchQuery;
+import com.epam.eco.kafkamanager.ConsumerGroupSearchCriteria;
 import com.epam.eco.kafkamanager.EntityType;
 import com.epam.eco.kafkamanager.KafkaAdminOperations;
 import com.epam.eco.kafkamanager.Metadata;
@@ -58,7 +58,7 @@ import com.epam.eco.kafkamanager.repo.CachedRepo;
 /**
  * @author Andrei_Tytsik
  */
-public class KafkaConsumerGroupRepo extends AbstractKeyValueRepo<String, ConsumerGroupInfo, ConsumerGroupSearchQuery> implements ConsumerGroupRepo, CachedRepo<String>, KafkaConsumerGroupCache.CacheListener, MetadataUpdateListener, AsyncStartingBean {
+public class KafkaConsumerGroupRepo extends AbstractKeyValueRepo<String, ConsumerGroupInfo, ConsumerGroupSearchCriteria> implements ConsumerGroupRepo, CachedRepo<String>, KafkaConsumerGroupCache.CacheListener, MetadataUpdateListener, AsyncStartingBean {
 
     private final static Logger LOGGER = LoggerFactory.getLogger(KafkaConsumerGroupRepo.class);
 

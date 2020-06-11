@@ -1,12 +1,12 @@
 <!--
- * Copyright 2019 EPAM Systems
- * 
+ * Copyright 2020 EPAM Systems
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License.  You may obtain a copy
  * of the License at
- * 
+ *
  *   http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
@@ -97,44 +97,44 @@
                                 </button>
                                 <ul class="dropdown-menu" aria-labelledby="exportButton">
                                     <li>
-                                        <a
-                                                th:href="@{/permissions/export(exporterType=PLAIN, resourceType=${searchQuery.resourceType}, resourceName=${searchQuery.resourceName}, kafkaPrincipal=${searchQuery.kafkaPrincipal}, permissionType=${searchQuery.permissionType}, operation=${searchQuery.operation}, host=${searchQuery.host}, description=${searchQuery.description})}" target="_blank">
+                                        <a 
+                                            th:href="@{/permissions/export(exporterType=PLAIN, resourceType=${searchCriteria.resourceType}, resourceName=${searchCriteria.resourceName}, kafkaPrincipal=${searchCriteria.kafkaPrincipal}, permissionType=${searchCriteria.permissionType}, operation=${searchCriteria.operation}, host=${searchCriteria.host}, description=${searchCriteria.description})}" target="_blank">
                                             Plain
                                         </a>
                                     </li>
                                     <li>
-                                        <a
-                                                th:href="@{/permissions/export(exporterType=JSON, resourceType=${searchQuery.resourceType}, resourceName=${searchQuery.resourceName}, kafkaPrincipal=${searchQuery.kafkaPrincipal}, permissionType=${searchQuery.permissionType}, operation=${searchQuery.operation}, host=${searchQuery.host}, description=${searchQuery.description})}" target="_blank">
+                                        <a 
+                                            th:href="@{/permissions/export(exporterType=JSON, resourceType=${searchCriteria.resourceType}, resourceName=${searchCriteria.resourceName}, kafkaPrincipal=${searchCriteria.kafkaPrincipal}, permissionType=${searchCriteria.permissionType}, operation=${searchCriteria.operation}, host=${searchCriteria.host}, description=${searchCriteria.description})}" target="_blank">
                                             Json
                                         </a>
                                     </li>
                                     <li>
-                                        <a
-                                                th:href="@{/permissions/export(exporterType=CSV, resourceType=${searchQuery.resourceType}, resourceName=${searchQuery.resourceName}, kafkaPrincipal=${searchQuery.kafkaPrincipal}, permissionType=${searchQuery.permissionType}, operation=${searchQuery.operation}, host=${searchQuery.host}, description=${searchQuery.description})}" target="_blank">
+                                        <a 
+                                            th:href="@{/permissions/export(exporterType=CSV, resourceType=${searchCriteria.resourceType}, resourceName=${searchCriteria.resourceName}, kafkaPrincipal=${searchCriteria.kafkaPrincipal}, permissionType=${searchCriteria.permissionType}, operation=${searchCriteria.operation}, host=${searchCriteria.host}, description=${searchCriteria.description})}" target="_blank">
                                             Csv
                                         </a>
                                     </li>
                                     <li>
-                                        <a
-                                                th:href="@{/permissions/export(exporterType=GROUPED_BY_RESOURCE_PLAIN, resourceType=${searchQuery.resourceType}, resourceName=${searchQuery.resourceName}, kafkaPrincipal=${searchQuery.kafkaPrincipal}, permissionType=${searchQuery.permissionType}, operation=${searchQuery.operation}, host=${searchQuery.host}, description=${searchQuery.description})}" target="_blank">
+                                        <a 
+                                            th:href="@{/permissions/export(exporterType=GROUPED_BY_RESOURCE_PLAIN, resourceType=${searchCriteria.resourceType}, resourceName=${searchCriteria.resourceName}, kafkaPrincipal=${searchCriteria.kafkaPrincipal}, permissionType=${searchCriteria.permissionType}, operation=${searchCriteria.operation}, host=${searchCriteria.host}, description=${searchCriteria.description})}" target="_blank">
                                             Grouped By Resource (Plain)
                                         </a>
                                     </li>
                                     <li>
-                                        <a
-                                                th:href="@{/permissions/export(exporterType=GROUPED_BY_RESOURCE_JSON, resourceType=${searchQuery.resourceType}, resourceName=${searchQuery.resourceName}, kafkaPrincipal=${searchQuery.kafkaPrincipal}, permissionType=${searchQuery.permissionType}, operation=${searchQuery.operation}, host=${searchQuery.host}, description=${searchQuery.description})}" target="_blank">
+                                        <a 
+                                            th:href="@{/permissions/export(exporterType=GROUPED_BY_RESOURCE_JSON, resourceType=${searchCriteria.resourceType}, resourceName=${searchCriteria.resourceName}, kafkaPrincipal=${searchCriteria.kafkaPrincipal}, permissionType=${searchCriteria.permissionType}, operation=${searchCriteria.operation}, host=${searchCriteria.host}, description=${searchCriteria.description})}" target="_blank">
                                             Grouped By Resource (Json)
                                         </a>
                                     </li>
                                     <li>
-                                        <a
-                                                th:href="@{/permissions/export(exporterType=GROUPED_BY_PRINCIPAL_PLAIN, resourceType=${searchQuery.resourceType}, resourceName=${searchQuery.resourceName}, kafkaPrincipal=${searchQuery.kafkaPrincipal}, permissionType=${searchQuery.permissionType}, operation=${searchQuery.operation}, host=${searchQuery.host}, description=${searchQuery.description})}" target="_blank">
+                                        <a 
+                                            th:href="@{/permissions/export(exporterType=GROUPED_BY_PRINCIPAL_PLAIN, resourceType=${searchCriteria.resourceType}, resourceName=${searchCriteria.resourceName}, kafkaPrincipal=${searchCriteria.kafkaPrincipal}, permissionType=${searchCriteria.permissionType}, operation=${searchCriteria.operation}, host=${searchCriteria.host}, description=${searchCriteria.description})}" target="_blank">
                                             Grouped By Principal (Plain)
                                         </a>
                                     </li>
                                     <li>
-                                        <a
-                                                th:href="@{/permissions/export(exporterType=GROUPED_BY_PRINCIPAL_JSON, resourceType=${searchQuery.resourceType}, resourceName=${searchQuery.resourceName}, kafkaPrincipal=${searchQuery.kafkaPrincipal}, permissionType=${searchQuery.permissionType}, operation=${searchQuery.operation}, host=${searchQuery.host}, description=${searchQuery.description})}" target="_blank">
+                                        <a 
+                                            th:href="@{/permissions/export(exporterType=GROUPED_BY_PRINCIPAL_JSON, resourceType=${searchCriteria.resourceType}, resourceName=${searchCriteria.resourceName}, kafkaPrincipal=${searchCriteria.kafkaPrincipal}, permissionType=${searchCriteria.permissionType}, operation=${searchCriteria.operation}, host=${searchCriteria.host}, description=${searchCriteria.description})}" target="_blank">
                                             Grouped By Principal (Json)
                                         </a>
                                     </li>
@@ -151,7 +151,7 @@
                                 th:each="resourceType : ${T(org.apache.kafka.common.resource.ResourceType).values()}"
                                 th:value="${resourceType}" 
                                 th:text="${resourceType}"
-                                th:selected="${resourceType == searchQuery.resourceType}">
+                                th:selected="${resourceType == searchCriteria.resourceType}">
                             </option>
                         </select>
                         <input 
@@ -159,20 +159,20 @@
                             class="form-control" 
                             id="resourceName" 
                             placeholder="Resource Name"
-                            th:value="${searchQuery.resourceName}"/>
+                            th:value="${searchCriteria.resourceName}"/>
                         <input 
                             type="text"
                             class="form-control"
                             id="kafkaPrincipal" 
                             placeholder="Kafka Principal"
-                            th:value="${searchQuery.kafkaPrincipal}"/>
+                            th:value="${searchCriteria.kafkaPrincipal}"/>
                         <select title="Permission Type" class="form-control" id="permissionType">
                             <option value="">-</option>
                             <option 
                                 th:each="permissionType : ${T(org.apache.kafka.common.acl.AclPermissionType).values()}"
                                 th:value="${permissionType}" 
                                 th:text="${permissionType}"
-                                th:selected="${permissionType == searchQuery.permissionType}">
+                                th:selected="${permissionType == searchCriteria.permissionType}">
                             </option>
                         </select>
                         <select title="Operation" class="form-control" id="operation">
@@ -181,7 +181,7 @@
                                 th:each="operation : ${T(org.apache.kafka.common.acl.AclOperation).values()}"
                                 th:value="${operation}" 
                                 th:text="${operation}"
-                                th:selected="${operation == searchQuery.operation}">
+                                th:selected="${operation == searchCriteria.operation}">
                             </option>
                         </select>
                         <input 
@@ -189,13 +189,13 @@
                             class="form-control"
                             id="host" 
                             placeholder="Host"
-                            th:value="${searchQuery.host}"/>
+                            th:value="${searchCriteria.host}"/>
                         <input 
                             type="text"
                             class="form-control"
                             id="description" 
                             placeholder="Description"
-                            th:value="${searchQuery.description}"/>
+                            th:value="${searchCriteria.description}"/>
                         <button 
                             type="submit"
                             class="btn btn-primary">

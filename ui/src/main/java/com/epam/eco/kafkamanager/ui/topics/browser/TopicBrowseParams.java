@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 EPAM Systems
+ * Copyright 2020 EPAM Systems
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License.  You may obtain a copy
@@ -26,19 +26,20 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.collections4.ListUtils;
 
-import com.epam.eco.kafkamanager.RecordFetchRequest;
-import com.epam.eco.kafkamanager.RecordFetchRequest.DataFormat;
+import com.epam.eco.kafkamanager.TopicRecordFetchParams;
+import com.epam.eco.kafkamanager.TopicRecordFetchParams.DataFormat;
 
 /**
  * @author Andrei_Tytsik
  */
-public class RecordFetchParams extends HashMap<String, Object> {
+public class TopicBrowseParams extends HashMap<String, Object> {
 
     private static final long serialVersionUID = 1L;
 
     public static final String TOPIC_NAME = "topicName";
     public static final String KEY_FORMAT = "keyFormat";
     public static final String VALUE_FORMAT = "valueFormat";
+    public static final String OFFSETS_TIMESTAMP = "offsetsTimestamp";
     public static final String TIMEOUT = "timeout";
     public static final String LIMIT = "limit";
     public static final String PARTITION_OFFSET = "p_%d";
@@ -48,7 +49,7 @@ public class RecordFetchParams extends HashMap<String, Object> {
     private static final Pattern PARTITION_OFFSET_PATTERN = Pattern.compile("^p_(0|[1-9]\\d*)$");
     private static final Pattern COLUMN_ENABLED_PATTERN = Pattern.compile("^ce_(.+)$");
 
-    public RecordFetchParams(Map<String, Object> requestParams) {
+    public TopicBrowseParams(Map<String, Object> requestParams) {
         if (requestParams != null) {
             putAll(requestParams);
         }
@@ -118,6 +119,14 @@ public class RecordFetchParams extends HashMap<String, Object> {
         }
     }
 
+    public String getOffsetsTimestamp() {
+        return (String)get(OFFSETS_TIMESTAMP);
+    }
+
+    public void setOffsetsTimestamp(String offsetsTimestamp) {
+        put(OFFSETS_TIMESTAMP, offsetsTimestamp);
+    }
+
     public List<String> listColumns() {
         return keySet().stream().
                 filter(key -> COLUMN_ENABLED_PATTERN.matcher(key).matches()).
@@ -138,7 +147,7 @@ public class RecordFetchParams extends HashMap<String, Object> {
 
     public long getLimit() {
         Long limit = getAsLong(LIMIT);
-        return limit != null ? limit : RecordFetchRequest.MAX_LIMIT;
+        return limit != null ? limit : TopicRecordFetchParams.MAX_LIMIT;
     }
 
     public void setLimit(long limit) {
@@ -302,8 +311,8 @@ public class RecordFetchParams extends HashMap<String, Object> {
         return matcher.group(1);
     }
 
-    public static RecordFetchParams with(Map<String, Object> requestParams) {
-        return new RecordFetchParams(requestParams);
+    public static TopicBrowseParams with(Map<String, Object> requestParams) {
+        return new TopicBrowseParams(requestParams);
     }
 
 }

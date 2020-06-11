@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 EPAM Systems
+ * Copyright 2020 EPAM Systems
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License.  You may obtain a copy
@@ -63,11 +63,11 @@ public class TopicMetadataUpdateParamsTest {
         json.put("attributes", attributes);
         json.put("description", "description");
 
-        TopicMetadataUpdateParams query = TopicMetadataUpdateParams.fromJson(json);
-        Assert.assertNotNull(query);
-        Assert.assertEquals("topic1", query.getTopicName());
-        Assert.assertEquals(attributes, query.getAttributes());
-        Assert.assertEquals("description", query.getDescription());
+        TopicMetadataUpdateParams params = TopicMetadataUpdateParams.fromJson(json);
+        Assert.assertNotNull(params);
+        Assert.assertEquals("topic1", params.getTopicName());
+        Assert.assertEquals(attributes, params.getAttributes());
+        Assert.assertEquals("description", params.getDescription());
     }
 
     @Test
@@ -79,15 +79,15 @@ public class TopicMetadataUpdateParamsTest {
                 ", \"description\": \"description\"" +
                 "}";
 
-        TopicMetadataUpdateParams query = TopicMetadataUpdateParams.fromJson(json);
-        Assert.assertNotNull(query);
-        Assert.assertEquals("topic1", query.getTopicName());
+        TopicMetadataUpdateParams params = TopicMetadataUpdateParams.fromJson(json);
+        Assert.assertNotNull(params);
+        Assert.assertEquals("topic1", params.getTopicName());
         Map<String, Object> attributes = new HashMap<>();
         attributes.put("attr1", "value1");
         attributes.put("attr2", "value2");
         attributes.put("attr3", "value3");
-        Assert.assertEquals(attributes, query.getAttributes());
-        Assert.assertEquals("description", query.getDescription());
+        Assert.assertEquals(attributes, params.getAttributes());
+        Assert.assertEquals("description", params.getDescription());
     }
 
 }

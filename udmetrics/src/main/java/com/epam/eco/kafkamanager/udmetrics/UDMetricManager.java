@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 EPAM Systems
+ * Copyright 2020 EPAM Systems
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License.  You may obtain a copy
@@ -32,7 +32,7 @@ public interface UDMetricManager {
     void remove(String name);
     UDMetric get(String name);
     Page<UDMetric> page(Pageable pageable);
-    Page<UDMetric> page(UDMetricSearchQuery query, Pageable pageable);
+    Page<UDMetric> page(UDMetricSearchCriteria criteria, Pageable pageable);
     List<UDMetric> listAll();
     int getCount();
 }

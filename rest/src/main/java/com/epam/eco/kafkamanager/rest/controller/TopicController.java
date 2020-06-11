@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 EPAM Systems
+ * Copyright 2020 EPAM Systems
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License.  You may obtain a copy
@@ -41,7 +41,7 @@ import com.epam.eco.kafkamanager.TopicInfo;
 import com.epam.eco.kafkamanager.TopicMetadataDeleteParams;
 import com.epam.eco.kafkamanager.TopicMetadataUpdateParams;
 import com.epam.eco.kafkamanager.TopicPartitionsCreateParams;
-import com.epam.eco.kafkamanager.TopicSearchQuery;
+import com.epam.eco.kafkamanager.TopicSearchCriteria;
 import com.epam.eco.kafkamanager.TransactionInfo;
 import com.epam.eco.kafkamanager.core.utils.PageUtils;
 import com.epam.eco.kafkamanager.rest.request.MetadataRequest;
@@ -68,14 +68,14 @@ public class TopicController {
             @RequestParam(value = "maxReplicationFactor", required = false) Integer maxReplicationFactor,
             @RequestParam(value = "minConsumerCount", required = false) Integer minConsumerCount,
             @RequestParam(value = "maxConsumerCount", required = false) Integer maxConsumerCount,
-            @RequestParam(value = "replicationState", required = false) TopicSearchQuery.ReplicationState replicationState,
+            @RequestParam(value = "replicationState", required = false) TopicSearchCriteria.ReplicationState replicationState,
             @RequestParam(value = "configString", required = false) String configString,
             @RequestParam(value = "configMap", required = false) Map<String, String> configMap,
             @RequestParam(value = "description", required = false) String description,
             @RequestParam(value = "page", required = false) Integer page,
             @RequestParam(value = "pageSize", required = false) Integer pageSize) {
         Pageable pageable = PageUtils.buildPageableWithDefaultsIfNull(page, pageSize);
-        TopicSearchQuery query = TopicSearchQuery.builder()
+        TopicSearchCriteria criteria = TopicSearchCriteria.builder()
                 .topicName(topicName)
                 .minPartitionCount(minPartitionCount)
                 .maxPartitionCount(maxPartitionCount)
@@ -88,7 +88,7 @@ public class TopicController {
                 .configMap(configMap)
                 .description(description)
                 .build();
-        return kafkaManager.getTopicPage(query, pageable);
+        return kafkaManager.getTopicPage(criteria, pageable);
     }
 
     @GetMapping("/{topicName}")
@@ -98,7 +98,7 @@ public class TopicController {
 
     @PostMapping
     public TopicInfo postTopic(@RequestBody TopicRequest request) {
-        TopicCreateParams query = TopicCreateParams.builder()
+        TopicCreateParams params = TopicCreateParams.builder()
                 .topicName(request.getTopicName())
                 .partitionCount(request.getPartitionCount())
                 .replicationFactor(request.getReplicationFactor())
@@ -106,7 +106,7 @@ public class TopicController {
                 .description(request.getDescription())
                 .attributes(request.getAttributes())
                 .build();
-        return kafkaManager.createTopic(query);
+        return kafkaManager.createTopic(params);
     }
 
     @DeleteMapping("/{topicName}")
@@ -119,42 +119,42 @@ public class TopicController {
     public TopicInfo putTopicConfigs(
             @PathVariable("topicName") String topicName,
             @RequestBody TopicConfigRequest request) {
-        TopicConfigUpdateParams query = TopicConfigUpdateParams.builder()
+        TopicConfigUpdateParams params = TopicConfigUpdateParams.builder()
                 .topicName(topicName)
                 .config(request.getConfig())
                 .build();
-        return kafkaManager.updateTopic(query);
+        return kafkaManager.updateTopic(params);
     }
 
     @PutMapping("/{topicName}/partitions")
     public TopicInfo putTopicPartitions(
             @PathVariable("topicName") String topicName,
             @RequestBody TopicPartitionsRequest request) {
-        TopicPartitionsCreateParams query = TopicPartitionsCreateParams.builder()
+        TopicPartitionsCreateParams params = TopicPartitionsCreateParams.builder()
                 .topicName(topicName)
                 .newPartitionCount(request.getNewPartitionCount())
                 .build();
-        return kafkaManager.updateTopic(query);
+        return kafkaManager.updateTopic(params);
     }
 
     @PutMapping("/{topicName}/metadata")
     public TopicInfo putTopicMetadata(
             @PathVariable("topicName") String topicName,
             @RequestBody MetadataRequest request) {
-        TopicMetadataUpdateParams query = TopicMetadataUpdateParams.builder()
+        TopicMetadataUpdateParams params = TopicMetadataUpdateParams.builder()
                 .topicName(topicName)
                 .description(request.getDescription())
                 .attributes(request.getAttributes())
                 .build();
-        return kafkaManager.updateTopic(query);
+        return kafkaManager.updateTopic(params);
     }
 
     @DeleteMapping("/{topicName}/metadata")
     public TopicInfo deleteTopicMetadata(@PathVariable("topicName") String topicName) {
-        TopicMetadataDeleteParams query = TopicMetadataDeleteParams.builder()
+        TopicMetadataDeleteParams params = TopicMetadataDeleteParams.builder()
                 .topicName(topicName)
                 .build();
-        return kafkaManager.updateTopic(query);
+        return kafkaManager.updateTopic(params);
     }
 
     @GetMapping("/{topicName}/consumer-groups")

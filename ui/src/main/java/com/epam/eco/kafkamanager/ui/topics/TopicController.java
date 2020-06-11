@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 EPAM Systems
+ * Copyright 2020 EPAM Systems
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License.  You may obtain a copy
@@ -52,7 +52,7 @@ import com.epam.eco.kafkamanager.TopicInfo;
 import com.epam.eco.kafkamanager.TopicMetadataDeleteParams;
 import com.epam.eco.kafkamanager.TopicMetadataUpdateParams;
 import com.epam.eco.kafkamanager.TopicPartitionsCreateParams;
-import com.epam.eco.kafkamanager.TopicSearchQuery;
+import com.epam.eco.kafkamanager.TopicSearchCriteria;
 import com.epam.eco.kafkamanager.udmetrics.UDMetric;
 import com.epam.eco.kafkamanager.udmetrics.UDMetricManager;
 import com.epam.eco.kafkamanager.udmetrics.UDMetricType;
@@ -77,7 +77,7 @@ public class TopicController {
     public static final String ATTR_PAGE = "page";
     public static final String ATTR_TOPIC = "topic";
     public static final String ATTR_CONFIG_DEF = "configDef";
-    public static final String ATTR_SEARCH_QUERY = "searchQuery";
+    public static final String ATTR_SEARCH_CRITERIA = "searchCriteria";
     public static final String ATTR_TOPIC_OFFSET_INCREASE_UDM_TYPE = "topicOffsetIncreaseUdmType";
     public static final String ATTR_TOPIC_OFFSET_INCREASE_UDM_NAME = "topicOffsetIncreaseUdmName";
     public static final String ATTR_TOPIC_OFFSET_INCREASE_UDM = "topicOffsetIncreaseUdm";
@@ -114,14 +114,14 @@ public class TopicController {
             @RequestParam(required=false) Integer page,
             @RequestParam Map<String, Object> paramsMap,
             Model model) {
-        TopicSearchQuery searchQuery = TopicSearchQuery.fromJsonWith(paramsMap, kafkaManager);
+        TopicSearchCriteria searchCriteria = TopicSearchCriteria.fromJsonWith(paramsMap, kafkaManager);
         page = page != null && page > 0 ? page -1 : 0;
 
         Page<TopicInfo> topicPage = kafkaManager.getTopicPage(
-                searchQuery,
+                searchCriteria,
                 PageRequest.of(page, PAGE_SIZE));
 
-        model.addAttribute(ATTR_SEARCH_QUERY, searchQuery);
+        model.addAttribute(ATTR_SEARCH_CRITERIA, searchCriteria);
         model.addAttribute(ATTR_PAGE, wrap(topicPage));
         model.addAttribute(ATTR_TOTAL_COUNT, kafkaManager.getTopicCount());
 
@@ -155,9 +155,9 @@ public class TopicController {
             @RequestParam TopicExporterType exporterType,
             @RequestParam Map<String, Object> paramsMap,
             HttpServletResponse response) throws IOException {
-        TopicSearchQuery searchQuery = TopicSearchQuery.fromJsonWith(paramsMap, kafkaManager);
+        TopicSearchCriteria searchCriteria = TopicSearchCriteria.fromJsonWith(paramsMap, kafkaManager);
 
-        List<TopicInfo> topicInfos = kafkaManager.getTopics(searchQuery);
+        List<TopicInfo> topicInfos = kafkaManager.getTopics(searchCriteria);
 
         response.setContentType(exporterType.contentType());
         response.setHeader(

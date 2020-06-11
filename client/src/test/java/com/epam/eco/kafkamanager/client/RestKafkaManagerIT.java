@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 EPAM Systems
+ * Copyright 2020 EPAM Systems
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License.  You may obtain a copy
@@ -36,7 +36,32 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 import com.epam.eco.commons.kafka.OffsetRange;
 import com.epam.eco.commons.kafka.helpers.RecordFetchResult;
-import com.epam.eco.kafkamanager.*;
+import com.epam.eco.kafkamanager.BrokerInfo;
+import com.epam.eco.kafkamanager.BrokerMetadataDeleteParams;
+import com.epam.eco.kafkamanager.BrokerMetadataUpdateParams;
+import com.epam.eco.kafkamanager.BrokerSearchCriteria;
+import com.epam.eco.kafkamanager.ConsumerGroupInfo;
+import com.epam.eco.kafkamanager.ConsumerGroupMetadataDeleteParams;
+import com.epam.eco.kafkamanager.ConsumerGroupMetadataUpdateParams;
+import com.epam.eco.kafkamanager.ConsumerGroupSearchCriteria;
+import com.epam.eco.kafkamanager.KafkaManager;
+import com.epam.eco.kafkamanager.OffsetTimeSeries;
+import com.epam.eco.kafkamanager.PermissionCreateParams;
+import com.epam.eco.kafkamanager.PermissionDeleteParams;
+import com.epam.eco.kafkamanager.PermissionInfo;
+import com.epam.eco.kafkamanager.PermissionMetadataDeleteParams;
+import com.epam.eco.kafkamanager.PermissionMetadataUpdateParams;
+import com.epam.eco.kafkamanager.PermissionSearchCriteria;
+import com.epam.eco.kafkamanager.TopicConfigUpdateParams;
+import com.epam.eco.kafkamanager.TopicCreateParams;
+import com.epam.eco.kafkamanager.TopicInfo;
+import com.epam.eco.kafkamanager.TopicMetadataDeleteParams;
+import com.epam.eco.kafkamanager.TopicMetadataUpdateParams;
+import com.epam.eco.kafkamanager.TopicPartitionsCreateParams;
+import com.epam.eco.kafkamanager.TopicRecordFetchParams;
+import com.epam.eco.kafkamanager.TopicSearchCriteria;
+import com.epam.eco.kafkamanager.TransactionInfo;
+import com.epam.eco.kafkamanager.TransactionSearchCriteria;
 import com.epam.eco.kafkamanager.exec.TaskResult;
 
 /**
@@ -62,7 +87,7 @@ public class RestKafkaManagerIT {
         Assert.assertTrue("Broker does't exist", kafkaManager.brokerExists(brokers.get(0).getId()));
 
         Page<BrokerInfo> brokerPage = kafkaManager.getBrokerPage(
-                BrokerSearchQuery.builder().build(),
+                BrokerSearchCriteria.builder().build(),
                 PageRequest.of(0, 10));
         Assert.assertNotNull(brokerPage);
         Assert.assertTrue("There is no brokers", brokerPage.getContent().size() > 0);
@@ -90,7 +115,7 @@ public class RestKafkaManagerIT {
 
         Assert.assertTrue("Topic doesn't exist", kafkaManager.topicExists(topicName));
 
-        Map<TopicPartition, OffsetRange> offsetMap = kafkaManager.getTopicOffsetFetcherTaskExecutor().execute(topicName);
+        Map<TopicPartition, OffsetRange> offsetMap = kafkaManager.getTopicOffsetRangeFetcherTaskExecutor().execute(topicName);
         Assert.assertNotNull(offsetMap);
         Assert.assertFalse("Offset map is empty", offsetMap.isEmpty());
 
@@ -98,19 +123,19 @@ public class RestKafkaManagerIT {
                 .collect(Collectors.toMap(
                         entry -> entry.getKey().partition(),
                         entry -> entry.getValue().getSmallest()));
-        RecordFetchRequest recordFetchRequest = new RecordFetchRequest(
-                RecordFetchRequest.DataFormat.STRING,
-                RecordFetchRequest.DataFormat.STRING,
+        TopicRecordFetchParams recordFetchParams = new TopicRecordFetchParams(
+                TopicRecordFetchParams.DataFormat.STRING,
+                TopicRecordFetchParams.DataFormat.STRING,
                 offsets,
                 10L,
                 10000L);
         RecordFetchResult<String, String> recordFetchResult =
                 kafkaManager.<String, String>getTopicRecordFetcherTaskExecutor()
-                .execute(topicName, recordFetchRequest);
+                .execute(topicName, recordFetchParams);
         Assert.assertNotNull(recordFetchResult);
         Assert.assertFalse("Fetched record list is empty", recordFetchResult.getRecords().isEmpty());
 
-        Map<TopicPartition, OffsetTimeSeries> offsetTimeSeries = kafkaManager.getTopicOffsetFetcherTaskExecutor()
+        Map<TopicPartition, OffsetTimeSeries> offsetTimeSeries = kafkaManager.getTopicOffsetRangeFetcherTaskExecutor()
                 .getOffsetTimeSeries(topicName);
         Assert.assertNotNull(offsetTimeSeries);
         Assert.assertFalse("Offset time series is empty", offsetTimeSeries.isEmpty());
@@ -143,7 +168,7 @@ public class RestKafkaManagerIT {
         Assert.assertTrue("Topic doesn't exist", kafkaManager.topicExists(topicName));
 
         Page<TopicInfo> topicPage = kafkaManager.getTopicPage(
-                TopicSearchQuery.builder().build(),
+                TopicSearchCriteria.builder().build(),
                 PageRequest.of(0, 10));
         Assert.assertNotNull(topicPage);
         Assert.assertTrue("There is no topics", topicPage.getContent().size() > 0);
@@ -236,7 +261,7 @@ public class RestKafkaManagerIT {
         Assert.assertTrue("Consumer group doesn't exist", kafkaManager.consumerGroupExists(consumerGroup));
 
         Page<ConsumerGroupInfo> topicPage = kafkaManager.getConsumerGroupPage(
-                ConsumerGroupSearchQuery.builder().build(),
+                ConsumerGroupSearchCriteria.builder().build(),
                 PageRequest.of(0, 10));
         Assert.assertNotNull(topicPage);
         Assert.assertTrue("There is no consumer groups", topicPage.getContent().size() > 0);
@@ -272,13 +297,13 @@ public class RestKafkaManagerIT {
         Assert.assertFalse("There is no permissions", permissionInfoList.isEmpty());
 
         Page<PermissionInfo> permissionPage = kafkaManager.getPermissionPage(
-                PermissionSearchQuery.builder().build(),
+                PermissionSearchCriteria.builder().build(),
                 PageRequest.of(0, 10));
         Assert.assertNotNull(permissionPage);
         Assert.assertTrue("There is no permissions", permissionPage.getContent().size() > 0);
 
         List<PermissionInfo> principalPermissions = kafkaManager.getPermissions(
-                PermissionSearchQuery.builder()
+                PermissionSearchCriteria.builder()
                         .kafkaPrincipal(principal)
                         .build());
         PermissionCreateParams permissionCreateParams = PermissionCreateParams.builder()
@@ -307,7 +332,7 @@ public class RestKafkaManagerIT {
                 .build();
         kafkaManager.updatePermission(permissionMetadataDeleteParams);
         List<PermissionInfo> newPrincipalPermissions = kafkaManager.getPermissions(
-                PermissionSearchQuery.builder()
+                PermissionSearchCriteria.builder()
                         .kafkaPrincipal(principal)
                         .build());
         Assert.assertEquals(principalPermissions.size() + 1, newPrincipalPermissions.size());
@@ -322,7 +347,7 @@ public class RestKafkaManagerIT {
                 .build();
         kafkaManager.deletePermission(permissionDeleteParams);
         newPrincipalPermissions = kafkaManager.getPermissions(
-                PermissionSearchQuery.builder()
+                PermissionSearchCriteria.builder()
                         .kafkaPrincipal(principal)
                         .build());
         Assert.assertEquals(principalPermissions.size(), newPrincipalPermissions.size());
@@ -341,7 +366,7 @@ public class RestKafkaManagerIT {
         Assert.assertNotNull(someTransaction);
 
         Page<TransactionInfo> transactionPage = kafkaManager.getTransactionPage(
-                TransactionSearchQuery.builder().build(),
+                TransactionSearchCriteria.builder().build(),
                 PageRequest.of(0, 10));
         Assert.assertNotNull(transactionPage);
         Assert.assertTrue("There is no transactions", transactionPage.getContent().size() > 0);

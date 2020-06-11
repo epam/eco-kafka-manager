@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 EPAM Systems
+ * Copyright 2020 EPAM Systems
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License.  You may obtain a copy
@@ -29,16 +29,16 @@ public class TopicOffsetFetchRequestTest {
 
     @Test
     public void testSerializedToJsonAndBack() throws Exception {
-        TopicOffsetFetchRequest origin = new TopicOffsetFetchRequest("topic");
+        TopicOffsetRangeFetchRequest origin = new TopicOffsetRangeFetchRequest("topic");
 
         ObjectMapper mapper = TestObjectMapperSingleton.getObjectMapper();
 
         String json = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(origin);
         Assert.assertNotNull(json);
 
-        TopicOffsetFetchRequest deserialized = mapper.readValue(
+        TopicOffsetRangeFetchRequest deserialized = mapper.readValue(
                 json,
-                TopicOffsetFetchRequest.class);
+                TopicOffsetRangeFetchRequest.class);
         Assert.assertNotNull(deserialized);
         Assert.assertEquals(deserialized, origin);
     }

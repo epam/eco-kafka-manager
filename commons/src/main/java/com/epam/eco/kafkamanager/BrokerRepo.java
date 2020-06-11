@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 EPAM Systems
+ * Copyright 2020 EPAM Systems
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License.  You may obtain a copy
@@ -24,7 +24,7 @@ import com.epam.eco.kafkamanager.repo.KeyValueRepo;
 /**
  * @author Andrei_Tytsik
  */
-public interface BrokerRepo extends KeyValueRepo<Integer, BrokerInfo, BrokerSearchQuery> {
+public interface BrokerRepo extends KeyValueRepo<Integer, BrokerInfo, BrokerSearchCriteria> {
 
     @PreAuthorize("@authorizer.isPermitted('BROKER', #brokerId, 'ALTER_CONFIG')")
     BrokerInfo updateConfig(int brokerId, Map<String, String> configs);

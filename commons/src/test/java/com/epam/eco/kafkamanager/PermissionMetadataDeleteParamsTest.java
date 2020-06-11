@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 EPAM Systems
+ * Copyright 2020 EPAM Systems
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License.  You may obtain a copy
@@ -58,11 +58,11 @@ public class PermissionMetadataDeleteParamsTest {
         json.put("resourceName", "group1");
         json.put("principal", "user:user1");
 
-        PermissionMetadataDeleteParams query = PermissionMetadataDeleteParams.fromJson(json);
-        Assert.assertNotNull(query);
-        Assert.assertEquals(ResourceType.GROUP, query.getResourceType());
-        Assert.assertEquals("group1", query.getResourceName());
-        Assert.assertEquals("user:user1", query.getPrincipal());
+        PermissionMetadataDeleteParams params = PermissionMetadataDeleteParams.fromJson(json);
+        Assert.assertNotNull(params);
+        Assert.assertEquals(ResourceType.GROUP, params.getResourceType());
+        Assert.assertEquals("group1", params.getResourceName());
+        Assert.assertEquals("user:user1", params.getPrincipal());
     }
 
     @Test
@@ -74,11 +74,11 @@ public class PermissionMetadataDeleteParamsTest {
                 ", \"principal\": \"user:user1\"" +
                 "}";
 
-        PermissionMetadataDeleteParams query = PermissionMetadataDeleteParams.fromJson(json);
-        Assert.assertNotNull(query);
-        Assert.assertEquals(ResourceType.GROUP, query.getResourceType());
-        Assert.assertEquals("group1", query.getResourceName());
-        Assert.assertEquals("user:user1", query.getPrincipal());
+        PermissionMetadataDeleteParams params = PermissionMetadataDeleteParams.fromJson(json);
+        Assert.assertNotNull(params);
+        Assert.assertEquals(ResourceType.GROUP, params.getResourceType());
+        Assert.assertEquals("group1", params.getResourceName());
+        Assert.assertEquals("user:user1", params.getPrincipal());
     }
 
 }

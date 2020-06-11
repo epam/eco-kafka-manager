@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 EPAM Systems
+ * Copyright 2020 EPAM Systems
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License.  You may obtain a copy
@@ -121,10 +121,10 @@ public class UDMetricManagerImpl implements UDMetricManager, UpdateListener {
     }
 
     @Override
-    public Page<UDMetric> page(UDMetricSearchQuery query, Pageable pageable) {
+    public Page<UDMetric> page(UDMetricSearchCriteria criteria, Pageable pageable) {
         Validate.notNull(pageable, "Pageable is null");
 
-        List<UDMetric> allUdms = applyQueryIfPresented(listAll(), query);
+        List<UDMetric> allUdms = applyCriteriaIfPresented(listAll(), criteria);
         List<UDMetric> pageUdms = new ArrayList<>();
         int idx = 0;
         for (UDMetric udm : allUdms) {
@@ -161,12 +161,12 @@ public class UDMetricManagerImpl implements UDMetricManager, UpdateListener {
         }
     }
 
-    protected List<UDMetric> applyQueryIfPresented(List<UDMetric> values, UDMetricSearchQuery query) {
-        if (query == null) {
+    protected List<UDMetric> applyCriteriaIfPresented(List<UDMetric> values, UDMetricSearchCriteria criteria) {
+        if (criteria == null) {
             return values;
         }
 
-        return values.stream().filter(query::matches).collect(Collectors.toList());
+        return values.stream().filter(criteria::matches).collect(Collectors.toList());
     }
 
     @Override

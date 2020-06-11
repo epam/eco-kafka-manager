@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 EPAM Systems
+ * Copyright 2020 EPAM Systems
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License.  You may obtain a copy
@@ -27,7 +27,7 @@ import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
 import com.epam.eco.commons.kafka.helpers.RecordFetchResult;
-import com.epam.eco.kafkamanager.RecordFetchRequest;
+import com.epam.eco.kafkamanager.TopicRecordFetchParams;
 import com.epam.eco.kafkamanager.TopicRecordFetcherTaskExecutor;
 import com.epam.eco.kafkamanager.exec.AbstractTaskExecutor;
 import com.epam.eco.kafkamanager.exec.TaskResult;
@@ -36,14 +36,14 @@ import com.epam.eco.kafkamanager.rest.request.TopicRecordFetchRequest;
 /**
  * @author Raman_Babich
  */
-public class RestTopicRecordFetcherTaskExecutor<K, V> extends AbstractTaskExecutor<String, RecordFetchRequest, RecordFetchResult<K, V>> implements TopicRecordFetcherTaskExecutor<K, V> {
+public class RestTopicRecordFetcherTaskExecutor<K, V> extends AbstractTaskExecutor<String, TopicRecordFetchParams, RecordFetchResult<K, V>> implements TopicRecordFetcherTaskExecutor<K, V> {
 
     @Autowired
     @Qualifier("KafkaManagerRestTemplate")
     private RestTemplate restTemplate;
 
     @Override
-    protected TaskResult<RecordFetchResult<K, V>> doExecute(String resourceKey, RecordFetchRequest input) {
+    protected TaskResult<RecordFetchResult<K, V>> doExecute(String resourceKey, TopicRecordFetchParams input) {
         Date start = new Date();
         try {
             ResponseEntity<TaskResult<RecordFetchResult<K, V>>> response = restTemplate.exchange(
@@ -63,4 +63,5 @@ public class RestTopicRecordFetcherTaskExecutor<K, V> extends AbstractTaskExecut
                     .build();
         }
     }
+
 }

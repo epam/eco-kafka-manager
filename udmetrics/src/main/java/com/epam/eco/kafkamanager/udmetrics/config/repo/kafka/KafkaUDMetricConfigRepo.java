@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 EPAM Systems
+ * Copyright 2020 EPAM Systems
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License.  You may obtain a copy
@@ -39,12 +39,12 @@ import com.epam.eco.kafkamanager.core.spring.AsyncStartingBean;
 import com.epam.eco.kafkamanager.repo.AbstractKeyValueRepo;
 import com.epam.eco.kafkamanager.udmetrics.UDMetricConfig;
 import com.epam.eco.kafkamanager.udmetrics.UDMetricConfigRepo;
-import com.epam.eco.kafkamanager.udmetrics.UDMetricConfigSearchQuery;
+import com.epam.eco.kafkamanager.udmetrics.UDMetricConfigSearchCriteria;
 
 /**
  * @author Andrei_Tytsik
  */
-public class KafkaUDMetricConfigRepo extends AbstractKeyValueRepo<String, UDMetricConfig, UDMetricConfigSearchQuery> implements UDMetricConfigRepo, CacheListener<String, UDMetricConfig>, AsyncStartingBean {
+public class KafkaUDMetricConfigRepo extends AbstractKeyValueRepo<String, UDMetricConfig, UDMetricConfigSearchCriteria> implements UDMetricConfigRepo, CacheListener<String, UDMetricConfig>, AsyncStartingBean {
 
     private final static Logger LOGGER = LoggerFactory.getLogger(KafkaUDMetricConfigRepo.class);
 

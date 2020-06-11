@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 EPAM Systems
+ * Copyright 2020 EPAM Systems
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License.  You may obtain a copy
@@ -25,8 +25,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.epam.eco.commons.kafka.TransactionState;
 import com.epam.eco.kafkamanager.ConsumerGroupInfo;
-import com.epam.eco.kafkamanager.RecordFetchRequest;
-import com.epam.eco.kafkamanager.TopicSearchQuery;
+import com.epam.eco.kafkamanager.TopicRecordFetchParams;
+import com.epam.eco.kafkamanager.TopicSearchCriteria;
 
 /**
  * @author Raman_Babich
@@ -56,13 +56,13 @@ public class EnumController {
     }
 
     @GetMapping("/replication-state")
-    public TopicSearchQuery.ReplicationState[] replicationStates() {
-        return TopicSearchQuery.ReplicationState.values();
+    public TopicSearchCriteria.ReplicationState[] replicationStates() {
+        return TopicSearchCriteria.ReplicationState.values();
     }
 
     @GetMapping("/data-format")
-    public RecordFetchRequest.DataFormat[] dataFormats() {
-        return RecordFetchRequest.DataFormat.values();
+    public TopicRecordFetchParams.DataFormat[] dataFormats() {
+        return TopicRecordFetchParams.DataFormat.values();
     }
 
     @GetMapping("/security-protocol")

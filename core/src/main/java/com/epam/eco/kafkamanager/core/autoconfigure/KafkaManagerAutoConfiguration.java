@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 EPAM Systems
+ * Copyright 2020 EPAM Systems
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License.  You may obtain a copy
@@ -38,7 +38,8 @@ import com.epam.eco.kafkamanager.KafkaManager;
 import com.epam.eco.kafkamanager.MetadataRepo;
 import com.epam.eco.kafkamanager.PermissionRepo;
 import com.epam.eco.kafkamanager.SecurityContextAdapter;
-import com.epam.eco.kafkamanager.TopicOffsetFetcherTaskExecutor;
+import com.epam.eco.kafkamanager.TopicOffsetForTimeFetcherTaskExecutor;
+import com.epam.eco.kafkamanager.TopicOffsetRangeFetcherTaskExecutor;
 import com.epam.eco.kafkamanager.TopicPurgerTaskExecutor;
 import com.epam.eco.kafkamanager.TopicRecordCounterTaskExecutor;
 import com.epam.eco.kafkamanager.TopicRecordFetcherTaskExecutor;
@@ -58,7 +59,8 @@ import com.epam.eco.kafkamanager.core.consumer.repo.zk.ZkConsumerGroupRepo;
 import com.epam.eco.kafkamanager.core.metadata.repo.kafka.KafkaMetadataRepo;
 import com.epam.eco.kafkamanager.core.permission.repo.zk.ZkPermissionRepo;
 import com.epam.eco.kafkamanager.core.spring.AsyncStartingBeanProcessor;
-import com.epam.eco.kafkamanager.core.topic.exec.TopicOffsetFetcherTaskExecutorImpl;
+import com.epam.eco.kafkamanager.core.topic.exec.TopicOffsetForTimeFetcherTaskExecutorImpl;
+import com.epam.eco.kafkamanager.core.topic.exec.TopicOffsetRangeFetcherTaskExecutorImpl;
 import com.epam.eco.kafkamanager.core.topic.exec.TopicPurgerTaskExecutorImpl;
 import com.epam.eco.kafkamanager.core.topic.exec.TopicRecordCounterTaskExecutorImpl;
 import com.epam.eco.kafkamanager.core.topic.exec.TopicRecordFetcherTaskExecutorImpl;
@@ -97,8 +99,13 @@ public class KafkaManagerAutoConfiguration {
     }
 
     @Bean
-    public TopicOffsetFetcherTaskExecutor topicOffsetFetcherTaskExecutor() {
-        return new TopicOffsetFetcherTaskExecutorImpl(cacheManager());
+    public TopicOffsetRangeFetcherTaskExecutor topicOffsetRangeFetcherTaskExecutor() {
+        return new TopicOffsetRangeFetcherTaskExecutorImpl(cacheManager());
+    }
+
+    @Bean
+    public TopicOffsetForTimeFetcherTaskExecutor topicOffsetForTimeFetcherTaskExecutor() {
+        return new TopicOffsetForTimeFetcherTaskExecutorImpl();
     }
 
     @Bean

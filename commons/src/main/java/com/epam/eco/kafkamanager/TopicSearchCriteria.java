@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 EPAM Systems
+ * Copyright 2020 EPAM Systems
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License.  You may obtain a copy
@@ -33,9 +33,9 @@ import com.epam.eco.kafkamanager.utils.MapperUtils;
 /**
  * @author Andrei_Tytsik
  */
-public class TopicSearchQuery implements SearchQuery<TopicInfo> {
+public class TopicSearchCriteria implements SearchCriteria<TopicInfo> {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(TopicSearchQuery.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(TopicSearchCriteria.class);
 
     public enum ReplicationState {
         ANY_REPLICATED, FULLY_REPLICATED, UNDER_REPLICATED
@@ -55,7 +55,7 @@ public class TopicSearchQuery implements SearchQuery<TopicInfo> {
 
     private final transient KafkaManager kafkaManager;
 
-    public TopicSearchQuery(
+    public TopicSearchCriteria(
             @JsonProperty("topicName") String topicName,
             @JsonProperty("minPartitionCount") Integer minPartitionCount,
             @JsonProperty("maxPartitionCount") Integer maxPartitionCount,
@@ -82,7 +82,7 @@ public class TopicSearchQuery implements SearchQuery<TopicInfo> {
                 null);
     }
 
-    public TopicSearchQuery(
+    public TopicSearchCriteria(
             String topicName,
             Integer minPartitionCount,
             Integer maxPartitionCount,
@@ -201,7 +201,7 @@ public class TopicSearchQuery implements SearchQuery<TopicInfo> {
         if (obj == null || getClass() != obj.getClass()) {
             return false;
         }
-        TopicSearchQuery that = (TopicSearchQuery) obj;
+        TopicSearchCriteria that = (TopicSearchCriteria) obj;
         return
                 Objects.equals(this.topicName, that.topicName) &&
                 Objects.equals(this.minPartitionCount, that.minPartitionCount) &&
@@ -257,38 +257,38 @@ public class TopicSearchQuery implements SearchQuery<TopicInfo> {
         return builder(null);
     }
 
-    public static Builder builder(TopicSearchQuery origin) {
+    public static Builder builder(TopicSearchCriteria origin) {
         return new Builder(origin);
     }
 
-    public static TopicSearchQuery fromJson(Map<String, ?> map) {
+    public static TopicSearchCriteria fromJson(Map<String, ?> map) {
         Validate.notNull(map, "JSON map is null");
 
-        return MapperUtils.convert(map, TopicSearchQuery.class);
+        return MapperUtils.convert(map, TopicSearchCriteria.class);
     }
 
-    public static TopicSearchQuery fromJson(String json) {
+    public static TopicSearchCriteria fromJson(String json) {
         Validate.notNull(json, "JSON is null");
 
-        return MapperUtils.jsonToBean(json, TopicSearchQuery.class);
+        return MapperUtils.jsonToBean(json, TopicSearchCriteria.class);
     }
 
-    public static TopicSearchQuery fromJsonWith(Map<String, ?> map, KafkaManager kafkaManager) {
-        TopicSearchQuery topicSearchQuery = fromJson(map);
-        if (topicSearchQuery == null) {
+    public static TopicSearchCriteria fromJsonWith(Map<String, ?> map, KafkaManager kafkaManager) {
+        TopicSearchCriteria topicSearchCriteria = fromJson(map);
+        if (topicSearchCriteria == null) {
             return null;
         }
-        return topicSearchQuery.toBuilder()
+        return topicSearchCriteria.toBuilder()
                 .kafkaManager(kafkaManager)
                 .build();
     }
 
-    public static TopicSearchQuery fromJsonWith(String json, KafkaManager kafkaManager) {
-        TopicSearchQuery topicSearchQuery = fromJson(json);
-        if (topicSearchQuery == null) {
+    public static TopicSearchCriteria fromJsonWith(String json, KafkaManager kafkaManager) {
+        TopicSearchCriteria topicSearchCriteria = fromJson(json);
+        if (topicSearchCriteria == null) {
             return null;
         }
-        return topicSearchQuery.toBuilder()
+        return topicSearchCriteria.toBuilder()
                 .kafkaManager(kafkaManager)
                 .build();
     }
@@ -332,7 +332,7 @@ public class TopicSearchQuery implements SearchQuery<TopicInfo> {
 
         private KafkaManager kafkaManager;
 
-        private Builder(TopicSearchQuery origin) {
+        private Builder(TopicSearchCriteria origin) {
             if (origin == null) {
                 return;
             }
@@ -423,8 +423,8 @@ public class TopicSearchQuery implements SearchQuery<TopicInfo> {
             return this;
         }
 
-        public TopicSearchQuery build() {
-            return new TopicSearchQuery(
+        public TopicSearchCriteria build() {
+            return new TopicSearchCriteria(
                     topicName,
                     minPartitionCount,
                     maxPartitionCount,

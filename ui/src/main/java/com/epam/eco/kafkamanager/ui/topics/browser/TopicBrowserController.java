@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 EPAM Systems
+ * Copyright 2020 EPAM Systems
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License.  You may obtain a copy
@@ -22,6 +22,7 @@ import java.util.stream.Collectors;
 
 import org.apache.kafka.common.TopicPartition;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -29,14 +30,15 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.epam.eco.commons.kafka.OffsetRange;
 import com.epam.eco.commons.kafka.helpers.PartitionRecordFetchResult;
 import com.epam.eco.commons.kafka.helpers.RecordFetchResult;
 import com.epam.eco.kafkamanager.KafkaManager;
-import com.epam.eco.kafkamanager.RecordFetchRequest;
-import com.epam.eco.kafkamanager.RecordFetchRequest.DataFormat;
+import com.epam.eco.kafkamanager.TopicRecordFetchParams;
+import com.epam.eco.kafkamanager.TopicRecordFetchParams.DataFormat;
 import com.epam.eco.kafkamanager.exec.TaskResult;
 import com.epam.eco.kafkamanager.ui.topics.TopicController;
 
@@ -49,13 +51,15 @@ public class TopicBrowserController {
     public static final String VIEW = "topic_browser";
 
     public static final String MAPPING = TopicController.MAPPING_TOPIC + "/browser";
+    public static final String MAPPING_OFFSETS_FOR_TIMES = MAPPING + "/offsets_for_times";
 
     public static final String ATTR_TOPIC_NAME = "topicName";
-    public static final String ATTR_FETCH_PARAMS = "fetchParams";
+    public static final String ATTR_BROWSE_PARAMS = "browseParams";
     public static final String ATTR_OFFSET_RANGES = "offsetRanges";
     public static final String ATTR_FETCHED_RECORDS = "fetchedRecords";
     public static final String ATTR_FETCH_SUMMARY = "fetchSummary";
     public static final String ATTR_NEXT_OFFSETS = "nextOffsets";
+    public static final String ATTR_OFFSETS_FOR_TIMES = "offsetsForTimes";
 
     private static final long DEFAULT_FETCH_TIMEOUT = 30_000;
 
@@ -67,13 +71,13 @@ public class TopicBrowserController {
     public String params(
             @PathVariable("name") String topicName,
             Model model) {
-        RecordFetchParams fetchParams = (RecordFetchParams)model.asMap().get(ATTR_FETCH_PARAMS);
-        if (fetchParams == null) {
-            fetchParams = RecordFetchParams.with(null);
-            fetchParams.setTopicName(topicName);
+        TopicBrowseParams browseParams = (TopicBrowseParams)model.asMap().get(ATTR_BROWSE_PARAMS);
+        if (browseParams == null) {
+            browseParams = TopicBrowseParams.with(null);
+            browseParams.setTopicName(topicName);
         }
 
-        handleParamsRequest(fetchParams, model::addAttribute);
+        handleParamsRequest(browseParams, model::addAttribute);
 
         return VIEW;
     }
@@ -84,52 +88,69 @@ public class TopicBrowserController {
             @PathVariable("name") String topicName,
             @RequestParam Map<String, Object> requestParams,
             RedirectAttributes redirectAttrs) {
-        RecordFetchParams fetchParams = RecordFetchParams.with(requestParams);
-        fetchParams.setTopicName(topicName);
+        TopicBrowseParams browseParams = TopicBrowseParams.with(requestParams);
+        browseParams.setTopicName(topicName);
 
-        handleParamsRequest(fetchParams, redirectAttrs::addFlashAttribute);
-        handleFetchRequest(fetchParams, redirectAttrs::addFlashAttribute);
+        handleParamsRequest(browseParams, redirectAttrs::addFlashAttribute);
+        handleFetchRequest(browseParams, redirectAttrs::addFlashAttribute);
 
         return "redirect:" + buildBrowserUrl(topicName);
     }
 
-    private void handleParamsRequest(RecordFetchParams fetchParams, BiConsumer<String, Object> modelAttributes) {
-        Map<Integer, OffsetRange> offsetRanges = fetchOffsetRanges(fetchParams.getTopicName());
+    @RequestMapping(value=MAPPING_OFFSETS_FOR_TIMES, method=RequestMethod.GET)
+    public @ResponseBody
+    ResponseEntity<?> fetchOffsetsForTimes(
+            @PathVariable("name") String topicName,
+            @RequestParam(name="timestamp", required=true) Long timestamp) {
+        Map<TopicPartition, Long> offsetsForTimes =
+                kafkaManager.getTopicOffsetForTimeFetcherTaskExecutor().execute(topicName, timestamp);
+        Map<Integer, Long> offsets = offsetsForTimes.entrySet().stream().
+                filter(e -> e.getValue() != null).
+                collect(Collectors.toMap(
+                        entry -> entry.getKey().partition(),
+                        entry -> entry.getValue()));
+        return ResponseEntity.ok().body(offsets);
+    }
 
-        setDefaultDataFormatsIfMissing(fetchParams);
-        populateMissingAndFixInvalidOffsets(offsetRanges, fetchParams);
+    private void handleParamsRequest(
+            TopicBrowseParams browseParams,
+            BiConsumer<String, Object> modelAttributes) {
+        Map<Integer, OffsetRange> offsetRanges = fetchOffsetRanges(browseParams.getTopicName());
 
-        modelAttributes.accept(ATTR_FETCH_PARAMS, fetchParams);
+        setDefaultDataFormatsIfMissing(browseParams);
+        populateMissingAndFixInvalidOffsets(offsetRanges, browseParams);
+
+        modelAttributes.accept(ATTR_BROWSE_PARAMS, browseParams);
         modelAttributes.accept(ATTR_OFFSET_RANGES, offsetRanges);
     }
 
-    private void handleFetchRequest(RecordFetchParams fetchParams, BiConsumer<String, Object> modelAttributes) {
-        RecordFetchRequest fetchRequest = toFetchRequest(fetchParams);
+    private void handleFetchRequest(TopicBrowseParams browseParams, BiConsumer<String, Object> modelAttributes) {
+        TopicRecordFetchParams fetchParams = toFetchParams(browseParams);
 
-        TaskResult<RecordFetchResult<Object, Object>> taskResult = kafkaManager.getTopicRecordFetcherTaskExecutor()
-                .executeDetailed(fetchParams.getTopicName(), fetchRequest);
+        TaskResult<RecordFetchResult<Object, Object>> taskResult = kafkaManager.getTopicRecordFetcherTaskExecutor().
+                executeDetailed(browseParams.getTopicName(), fetchParams);
 
         RecordFetchResult<Object, Object> fetchResult = taskResult.getValue();
 
-        TabularRecords tabularRecords = ToTabularRecordsConverter.from(fetchParams, fetchResult);
+        TabularRecords tabularRecords = ToTabularRecordsConverter.from(browseParams, fetchResult);
 
         modelAttributes.accept(ATTR_FETCHED_RECORDS, tabularRecords);
         modelAttributes.accept(ATTR_FETCH_SUMMARY, buildFetchSummary(taskResult));
         modelAttributes.accept(ATTR_NEXT_OFFSETS, getNextOffsetsOrNullIfEndOfTopic(fetchResult));
     }
 
-    private RecordFetchRequest toFetchRequest(RecordFetchParams fetchParams) {
-        return new RecordFetchRequest(
-                fetchParams.getKeyFormat(),
-                fetchParams.getValueFormat(),
-                fetchParams.getPartitionOffsets(),
-                fetchParams.getLimit(),
-                fetchParams.getTimeout() > 0 ? fetchParams.getTimeout() : DEFAULT_FETCH_TIMEOUT);
+    private TopicRecordFetchParams toFetchParams(TopicBrowseParams browseParams) {
+        return new TopicRecordFetchParams(
+                browseParams.getKeyFormat(),
+                browseParams.getValueFormat(),
+                browseParams.getPartitionOffsets(),
+                browseParams.getLimit(),
+                browseParams.getTimeout() > 0 ? browseParams.getTimeout() : DEFAULT_FETCH_TIMEOUT);
     }
 
     private Map<Integer, OffsetRange> fetchOffsetRanges(String topicName) {
         Map<TopicPartition, OffsetRange> ranges = kafkaManager.
-                getTopicOffsetFetcherTaskExecutor().getResultIfActualOrRefresh(topicName).getValue();
+                getTopicOffsetRangeFetcherTaskExecutor().getResultIfActualOrRefresh(topicName).getValue();
         return ranges.entrySet().stream().
                 collect(
                         Collectors.toMap(
@@ -157,26 +178,26 @@ public class TopicBrowserController {
                 workerResult.getValue().count(), workerResult.getElapsedFormattedAsHMS());
     }
 
-    private void setDefaultDataFormatsIfMissing(RecordFetchParams fetchParams) {
-        fetchParams.setKeyFormatIfMissing(DataFormat.STRING);
-        fetchParams.setValueFormatIfMissing(DataFormat.STRING);
+    private void setDefaultDataFormatsIfMissing(TopicBrowseParams fetchRequestParams) {
+        fetchRequestParams.setKeyFormatIfMissing(DataFormat.STRING);
+        fetchRequestParams.setValueFormatIfMissing(DataFormat.STRING);
     }
 
     private void populateMissingAndFixInvalidOffsets(
             Map<Integer, OffsetRange> offsetRanges,
-            RecordFetchParams fetchParams) {
-        fetchParams.listPartitions().forEach(partition -> {
+            TopicBrowseParams fetchRequestParams) {
+        fetchRequestParams.listPartitions().forEach(partition -> {
             if (!offsetRanges.containsKey(partition)) {
-                fetchParams.removePartitionOffset(partition);
+                fetchRequestParams.removePartitionOffset(partition);
             }
         });
         offsetRanges.forEach((key, range) -> {
             int partition = key;
-            long offset = fetchParams.getPartitionOffset(partition);
-            if (offset < range.getSmallest() || !fetchParams.containsPartition(partition)) {
-                fetchParams.addPartitionOffset(partition, range.getSmallest());
+            long offset = fetchRequestParams.getPartitionOffset(partition);
+            if (offset < range.getSmallest() || !fetchRequestParams.containsPartition(partition)) {
+                fetchRequestParams.addPartitionOffset(partition, range.getSmallest());
             } else if (offset > range.getLargest()) {
-                fetchParams.addPartitionOffset(partition, range.getLargest());
+                fetchRequestParams.addPartitionOffset(partition, range.getLargest());
             }
         });
     }

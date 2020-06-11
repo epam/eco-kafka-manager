@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 EPAM Systems
+ * Copyright 2020 EPAM Systems
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License.  You may obtain a copy
@@ -15,14 +15,23 @@
  */
 package com.epam.eco.kafkamanager;
 
+import java.util.Map;
+
+import org.apache.kafka.common.TopicPartition;
+import org.springframework.security.core.parameters.P;
+
+import com.epam.eco.kafkamanager.exec.TaskExecutor;
+import com.epam.eco.kafkamanager.exec.TaskResult;
+
 /**
- * @author Andrei_Tytsik
+ * @author Naira_Tamrazyan
  */
-public class MetadataSearchQuery implements SearchQuery<Metadata> {
+public interface TopicOffsetForTimeFetcherTaskExecutor extends TaskExecutor<String, Long, Map<TopicPartition, Long>> {
 
     @Override
-    public boolean matches(Metadata obj) {
-        return true;
-    }
+    Map<TopicPartition, Long> execute(@P("resourceKey") String topicName, Long timestamp);
+
+    @Override
+    TaskResult<Map<TopicPartition, Long>> executeDetailed(@P("resourceKey") String topicName, Long timestamp);
 
 }

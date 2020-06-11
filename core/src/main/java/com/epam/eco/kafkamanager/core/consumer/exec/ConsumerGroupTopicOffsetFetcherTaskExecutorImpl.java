@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 EPAM Systems
+ * Copyright 2020 EPAM Systems
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License.  You may obtain a copy
@@ -26,7 +26,7 @@ import org.apache.kafka.common.TopicPartition;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.epam.eco.commons.kafka.OffsetRange;
-import com.epam.eco.commons.kafka.helpers.TopicOffsetFetcher;
+import com.epam.eco.commons.kafka.helpers.TopicOffsetRangeFetcher;
 import com.epam.eco.kafkamanager.ConsumerGroupInfo;
 import com.epam.eco.kafkamanager.ConsumerGroupTopicOffsetFetcherTaskExecutor;
 import com.epam.eco.kafkamanager.KafkaManager;
@@ -66,7 +66,7 @@ public class ConsumerGroupTopicOffsetFetcherTaskExecutorImpl extends AbstractAsy
             if (groupInfo.getTopicNames().isEmpty()) {
                 return Collections.emptyMap();
             }
-            return TopicOffsetFetcher.
+            return TopicOffsetRangeFetcher.
                     with(properties.getCommonConsumerConfig()).
                     fetchForTopics(groupInfo.getTopicNames());
         });

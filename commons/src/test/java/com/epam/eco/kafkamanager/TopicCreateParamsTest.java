@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 EPAM Systems
+ * Copyright 2020 EPAM Systems
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License.  You may obtain a copy
@@ -75,14 +75,14 @@ public class TopicCreateParamsTest {
         json.put("attributes", attributes);
         json.put("description", "description");
 
-        TopicCreateParams query = TopicCreateParams.fromJson(json);
-        Assert.assertNotNull(query);
-        Assert.assertEquals("topic1", query.getTopicName());
-        Assert.assertEquals(42, query.getPartitionCount());
-        Assert.assertEquals(10, query.getReplicationFactor());
-        Assert.assertEquals(config, query.getConfig());
-        Assert.assertEquals(attributes, query.getAttributes());
-        Assert.assertEquals("description", query.getDescription());
+        TopicCreateParams params = TopicCreateParams.fromJson(json);
+        Assert.assertNotNull(params);
+        Assert.assertEquals("topic1", params.getTopicName());
+        Assert.assertEquals(42, params.getPartitionCount());
+        Assert.assertEquals(10, params.getReplicationFactor());
+        Assert.assertEquals(config, params.getConfig());
+        Assert.assertEquals(attributes, params.getAttributes());
+        Assert.assertEquals("description", params.getDescription());
     }
 
     @Test
@@ -97,22 +97,22 @@ public class TopicCreateParamsTest {
                 ", \"description\": \"description\"" +
                 "}";
 
-        TopicCreateParams query = TopicCreateParams.fromJson(json);
-        Assert.assertNotNull(query);
-        Assert.assertEquals("topic1", query.getTopicName());
-        Assert.assertEquals(42, query.getPartitionCount());
-        Assert.assertEquals(10, query.getReplicationFactor());
+        TopicCreateParams params = TopicCreateParams.fromJson(json);
+        Assert.assertNotNull(params);
+        Assert.assertEquals("topic1", params.getTopicName());
+        Assert.assertEquals(42, params.getPartitionCount());
+        Assert.assertEquals(10, params.getReplicationFactor());
         Map<String, Object> config = new HashMap<>();
         config.put("config1", "value1");
         config.put("config2", "value2");
         config.put("config3", "value3");
-        Assert.assertEquals(config, query.getConfig());
+        Assert.assertEquals(config, params.getConfig());
         Map<String, Object> attributes = new HashMap<>();
         attributes.put("attr1", "value1");
         attributes.put("attr2", "value2");
         attributes.put("attr3", "value3");
-        Assert.assertEquals(attributes, query.getAttributes());
-        Assert.assertEquals("description", query.getDescription());
+        Assert.assertEquals(attributes, params.getAttributes());
+        Assert.assertEquals("description", params.getDescription());
     }
 
 }

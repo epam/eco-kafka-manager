@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 EPAM Systems
+ * Copyright 2020 EPAM Systems
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License.  You may obtain a copy
@@ -32,7 +32,7 @@ import com.epam.eco.kafkamanager.BrokerMetadataDeleteParams;
 import com.epam.eco.kafkamanager.BrokerMetadataKey;
 import com.epam.eco.kafkamanager.BrokerMetadataUpdateParams;
 import com.epam.eco.kafkamanager.BrokerRepo;
-import com.epam.eco.kafkamanager.BrokerSearchQuery;
+import com.epam.eco.kafkamanager.BrokerSearchCriteria;
 import com.epam.eco.kafkamanager.ConsumerGroupDeleteTopicParams;
 import com.epam.eco.kafkamanager.ConsumerGroupInfo;
 import com.epam.eco.kafkamanager.ConsumerGroupMetadataDeleteParams;
@@ -40,7 +40,7 @@ import com.epam.eco.kafkamanager.ConsumerGroupMetadataKey;
 import com.epam.eco.kafkamanager.ConsumerGroupMetadataUpdateParams;
 import com.epam.eco.kafkamanager.ConsumerGroupOffsetResetterTaskExecutor;
 import com.epam.eco.kafkamanager.ConsumerGroupRepo;
-import com.epam.eco.kafkamanager.ConsumerGroupSearchQuery;
+import com.epam.eco.kafkamanager.ConsumerGroupSearchCriteria;
 import com.epam.eco.kafkamanager.ConsumerGroupTopicOffsetFetcherTaskExecutor;
 import com.epam.eco.kafkamanager.KafkaManager;
 import com.epam.eco.kafkamanager.Metadata;
@@ -52,7 +52,7 @@ import com.epam.eco.kafkamanager.PermissionMetadataDeleteParams;
 import com.epam.eco.kafkamanager.PermissionMetadataKey;
 import com.epam.eco.kafkamanager.PermissionMetadataUpdateParams;
 import com.epam.eco.kafkamanager.PermissionRepo;
-import com.epam.eco.kafkamanager.PermissionSearchQuery;
+import com.epam.eco.kafkamanager.PermissionSearchCriteria;
 import com.epam.eco.kafkamanager.ResourcePermissionDeleteParams;
 import com.epam.eco.kafkamanager.SecurityContextAdapter;
 import com.epam.eco.kafkamanager.TopicConfigUpdateParams;
@@ -62,15 +62,17 @@ import com.epam.eco.kafkamanager.TopicMetadataDeleteParams;
 import com.epam.eco.kafkamanager.TopicMetadataKey;
 import com.epam.eco.kafkamanager.TopicMetadataUpdateParams;
 import com.epam.eco.kafkamanager.TopicOffsetFetcherTaskExecutor;
+import com.epam.eco.kafkamanager.TopicOffsetForTimeFetcherTaskExecutor;
+import com.epam.eco.kafkamanager.TopicOffsetRangeFetcherTaskExecutor;
 import com.epam.eco.kafkamanager.TopicPartitionsCreateParams;
 import com.epam.eco.kafkamanager.TopicPurgerTaskExecutor;
 import com.epam.eco.kafkamanager.TopicRecordCounterTaskExecutor;
 import com.epam.eco.kafkamanager.TopicRecordFetcherTaskExecutor;
 import com.epam.eco.kafkamanager.TopicRepo;
-import com.epam.eco.kafkamanager.TopicSearchQuery;
+import com.epam.eco.kafkamanager.TopicSearchCriteria;
 import com.epam.eco.kafkamanager.TransactionInfo;
 import com.epam.eco.kafkamanager.TransactionRepo;
-import com.epam.eco.kafkamanager.TransactionSearchQuery;
+import com.epam.eco.kafkamanager.TransactionSearchCriteria;
 import com.epam.eco.kafkamanager.repo.CachedRepo;
 
 import kafka.security.auth.Resource;
@@ -78,6 +80,7 @@ import kafka.security.auth.Resource;
 /**
  * @author Andrei_Tytsik
  */
+@SuppressWarnings("deprecation")
 public class KafkaManagerImpl implements KafkaManager {
 
     @Autowired
@@ -97,7 +100,9 @@ public class KafkaManagerImpl implements KafkaManager {
     @Autowired
     private TopicRecordCounterTaskExecutor topicRecordCounterTaskExecutor;
     @Autowired
-    private TopicOffsetFetcherTaskExecutor topicOffsetFetcherTaskExecutor;
+    private TopicOffsetRangeFetcherTaskExecutor topicOffsetRangeFetcherTaskExecutor;
+    @Autowired
+    private TopicOffsetForTimeFetcherTaskExecutor topicOffsetForTimeFetcherTaskExecutor;
     @Autowired
     private TopicPurgerTaskExecutor topicPurgerTaskExecutor;
     @Autowired
@@ -128,8 +133,8 @@ public class KafkaManagerImpl implements KafkaManager {
     }
 
     @Override
-    public List<BrokerInfo> getBrokers(BrokerSearchQuery query) {
-        return brokerRepo.values(query);
+    public List<BrokerInfo> getBrokers(BrokerSearchCriteria criteria) {
+        return brokerRepo.values(criteria);
     }
 
     @Override
@@ -138,8 +143,8 @@ public class KafkaManagerImpl implements KafkaManager {
     }
 
     @Override
-    public Page<BrokerInfo> getBrokerPage(BrokerSearchQuery query, Pageable pageable) {
-        return brokerRepo.page(query, pageable);
+    public Page<BrokerInfo> getBrokerPage(BrokerSearchCriteria criteria, Pageable pageable) {
+        return brokerRepo.page(criteria, pageable);
     }
 
     @SuppressWarnings("unchecked")
@@ -211,8 +216,8 @@ public class KafkaManagerImpl implements KafkaManager {
     }
 
     @Override
-    public List<TopicInfo> getTopics(TopicSearchQuery query) {
-        return topicRepo.values(query);
+    public List<TopicInfo> getTopics(TopicSearchCriteria criteria) {
+        return topicRepo.values(criteria);
     }
 
     @Override
@@ -221,8 +226,8 @@ public class KafkaManagerImpl implements KafkaManager {
     }
 
     @Override
-    public Page<TopicInfo> getTopicPage(TopicSearchQuery query, Pageable pageable) {
-        return topicRepo.page(query, pageable);
+    public Page<TopicInfo> getTopicPage(TopicSearchCriteria criteria, Pageable pageable) {
+        return topicRepo.page(criteria, pageable);
     }
 
     @SuppressWarnings("unchecked")
@@ -325,7 +330,17 @@ public class KafkaManagerImpl implements KafkaManager {
 
     @Override
     public TopicOffsetFetcherTaskExecutor getTopicOffsetFetcherTaskExecutor() {
-        return topicOffsetFetcherTaskExecutor;
+        return topicOffsetRangeFetcherTaskExecutor;
+    }
+
+    @Override
+    public TopicOffsetRangeFetcherTaskExecutor getTopicOffsetRangeFetcherTaskExecutor() {
+        return topicOffsetRangeFetcherTaskExecutor;
+    }
+
+    @Override
+    public TopicOffsetForTimeFetcherTaskExecutor getTopicOffsetForTimeFetcherTaskExecutor() {
+        return topicOffsetForTimeFetcherTaskExecutor;
     }
 
     @Override
@@ -360,8 +375,8 @@ public class KafkaManagerImpl implements KafkaManager {
     }
 
     @Override
-    public List<ConsumerGroupInfo> getConsumerGroups(ConsumerGroupSearchQuery query) {
-        return consumerGroupRepo.values(query);
+    public List<ConsumerGroupInfo> getConsumerGroups(ConsumerGroupSearchCriteria criteria) {
+        return consumerGroupRepo.values(criteria);
     }
 
     @Override
@@ -370,8 +385,8 @@ public class KafkaManagerImpl implements KafkaManager {
     }
 
     @Override
-    public Page<ConsumerGroupInfo> getConsumerGroupPage(ConsumerGroupSearchQuery query, Pageable pageable) {
-        return consumerGroupRepo.page(query, pageable);
+    public Page<ConsumerGroupInfo> getConsumerGroupPage(ConsumerGroupSearchCriteria criteria, Pageable pageable) {
+        return consumerGroupRepo.page(criteria, pageable);
     }
 
     @Override
@@ -459,8 +474,8 @@ public class KafkaManagerImpl implements KafkaManager {
     }
 
     @Override
-    public List<PermissionInfo> getPermissions(PermissionSearchQuery query) {
-        return permissionRepo.values(query);
+    public List<PermissionInfo> getPermissions(PermissionSearchCriteria criteria) {
+        return permissionRepo.values(criteria);
     }
 
     @Override
@@ -469,8 +484,8 @@ public class KafkaManagerImpl implements KafkaManager {
     }
 
     @Override
-    public Page<PermissionInfo> getPermissionPage(PermissionSearchQuery query, Pageable pageable) {
-        return permissionRepo.page(query, pageable);
+    public Page<PermissionInfo> getPermissionPage(PermissionSearchCriteria criteria, Pageable pageable) {
+        return permissionRepo.page(criteria, pageable);
     }
 
     @SuppressWarnings("unchecked")
@@ -492,7 +507,6 @@ public class KafkaManagerImpl implements KafkaManager {
                     params.getResourceName()));
         }
     }
-
 
     @SuppressWarnings("unchecked")
     @Override
@@ -623,8 +637,8 @@ public class KafkaManagerImpl implements KafkaManager {
     }
 
     @Override
-    public List<TransactionInfo> getTransactions(TransactionSearchQuery query) {
-        return transactionRepo.values(query);
+    public List<TransactionInfo> getTransactions(TransactionSearchCriteria criteria) {
+        return transactionRepo.values(criteria);
     }
 
     @Override
@@ -634,9 +648,9 @@ public class KafkaManagerImpl implements KafkaManager {
 
     @Override
     public Page<TransactionInfo> getTransactionPage(
-            TransactionSearchQuery query,
+            TransactionSearchCriteria criteria,
             Pageable pageable) {
-        return transactionRepo.page(query, pageable);
+        return transactionRepo.page(criteria, pageable);
     }
 
     @Override

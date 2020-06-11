@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 EPAM Systems
+ * Copyright 2020 EPAM Systems
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License.  You may obtain a copy
@@ -68,13 +68,13 @@ public class PermissionMetadataUpdateParamsTest {
         json.put("attributes", attributes);
         json.put("description", "description");
 
-        PermissionMetadataUpdateParams query = PermissionMetadataUpdateParams.fromJson(json);
-        Assert.assertNotNull(query);
-        Assert.assertEquals(ResourceType.GROUP, query.getResourceType());
-        Assert.assertEquals("group1", query.getResourceName());
-        Assert.assertEquals("user:user1", query.getPrincipal());
-        Assert.assertEquals(attributes, query.getAttributes());
-        Assert.assertEquals("description", query.getDescription());
+        PermissionMetadataUpdateParams params = PermissionMetadataUpdateParams.fromJson(json);
+        Assert.assertNotNull(params);
+        Assert.assertEquals(ResourceType.GROUP, params.getResourceType());
+        Assert.assertEquals("group1", params.getResourceName());
+        Assert.assertEquals("user:user1", params.getPrincipal());
+        Assert.assertEquals(attributes, params.getAttributes());
+        Assert.assertEquals("description", params.getDescription());
     }
 
     @Test
@@ -88,17 +88,17 @@ public class PermissionMetadataUpdateParamsTest {
                 ", \"description\": \"description\"" +
                 "}";
 
-        PermissionMetadataUpdateParams query = PermissionMetadataUpdateParams.fromJson(json);
-        Assert.assertNotNull(query);
-        Assert.assertEquals(ResourceType.GROUP, query.getResourceType());
-        Assert.assertEquals("group1", query.getResourceName());
-        Assert.assertEquals("user:user1", query.getPrincipal());
+        PermissionMetadataUpdateParams params = PermissionMetadataUpdateParams.fromJson(json);
+        Assert.assertNotNull(params);
+        Assert.assertEquals(ResourceType.GROUP, params.getResourceType());
+        Assert.assertEquals("group1", params.getResourceName());
+        Assert.assertEquals("user:user1", params.getPrincipal());
         Map<String, Object> attributes = new HashMap<>();
         attributes.put("attr1", "value1");
         attributes.put("attr2", "value2");
         attributes.put("attr3", "value3");
-        Assert.assertEquals(attributes, query.getAttributes());
-        Assert.assertEquals("description", query.getDescription());
+        Assert.assertEquals(attributes, params.getAttributes());
+        Assert.assertEquals("description", params.getDescription());
     }
 
 }

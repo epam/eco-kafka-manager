@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 EPAM Systems
+ * Copyright 2020 EPAM Systems
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License.  You may obtain a copy
@@ -23,29 +23,22 @@ import org.apache.commons.lang3.Validate;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import com.epam.eco.kafkamanager.SearchQuery;
+import com.epam.eco.kafkamanager.SearchCriteria;
 import com.epam.eco.kafkamanager.utils.MapperUtils;
 
 /**
  * @author Andrei_Tytsik
  */
-public class UDMetricSearchQuery implements SearchQuery<UDMetric> {
-
-    public enum Status {
-        OK, FAILED
-    }
+public class UDMetricConfigSearchCriteria implements SearchCriteria<UDMetricConfig> {
 
     private final UDMetricType type;
     private final String resourceName;
-    private final Status status;
 
-    public UDMetricSearchQuery(
+    public UDMetricConfigSearchCriteria(
             @JsonProperty("type") UDMetricType type,
-            @JsonProperty("resourceName") String resourceName,
-            @JsonProperty("status") Status status) {
+            @JsonProperty("resourceName") String resourceName) {
         this.type = type;
         this.resourceName = resourceName;
-        this.status = status;
     }
 
     public UDMetricType getType() {
@@ -54,27 +47,14 @@ public class UDMetricSearchQuery implements SearchQuery<UDMetric> {
     public String getResourceName() {
         return resourceName;
     }
-    public Status getStatus() {
-        return status;
-    }
 
     @Override
-    public boolean matches(UDMetric obj) {
-        Validate.notNull(obj, "UDM Metric is null");
-
-        Boolean failed = null;
-        if (Status.OK == status) {
-            failed = Boolean.FALSE;
-        } else if (Status.FAILED == status) {
-            failed = Boolean.TRUE;
-        }
+    public boolean matches(UDMetricConfig obj) {
+        Validate.notNull(obj, "UDM Config is null");
 
         return
                 (type == null || Objects.equals(obj.getType(), type)) &&
-                (
-                        StringUtils.isBlank(resourceName) ||
-                        StringUtils.containsIgnoreCase(obj.getResourceName(), resourceName)) &&
-                (failed == null || failed == obj.hasErrors());
+                (StringUtils.isBlank(resourceName) || StringUtils.containsIgnoreCase(obj.getResourceName(), resourceName));
     }
 
     @Override
@@ -85,16 +65,15 @@ public class UDMetricSearchQuery implements SearchQuery<UDMetric> {
         if (obj == null || getClass() != obj.getClass()) {
             return false;
         }
-        UDMetricSearchQuery that = (UDMetricSearchQuery) obj;
+        UDMetricConfigSearchCriteria that = (UDMetricConfigSearchCriteria) obj;
         return
                 Objects.equals(this.type, that.type) &&
-                Objects.equals(this.resourceName, that.resourceName) &&
-                Objects.equals(this.status, that.status);
+                Objects.equals(this.resourceName, that.resourceName);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(type, resourceName, status);
+        return Objects.hash(type, resourceName);
     }
 
     @Override
@@ -102,7 +81,6 @@ public class UDMetricSearchQuery implements SearchQuery<UDMetric> {
         return
                 "{type: " + type +
                 ", resourceName: " + resourceName +
-                ", status: " + status +
                 "}";
     }
 
@@ -114,36 +92,34 @@ public class UDMetricSearchQuery implements SearchQuery<UDMetric> {
         return builder(null);
     }
 
-    public static Builder builder(UDMetricSearchQuery origin) {
+    public static Builder builder(UDMetricConfigSearchCriteria origin) {
         return new Builder(origin);
     }
 
-    public static UDMetricSearchQuery fromJson(Map<String, ?> map) {
+    public static UDMetricConfigSearchCriteria fromJson(Map<String, ?> map) {
         Validate.notNull(map, "JSON map is null");
 
-        return MapperUtils.convert(map, UDMetricSearchQuery.class);
+        return MapperUtils.convert(map, UDMetricConfigSearchCriteria.class);
     }
 
-    public static UDMetricSearchQuery fromJson(String json) {
+    public static UDMetricConfigSearchCriteria fromJson(String json) {
         Validate.notNull(json, "JSON is null");
 
-        return MapperUtils.jsonToBean(json, UDMetricSearchQuery.class);
+        return MapperUtils.jsonToBean(json, UDMetricConfigSearchCriteria.class);
     }
 
     public static class Builder {
 
         private UDMetricType type;
         private String resourceName;
-        private Status status;
 
-        private Builder(UDMetricSearchQuery origin) {
+        private Builder(UDMetricConfigSearchCriteria origin) {
             if (origin == null) {
                 return;
             }
 
             this.type = origin.type;
             this.resourceName = origin.resourceName;
-            this.status = origin.status;
         }
 
         public Builder type(UDMetricType type) {
@@ -156,13 +132,8 @@ public class UDMetricSearchQuery implements SearchQuery<UDMetric> {
             return this;
         }
 
-        public Builder status(Status status) {
-            this.status = status;
-            return this;
-        }
-
-        public UDMetricSearchQuery build() {
-            return new UDMetricSearchQuery(type, resourceName, status);
+        public UDMetricConfigSearchCriteria build() {
+            return new UDMetricConfigSearchCriteria(type, resourceName);
         }
 
     }

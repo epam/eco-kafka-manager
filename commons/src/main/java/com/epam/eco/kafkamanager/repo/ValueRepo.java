@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 EPAM Systems
+ * Copyright 2020 EPAM Systems
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License.  You may obtain a copy
@@ -20,15 +20,15 @@ import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
-import com.epam.eco.kafkamanager.SearchQuery;
+import com.epam.eco.kafkamanager.SearchCriteria;
 
 /**
  * @author Andrei_Tytsik
  */
-public interface ValueRepo<V, Q extends SearchQuery<V>> {
+public interface ValueRepo<V, SC extends SearchCriteria<V>> {
     int size();
     List<V> values();
-    List<V> values(Q query);
+    List<V> values(SC criteria);
     Page<V> page(Pageable pageable);
-    Page<V> page(Q query, Pageable pageable);
+    Page<V> page(SC criteria, Pageable pageable);
 }

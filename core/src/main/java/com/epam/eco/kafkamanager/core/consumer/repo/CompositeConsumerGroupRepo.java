@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 EPAM Systems
+ * Copyright 2020 EPAM Systems
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License.  You may obtain a copy
@@ -24,7 +24,7 @@ import org.apache.commons.lang3.Validate;
 
 import com.epam.eco.kafkamanager.ConsumerGroupInfo;
 import com.epam.eco.kafkamanager.ConsumerGroupRepo;
-import com.epam.eco.kafkamanager.ConsumerGroupSearchQuery;
+import com.epam.eco.kafkamanager.ConsumerGroupSearchCriteria;
 import com.epam.eco.kafkamanager.NotFoundException;
 import com.epam.eco.kafkamanager.repo.AbstractKeyValueRepo;
 import com.epam.eco.kafkamanager.repo.CachedRepo;
@@ -32,7 +32,7 @@ import com.epam.eco.kafkamanager.repo.CachedRepo;
 /**
  * @author Andrei_Tytsik
  */
-public class CompositeConsumerGroupRepo extends AbstractKeyValueRepo<String, ConsumerGroupInfo, ConsumerGroupSearchQuery> implements ConsumerGroupRepo, CachedRepo<String> {
+public class CompositeConsumerGroupRepo extends AbstractKeyValueRepo<String, ConsumerGroupInfo, ConsumerGroupSearchCriteria> implements ConsumerGroupRepo, CachedRepo<String> {
 
     @Resource(name="ZK")
     private ConsumerGroupRepo zkConsumerGroupRepo;

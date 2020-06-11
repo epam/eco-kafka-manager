@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 EPAM Systems
+ * Copyright 2020 EPAM Systems
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License.  You may obtain a copy
@@ -42,6 +42,7 @@ import com.epam.eco.kafkamanager.utils.MapperUtils;
  */
 public class TabularRecords implements Iterable<Record> {
 
+    private static final String DATETIME_PATTERN = "dd/MM/yyyy hh:mm:ss a"; // should be the same as in topic_browser.html (see #offsets-timestamp.format)
     private static final String NA = "N/A";
 
     private final List<Record> records;
@@ -298,9 +299,7 @@ public class TabularRecords implements Iterable<Record> {
                 return null;
             }
 
-            String formatted = DateFormatUtils.formatUTC(
-                    timestamp,
-                    DateFormatUtils.ISO_8601_EXTENDED_DATETIME_FORMAT.getPattern());
+            String formatted = DateFormatUtils.formatUTC(timestamp, DATETIME_PATTERN);
 
             if (TimestampType.CREATE_TIME == timestampType) {
                 formatted += " (client)";

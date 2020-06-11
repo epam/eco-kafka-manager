@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 EPAM Systems
+ * Copyright 2020 EPAM Systems
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License.  You may obtain a copy
@@ -40,7 +40,7 @@ import com.epam.eco.kafkamanager.ResourcePermissionDeleteParams;
 import com.epam.eco.kafkamanager.PermissionInfo;
 import com.epam.eco.kafkamanager.PermissionMetadataDeleteParams;
 import com.epam.eco.kafkamanager.PermissionMetadataUpdateParams;
-import com.epam.eco.kafkamanager.PermissionSearchQuery;
+import com.epam.eco.kafkamanager.PermissionSearchCriteria;
 import com.epam.eco.kafkamanager.core.utils.PageUtils;
 import com.epam.eco.kafkamanager.rest.request.MetadataRequest;
 import com.epam.eco.kafkamanager.rest.request.PermissionRequest;
@@ -67,7 +67,7 @@ public class PermissionController {
             @RequestParam(value = "page", required = false) Integer page,
             @RequestParam(value = "pageSize", required = false) Integer pageSize) {
         Pageable pageable = PageUtils.buildPageableWithDefaultsIfNull(page, pageSize);
-        PermissionSearchQuery query = PermissionSearchQuery.builder()
+        PermissionSearchCriteria criteria = PermissionSearchCriteria.builder()
                 .kafkaPrincipal(kafkaPrincipal)
                 .resourceType(resourceType)
                 .resourceName(resourceName)
@@ -77,7 +77,7 @@ public class PermissionController {
                 .description(description)
                 .build();
 
-        return kafkaManager.getPermissionPage(query, pageable);
+        return kafkaManager.getPermissionPage(criteria, pageable);
     }
 
     @PostMapping

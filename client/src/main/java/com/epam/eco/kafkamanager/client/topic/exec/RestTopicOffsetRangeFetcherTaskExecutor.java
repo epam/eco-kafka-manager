@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 EPAM Systems
+ * Copyright 2020 EPAM Systems
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License.  You may obtain a copy
@@ -38,24 +38,28 @@ import org.springframework.web.util.UriComponentsBuilder;
 import com.epam.eco.commons.kafka.OffsetRange;
 import com.epam.eco.kafkamanager.OffsetTimeSeries;
 import com.epam.eco.kafkamanager.TopicOffsetFetcherTaskExecutor;
+import com.epam.eco.kafkamanager.TopicOffsetRangeFetcherTaskExecutor;
 import com.epam.eco.kafkamanager.exec.AbstractAsyncStatefullTaskExecutor;
 import com.epam.eco.kafkamanager.exec.TaskResult;
-import com.epam.eco.kafkamanager.rest.request.TopicOffsetFetchRequest;
+import com.epam.eco.kafkamanager.rest.request.TopicOffsetRangeFetchRequest;
 
 /**
  * @author Raman_Babich
  */
-public class RestTopicOffsetFetcherTaskExecutor extends AbstractAsyncStatefullTaskExecutor<String, Map<TopicPartition, OffsetRange>> implements TopicOffsetFetcherTaskExecutor {
+@SuppressWarnings("deprecation")
+public class RestTopicOffsetRangeFetcherTaskExecutor extends
+        AbstractAsyncStatefullTaskExecutor<String, Map<TopicPartition, OffsetRange>> implements
+        TopicOffsetRangeFetcherTaskExecutor, TopicOffsetFetcherTaskExecutor {
 
     @Autowired
     @Qualifier("KafkaManagerRestTemplate")
     private RestTemplate restTemplate;
 
-    public RestTopicOffsetFetcherTaskExecutor(CacheManager cacheManager) {
+    public RestTopicOffsetRangeFetcherTaskExecutor(CacheManager cacheManager) {
         super(cacheManager);
     }
 
-    public RestTopicOffsetFetcherTaskExecutor(ExecutorService executor, CacheManager cacheManager) {
+    public RestTopicOffsetRangeFetcherTaskExecutor(ExecutorService executor, CacheManager cacheManager) {
         super(executor, cacheManager);
     }
 
@@ -69,9 +73,9 @@ public class RestTopicOffsetFetcherTaskExecutor extends AbstractAsyncStatefullTa
         Date start = new Date();
         try {
             ResponseEntity<TaskResult<Map<TopicPartition, OffsetRange>>> response = restTemplate.exchange(
-                    "/api/tasks/topic-offset-fetcher",
+                    "/api/tasks/topic-offset-range-fetcher",
                     HttpMethod.POST,
-                    new HttpEntity<>(new TopicOffsetFetchRequest(resourceKey)),
+                    new HttpEntity<>(new TopicOffsetRangeFetchRequest(resourceKey)),
                     new ParameterizedTypeReference<TaskResult<Map<TopicPartition, OffsetRange>>>() {});
             return response.getBody();
         } catch (RestClientException ex) {
@@ -92,7 +96,7 @@ public class RestTopicOffsetFetcherTaskExecutor extends AbstractAsyncStatefullTa
         Map<String, Object> uriVariables = Collections.singletonMap("topicName", topicName);
 
         UriComponentsBuilder builder = UriComponentsBuilder
-                .fromUriString("/api/tasks/topic-offset-fetcher/{topicName}")
+                .fromUriString("/api/tasks/topic-offset-range-fetcher/{topicName}")
                 .uriVariables(uriVariables);
 
         ResponseEntity<Map<TopicPartition, OffsetTimeSeries>> response = restTemplate.exchange(

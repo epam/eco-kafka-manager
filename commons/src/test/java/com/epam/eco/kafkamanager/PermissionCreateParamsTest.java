@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 EPAM Systems
+ * Copyright 2020 EPAM Systems
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License.  You may obtain a copy
@@ -66,14 +66,14 @@ public class PermissionCreateParamsTest {
         json.put("operation", AclOperation.READ);
         json.put("host", "host");
 
-        PermissionCreateParams query = PermissionCreateParams.fromJson(json);
-        Assert.assertNotNull(query);
-        Assert.assertEquals(ResourceType.GROUP, query.getResourceType());
-        Assert.assertEquals("group1", query.getResourceName());
-        Assert.assertEquals("user:user1", query.getPrincipal());
-        Assert.assertEquals(AclPermissionType.ALLOW, query.getPermissionType());
-        Assert.assertEquals(AclOperation.READ, query.getOperation());
-        Assert.assertEquals("host", query.getHost());
+        PermissionCreateParams params = PermissionCreateParams.fromJson(json);
+        Assert.assertNotNull(params);
+        Assert.assertEquals(ResourceType.GROUP, params.getResourceType());
+        Assert.assertEquals("group1", params.getResourceName());
+        Assert.assertEquals("user:user1", params.getPrincipal());
+        Assert.assertEquals(AclPermissionType.ALLOW, params.getPermissionType());
+        Assert.assertEquals(AclOperation.READ, params.getOperation());
+        Assert.assertEquals("host", params.getHost());
     }
 
     @Test
@@ -88,14 +88,14 @@ public class PermissionCreateParamsTest {
                 ", \"host\": \"host\"" +
                 "}";
 
-        PermissionCreateParams query = PermissionCreateParams.fromJson(json);
-        Assert.assertNotNull(query);
-        Assert.assertEquals(ResourceType.GROUP, query.getResourceType());
-        Assert.assertEquals("group1", query.getResourceName());
-        Assert.assertEquals("user:user1", query.getPrincipal());
-        Assert.assertEquals(AclPermissionType.ALLOW, query.getPermissionType());
-        Assert.assertEquals(AclOperation.READ, query.getOperation());
-        Assert.assertEquals("host", query.getHost());
+        PermissionCreateParams params = PermissionCreateParams.fromJson(json);
+        Assert.assertNotNull(params);
+        Assert.assertEquals(ResourceType.GROUP, params.getResourceType());
+        Assert.assertEquals("group1", params.getResourceName());
+        Assert.assertEquals("user:user1", params.getPrincipal());
+        Assert.assertEquals(AclPermissionType.ALLOW, params.getPermissionType());
+        Assert.assertEquals(AclOperation.READ, params.getOperation());
+        Assert.assertEquals("host", params.getHost());
     }
 
 }

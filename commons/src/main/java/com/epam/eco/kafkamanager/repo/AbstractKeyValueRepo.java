@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 EPAM Systems
+ * Copyright 2020 EPAM Systems
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License.  You may obtain a copy
@@ -15,10 +15,10 @@
  */
 package com.epam.eco.kafkamanager.repo;
 
-import com.epam.eco.kafkamanager.SearchQuery;
+import com.epam.eco.kafkamanager.SearchCriteria;
 
 /**
  * @author Andrei_Tytsik
  */
-public abstract class AbstractKeyValueRepo<K, V, Q extends SearchQuery<V>> extends AbstractValueRepo<V, Q> implements KeyValueRepo<K, V, Q> {
+public abstract class AbstractKeyValueRepo<K, V, SC extends SearchCriteria<V>> extends AbstractValueRepo<V, SC> implements KeyValueRepo<K, V, SC> {
 }

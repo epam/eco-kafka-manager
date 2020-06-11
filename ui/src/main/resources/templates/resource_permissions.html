@@ -1,12 +1,12 @@
 <!--
- * Copyright 2019 EPAM Systems
- * 
+ * Copyright 2020 EPAM Systems
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License.  You may obtain a copy
  * of the License at
- * 
+ *
  *   http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
@@ -94,9 +94,21 @@
                                 <b>Resource Type:</b>
                                 <span th:text="${resourceType}"></span>
                             </p>
-                            <p>
+                            <p th:switch="${resourceType}">
                                 <b>Resource Name:</b>
-                                <span th:text="${resourceName}"></span>
+                                <a th:case="${T(org.apache.kafka.common.resource.ResourceType).TOPIC}"
+                                   th:href="@{/topics/{name}/(name=${resourceName})}"
+                                   th:text="${resourceName}">
+                                </a>
+                                <a th:case="${T(org.apache.kafka.common.resource.ResourceType).GROUP}"
+                                   th:href="@{/consumer_groups/{name}/(name=${resourceName})}"
+                                   th:text="${resourceName}">
+                                </a>
+                                <a th:case="${T(org.apache.kafka.common.resource.ResourceType).TRANSACTIONAL_ID}"
+                                   th:href="@{/transactions/{id}/(id=${resourceName})}"
+                                   th:text="${resourceName}">
+                                </a>
+                                <span th:case="*" th:text="${resourceName}"></span>
                             </p>
                             <p>
                                 <b>Kafka Principal:</b>

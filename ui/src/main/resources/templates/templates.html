@@ -1,12 +1,12 @@
 <!--
- * Copyright 2019 EPAM Systems
- * 
+ * Copyright 2020 EPAM Systems
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License.  You may obtain a copy
  * of the License at
- * 
+ *
  *   http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
@@ -25,14 +25,20 @@
     <link rel="stylesheet" type="text/css" th:href="@{/bootstrap-multiselect/css/bootstrap-multiselect.css}" />
     <link rel="stylesheet" type="text/css" th:href="@{/styles/fonts/font-awesome/css/font-awesome.min.css}" />
     <link rel="stylesheet" type="text/css" th:href="@{/styles/index.css}" />
+    <link rel="stylesheet" type="text/css" th:href="@{/bootstrap-datetimepicker/css/bootstrap-datetimepicker.min.css}" />
+    
     <th:block th:replace="${links}" />
     
     <script type="text/javascript" th:src="@{/jquery/jquery-3.1.1.min.js}"></script>
+    <script type="text/javascript" th:src="@{/moment/moment-2.26.min.js}"></script>
+    <script type="text/javascript" th:src="@{/moment/moment-timezone-with-data.min.js}"></script>
     <script type="text/javascript" th:src="@{/bootstrap/js/bootstrap.min.js}"></script>
     <script type="text/javascript" th:src="@{/jquery-twbsPagination/jquery.twbsPagination.min.js}"></script>
     <script type="text/javascript" th:src="@{/bootstrap-multiselect/js/bootstrap-multiselect.js}"></script>
     <script type="text/javascript" th:src="@{/bootstrap/js/bootstrap-select.min.js}"></script>
+    <script type="text/javascript" th:src="@{/bootstrap-datetimepicker/js/bootstrap-datetimepicker.min.js}"></script>
     <script type="text/javascript" th:src="@{/ui_lib.js}"></script>
+    
     <th:block th:replace="${scripts}" />
     
     <th:block th:if="${gaTrackingId != null}">
