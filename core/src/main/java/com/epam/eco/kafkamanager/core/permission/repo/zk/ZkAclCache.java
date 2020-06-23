@@ -46,6 +46,7 @@ import com.epam.eco.kafkamanager.core.utils.ZKPathUtils;
 
 import kafka.security.auth.Acl;
 import kafka.security.auth.Resource;
+import kafka.security.auth.ResourceType;
 import kafka.zk.LiteralAclStore;
 
 /**
@@ -207,7 +208,7 @@ class ZkAclCache {
     }
 
     private Resource toResource(String resourceType, String resourceName) {
-        return Resource.fromString(resourceType + Resource.Separator() + resourceName);
+        return new Resource(ResourceType.fromString(resourceType), resourceName, PatternType.LITERAL);
     }
 
     private String getResourceTypeFromPath(String path) {
