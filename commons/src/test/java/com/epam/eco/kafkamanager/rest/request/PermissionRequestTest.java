@@ -15,8 +15,6 @@
  */
 package com.epam.eco.kafkamanager.rest.request;
 
-import java.util.Collections;
-
 import org.apache.kafka.common.acl.AclOperation;
 import org.apache.kafka.common.acl.AclPermissionType;
 import org.apache.kafka.common.resource.ResourceType;

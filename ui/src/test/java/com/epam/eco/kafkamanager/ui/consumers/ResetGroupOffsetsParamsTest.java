@@ -21,8 +21,6 @@ import org.apache.kafka.common.TopicPartition;
 import org.junit.Assert;
 import org.junit.Test;
 
-import com.epam.eco.kafkamanager.ui.consumers.ResetGroupOffsetsParams;
-
 /**
  * @author Andrei_Tytsik
  */

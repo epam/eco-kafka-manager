@@ -22,7 +22,6 @@ import java.io.Writer;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 import javax.servlet.http.HttpServletResponse;
 
@@ -42,7 +41,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.epam.eco.kafkamanager.KafkaManager;
-import com.epam.eco.kafkamanager.Metadata;
 import com.epam.eco.kafkamanager.PermissionCreateParams;
 import com.epam.eco.kafkamanager.PermissionDeleteParams;
 import com.epam.eco.kafkamanager.PermissionInfo;
