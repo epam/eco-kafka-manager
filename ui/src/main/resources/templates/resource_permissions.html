@@ -37,58 +37,21 @@
                                 Back To Permissions <span class="glyphicon glyphicon-arrow-left"></span>
                             </a>
                             <a
-                                    th:href="@{/permissions/resource_metadata(resourceType=${resourceType}, resourceName=${resourceName}, kafkaPrincipal=${kafkaPrincipal})}"
+                                    th:href="@{/permissions/create(resourceType=${resourceType}, resourceName=${resourceName}, patternType=${patternType}, kafkaPrincipal=${kafkaPrincipal})}"
+                                    class="btn btn-primary right-icon">
+                                Create <i class="fa fa-plus"></i>
+                            </a>
+                            <a
+                                    th:if="${kafkaPrincipalPresent}"
+                                    th:href="@{/permissions/resource/{resourceType}/{resourceName}/{patternType}/metadata(resourceType=${resourceType}, resourceName=${resourceName}, patternType=${patternType}, kafkaPrincipal=${kafkaPrincipal})}"
                                     class="btn btn-primary right-icon">
                                 Edit Metadata <span class="glyphicon glyphicon-tags"></span>
                             </a>
-
-
-                            <button style="float:right;"
-                                    type="button"
-                                    class="btn btn-danger right-icon"
-                                    data-toggle="modal"
-                                    data-target="#delete-permissions-confirm">
-                                Delete Permissions <i class="fa fa-trash"></i>
-                            </button>
-                            <div id="delete-permissions-confirm" class="modal fade" role="dialog">
-                                <div class="modal-dialog">
-                                    <div class="modal-content">
-                                        <div class="modal-header">
-                                            <button type="button" class="close" data-dismiss="modal">&times;</button>
-                                            <h4 class="modal-title">Confirm Resource Permission Delete</h4>
-                                        </div>
-                                        <div class="modal-body">
-                                            <p>
-                                                Are you sure you want to delete all permissions for "[[${resourceName}]]" "[[${resourceType}]]" of "[[${kafkaPrincipal}]]"?
-                                            </p>
-                                        </div>
-                                        <div class="modal-footer">
-                                            <form
-                                                    th:action="@{/permissions/resource/{resourceType}/{resourceName}/{principal}/delete(resourceType=${resourceType},resourceName=${resourceName},principal=${kafkaPrincipal})}"
-                                                    method="post">
-                                                <button
-                                                        type="button"
-                                                        class="btn btn-primary"
-                                                        data-dismiss="modal">
-                                                    Cancel
-                                                </button>
-                                                <button
-                                                        type="submit"
-                                                        class="btn btn-danger">
-                                                    Delete
-                                                </button>
-                                            </form>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-
                         </div>
                     </div>
         
                     <div class="panel panel-default">
-                        <div class="panel-heading">Permission</div>
+                        <div class="panel-heading">Resource</div>
                         <div class="panel-body">
                             <p>
                                 <b>Resource Type:</b>
@@ -111,8 +74,14 @@
                                 <span th:case="*" th:text="${resourceName}"></span>
                             </p>
                             <p>
+                                <b>Pattern Type:</b>
+                                <span th:text="${patternType}"></span>
+                            </p>
+                            <p>
                                 <b>Kafka Principal:</b>
-                                <span th:text="${kafkaPrincipal}"></span>
+                                <span 
+                                    th:text="${kafkaPrincipal}" 
+                                    th:classappend="${kafkaPrincipalPresent} ? 'bg-success' : 'bg-danger'"></span>
                             </p>
                             <p>
                                 <b>Description:</b>
@@ -128,6 +97,7 @@
                             <tr>
                                 <td>Resource Type</td>
                                 <td>Resource Name</td>
+                                <td>Pattern Type</td>
                                 <td>Kafka Principal</td>
                                 <td>Permission Type</td>
                                 <td>Operation</td>
@@ -136,23 +106,66 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr style="background-color: #FFFFFF; text-align:center;">
-                                <td colspan="7">
-                                    Permissions to <span th:text="${resourceType + ' (' + resourceName + ')'}" style="font-weight:bold"></span>:
+                            <tr style="background-color: #FFFFFF;">
+                                <td colspan="7" style="text-align:center;">
+                                    Permissions of <span th:text="${resourceType + ':' + patternType + ':' + resourceName}" style="font-weight:bold"></span>:
+                                </td>
+                                <td>
+                                    <button
+                                            type="button"
+                                            class="btn btn-danger right-icon"
+                                            data-toggle="modal"
+                                            data-target="#delete-all-resource-permissions-confirm">
+                                        Delete All <i class="fa fa-trash"></i>
+                                    </button>
+                                    <div id="delete-all-resource-permissions-confirm" class="modal fade" role="dialog">
+                                        <div class="modal-dialog">
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+                                                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                                                    <h4 class="modal-title">Confirm Resource Permission Delete</h4>
+                                                </div>
+                                                <div class="modal-body">
+                                                    <p>
+                                                        Are you sure you want to delete all permissions of <span th:text="${resourceType + ':' + patternType + ':' + resourceName}" style="font-weight:bold"></span>?
+                                                    </p>
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <form
+                                                            th:action="@{/permissions/resource/{resourceType}/{resourceName}/{patternType}(resourceType=${resourceType},resourceName=${resourceName},patternType=${patternType})}"
+                                                            method="post">
+                                                        <input type="hidden" name="_method" value="delete"/>
+                                                        <button
+                                                                type="button"
+                                                                class="btn btn-primary"
+                                                                data-dismiss="modal">
+                                                            Cancel
+                                                        </button>
+                                                        <button
+                                                                type="submit"
+                                                                class="btn btn-danger">
+                                                            Delete
+                                                        </button>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>                                
                                 </td>
                             </tr>
                                     
                             <tr 
-                                th:if="${resourcePermissions != null}"
-                                th:each="permission : ${resourcePermissions}">
+                                th:if="${resourcePermissions != null AND !resourcePermissions.isEmpty()}"
+                                th:each="permission,iter : ${resourcePermissions}">
                                 <td th:text="${permission.resourceType}"></td>
                                 <td>
                                     <a 
-                                        th:href="@{/permissions/resource(resourceType=${permission.resourceType}, resourceName=${permission.resourceName}, kafkaPrincipal=${permission.kafkaPrincipal})}">
+                                        th:href="@{/permissions/resource/{resourceType}/{resourceName}/{patternType}(resourceType=${permission.resourceType}, resourceName=${permission.resourceName}, patternType=${permission.patternType}, kafkaPrincipal=${permission.kafkaPrincipal})}">
                                         <span th:text="${permission.resourceName}"></span>
                                     </a>
                                 </td>
-                                <td th:text="${permission.kafkaPrincipal}" th:class="${permission.kafkaPrincipal.toString().equals(kafkaPrincipal)} ? warning : default"></td>
+                                <td th:text="${permission.patternType}"></td>
+                                <td th:text="${permission.kafkaPrincipal}" th:class="${permission.kafkaPrincipal.toString().equals(kafkaPrincipal)} ? success : default"></td>
                                 <td th:text="${permission.permissionType}"></td>
                                 <td th:text="${permission.operation}"></td>
                                 <td th:text="${permission.host}"></td>
@@ -161,10 +174,10 @@
                                             type="button"
                                             class="btn btn-danger right-icon"
                                             data-toggle="modal"
-                                            th:data-target="${'#delete-permission-confirm'}">
+                                            th:data-target="${'#delete-permission-confirm' + iter.index}">
                                         Delete <i class="fa fa-trash"></i>
                                     </button>
-                                    <div th:id="${'delete-permission-confirm'}" class="modal fade" role="dialog">
+                                    <div th:id="${'delete-permission-confirm' + iter.index}" class="modal fade" role="dialog">
                                         <div class="modal-dialog">
                                             <div class="modal-content">
                                                 <div class="modal-header">
@@ -178,8 +191,9 @@
                                                 </div>
                                                 <div class="modal-footer">
                                                     <form
-                                                            th:action="@{/permissions/{resourceType}/{resourceName}/{permissionType}/{operation}/{principal}/{host}/delete(resourceType=${permission.resourceType},resourceName=${permission.resourceName},permissionType=${permission.permissionType},operation=${permission.operation},principal=${permission.kafkaPrincipal},host=${permission.host})}"
+                                                            th:action="@{/permissions/resource/{resourceType}/{resourceName}/{patternType}(resourceType=${permission.resourceType},resourceName=${permission.resourceName},patternType=${permission.patternType},kafkaPrincipalFilter=${permission.kafkaPrincipal},permissionTypeFilter=${permission.permissionType},operationFilter=${permission.operation},hostFilter=${permission.host},resourceTypeRedirect=${resourceType},resourceNameRedirect=${resourceName},patternTypeRedirect=${patternType},kafkaPrincipalRedirect=${kafkaPrincipal})}"
                                                             method="post">
+                                                        <input type="hidden" name="_method" value="delete"/>
                                                         <button
                                                                 type="button"
                                                                 class="btn btn-primary"
@@ -199,23 +213,26 @@
                                 </td>
                             </tr>
         
-                            <tr style="background-color: #FFFFFF; text-align:center;">
-                                <td colspan="7">
+                            <tr 
+                                th:if="${principalPermissions != null AND !principalPermissions.isEmpty()}"
+                                style="background-color: #FFFFFF; text-align:center;">
+                                <td colspan="8">
                                     Other <span th:text="${kafkaPrincipal}" style="font-weight:bold"></span>'s permissions:
                                 </td>
                             </tr>
         
                             <tr 
-                                th:if="${principalPermissions != null}"
-                                th:each="permission : ${principalPermissions}">
+                                th:if="${principalPermissions != null AND !principalPermissions.isEmpty()}"
+                                th:each="permission,iter : ${principalPermissions}">
                                 <td th:text="${permission.resourceType}"></td>
                                 <td>
                                     <a 
-                                        th:href="@{/permissions/resource(resourceType=${permission.resourceType}, resourceName=${permission.resourceName}, kafkaPrincipal=${permission.kafkaPrincipal})}">
+                                        th:href="@{/permissions/resource/{resourceType}/{resourceName}/{patternType}(resourceType=${permission.resourceType}, resourceName=${permission.resourceName}, patternType=${permission.patternType}, kafkaPrincipal=${permission.kafkaPrincipal})}">
                                         <span th:text="${permission.resourceName}"></span>
                                     </a>
                                 </td>
-                                <td th:text="${permission.kafkaPrincipal}" th:class="${permission.kafkaPrincipal.toString().equals(kafkaPrincipal)} ? warning : default"></td>
+                                <td th:text="${permission.patternType}"></td>
+                                <td th:text="${permission.kafkaPrincipal}" th:class="${permission.kafkaPrincipal.toString().equals(kafkaPrincipal)} ? success : default"></td>
                                 <td th:text="${permission.permissionType}"></td>
                                 <td th:text="${permission.operation}"></td>
                                 <td th:text="${permission.host}"></td>
@@ -224,10 +241,10 @@
                                             type="button"
                                             class="btn btn-danger right-icon"
                                             data-toggle="modal"
-                                            th:data-target="${'#delete-other-permission-confirm'}">
+                                            th:data-target="${'#delete-other-permission-confirm' + iter.index}">
                                         Delete <i class="fa fa-trash"></i>
                                     </button>
-                                    <div th:id="${'delete-other-permission-confirm'}" class="modal fade" role="dialog">
+                                    <div th:id="${'delete-other-permission-confirm' + iter.index}" class="modal fade" role="dialog">
                                         <div class="modal-dialog">
                                             <div class="modal-content">
                                                 <div class="modal-header">
@@ -241,8 +258,9 @@
                                                 </div>
                                                 <div class="modal-footer">
                                                     <form
-                                                            th:action="@{/permissions/{resourceType}/{resourceName}/{permissionType}/{operation}/{principal}/{host}/delete(resourceType=${permission.resourceType},resourceName=${permission.resourceName},permissionType=${permission.permissionType},operation=${permission.operation},principal=${permission.kafkaPrincipal},host=${permission.host})}"
+                                                            th:action="@{/permissions/resource/{resourceType}/{resourceName}/{patternType}(resourceType=${permission.resourceType},resourceName=${permission.resourceName},patternType=${permission.patternType},kafkaPrincipalFilter=${permission.kafkaPrincipal},permissionTypeFilter=${permission.permissionType},operationFilter=${permission.operation},hostFilter=${permission.host},resourceTypeRedirect=${resourceType},resourceNameRedirect=${resourceName},patternTypeRedirect=${patternType},kafkaPrincipalRedirect=${kafkaPrincipal})}"
                                                             method="post">
+                                                        <input type="hidden" name="_method" value="delete"/>
                                                         <button
                                                                 type="button"
                                                                 class="btn btn-primary"

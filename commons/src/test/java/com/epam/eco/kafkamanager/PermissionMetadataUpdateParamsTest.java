@@ -18,6 +18,7 @@ package com.epam.eco.kafkamanager;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.kafka.common.resource.PatternType;
 import org.apache.kafka.common.resource.ResourceType;
 import org.junit.Assert;
 import org.junit.Test;
@@ -36,6 +37,7 @@ public class PermissionMetadataUpdateParamsTest {
         PermissionMetadataUpdateParams origin = PermissionMetadataUpdateParams.builder().
                 resourceType(ResourceType.GROUP).
                 resourceName("group").
+                patternType(PatternType.LITERAL).
                 principal("user:user").
                 description("description").
                 appendAttribute("attr1", "value1").
@@ -60,6 +62,7 @@ public class PermissionMetadataUpdateParamsTest {
         Map<String, Object> json = new HashMap<>();
         json.put("resourceType", "GROUP");
         json.put("resourceName", "group1");
+        json.put("patternType", "LITERAL");
         json.put("principal", "user:user1");
         Map<String, Object> attributes = new HashMap<>();
         attributes.put("attr1", "value1");
@@ -72,6 +75,7 @@ public class PermissionMetadataUpdateParamsTest {
         Assert.assertNotNull(params);
         Assert.assertEquals(ResourceType.GROUP, params.getResourceType());
         Assert.assertEquals("group1", params.getResourceName());
+        Assert.assertEquals(PatternType.LITERAL, params.getPatternType());
         Assert.assertEquals("user:user1", params.getPrincipal());
         Assert.assertEquals(attributes, params.getAttributes());
         Assert.assertEquals("description", params.getDescription());
@@ -83,6 +87,7 @@ public class PermissionMetadataUpdateParamsTest {
                 "{" +
                 "\"resourceType\": \"GROUP\"" +
                 ", \"resourceName\": \"group1\"" +
+                ", \"patternType\": \"LITERAL\"" +
                 ", \"principal\": \"user:user1\"" +
                 ", \"attributes\": {\"attr1\":\"value1\",\"attr2\":\"value2\",\"attr3\":\"value3\"}" +
                 ", \"description\": \"description\"" +
@@ -92,6 +97,7 @@ public class PermissionMetadataUpdateParamsTest {
         Assert.assertNotNull(params);
         Assert.assertEquals(ResourceType.GROUP, params.getResourceType());
         Assert.assertEquals("group1", params.getResourceName());
+        Assert.assertEquals(PatternType.LITERAL, params.getPatternType());
         Assert.assertEquals("user:user1", params.getPrincipal());
         Map<String, Object> attributes = new HashMap<>();
         attributes.put("attr1", "value1");

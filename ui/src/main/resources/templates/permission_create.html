@@ -42,15 +42,15 @@
                         </div>
                     </div>
                     
-                    <form th:action="@{/permission_create}" method="post">
+                    <form th:action="@{/permissions/create}" method="post">
                     
                         <div class="panel panel-default">
                             <div class="panel-heading">Permission</div>
                             <div class="panel-body">
 
                                 <div class="row form-group">
-                                    <div class="form-group col col-md-4">
-                                        <label for="resourceType">Resource type</label>
+                                    <div class="form-group col col-md-2">
+                                        <label for="resourceType">Resource Type</label>
                                         <select title="Resource type" class="form-control" id="resourceType" name="resourceType">
                                             <option
                                                     th:each="type : ${T(org.apache.kafka.common.resource.ResourceType).values()}"
@@ -60,38 +60,31 @@
                                             </option>
                                         </select>
                                     </div>
-                                    <div class="form-group col col-md-4">
-                                        <label for="resourceName">Resource name</label>
+                                    <div class="form-group col col-md-2">
+                                        <label for="resourceName">Resource Name</label>
                                         <input
                                                 type="text"
                                                 class="form-control"
                                                 id="resourceName"
-                                                name="resourceName"/>
+                                                name="resourceName"
+                                                th:value="${defaultResourceName}"/>
+                                    </div>
+                                    <div class="form-group col col-md-2">
+                                        <label for="patternType">Pattern Type</label>
+                                        <select title="Pattern Type" class="form-control" id="patternType" name="patternType">
+                                            <option
+                                                    th:each="type : ${T(org.apache.kafka.common.resource.PatternType).values()}"
+                                                    th:value="${type}"
+                                                    th:text="${type}"
+                                                    th:selected="${type == defaultPatternType}">
+                                            </option>
+                                        </select>
                                     </div>
                                 </div>
-
+                                
                                 <div class="row form-group">
-                                    <div class="form-group col col-md-4">
-                                        <label for="principal">Principal</label>
-                                        <input
-                                                type="text"
-                                                class="form-control"
-                                                id="principal"
-                                                name="principal"/>
-                                    </div>
-                                    <div class="form-group col col-md-4">
-                                        <label for="host">Host</label>
-                                        <input
-                                                type="text"
-                                                class="form-control"
-                                                id="host"
-                                                name="host"/>
-                                    </div>
-                                </div>
-
-                                <div class="row form-group">
-                                    <div class="form-group col col-md-4">
-                                        <label for="permissionType">Permission type</label>
+                                    <div class="form-group col col-md-2">
+                                        <label for="permissionType">Permission Type</label>
                                         <select title="Permission type" class="form-control" id="permissionType" name="permissionType">
                                             <option
                                                     th:each="type : ${T(org.apache.kafka.common.acl.AclPermissionType).values()}"
@@ -101,7 +94,7 @@
                                             </option>
                                         </select>
                                     </div>
-                                    <div class="form-group col col-md-4">
+                                    <div class="form-group col col-md-2">
                                         <label for="operation">Operation</label>
                                         <select title="Operation" class="form-control" id="operation" name="operation">
                                             <option
@@ -111,6 +104,27 @@
                                                     th:selected="${op == defaultOperation}">
                                             </option>
                                         </select>
+                                    </div>
+                                    <div class="form-group col col-md-2">
+                                        <label for="host">Host</label>
+                                        <input
+                                                type="text"
+                                                class="form-control"
+                                                id="host"
+                                                name="host"
+                                                th:value="${defaultHost}"/>
+                                    </div>
+                                </div>
+
+                                <div class="row form-group">
+                                    <div class="form-group col col-md-6">
+                                        <label for="kafkaPrincipal">Principal</label>
+                                        <input
+                                                type="text"
+                                                class="form-control"
+                                                id="kafkaPrincipal"
+                                                name="kafkaPrincipal"
+                                                th:value="${defaultKafkaPrincipal}"/>
                                     </div>
                                 </div>
                                 

@@ -56,8 +56,13 @@
                             </a>
                             <a
                                 th:href="@{/permissions/(resourceType=${T(org.apache.kafka.common.resource.ResourceType).GROUP}, resourceName=${group.name})}"
-                                 class="btn btn-primary right-icon">
-                                Edit Permissions <span class="glyphicon glyphicon-list"></span>
+                                class="btn btn-primary right-icon">
+                                View Permissions <span class="glyphicon glyphicon-list"></span>
+                            </a>
+                            <a
+                                th:href="@{/permissions/create(resourceType=${T(org.apache.kafka.common.resource.ResourceType).GROUP}, resourceName=${group.name})}"
+                                class="btn btn-primary right-icon">
+                                Create Permission <i class="fa fa-plus"></i>
                             </a>
 
                             <a

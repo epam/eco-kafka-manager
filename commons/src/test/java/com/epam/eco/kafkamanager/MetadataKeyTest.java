@@ -15,6 +15,7 @@
  */
 package com.epam.eco.kafkamanager;
 
+import org.apache.kafka.common.resource.PatternType;
 import org.apache.kafka.common.resource.ResourceType;
 import org.junit.Assert;
 import org.junit.Test;
@@ -32,7 +33,11 @@ public class MetadataKeyTest {
     public void testSerializedToJsonAndBack() throws Exception {
         MetadataKey origin1 = BrokerMetadataKey.with(42);
         MetadataKey origin2 = ConsumerGroupMetadataKey.with("groupName");
-        MetadataKey origin3 = PermissionMetadataKey.with("user:user", ResourceType.TOPIC, "topicName");
+        MetadataKey origin3 = PermissionMetadataKey.with(
+                "user:user",
+                ResourceType.TOPIC,
+                "topicName",
+                PatternType.LITERAL);
         MetadataKey origin4 = TopicMetadataKey.with("topicName");
 
         ObjectMapper mapper = TestObjectMapperSingleton.getObjectMapper();

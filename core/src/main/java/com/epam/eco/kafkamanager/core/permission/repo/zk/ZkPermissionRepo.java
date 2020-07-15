@@ -26,18 +26,17 @@ import java.util.stream.Collectors;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.kafka.common.acl.AccessControlEntry;
-import org.apache.kafka.common.acl.AccessControlEntryFilter;
 import org.apache.kafka.common.acl.AclBinding;
 import org.apache.kafka.common.acl.AclBindingFilter;
 import org.apache.kafka.common.acl.AclOperation;
 import org.apache.kafka.common.acl.AclPermissionType;
 import org.apache.kafka.common.resource.PatternType;
-import org.apache.kafka.common.resource.ResourceFilter;
 import org.apache.kafka.common.resource.ResourcePattern;
-import org.apache.kafka.common.resource.ResourcePatternFilter;
 import org.apache.kafka.common.resource.ResourceType;
 import org.apache.kafka.common.security.auth.KafkaPrincipal;
 import org.slf4j.Logger;
@@ -56,6 +55,7 @@ import com.epam.eco.kafkamanager.PermissionInfo;
 import com.epam.eco.kafkamanager.PermissionMetadataKey;
 import com.epam.eco.kafkamanager.PermissionRepo;
 import com.epam.eco.kafkamanager.PermissionSearchCriteria;
+import com.epam.eco.kafkamanager.ResourcePermissionFilter;
 import com.epam.eco.kafkamanager.core.permission.repo.zk.ZkAclCache.ACL;
 import com.epam.eco.kafkamanager.core.spring.AsyncStartingBean;
 import com.epam.eco.kafkamanager.repo.AbstractValueRepo;
@@ -142,43 +142,51 @@ public class ZkPermissionRepo extends AbstractValueRepo<PermissionInfo, Permissi
     }
 
     @Override
+    public List<PermissionInfo> findMatchingOfResource(ResourcePermissionFilter filter) {
+        Validate.notNull(filter, "Filter is null");
+
+        return findMatchingOfResource(filter.toAclBindingFilter());
+    }
+
+    @Override
     public void create(
             ResourceType resourceType,
             String resourceName,
+            PatternType patternType,
             KafkaPrincipal principal,
             AclPermissionType permissionType,
             AclOperation operation,
             String host) {
         Validate.notNull(resourceType, "Resource type is null");
         Validate.notBlank(resourceName, "Resource name is blank");
+        Validate.notNull(patternType, "Pattern type is null");
         Validate.notNull(principal, "Principal is null");
         Validate.notNull(permissionType, "Permission type is null");
         Validate.notNull(operation, "Operation is null");
         Validate.notBlank(host, "Host is blank");
 
-        org.apache.kafka.common.resource.Resource resource =
-                new org.apache.kafka.common.resource.Resource(
-                        resourceType,
-                        resourceName);
-        AccessControlEntry ace = new AccessControlEntry(
+        ResourcePattern pattern = new ResourcePattern(
+                resourceType,
+                resourceName,
+                patternType);
+        AccessControlEntry entry = new AccessControlEntry(
                 principal.toString(),
                 host,
                 operation,
                 permissionType);
-        Resource semaphoreKey = ScalaConversions.asScalaResource(resourceType, resourceName);
+        AclBinding binding = new AclBinding(pattern, entry);
+
+        Resource resource = asScalaResource(resourceType, resourceName, patternType);
 
         ResourceSemaphores.ResourceSemaphore<Resource, PermissionOperation> semaphore = null;
         try {
             semaphore = aclCache.callInLock(() -> {
                 ResourceSemaphores.ResourceSemaphore<Resource, PermissionOperation> updateSemaphore =
                         semaphores.createSemaphore(
-                                semaphoreKey,
+                                resource,
                                 PermissionOperation.UPDATE);
 
-                adminOperations.createAcl(
-                        new AclBinding(
-                                new ResourcePattern(resource.resourceType(), resource.name(), PatternType.LITERAL),
-                                ace));
+                adminOperations.createAcl(binding);
 
                 return updateSemaphore;
             });
@@ -190,50 +198,45 @@ public class ZkPermissionRepo extends AbstractValueRepo<PermissionInfo, Permissi
     }
 
     @Override
-    public void delete(
-            ResourceType resourceType,
-            String resourceName,
-            KafkaPrincipal principal,
-            AclPermissionType permissionType,
-            AclOperation operation,
-            String host) {
-        Validate.notNull(resourceType, "Resource type is null");
-        Validate.notBlank(resourceName, "Resource name is blank");
-        Validate.notNull(principal, "Principal is null");
-        Validate.notNull(permissionType, "Permission type is null");
-        Validate.notNull(operation, "Operation is null");
-        Validate.notBlank(host, "Host is blank");
+    public void deleteOfResource(
+            ResourcePermissionFilter filter,
+            DeleteCallback deleteCallback) {
+        Validate.notNull(filter, "Filter is null");
 
-        ResourceFilter resourceFilter = new ResourceFilter(
-                resourceType,
-                resourceName);
-        AccessControlEntryFilter aceFilter = new AccessControlEntryFilter(
-                principal.toString(),
-                host,
-                operation,
-                permissionType);
-        AclBindingFilter aclBindingFilter = new AclBindingFilter(
-                new ResourcePatternFilter(
-                        resourceFilter.resourceType(),
-                        resourceFilter.name(),
-                        PatternType.LITERAL),
-                aceFilter);
-        Resource semaphoreKey = ScalaConversions.asScalaResource(resourceType, resourceName);
+        AclBindingFilter bindingFilter = filter.toAclBindingFilter();
+
+        Resource resource = asScalaResource(
+                bindingFilter.patternFilter().resourceType(),
+                bindingFilter.patternFilter().name(),
+                bindingFilter.patternFilter().patternType());
 
         ResourceSemaphores.ResourceSemaphore<Resource, PermissionOperation> semaphore = null;
         try {
             semaphore = aclCache.callInLock(() -> {
-                ResourceSemaphores.ResourceSemaphore<Resource, PermissionOperation> updateSemaphore =
-                        semaphores.createSemaphore(
-                                semaphoreKey,
-                                PermissionOperation.DELETE);
+                ResourceSemaphores.ResourceSemaphore<Resource, PermissionOperation> updateSemaphore = null;
 
-                adminOperations.deleteAcl(aclBindingFilter);
+                Set<PermissionInfo> allResourcePermissions = permissionInfoCache.get(resource);
+                if (!CollectionUtils.isEmpty(allResourcePermissions)) {
+                    List<PermissionInfo> resourcePermissionsToDelete = findMatchingOfResource(bindingFilter);
+                    if (allResourcePermissions.size() == resourcePermissionsToDelete.size()) {
+                        updateSemaphore = semaphores.createSemaphore(resource, PermissionOperation.DELETE);
+                    } else {
+                        updateSemaphore = semaphores.createSemaphore(resource, PermissionOperation.UPDATE);
+                    }
+
+                    if (deleteCallback != null) {
+                        deleteCallback.onBeforeDelete(resourcePermissionsToDelete);
+                    }
+
+                    adminOperations.deleteAcl(bindingFilter);
+                }
 
                 return updateSemaphore;
             });
 
-            semaphore.awaitUnchecked();
+            if (semaphore != null) {
+                semaphore.awaitUnchecked();
+            }
         } finally {
             semaphores.removeSemaphore(semaphore);
         }
@@ -278,9 +281,7 @@ public class ZkPermissionRepo extends AbstractValueRepo<PermissionInfo, Permissi
         }
 
         PermissionMetadataKey permissionKey = (PermissionMetadataKey)key;
-        Resource resource = ScalaConversions.asScalaResource(
-                permissionKey.getResourceType(),
-                permissionKey.getResourceName());
+        Resource resource = asScalaResource(permissionKey);
         removePermissionsFromInfoCache(resource);
     }
 
@@ -293,10 +294,35 @@ public class ZkPermissionRepo extends AbstractValueRepo<PermissionInfo, Permissi
         }
 
         PermissionMetadataKey permissionKey = (PermissionMetadataKey)key;
-        Resource resource = ScalaConversions.asScalaResource(
-                permissionKey.getResourceType(),
-                permissionKey.getResourceName());
+        Resource resource = asScalaResource(permissionKey);
         removePermissionsFromInfoCache(resource);
+    }
+
+    private List<PermissionInfo> findMatchingOfResource(AclBindingFilter bindingFilter) {
+        Resource resource = asScalaResource(
+                bindingFilter.patternFilter().resourceType(),
+                bindingFilter.patternFilter().name(),
+                bindingFilter.patternFilter().patternType());
+
+        Set<PermissionInfo> resourcePermissions = getPermissionsFromInfoCacheOrCreate(resource);
+        if (CollectionUtils.isEmpty(resourcePermissions)) {
+            return Collections.emptyList();
+        }
+
+        return resourcePermissions.stream().filter(permission ->
+                (
+                        StringUtils.isBlank(bindingFilter.entryFilter().principal()) ||
+                        bindingFilter.entryFilter().principal().equals(permission.getKafkaPrincipal().toString())) &&
+                (
+                        StringUtils.isBlank(bindingFilter.entryFilter().host()) ||
+                        bindingFilter.entryFilter().host().equals(permission.getHost())) &&
+                (
+                        bindingFilter.entryFilter().operation() == AclOperation.ANY ||
+                        bindingFilter.entryFilter().operation() == permission.getOperation()) &&
+                (
+                        bindingFilter.entryFilter().permissionType() == AclPermissionType.ANY ||
+                        bindingFilter.entryFilter().permissionType() == permission.getPermissionType())).
+                collect(Collectors.toList());
     }
 
     private void removePermissionsFromInfoCache(Resource resource) {
@@ -313,6 +339,20 @@ public class ZkPermissionRepo extends AbstractValueRepo<PermissionInfo, Permissi
                 });
     }
 
+    private Resource asScalaResource(PermissionMetadataKey metadataKey) {
+        return asScalaResource(
+                metadataKey.getResourceType(),
+                metadataKey.getResourceName(),
+                metadataKey.getPatternType());
+    }
+
+    private Resource asScalaResource(
+            ResourceType resourceType,
+            String resourceName,
+            PatternType patternType) {
+        return ScalaConversions.asScalaResource(resourceType, resourceName, patternType);
+    }
+
     private Set<PermissionInfo> toInfos(ACL acl) {
         return acl.permissions.stream().
                 map((permission) -> toInfo(acl.resource, permission)).
@@ -324,6 +364,7 @@ public class ZkPermissionRepo extends AbstractValueRepo<PermissionInfo, Permissi
                 kafkaPrincipal(permission.principal()).
                 resourceType(resource.resourceType().toJava()).
                 resourceName(resource.name()).
+                patternType(resource.patternType()).
                 permissionType(permission.permissionType().toJava()).
                 operation(permission.operation().toJava()).
                 host(permission.host()).
@@ -332,7 +373,8 @@ public class ZkPermissionRepo extends AbstractValueRepo<PermissionInfo, Permissi
                                 PermissionMetadataKey.with(
                                         permission.principal(),
                                         resource.resourceType().toJava(),
-                                        resource.name()))).
+                                        resource.name(),
+                                        resource.patternType()))).
                 build();
     }
 

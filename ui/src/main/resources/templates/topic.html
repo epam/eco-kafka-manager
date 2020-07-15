@@ -88,10 +88,16 @@
                                 Edit Metadata <i class="fa fa-tags"></i>
                             </a>
                             <a
-                               th:href="@{/permissions/(resourceType=${T(org.apache.kafka.common.resource.ResourceType).TOPIC}, resourceName=${topic.name})}"
-                               class="btn btn-primary right-icon">
-                                Edit Permissions <span class="glyphicon glyphicon-list"></span>
+                                th:href="@{/permissions/(resourceType=${T(org.apache.kafka.common.resource.ResourceType).TOPIC}, resourceName=${topic.name})}"
+                                class="btn btn-primary right-icon">
+                                View Permissions <span class="glyphicon glyphicon-list"></span>
                             </a>
+                            <a
+                                th:href="@{/permissions/create(resourceType=${T(org.apache.kafka.common.resource.ResourceType).TOPIC}, resourceName=${topic.name})}"
+                                class="btn btn-primary right-icon">
+                                Create Permission <i class="fa fa-plus"></i>
+                            </a>
+                            
                             <button 
                                 type="button"
                                 class="to-right btn btn-danger right-icon"

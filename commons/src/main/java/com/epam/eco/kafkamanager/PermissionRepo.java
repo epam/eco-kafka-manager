@@ -15,8 +15,11 @@
  */
 package com.epam.eco.kafkamanager;
 
+import java.util.List;
+
 import org.apache.kafka.common.acl.AclOperation;
 import org.apache.kafka.common.acl.AclPermissionType;
+import org.apache.kafka.common.resource.PatternType;
 import org.apache.kafka.common.resource.ResourceType;
 import org.apache.kafka.common.security.auth.KafkaPrincipal;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -28,20 +31,25 @@ import com.epam.eco.kafkamanager.repo.ValueRepo;
  */
 public interface PermissionRepo extends ValueRepo<PermissionInfo, PermissionSearchCriteria> {
 
-    @PreAuthorize("@authorizer.isPermitted('PERMISSION', null, 'WRITE')")
-    void create(ResourceType resourceType,
-                String resourceName,
-                KafkaPrincipal principal,
-                AclPermissionType permissionType,
-                AclOperation operation,
-                String host);
+    List<PermissionInfo> findMatchingOfResource(ResourcePermissionFilter filter);
 
-    @PreAuthorize("@authorizer.isPermitted('PERMISSION', null, 'WRITE')")
-    void delete(ResourceType resourceType,
-                String resourceName,
-                KafkaPrincipal principal,
-                AclPermissionType permissionType,
-                AclOperation operation,
-                String host);
+    @PreAuthorize("@authorizer.isPermitted('PERMISSION', null, 'CREATE')")
+    void create(
+            ResourceType resourceType,
+            String resourceName,
+            PatternType patternType,
+            KafkaPrincipal principal,
+            AclPermissionType permissionType,
+            AclOperation operation,
+            String host);
+
+    @PreAuthorize("@authorizer.isPermitted('PERMISSION', null, 'DELETE')")
+    void deleteOfResource(
+            ResourcePermissionFilter filter,
+            DeleteCallback deleteCallback);
+
+    interface DeleteCallback {
+        void onBeforeDelete(List<PermissionInfo> permissions);
+    }
 
 }

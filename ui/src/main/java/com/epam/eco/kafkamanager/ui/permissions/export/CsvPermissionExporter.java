@@ -43,11 +43,12 @@ public class CsvPermissionExporter implements PermissionExporter {
         record[0] = permissionInfo.getKafkaPrincipal().toString();
         record[1] = permissionInfo.getResourceType().name();
         record[2] = permissionInfo.getResourceName();
-        record[3] = permissionInfo.getPermissionType().name();
-        record[4] = permissionInfo.getOperation().name();
-        record[5] = permissionInfo.getHost();
+        record[3] = permissionInfo.getPatternType().name();
+        record[4] = permissionInfo.getPermissionType().name();
+        record[5] = permissionInfo.getOperation().name();
+        record[6] = permissionInfo.getHost();
         Metadata metadata = permissionInfo.getMetadata().orElse(null);
-        record[6] = metadata != null ? metadata.getDescription() : null;
+        record[7] = metadata != null ? metadata.getDescription() : null;
         return record;
     }
 

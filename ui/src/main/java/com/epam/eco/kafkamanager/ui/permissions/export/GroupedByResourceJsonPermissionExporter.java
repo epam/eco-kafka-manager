@@ -48,6 +48,7 @@ public class GroupedByResourceJsonPermissionExporter extends GroupedByResourcePl
 
         groupRecord.put(KEY_RESOURCE_TYPE, groupKey.getResourceType());
         groupRecord.put(KEY_RESOURCE_NAME, groupKey.getResourceName());
+        groupRecord.put(KEY_PATTERN_TYPE, groupKey.getPatternType());
 
         List<Object> permissionRecords = new ArrayList<>();
         groupRecord.put(KEY_PERMISSIONS, permissionRecords);

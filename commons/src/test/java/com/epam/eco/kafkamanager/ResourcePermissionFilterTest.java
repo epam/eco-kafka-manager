@@ -20,6 +20,7 @@ import java.util.Map;
 
 import org.apache.kafka.common.acl.AclOperation;
 import org.apache.kafka.common.acl.AclPermissionType;
+import org.apache.kafka.common.resource.PatternType;
 import org.apache.kafka.common.resource.ResourceType;
 import org.junit.Assert;
 import org.junit.Test;
@@ -31,17 +32,18 @@ import com.epam.eco.kafkamanager.utils.TestObjectMapperSingleton;
 /**
  * @author Andrei_Tytsik
  */
-public class PermissionDeleteParamsTest {
+public class ResourcePermissionFilterTest {
 
     @Test
     public void testSerializedToJsonAndBack() throws Exception {
-        PermissionDeleteParams origin = PermissionDeleteParams.builder().
+        ResourcePermissionFilter origin = ResourcePermissionFilter.builder().
                 resourceType(ResourceType.GROUP).
                 resourceName("group").
-                principal("user:user").
-                permissionType(AclPermissionType.ALLOW).
-                operation(AclOperation.CREATE).
-                host("host").
+                patternType(PatternType.LITERAL).
+                principalFilter("user:user").
+                permissionTypeFilter(AclPermissionType.ALLOW).
+                operationFilter(AclOperation.CREATE).
+                hostFilter("host").
                 build();
 
         ObjectMapper mapper = TestObjectMapperSingleton.getObjectMapper();
@@ -49,9 +51,9 @@ public class PermissionDeleteParamsTest {
         String json = mapper.writeValueAsString(origin);
         Assert.assertNotNull(json);
 
-        PermissionDeleteParams deserialized = mapper.readValue(
+        ResourcePermissionFilter deserialized = mapper.readValue(
                 json,
-                PermissionDeleteParams.class);
+                ResourcePermissionFilter.class);
         Assert.assertNotNull(deserialized);
         Assert.assertEquals(origin, deserialized);
     }
@@ -61,19 +63,21 @@ public class PermissionDeleteParamsTest {
         Map<String, Object> json = new HashMap<>();
         json.put("resourceType", "GROUP");
         json.put("resourceName", "group1");
-        json.put("principal", "user:user1");
-        json.put("permissionType", AclPermissionType.ALLOW);
-        json.put("operation", AclOperation.READ);
-        json.put("host", "host");
+        json.put("patternType", "LITERAL");
+        json.put("principalFilter", "user:user1");
+        json.put("permissionTypeFilter", AclPermissionType.ALLOW);
+        json.put("operationFilter", AclOperation.READ);
+        json.put("hostFilter", "host");
 
-        PermissionDeleteParams params = PermissionDeleteParams.fromJson(json);
+        ResourcePermissionFilter params = ResourcePermissionFilter.fromJson(json);
         Assert.assertNotNull(params);
         Assert.assertEquals(ResourceType.GROUP, params.getResourceType());
         Assert.assertEquals("group1", params.getResourceName());
-        Assert.assertEquals("user:user1", params.getPrincipal());
-        Assert.assertEquals(AclPermissionType.ALLOW, params.getPermissionType());
-        Assert.assertEquals(AclOperation.READ, params.getOperation());
-        Assert.assertEquals("host", params.getHost());
+        Assert.assertEquals(PatternType.LITERAL, params.getPatternType());
+        Assert.assertEquals("user:user1", params.getPrincipalFilter());
+        Assert.assertEquals(AclPermissionType.ALLOW, params.getPermissionTypeFilter());
+        Assert.assertEquals(AclOperation.READ, params.getOperationFilter());
+        Assert.assertEquals("host", params.getHostFilter());
     }
 
     @Test
@@ -82,20 +86,22 @@ public class PermissionDeleteParamsTest {
                 "{" +
                 "\"resourceType\": \"GROUP\"" +
                 ", \"resourceName\": \"group1\"" +
-                ", \"principal\": \"user:user1\"" +
-                ", \"permissionType\": \"ALLOW\"" +
-                ", \"operation\": \"READ\"" +
-                ", \"host\": \"host\"" +
+                ", \"patternType\": \"LITERAL\"" +
+                ", \"principalFilter\": \"user:user1\"" +
+                ", \"permissionTypeFilter\": \"ALLOW\"" +
+                ", \"operationFilter\": \"READ\"" +
+                ", \"hostFilter\": \"host\"" +
                 "}";
 
-        PermissionDeleteParams params = PermissionDeleteParams.fromJson(json);
+        ResourcePermissionFilter params = ResourcePermissionFilter.fromJson(json);
         Assert.assertNotNull(params);
         Assert.assertEquals(ResourceType.GROUP, params.getResourceType());
         Assert.assertEquals("group1", params.getResourceName());
-        Assert.assertEquals("user:user1", params.getPrincipal());
-        Assert.assertEquals(AclPermissionType.ALLOW, params.getPermissionType());
-        Assert.assertEquals(AclOperation.READ, params.getOperation());
-        Assert.assertEquals("host", params.getHost());
+        Assert.assertEquals(PatternType.LITERAL, params.getPatternType());
+        Assert.assertEquals("user:user1", params.getPrincipalFilter());
+        Assert.assertEquals(AclPermissionType.ALLOW, params.getPermissionTypeFilter());
+        Assert.assertEquals(AclOperation.READ, params.getOperationFilter());
+        Assert.assertEquals("host", params.getHostFilter());
     }
 
 }

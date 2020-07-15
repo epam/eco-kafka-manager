@@ -49,12 +49,13 @@ import com.epam.eco.kafkamanager.ConsumerGroupTopicOffsetFetcherTaskExecutor;
 import com.epam.eco.kafkamanager.KafkaManager;
 import com.epam.eco.kafkamanager.NotFoundException;
 import com.epam.eco.kafkamanager.PermissionCreateParams;
-import com.epam.eco.kafkamanager.PermissionDeleteParams;
 import com.epam.eco.kafkamanager.PermissionInfo;
 import com.epam.eco.kafkamanager.PermissionMetadataDeleteParams;
 import com.epam.eco.kafkamanager.PermissionMetadataUpdateParams;
-import com.epam.eco.kafkamanager.ResourcePermissionDeleteParams;
 import com.epam.eco.kafkamanager.PermissionSearchCriteria;
+import com.epam.eco.kafkamanager.PrincipalPermissionsDeleteParams;
+import com.epam.eco.kafkamanager.ResourcePermissionFilter;
+import com.epam.eco.kafkamanager.ResourcePermissionsDeleteParams;
 import com.epam.eco.kafkamanager.TopicConfigUpdateParams;
 import com.epam.eco.kafkamanager.TopicCreateParams;
 import com.epam.eco.kafkamanager.TopicInfo;
@@ -673,12 +674,29 @@ public class RestKafkaManager implements KafkaManager {
     }
 
     @Override
+    public List<PermissionInfo> getPermissionsOfResource(ResourcePermissionFilter filter) {
+        Validate.notNull(filter, "Filter can't be null");
+
+        UriComponentsBuilder builder = UriComponentsBuilder.fromUriString("/api/permissions/resource");
+        builder.path(filter.getResourceType().name());
+        builder.path(filter.getResourceName());
+        builder.path(filter.getPatternType().name());
+
+        return restTemplate.exchange(
+                builder.toUriString(),
+                HttpMethod.GET,
+                null,
+                new ParameterizedTypeReference<List<PermissionInfo>>(){}).getBody();
+    }
+
+    @Override
     public void createPermission(PermissionCreateParams params) {
         Validate.notNull(params, "PermissionCreateParams object can't be null");
 
         PermissionRequest request = new PermissionRequest(
                 params.getResourceType(),
                 params.getResourceName(),
+                params.getPatternType(),
                 params.getPrincipal(),
                 params.getPermissionType(),
                 params.getOperation(),
@@ -696,6 +714,7 @@ public class RestKafkaManager implements KafkaManager {
         Map<String, Object> uriVariables = new HashMap<>();
         uriVariables.put("resourceName", params.getResourceName());
         uriVariables.put("resourceType", params.getResourceType());
+        uriVariables.put("patternType", params.getPatternType());
         uriVariables.put("principal", params.getPrincipal());
 
         MetadataRequest request = new MetadataRequest(
@@ -703,7 +722,7 @@ public class RestKafkaManager implements KafkaManager {
                 params.getAttributes());
 
         restTemplate.put(
-                "/api/permissions/{resourceType}/{resourceName}/{principal}/metadata",
+                "/api/permissions/resource/{resourceType}/{resourceName}/{patternType}/metadata?principal={principal}",
                 request,
                 uriVariables);
     }
@@ -715,41 +734,45 @@ public class RestKafkaManager implements KafkaManager {
         Map<String, Object> uriVariables = new HashMap<>();
         uriVariables.put("resourceName", params.getResourceName());
         uriVariables.put("resourceType", params.getResourceType());
+        uriVariables.put("patternType", params.getPatternType());
         uriVariables.put("principal", params.getPrincipal());
 
         restTemplate.delete(
-                "/api/permissions/{resourceType}/{resourceName}/{principal}/metadata",
+                "/api/permissions/resource/{resourceType}/{resourceName}/{patternType}/metadata?principal={principal}",
                 uriVariables);
     }
 
     @Override
-    public void deletePermission(PermissionDeleteParams params) {
-        Validate.notNull(params, "PermissionDeleteParams object can't be null");
+    public void deletePermissions(ResourcePermissionsDeleteParams params) {
+        Validate.notNull(params, "ResourcePermissionsDeleteParams object can't be null");
 
         Map<String, Object> uriVariables = new HashMap<>();
-        uriVariables.put("resourceName", params.getResourceName());
-        uriVariables.put("resourceType", params.getResourceType());
-        uriVariables.put("principal", params.getPrincipal());
-        uriVariables.put("permissionType", params.getPermissionType());
-        uriVariables.put("operation", params.getOperation());
-        uriVariables.put("host", params.getHost());
+        uriVariables.put("resourceName", params.getFilter().getResourceName());
+        uriVariables.put("resourceType", params.getFilter().getResourceType());
+        uriVariables.put("patternType", params.getFilter().getPatternType());
+        uriVariables.put("principalFilter", params.getFilter().getPrincipalFilter());
+        uriVariables.put("permissionTypeFilter", params.getFilter().getPermissionTypeFilter());
+        uriVariables.put("operationFilter", params.getFilter().getOperationFilter());
+        uriVariables.put("hostFilter", params.getFilter().getHostFilter());
 
         restTemplate.delete(
-                "/api/permissions/{resourceType}/{resourceName}/{principal}/{permissionType}/{operation}/{host}",
+                "/api/permissions/resource/{resourceType}/{resourceName}/{patternType}" +
+                "?principalFilter={principalFilter}" +
+                "&permissionTypeFilter={permissionTypeFilter}" +
+                "&operationFilter={operationFilter}" +
+                "$hostFilter={hostFilter}",
                 uriVariables);
     }
 
     @Override
-    public void deletePermissions(ResourcePermissionDeleteParams params) {
-        Validate.notNull(params, "PermissionDeleteParams object can't be null");
+    public void deletePermissions(PrincipalPermissionsDeleteParams params) {
+        Validate.notNull(params, "PrincipalPermissionsDeleteParams object can't be null");
 
         Map<String, Object> uriVariables = new HashMap<>();
-        uriVariables.put("resourceName", params.getResourceName());
-        uriVariables.put("resourceType", params.getResourceType());
         uriVariables.put("principal", params.getPrincipal());
 
         restTemplate.delete(
-                "/api/permissions/{resourceType}/{resourceName}/{principal}",
+                "/api/permissions/principal?principal={principal}",
                 uriVariables);
     }
 

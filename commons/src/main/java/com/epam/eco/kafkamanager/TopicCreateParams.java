@@ -102,7 +102,13 @@ public class TopicCreateParams {
 
     @Override
     public int hashCode() {
-        return Objects.hash(topicName, partitionCount, replicationFactor, config, description, attributes);
+        return Objects.hash(
+                topicName,
+                partitionCount,
+                replicationFactor,
+                config,
+                description,
+                attributes);
     }
 
     @Override

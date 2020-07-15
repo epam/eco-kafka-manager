@@ -21,6 +21,7 @@ import java.util.Map;
 import java.util.Objects;
 
 import org.apache.commons.lang3.Validate;
+import org.apache.kafka.common.resource.PatternType;
 import org.apache.kafka.common.resource.ResourceType;
 import org.apache.kafka.common.security.auth.KafkaPrincipal;
 import org.apache.kafka.common.utils.SecurityUtils;
@@ -38,6 +39,7 @@ public class PermissionMetadataUpdateParams {
 
     private final ResourceType resourceType;
     private final String resourceName;
+    private final PatternType patternType;
     private final String principal;
     private final KafkaPrincipal principalObject;
     private final String description;
@@ -47,12 +49,14 @@ public class PermissionMetadataUpdateParams {
     public PermissionMetadataUpdateParams(
             @JsonProperty("resourceType") ResourceType resourceType,
             @JsonProperty("resourceName") String resourceName,
+            @JsonProperty("patternType") PatternType patternType,
             @JsonProperty("principal") String principal,
             @JsonProperty("description") String description,
             @JsonProperty("attributes") Map<String, Object> attributes) {
         this(
                 resourceType,
                 resourceName,
+                patternType,
                 principal,
                 SecurityUtils.parseKafkaPrincipal(principal),
                 description,
@@ -62,12 +66,14 @@ public class PermissionMetadataUpdateParams {
     public PermissionMetadataUpdateParams(
             ResourceType resourceType,
             String resourceName,
+            PatternType patternType,
             KafkaPrincipal principal,
             String description,
             Map<String, Object> attributes) {
         this(
                 resourceType,
                 resourceName,
+                patternType,
                 principal != null ? principal.toString() : null,
                 principal,
                 description,
@@ -77,17 +83,20 @@ public class PermissionMetadataUpdateParams {
     private PermissionMetadataUpdateParams(
             ResourceType resourceType,
             String resourceName,
+            PatternType patternType,
             String principal,
             KafkaPrincipal principalObject,
             String description,
             Map<String, Object> attributes) {
-        Validate.notBlank(principal, "Principal can't be null");
-        Validate.notNull(principalObject, "Principal object can't be null");
         Validate.notNull(resourceType, "Resource type can't be null");
         Validate.notBlank(resourceName, "Resource name can't be blank");
+        Validate.notNull(patternType, "Pattern Type is null");
+        Validate.notBlank(principal, "Principal can't be null");
+        Validate.notNull(principalObject, "Principal object can't be null");
 
         this.resourceType = resourceType;
         this.resourceName = resourceName;
+        this.patternType = patternType;
         this.principal = principal;
         this.principalObject = principalObject;
         this.description = description;
@@ -102,6 +111,9 @@ public class PermissionMetadataUpdateParams {
     }
     public String getResourceName() {
         return resourceName;
+    }
+    public PatternType getPatternType() {
+        return patternType;
     }
     public String getPrincipal() {
         return principal;
@@ -129,6 +141,7 @@ public class PermissionMetadataUpdateParams {
         return
                 Objects.equals(this.resourceType, that.resourceType) &&
                 Objects.equals(this.resourceName, that.resourceName) &&
+                Objects.equals(this.patternType, that.patternType) &&
                 Objects.equals(this.principal, that.principal) &&
                 Objects.equals(this.description, that.description) &&
                 Objects.equals(this.attributes, that.attributes);
@@ -139,6 +152,7 @@ public class PermissionMetadataUpdateParams {
         return Objects.hash(
                 resourceType,
                 resourceName,
+                patternType,
                 principal,
                 description,
                 attributes);
@@ -149,6 +163,7 @@ public class PermissionMetadataUpdateParams {
         return
                 "{resourceType: " + resourceType +
                 ", resourceName: " + resourceName +
+                ", patternType: " + patternType +
                 ", principal: " + principal +
                 ", description: " + description +
                 ", attributes: " + attributes +
@@ -187,6 +202,7 @@ public class PermissionMetadataUpdateParams {
 
         private ResourceType resourceType;
         private String resourceName;
+        private PatternType patternType;
         private String principal;
         private KafkaPrincipal principalObject;
         private String description;
@@ -199,6 +215,7 @@ public class PermissionMetadataUpdateParams {
 
             this.resourceType = origin.resourceType;
             this.resourceName = origin.resourceName;
+            this.patternType = origin.patternType;
             this.principal = origin.principal;
             this.description = origin.description;
             this.attributes.putAll(origin.attributes);
@@ -220,6 +237,11 @@ public class PermissionMetadataUpdateParams {
 
         public Builder resourceName(String resourceName) {
             this.resourceName = resourceName;
+            return this;
+        }
+
+        public Builder patternType(PatternType patternType) {
+            this.patternType = patternType;
             return this;
         }
 
@@ -269,6 +291,7 @@ public class PermissionMetadataUpdateParams {
             return new PermissionMetadataUpdateParams(
                     resourceType,
                     resourceName,
+                    patternType,
                     principal,
                     principalObject,
                     description,

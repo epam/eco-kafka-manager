@@ -15,8 +15,11 @@
  */
 package com.epam.eco.kafkamanager.rest.controller;
 
+import java.util.List;
+
 import org.apache.kafka.common.acl.AclOperation;
 import org.apache.kafka.common.acl.AclPermissionType;
+import org.apache.kafka.common.resource.PatternType;
 import org.apache.kafka.common.resource.ResourceType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -35,12 +38,13 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.epam.eco.kafkamanager.KafkaManager;
 import com.epam.eco.kafkamanager.PermissionCreateParams;
-import com.epam.eco.kafkamanager.PermissionDeleteParams;
-import com.epam.eco.kafkamanager.ResourcePermissionDeleteParams;
 import com.epam.eco.kafkamanager.PermissionInfo;
 import com.epam.eco.kafkamanager.PermissionMetadataDeleteParams;
 import com.epam.eco.kafkamanager.PermissionMetadataUpdateParams;
 import com.epam.eco.kafkamanager.PermissionSearchCriteria;
+import com.epam.eco.kafkamanager.PrincipalPermissionsDeleteParams;
+import com.epam.eco.kafkamanager.ResourcePermissionFilter;
+import com.epam.eco.kafkamanager.ResourcePermissionsDeleteParams;
 import com.epam.eco.kafkamanager.core.utils.PageUtils;
 import com.epam.eco.kafkamanager.rest.request.MetadataRequest;
 import com.epam.eco.kafkamanager.rest.request.PermissionRequest;
@@ -60,6 +64,7 @@ public class PermissionController {
             @RequestParam(value = "kafkaPrincipal", required = false) String kafkaPrincipal,
             @RequestParam(value = "resourceType", required = false) ResourceType resourceType,
             @RequestParam(value = "resourceName", required = false) String resourceName,
+            @RequestParam(value = "patternType", required = false) PatternType patternType,
             @RequestParam(value = "permissionType", required = false) AclPermissionType permissionType,
             @RequestParam(value = "operation", required = false) AclOperation operation,
             @RequestParam(value = "host", required = false) String host,
@@ -71,6 +76,7 @@ public class PermissionController {
                 .kafkaPrincipal(kafkaPrincipal)
                 .resourceType(resourceType)
                 .resourceName(resourceName)
+                .patternType(patternType)
                 .permissionType(permissionType)
                 .operation(operation)
                 .host(host)
@@ -85,6 +91,7 @@ public class PermissionController {
         PermissionCreateParams params = PermissionCreateParams.builder()
                 .resourceType(request.getResourceType())
                 .resourceName(request.getResourceName())
+                .patternType(request.getPatternType())
                 .principal(request.getPrincipal())
                 .permissionType(request.getPermissionType())
                 .operation(request.getOperation())
@@ -93,46 +100,66 @@ public class PermissionController {
         kafkaManager.createPermission(params);
     }
 
-    @DeleteMapping("/{resourceType}/{resourceName}/{principal}/{permissionType}/{operation}/{host}")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deletePermission(
+    @GetMapping("/resource/{resourceType}/{resourceName}/{patternType}")
+    public List<PermissionInfo> getResourcePermissions(
             @PathVariable("resourceType") ResourceType resourceType,
             @PathVariable("resourceName") String resourceName,
-            @PathVariable("principal") String principal,
-            @PathVariable("permissionType") AclPermissionType permissionType,
-            @PathVariable("operation") AclOperation operation,
-            @PathVariable("host") String host) {
-        PermissionDeleteParams params = PermissionDeleteParams.builder()
+            @PathVariable("patternType") PatternType patternType,
+            @RequestParam(value = "principalFilter", required = false) String principalFilter,
+            @RequestParam(value = "permissionTypeFilter", required = false) AclPermissionType permissionTypeFilter,
+            @RequestParam(value = "operationFilter", required = false) AclOperation operationFilter,
+            @RequestParam(value = "hostFilter", required = false) String hostFilter) {
+        ResourcePermissionFilter filter = ResourcePermissionFilter.builder()
                 .resourceType(resourceType)
                 .resourceName(resourceName)
-                .principal(principal)
-                .permissionType(permissionType)
-                .operation(operation)
-                .host(host)
+                .principalFilter(principalFilter)
+                .permissionTypeFilter(permissionTypeFilter)
+                .operationFilter(operationFilter)
+                .hostFilter(hostFilter)
                 .build();
-        kafkaManager.deletePermission(params);
+
+        return kafkaManager.getPermissionsOfResource(filter);
     }
 
-    @DeleteMapping("/{resourceType}/{resourceName}/{principal}")
+    @DeleteMapping("/resource/{resourceType}/{resourceName}/{patternType}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deletePermissions(
+    public void deleteResourcePermissions(
             @PathVariable("resourceType") ResourceType resourceType,
             @PathVariable("resourceName") String resourceName,
-            @PathVariable("principal") String principal) {
-        ResourcePermissionDeleteParams params = ResourcePermissionDeleteParams.builder()
+            @PathVariable("patternType") PatternType patternType,
+            @RequestParam(value = "principalFilter", required = false) String principalFilter,
+            @RequestParam(value = "permissionTypeFilter", required = false) AclPermissionType permissionTypeFilter,
+            @RequestParam(value = "operationFilter", required = false) AclOperation operationFilter,
+            @RequestParam(value = "hostFilter", required = false) String hostFilter) {
+        ResourcePermissionFilter filter = ResourcePermissionFilter.builder()
                 .resourceType(resourceType)
                 .resourceName(resourceName)
+                .principalFilter(principalFilter)
+                .permissionTypeFilter(permissionTypeFilter)
+                .operationFilter(operationFilter)
+                .hostFilter(hostFilter)
+                .build();
+
+        kafkaManager.deletePermissions(new ResourcePermissionsDeleteParams(filter));
+    }
+
+    @DeleteMapping("/principal")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deletePrincipalPermissions(
+            @RequestParam("principalFilter") String principal) {
+        PrincipalPermissionsDeleteParams params = PrincipalPermissionsDeleteParams.builder()
                 .principal(principal)
                 .build();
         kafkaManager.deletePermissions(params);
     }
 
-    @PutMapping("/{resourceType}/{resourceName}/{principal}/metadata")
+    @PutMapping("/resource/{resourceType}/{resourceName}/{patternType}/metadata")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void putPermissionMetadata(
             @PathVariable("resourceType") ResourceType resourceType,
             @PathVariable("resourceName") String resourceName,
-            @PathVariable("principal") String principal,
+            @PathVariable("patternType") PatternType patternType,
+            @RequestParam("principal") String principal,
             @RequestBody MetadataRequest request) {
         PermissionMetadataUpdateParams params = PermissionMetadataUpdateParams.builder()
                 .resourceType(resourceType)
@@ -144,12 +171,13 @@ public class PermissionController {
         kafkaManager.updatePermission(params);
     }
 
-    @DeleteMapping("/{resourceType}/{resourceName}/{principal}/metadata")
+    @DeleteMapping("/resource/{resourceType}/{resourceName}/{patternType}/metadata")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deletePermissionMetadata(
             @PathVariable("resourceType") ResourceType resourceType,
             @PathVariable("resourceName") String resourceName,
-            @PathVariable("principal") String principal) {
+            @PathVariable("patternType") PatternType patternType,
+            @RequestParam("principal") String principal) {
         PermissionMetadataDeleteParams params = PermissionMetadataDeleteParams.builder()
                 .resourceType(resourceType)
                 .resourceName(resourceName)

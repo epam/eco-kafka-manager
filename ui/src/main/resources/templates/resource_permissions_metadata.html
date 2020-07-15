@@ -43,7 +43,7 @@
                     <div class="panel panel-default">
                         <div class="panel-body">
                             <a  
-                                th:href="@{/permissions/resource(resourceType=${resourceType}, resourceName=${resourceName}, kafkaPrincipal=${kafkaPrincipal})}"
+                                th:href="@{/permissions/resource/{resourceType}/{resourceName}/{patternType}(resourceType=${resourceType}, resourceName=${resourceName}, patternType=${patternType}, kafkaPrincipal=${kafkaPrincipal})}"
                                 class="btn btn-primary right-icon">
                                 Back To Resource Permissions <span class="glyphicon glyphicon-arrow-left"></span>
                             </a>
@@ -67,7 +67,7 @@
                         <div class="panel-body">
                             
                             <form 
-                                th:action="@{/permissions/resource_metadata(resourceType=${resourceType}, resourceName=${resourceName}, kafkaPrincipal=${kafkaPrincipal})}" 
+                                th:action="@{/permissions/resource/{resourceType}/{resourceName}/{patternType}/metadata(resourceType=${resourceType}, resourceName=${resourceName}, patternType=${patternType}, kafkaPrincipal=${kafkaPrincipal})}" 
                                 method="post">
 
                                 <p>
@@ -77,6 +77,10 @@
                                 <p>
                                     <b>Resource Name:</b>
                                     <span th:text="${resourceName}"></span>
+                                </p>
+                                <p>
+                                    <b>Pattern Type:</b>
+                                    <span th:text="${patternType}"></span>
                                 </p>
                                 <p>
                                     <b>Kafka Principal:</b>
@@ -109,7 +113,7 @@
                             
                             <form 
                                 id="delete-metadata-form" 
-                                th:action="@{/permissions/resource_metadata(resourceType=${resourceType}, resourceName=${resourceName}, kafkaPrincipal=${kafkaPrincipal})}"
+                                th:action="@{/permissions/resource/{resourceType}/{resourceName}/{patternType}/metadata(resourceType=${resourceType}, resourceName=${resourceName}, patternType=${patternType}, kafkaPrincipal=${kafkaPrincipal})}"
                                 method="post">
                                 <input type="hidden" name="_method" value="delete"/>
                                 <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>

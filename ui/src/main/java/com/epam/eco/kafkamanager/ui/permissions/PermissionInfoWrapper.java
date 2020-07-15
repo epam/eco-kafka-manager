@@ -18,6 +18,7 @@ package com.epam.eco.kafkamanager.ui.permissions;
 import org.apache.commons.lang3.Validate;
 import org.apache.kafka.common.acl.AclOperation;
 import org.apache.kafka.common.acl.AclPermissionType;
+import org.apache.kafka.common.resource.PatternType;
 import org.apache.kafka.common.resource.ResourceType;
 import org.apache.kafka.common.security.auth.KafkaPrincipal;
 
@@ -47,6 +48,10 @@ public class PermissionInfoWrapper {
 
     public String getResourceName() {
         return permissionInfo.getResourceName();
+    }
+
+    public PatternType getPatternType() {
+        return permissionInfo.getPatternType();
     }
 
     public AclPermissionType getPermissionType() {

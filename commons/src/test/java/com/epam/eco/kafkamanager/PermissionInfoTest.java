@@ -17,6 +17,7 @@ package com.epam.eco.kafkamanager;
 
 import org.apache.kafka.common.acl.AclOperation;
 import org.apache.kafka.common.acl.AclPermissionType;
+import org.apache.kafka.common.resource.PatternType;
 import org.apache.kafka.common.resource.ResourceType;
 import org.apache.kafka.common.security.auth.KafkaPrincipal;
 import org.junit.Assert;
@@ -36,6 +37,7 @@ public class PermissionInfoTest {
         PermissionInfo origin = PermissionInfo.builder()
                 .resourceType(ResourceType.TOPIC)
                 .resourceName("topicName")
+                .patternType(PatternType.LITERAL)
                 .kafkaPrincipal(new KafkaPrincipal("User", "John_Doe@acme.com"))
                 .host("*")
                 .operation(AclOperation.DESCRIBE)

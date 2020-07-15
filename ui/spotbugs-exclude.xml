@@ -56,8 +56,16 @@
     </Match>
     <Match>
         <Class name="com.epam.eco.kafkamanager.ui.permissions.ResourcePermissionController" />
-        <Method name="metadata" />
+        <Or>
+            <Method name="metadata" />
+            <Method name="deletePermissions" />
+        </Or>
         <Bug pattern="SPRING_UNVALIDATED_REDIRECT" />
+    </Match>
+    <Match>
+        <Class name="com.epam.eco.kafkamanager.ui.permissions.ResourcePermissionController" />
+        <Method name="buildResourceUrl" />
+        <Bug pattern="USBR_UNNECESSARY_STORE_BEFORE_RETURN" />
     </Match>
     <Match>
         <Class name="com.epam.eco.kafkamanager.ui.permissions.PermissionController" />
@@ -95,6 +103,11 @@
         <Class name="com.epam.eco.kafkamanager.ui.permissions.export.GroupedByPrincipalJsonPermissionExporter" />
         <Method name="toJsonRecord" />
         <Bug pattern="OCP_OVERLY_CONCRETE_PARAMETER" />
+    </Match>
+    <Match>
+        <Class name="com.epam.eco.kafkamanager.ui.permissions.export.GroupedByPrincipalJsonPermissionExporter" />
+        <Method name="lambda$toJsonRecord$1" />
+        <Bug pattern="CE_CLASS_ENVY" />
     </Match>
     <Match>
         <Class name="com.epam.eco.kafkamanager.ui.permissions.export.JsonPermissionExporter" />

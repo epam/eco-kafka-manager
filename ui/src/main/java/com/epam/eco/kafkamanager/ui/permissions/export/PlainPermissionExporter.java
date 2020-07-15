@@ -34,6 +34,7 @@ public class PlainPermissionExporter implements PermissionExporter {
                 append(permissionInfo.getKafkaPrincipal().toString()).append(" ").
                 append(permissionInfo.getResourceType().name()).append(" ").
                 append(permissionInfo.getResourceName()).append(" ").
+                append(permissionInfo.getPatternType().name()).append(" ").
                 append(permissionInfo.getPermissionType().name()).append(" ").
                 append(permissionInfo.getOperation().name()).append(" ").
                 append(permissionInfo.getHost()).append(" ").

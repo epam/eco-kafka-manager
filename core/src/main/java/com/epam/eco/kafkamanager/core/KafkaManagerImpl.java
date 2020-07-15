@@ -19,8 +19,6 @@ import java.security.Principal;
 import java.util.List;
 
 import org.apache.commons.lang3.Validate;
-import org.apache.kafka.common.resource.ResourceType;
-import org.apache.kafka.common.security.auth.KafkaPrincipal;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -46,14 +44,16 @@ import com.epam.eco.kafkamanager.KafkaManager;
 import com.epam.eco.kafkamanager.Metadata;
 import com.epam.eco.kafkamanager.MetadataRepo;
 import com.epam.eco.kafkamanager.PermissionCreateParams;
-import com.epam.eco.kafkamanager.PermissionDeleteParams;
 import com.epam.eco.kafkamanager.PermissionInfo;
 import com.epam.eco.kafkamanager.PermissionMetadataDeleteParams;
 import com.epam.eco.kafkamanager.PermissionMetadataKey;
 import com.epam.eco.kafkamanager.PermissionMetadataUpdateParams;
 import com.epam.eco.kafkamanager.PermissionRepo;
+import com.epam.eco.kafkamanager.PermissionRepo.DeleteCallback;
 import com.epam.eco.kafkamanager.PermissionSearchCriteria;
-import com.epam.eco.kafkamanager.ResourcePermissionDeleteParams;
+import com.epam.eco.kafkamanager.PrincipalPermissionsDeleteParams;
+import com.epam.eco.kafkamanager.ResourcePermissionFilter;
+import com.epam.eco.kafkamanager.ResourcePermissionsDeleteParams;
 import com.epam.eco.kafkamanager.SecurityContextAdapter;
 import com.epam.eco.kafkamanager.TopicConfigUpdateParams;
 import com.epam.eco.kafkamanager.TopicCreateParams;
@@ -488,6 +488,11 @@ public class KafkaManagerImpl implements KafkaManager {
         return permissionRepo.page(criteria, pageable);
     }
 
+    @Override
+    public List<PermissionInfo> getPermissionsOfResource(ResourcePermissionFilter filter) {
+        return permissionRepo.findMatchingOfResource(filter);
+    }
+
     @SuppressWarnings("unchecked")
     @Override
     public void createPermission(PermissionCreateParams params) {
@@ -496,6 +501,7 @@ public class KafkaManagerImpl implements KafkaManager {
         permissionRepo.create(
                 params.getResourceType(),
                 params.getResourceName(),
+                params.getPatternType(),
                 params.getPrincipalObject(),
                 params.getPermissionType(),
                 params.getOperation(),
@@ -504,7 +510,8 @@ public class KafkaManagerImpl implements KafkaManager {
         if (permissionRepo instanceof CachedRepo) {
             ((CachedRepo<Resource>)permissionRepo).evict(ScalaConversions.asScalaResource(
                     params.getResourceType(),
-                    params.getResourceName()));
+                    params.getResourceName(),
+                    params.getPatternType()));
         }
     }
 
@@ -519,18 +526,20 @@ public class KafkaManagerImpl implements KafkaManager {
                 PermissionMetadataKey.with(
                         params.getPrincipalObject(),
                         params.getResourceType(),
-                        params.getResourceName()),
+                        params.getResourceName(),
+                        params.getPatternType()),
                 Metadata.builder().
-                    description(params.getDescription()).
-                    attributes(params.getAttributes()).
-                    updatedAtNow().
-                    updatedBy(principal).
-                    build());
+                        description(params.getDescription()).
+                        attributes(params.getAttributes()).
+                        updatedAtNow().
+                        updatedBy(principal).
+                        build());
 
         if (permissionRepo instanceof CachedRepo) {
             ((CachedRepo<Resource>)permissionRepo).evict(ScalaConversions.asScalaResource(
                     params.getResourceType(),
-                    params.getResourceName()));
+                    params.getResourceName(),
+                    params.getPatternType()));
         }
     }
 
@@ -543,77 +552,47 @@ public class KafkaManagerImpl implements KafkaManager {
                 PermissionMetadataKey.with(
                         params.getPrincipalObject(),
                         params.getResourceType(),
-                        params.getResourceName()));
+                        params.getResourceName(),
+                        params.getPatternType()));
 
         if (permissionRepo instanceof CachedRepo) {
             ((CachedRepo<Resource>)permissionRepo).evict(ScalaConversions.asScalaResource(
                     params.getResourceType(),
-                    params.getResourceName()));
+                    params.getResourceName(),
+                    params.getPatternType()));
         }
     }
 
     @Override
-    public void deletePermission(PermissionDeleteParams params) {
-        Validate.notNull(params, "PermissionDeleteParams object is null");
+    public void deletePermissions(ResourcePermissionsDeleteParams params) {
+        Validate.notNull(params, "ResourcePermissionsDeleteParams object is null");
 
-        if (isLastResourcePermissionDelete(params)) {
-            metadataRepo.delete(PermissionMetadataKey.with(
-                    params.getPrincipalObject(),
-                    params.getResourceType(),
-                    params.getResourceName()));
-        }
+        permissionRepo.deleteOfResource(
+                params.getFilter(),
+                new DeleteCallback() {
+                    @Override
+                    public void onBeforeDelete(List<PermissionInfo> permissionsToDelete) {
+                        if (params.getFilter().getPrincipalObjectFilter() == null) {
+                            return;
+                        }
 
-        permissionRepo.delete(
-                params.getResourceType(),
-                params.getResourceName(),
-                params.getPrincipalObject(),
-                params.getPermissionType(),
-                params.getOperation(),
-                params.getHost());
-    }
-
-    private boolean isLastResourcePermissionDelete(PermissionDeleteParams params) {
-        for (PermissionInfo permission : getAllPermissions()) {
-            if (permissionHas(permission, params.getPrincipalObject(), params.getResourceType(),
-                    params.getResourceName()) &&
-                    (permission.getPermissionType() != params.getPermissionType() ||
-                            !permission.getHost().equals(params.getHost()) ||
-                            permission.getOperation() != params.getOperation())) {
-                return false;
-            }
-        }
-        return true;
+                        List<PermissionInfo> allResourcePermissions =
+                                permissionRepo.findMatchingOfResource(params.getFilter().toMatchAnyFilter());
+                        if (allResourcePermissions.size() == permissionsToDelete.size()) {
+                            metadataRepo.delete(
+                                    PermissionMetadataKey.with(
+                                    params.getFilter().getPrincipalObjectFilter(),
+                                    params.getFilter().getResourceType(),
+                                    params.getFilter().getResourceName(),
+                                    params.getFilter().getPatternType()));
+                        }
+                    }
+                });
     }
 
     @Override
-    public void deletePermissions(ResourcePermissionDeleteParams params) {
-        Validate.notNull(params, "PermissionDeleteParams object is null");
-
-        metadataRepo.delete(
-                PermissionMetadataKey.with(
-                params.getPrincipalObject(),
-                params.getResourceType(),
-                params.getResourceName()));
-
-        for (PermissionInfo permission : getAllPermissions()) {
-            if (permissionHas(permission, params.getPrincipalObject(), params.getResourceType(),
-                    params.getResourceName())) {
-                permissionRepo.delete(
-                        permission.getResourceType(),
-                        permission.getResourceName(),
-                        params.getPrincipalObject(),
-                        permission.getPermissionType(),
-                        permission.getOperation(),
-                        permission.getHost());
-            }
-        }
-    }
-
-    private boolean permissionHas(PermissionInfo permission, KafkaPrincipal principalObject, ResourceType resourceType,
-                                  String resourceName) {
-        return permission.getKafkaPrincipal().equals(principalObject) &&
-                permission.getResourceType() == resourceType &&
-                permission.getResourceName().equals(resourceName);
+    public void deletePermissions(PrincipalPermissionsDeleteParams params) {
+        throw new UnsupportedOperationException();
     }
 
     @Override

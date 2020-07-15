@@ -22,11 +22,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.TreeMap;
-
-import org.apache.commons.lang3.ObjectUtils;
-import org.apache.kafka.common.resource.ResourceType;
 
 import com.epam.eco.kafkamanager.Metadata;
 import com.epam.eco.kafkamanager.PermissionInfo;
@@ -45,7 +41,8 @@ public class GroupedByResourcePlainPermissionExporter implements PermissionExpor
 
             out.
                 append(key.getResourceType().name()).append(" ").
-                append(key.getResourceName()).append("\n");
+                append(key.getResourceName()).append(" ").
+                append(key.getPatternType().name()).append("\n");
 
             for (PermissionInfo permissionInfo : group) {
                 out.
@@ -68,7 +65,8 @@ public class GroupedByResourcePlainPermissionExporter implements PermissionExpor
         permissionInfos.forEach(permissionInfo -> {
             GroupKey key = new GroupKey(
                     permissionInfo.getResourceType(),
-                    permissionInfo.getResourceName());
+                    permissionInfo.getResourceName(),
+                    permissionInfo.getPatternType());
 
             List<PermissionInfo> group = groupedByResource.computeIfAbsent(key, k -> new ArrayList<>());
 
@@ -78,53 +76,6 @@ public class GroupedByResourcePlainPermissionExporter implements PermissionExpor
         groupedByResource.values().forEach(Collections::sort);
 
         return groupedByResource;
-    }
-
-    protected static class GroupKey implements Comparable<GroupKey> {
-
-        private final ResourceType resourceType;
-        private final String resourceName;
-
-        public GroupKey(ResourceType resourceType, String resourceName) {
-            this.resourceType = resourceType;
-            this.resourceName = resourceName;
-        }
-
-        public ResourceType getResourceType() {
-            return resourceType;
-        }
-        public String getResourceName() {
-            return resourceName;
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hash(resourceType, resourceName);
-        }
-
-        @Override
-        public boolean equals(Object obj) {
-            if (obj == null || obj.getClass() != this.getClass()) {
-                return false;
-            }
-            if (this == obj) {
-                return true;
-            }
-            GroupKey that = (GroupKey)obj;
-            return
-                    Objects.equals(this.resourceType, that.resourceType) &&
-                    Objects.equals(this.resourceName, that.resourceName);
-        }
-
-        @Override
-        public int compareTo(GroupKey that) {
-            int result = ObjectUtils.compare(this.resourceType, that.resourceType);
-            if (result == 0) {
-                result = ObjectUtils.compare(this.resourceName, that.resourceName);
-            }
-            return result;
-        }
-
     }
 
 }

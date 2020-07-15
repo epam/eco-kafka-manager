@@ -46,6 +46,7 @@ public class JsonPermissionExporter implements PermissionExporter {
         record.put(KEY_KAFKA_PRINCIPAL, permissionInfo.getKafkaPrincipal().toString());
         record.put(KEY_RESOURCE_TYPE, permissionInfo.getResourceType().name());
         record.put(KEY_RESOURCE_NAME, permissionInfo.getResourceName());
+        record.put(KEY_PATTERN_TYPE, permissionInfo.getPatternType());
         record.put(KEY_PERMISSION_TYPE, permissionInfo.getPermissionType().name());
         record.put(KEY_OPERATION, permissionInfo.getOperation().name());
         record.put(KEY_HOST, permissionInfo.getHost());

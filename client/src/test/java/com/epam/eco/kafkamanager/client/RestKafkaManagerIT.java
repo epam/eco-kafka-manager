@@ -47,11 +47,12 @@ import com.epam.eco.kafkamanager.ConsumerGroupSearchCriteria;
 import com.epam.eco.kafkamanager.KafkaManager;
 import com.epam.eco.kafkamanager.OffsetTimeSeries;
 import com.epam.eco.kafkamanager.PermissionCreateParams;
-import com.epam.eco.kafkamanager.PermissionDeleteParams;
 import com.epam.eco.kafkamanager.PermissionInfo;
 import com.epam.eco.kafkamanager.PermissionMetadataDeleteParams;
 import com.epam.eco.kafkamanager.PermissionMetadataUpdateParams;
 import com.epam.eco.kafkamanager.PermissionSearchCriteria;
+import com.epam.eco.kafkamanager.ResourcePermissionFilter;
+import com.epam.eco.kafkamanager.ResourcePermissionsDeleteParams;
 import com.epam.eco.kafkamanager.TopicConfigUpdateParams;
 import com.epam.eco.kafkamanager.TopicCreateParams;
 import com.epam.eco.kafkamanager.TopicInfo;
@@ -337,15 +338,15 @@ public class RestKafkaManagerIT {
                         .build());
         Assert.assertEquals(principalPermissions.size() + 1, newPrincipalPermissions.size());
 
-        PermissionDeleteParams permissionDeleteParams = PermissionDeleteParams.builder()
+        ResourcePermissionFilter permissionDeleteFilter = ResourcePermissionFilter.builder()
                 .resourceType(ResourceType.TOPIC)
                 .resourceName(topicName)
-                .principal(principal)
-                .permissionType(AclPermissionType.ALLOW)
-                .operation(AclOperation.DESCRIBE)
-                .host("*")
+                .principalFilter(principal)
+                .permissionTypeFilter(AclPermissionType.ALLOW)
+                .operationFilter(AclOperation.DESCRIBE)
+                .hostFilter("*")
                 .build();
-        kafkaManager.deletePermission(permissionDeleteParams);
+        kafkaManager.deletePermissions(new ResourcePermissionsDeleteParams(permissionDeleteFilter));
         newPrincipalPermissions = kafkaManager.getPermissions(
                 PermissionSearchCriteria.builder()
                         .kafkaPrincipal(principal)

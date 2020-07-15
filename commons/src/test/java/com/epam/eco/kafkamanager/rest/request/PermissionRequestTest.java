@@ -17,6 +17,7 @@ package com.epam.eco.kafkamanager.rest.request;
 
 import org.apache.kafka.common.acl.AclOperation;
 import org.apache.kafka.common.acl.AclPermissionType;
+import org.apache.kafka.common.resource.PatternType;
 import org.apache.kafka.common.resource.ResourceType;
 import org.junit.Assert;
 import org.junit.Test;
@@ -35,6 +36,7 @@ public class PermissionRequestTest {
         PermissionRequest origin = new PermissionRequest(
                 ResourceType.TOPIC,
                 "topic",
+                PatternType.LITERAL,
                 "User:John_Doe@acme.com",
                 AclPermissionType.ALLOW,
                 AclOperation.DESCRIBE,

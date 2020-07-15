@@ -19,7 +19,6 @@ import java.util.Map;
 import java.util.Objects;
 
 import org.apache.commons.lang3.Validate;
-import org.apache.kafka.common.resource.ResourceType;
 import org.apache.kafka.common.security.auth.KafkaPrincipal;
 import org.apache.kafka.common.utils.SecurityUtils;
 
@@ -30,96 +29,69 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.epam.eco.kafkamanager.utils.MapperUtils;
 
 /**
- * @author Naira_Tamrazyan
+ * @author Andrei_Tytsik
  */
-public class ResourcePermissionDeleteParams {
+public class PrincipalPermissionsDeleteParams {
 
-    private final ResourceType resourceType;
-    private final String resourceName;
     private final String principal;
     private final KafkaPrincipal principalObject;
 
     @JsonCreator
-    public ResourcePermissionDeleteParams(
-            @JsonProperty("resourceType") ResourceType resourceType,
-            @JsonProperty("resourceName") String resourceName,
+    public PrincipalPermissionsDeleteParams(
             @JsonProperty("principal") String principal) {
         this(
-                resourceType,
-                resourceName,
                 principal,
                 SecurityUtils.parseKafkaPrincipal(principal));
     }
 
-    public ResourcePermissionDeleteParams(
-            ResourceType resourceType,
-            String resourceName,
-            KafkaPrincipal principal) {
+    public PrincipalPermissionsDeleteParams(KafkaPrincipal principal) {
         this(
-                resourceType,
-                resourceName,
                 principal != null ? principal.toString() : null,
                 principal);
     }
 
-    private ResourcePermissionDeleteParams(
-            ResourceType resourceType,
-            String resourceName,
+    private PrincipalPermissionsDeleteParams(
             String principal,
             KafkaPrincipal principalObject) {
-        Validate.notNull(resourceType, "Resource Type is null");
-        Validate.notBlank(resourceName, "Resource Name is blank");
         Validate.notBlank(principal, "Principal is blank");
         Validate.notNull(principalObject, "Principal Object is null");
 
-        this.resourceType = resourceType;
-        this.resourceName = resourceName;
         this.principal = principal;
         this.principalObject = principalObject;
-    }
-
-    public ResourceType getResourceType() {
-        return resourceType;
-    }
-
-    public String getResourceName() {
-        return resourceName;
     }
 
     public String getPrincipal() {
         return principal;
     }
-
     @JsonIgnore
     public KafkaPrincipal getPrincipalObject() {
         return principalObject;
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        ResourcePermissionDeleteParams that = (ResourcePermissionDeleteParams) o;
-        return resourceType == that.resourceType &&
-                Objects.equals(resourceName, that.resourceName) &&
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null || getClass() != obj.getClass()) {
+            return false;
+        }
+
+        PrincipalPermissionsDeleteParams that = (PrincipalPermissionsDeleteParams) obj;
+        return
                 Objects.equals(principal, that.principal);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(
-                resourceType,
-                resourceName,
-                principal);
+        return Objects.hash(principal);
     }
 
     @Override
     public String toString() {
         return
-                "{resourceType: " + resourceType +
-                        ", resourceName: " + resourceName +
-                        ", principal: " + principal +
-                        "}";
+                "{principal: " + principal +
+                "}";
     }
 
     public Builder toBuilder() {
@@ -130,47 +102,33 @@ public class ResourcePermissionDeleteParams {
         return builder(null);
     }
 
-    public static Builder builder(ResourcePermissionDeleteParams origin) {
+    public static Builder builder(PrincipalPermissionsDeleteParams origin) {
         return new Builder(origin);
     }
 
-    public static PermissionDeleteParams fromJson(Map<String, ?> map) {
+    public static PrincipalPermissionsDeleteParams fromJson(Map<String, ?> map) {
         Validate.notNull(map, "JSON map is null");
 
-        return MapperUtils.convert(map, PermissionDeleteParams.class);
+        return MapperUtils.convert(map, PrincipalPermissionsDeleteParams.class);
     }
 
-    public static PermissionDeleteParams fromJson(String json) {
+    public static PrincipalPermissionsDeleteParams fromJson(String json) {
         Validate.notNull(json, "JSON is null");
 
-        return MapperUtils.jsonToBean(json, PermissionDeleteParams.class);
+        return MapperUtils.jsonToBean(json, PrincipalPermissionsDeleteParams.class);
     }
 
     public static class Builder {
 
-        private ResourceType resourceType;
-        private String resourceName;
         private String principal;
         private KafkaPrincipal principalObject;
 
-        private Builder(ResourcePermissionDeleteParams origin) {
+        private Builder(PrincipalPermissionsDeleteParams origin) {
             if (origin == null) {
                 return;
             }
 
-            this.resourceType = origin.resourceType;
-            this.resourceName = origin.resourceName;
             this.principal = origin.principal;
-        }
-
-        public Builder resourceType(ResourceType resourceType) {
-            this.resourceType = resourceType;
-            return this;
-        }
-
-        public Builder resourceName(String resourceName) {
-            this.resourceName = resourceName;
-            return this;
         }
 
         public Builder principal(String principal) {
@@ -185,10 +143,8 @@ public class ResourcePermissionDeleteParams {
             return this;
         }
 
-        public ResourcePermissionDeleteParams build() {
-            return new ResourcePermissionDeleteParams(
-                    resourceType,
-                    resourceName,
+        public PrincipalPermissionsDeleteParams build() {
+            return new PrincipalPermissionsDeleteParams(
                     principal,
                     principalObject);
         }

@@ -61,8 +61,6 @@
         });
     </script>
 
-    
-
     <div th:replace="templates :: navbar"></div>
     
     <div class="main-content">
@@ -218,7 +216,9 @@
                                     th:each="topic : ${page.content}"
                                     th:classappend="${topic.hasUnderReplicatedPartitions()} ? 'warning' : ''">
                                     <td>
-                                        <a th:href="@{/topics/{name}(name=${topic.name})}"><span th:text="${topic.name}"></span></a>
+                                        <a th:href="@{/topics/{name}(name=${topic.name})}">
+                                            <span th:text="${topic.name}"></span>
+                                        </a>
                                     </td>
                                     <td th:text="${topic.partitionCount}"></td>
                                     <td th:text="${topic.replicationFactor}"></td>

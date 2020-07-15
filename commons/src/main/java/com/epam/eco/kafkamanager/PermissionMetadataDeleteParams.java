@@ -19,6 +19,7 @@ import java.util.Map;
 import java.util.Objects;
 
 import org.apache.commons.lang3.Validate;
+import org.apache.kafka.common.resource.PatternType;
 import org.apache.kafka.common.resource.ResourceType;
 import org.apache.kafka.common.security.auth.KafkaPrincipal;
 import org.apache.kafka.common.utils.SecurityUtils;
@@ -36,6 +37,7 @@ public class PermissionMetadataDeleteParams {
 
     private final ResourceType resourceType;
     private final String resourceName;
+    private final PatternType patternType;
     private final String principal;
     private final KafkaPrincipal principalObject;
 
@@ -43,21 +45,25 @@ public class PermissionMetadataDeleteParams {
     public PermissionMetadataDeleteParams(
             @JsonProperty("resourceType") ResourceType resourceType,
             @JsonProperty("resourceName") String resourceName,
+            @JsonProperty("patternType") PatternType patternType,
             @JsonProperty("principal") String principal) {
         this(
                 resourceType,
                 resourceName,
+                patternType,
                 principal,
                 SecurityUtils.parseKafkaPrincipal(principal));
     }
 
     public PermissionMetadataDeleteParams(
             ResourceType resourceType,
+            PatternType patternType,
             String resourceName,
             KafkaPrincipal principal) {
         this(
                 resourceType,
                 resourceName,
+                patternType,
                 principal != null ? principal.toString() : null,
                 principal);
     }
@@ -65,15 +71,18 @@ public class PermissionMetadataDeleteParams {
     private PermissionMetadataDeleteParams(
             ResourceType resourceType,
             String resourceName,
+            PatternType patternType,
             String principal,
             KafkaPrincipal principalObject) {
-        Validate.notBlank(principal, "Principal can't be null");
-        Validate.notNull(principalObject, "Principal object can't be null");
         Validate.notNull(resourceType, "Resource type can't be null");
         Validate.notBlank(resourceName, "Resource name can't be blank");
+        Validate.notNull(patternType, "Pattern Type is null");
+        Validate.notBlank(principal, "Principal can't be null");
+        Validate.notNull(principalObject, "Principal object can't be null");
 
         this.resourceType = resourceType;
         this.resourceName = resourceName;
+        this.patternType = patternType;
         this.principal = principal;
         this.principalObject = principalObject;
     }
@@ -83,6 +92,9 @@ public class PermissionMetadataDeleteParams {
     }
     public String getResourceName() {
         return resourceName;
+    }
+    public PatternType getPatternType() {
+        return patternType;
     }
     public String getPrincipal() {
         return principal;
@@ -104,6 +116,7 @@ public class PermissionMetadataDeleteParams {
         return
                 Objects.equals(this.resourceType, that.resourceType) &&
                 Objects.equals(this.resourceName, that.resourceName) &&
+                Objects.equals(this.patternType, that.patternType) &&
                 Objects.equals(this.principal, that.principal);
     }
 
@@ -112,6 +125,7 @@ public class PermissionMetadataDeleteParams {
         return Objects.hash(
                 resourceType,
                 resourceName,
+                patternType,
                 principal);
     }
 
@@ -120,6 +134,7 @@ public class PermissionMetadataDeleteParams {
         return
                 "{resourceType: " + resourceType +
                 ", resourceName: " + resourceName +
+                ", patternType: " + patternType +
                 ", principal: " + principal +
                 "}";
     }
@@ -152,6 +167,7 @@ public class PermissionMetadataDeleteParams {
 
         private ResourceType resourceType;
         private String resourceName;
+        private PatternType patternType;
         private String principal;
         private KafkaPrincipal principalObject;
 
@@ -162,6 +178,7 @@ public class PermissionMetadataDeleteParams {
 
             this.resourceType = origin.resourceType;
             this.resourceName = origin.resourceName;
+            this.patternType = origin.patternType;
             this.principal = origin.principal;
         }
 
@@ -172,6 +189,11 @@ public class PermissionMetadataDeleteParams {
 
         public Builder resourceName(String resourceName) {
             this.resourceName = resourceName;
+            return this;
+        }
+
+        public Builder patternType(PatternType patternType) {
+            this.patternType = patternType;
             return this;
         }
 
@@ -191,6 +213,7 @@ public class PermissionMetadataDeleteParams {
             return new PermissionMetadataDeleteParams(
                     resourceType,
                     resourceName,
+                    patternType,
                     principal,
                     principalObject);
         }

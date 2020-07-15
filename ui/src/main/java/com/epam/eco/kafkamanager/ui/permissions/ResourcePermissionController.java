@@ -15,7 +15,6 @@
  */
 package com.epam.eco.kafkamanager.ui.permissions;
 
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -23,7 +22,11 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.kafka.common.acl.AclOperation;
+import org.apache.kafka.common.acl.AclPermissionType;
+import org.apache.kafka.common.resource.PatternType;
 import org.apache.kafka.common.resource.ResourceType;
 import org.apache.kafka.common.security.auth.KafkaPrincipal;
 import org.apache.kafka.common.utils.SecurityUtils;
@@ -40,7 +43,8 @@ import com.epam.eco.kafkamanager.Metadata;
 import com.epam.eco.kafkamanager.PermissionInfo;
 import com.epam.eco.kafkamanager.PermissionMetadataDeleteParams;
 import com.epam.eco.kafkamanager.PermissionMetadataUpdateParams;
-import com.epam.eco.kafkamanager.ResourcePermissionDeleteParams;
+import com.epam.eco.kafkamanager.ResourcePermissionFilter;
+import com.epam.eco.kafkamanager.ResourcePermissionsDeleteParams;
 import com.epam.eco.kafkamanager.ui.utils.MetadataWrapper;
 import com.epam.eco.kafkamanager.utils.MapperUtils;
 
@@ -50,85 +54,122 @@ import com.epam.eco.kafkamanager.utils.MapperUtils;
 @Controller
 public class ResourcePermissionController {
 
-    public static final String VIEW = "resource_permissions";
+    public static final String RESOURCE_VIEW = "resource_permissions";
     public static final String METADATA_VIEW = "resource_permissions_metadata";
 
     public static final String ATTR_RESOURCE_PERMISSIONS = "resourcePermissions";
     public static final String ATTR_PRINCIPAL_PERMISSIONS = "principalPermissions";
     public static final String ATTR_RESOURCE_TYPE = "resourceType";
     public static final String ATTR_RESOURCE_NAME = "resourceName";
+    public static final String ATTR_PATTERN_TYPE = "patternType";
     public static final String ATTR_KAFKA_PRINCIPAL = "kafkaPrincipal";
+    public static final String ATTR_KAFKA_PRINCIPAL_PRESENT = "kafkaPrincipalPresent";
     public static final String ATTR_METADATA = "metadata";
 
-    public static final String MAPPING = PermissionController.MAPPING + "/resource";
-    public static final String MAPPING_METADATA = PermissionController.MAPPING + "/resource_metadata";
-    public static final String MAPPING_RESOURCE_PERMISSION = MAPPING + "/{resourceType}/{resourceName}/{principal}";
-    public static final String MAPPING_DELETE_RESOURCE_PERMISSIONS = MAPPING_RESOURCE_PERMISSION + "/delete";
+    public static final String MAPPING_RESOURCE =
+            PermissionController.MAPPING_PERMISSIONS + "/resource/{resourceType}/{resourceName}/{patternType}";
+    public static final String MAPPING_METADATA = MAPPING_RESOURCE + "/metadata";
 
     @Autowired
     private KafkaManager kafkaManager;
 
-    @RequestMapping(value=MAPPING, method=RequestMethod.GET)
-    public String permissions(
-            ResourceType resourceType,
-            String resourceName,
+    @RequestMapping(value=MAPPING_RESOURCE, method=RequestMethod.GET)
+    public String resource(
+            @PathVariable("resourceType") ResourceType resourceType,
+            @PathVariable("resourceName") String resourceName,
+            @PathVariable("patternType") PatternType patternType,
             @RequestParam("kafkaPrincipal") String kafkaPrincipalString,
             Model model) {
-        KafkaPrincipal kafkaPrincipal = SecurityUtils.parseKafkaPrincipal(kafkaPrincipalString);
-
-        List<PermissionInfo> resourcePermissions = getResourcePermissions(resourceType, resourceName);
-        checkPrincipalPresent(resourcePermissions, kafkaPrincipal);
+        // resource permissions
+        List<PermissionInfo> resourcePermissions = getResourcePermissions(resourceType, resourceName, patternType);
         model.addAttribute(ATTR_RESOURCE_PERMISSIONS, wrap(resourcePermissions));
+        model.addAttribute(ATTR_RESOURCE_TYPE, resourceType);
+        model.addAttribute(ATTR_RESOURCE_NAME, resourceName);
+        model.addAttribute(ATTR_PATTERN_TYPE, patternType);
 
+        // principal permissions
+        KafkaPrincipal kafkaPrincipal = SecurityUtils.parseKafkaPrincipal(kafkaPrincipalString);
         List<PermissionInfo> principalPermissions = getPrincipalPermissions(
                 kafkaPrincipal,
                 resourcePermissions);
         model.addAttribute(ATTR_PRINCIPAL_PERMISSIONS, wrap(principalPermissions));
-
-        model.addAttribute(ATTR_RESOURCE_TYPE, resourceType);
-        model.addAttribute(ATTR_RESOURCE_NAME, resourceName);
         model.addAttribute(ATTR_KAFKA_PRINCIPAL, kafkaPrincipalString);
 
-        getPermissionMetadata(
-                resourceType,
-                resourceName,
-                kafkaPrincipal).ifPresent(metadata -> {
-                    model.addAttribute(ATTR_METADATA, MetadataWrapper.wrap(metadata));
-                });
+        boolean isPrincipalPresent = isPrincipalPresent(resourcePermissions, kafkaPrincipal);
+        model.addAttribute(ATTR_KAFKA_PRINCIPAL_PRESENT, isPrincipalPresent);
+        if (isPrincipalPresent) {
+            getPermissionMetadata(
+                    resourcePermissions,
+                    kafkaPrincipal).ifPresent(metadata -> {
+                        model.addAttribute(ATTR_METADATA, MetadataWrapper.wrap(metadata));
+                    });
+        }
 
-        return VIEW;
+        return RESOURCE_VIEW;
     }
 
-    @RequestMapping(value = MAPPING_DELETE_RESOURCE_PERMISSIONS, method = RequestMethod.POST)
+    @RequestMapping(value = MAPPING_RESOURCE, method = RequestMethod.DELETE)
     public String deletePermissions(
             @PathVariable("resourceType") ResourceType resourceType,
             @PathVariable("resourceName") String resourceName,
-            @PathVariable("principal") String principal) {
-        ResourcePermissionDeleteParams params = ResourcePermissionDeleteParams.builder()
+            @PathVariable("patternType") PatternType patternType,
+            @RequestParam(value = "kafkaPrincipalFilter", required = false) String kafkaPrincipalFilterString,
+            @RequestParam(value = "permissionTypeFilter", required = false) AclPermissionType permissionTypeFilter,
+            @RequestParam(value = "operationFilter", required = false) AclOperation operationFilter,
+            @RequestParam(value = "hostFilter", required = false) String hostFilter,
+            @RequestParam(value = "resourceTypeRedirect", required = false) ResourceType resourceTypeRedirect,
+            @RequestParam(value = "resourceNameRedirect", required = false) String resourceNameRedirect,
+            @RequestParam(value = "patternTypeRedirect", required = false) PatternType patternTypeRedirect,
+            @RequestParam(value = "kafkaPrincipalRedirect", required = false) String kafkaPrincipalRedirect) {
+        ResourcePermissionFilter filter = ResourcePermissionFilter.builder()
                 .resourceType(resourceType)
                 .resourceName(resourceName)
-                .principal(principal)
+                .patternType(patternType)
+                .principalFilter(kafkaPrincipalFilterString)
+                .permissionTypeFilterOrElseDefault(permissionTypeFilter)
+                .operationFilterOrElseDefault(operationFilter)
+                .hostFilter(hostFilter)
                 .build();
 
-        kafkaManager.deletePermissions(params);
+        kafkaManager.deletePermissions(new ResourcePermissionsDeleteParams(filter));
 
-        return "redirect:" + PermissionController.MAPPING;
+        resourceType = resourceTypeRedirect != null ? resourceTypeRedirect : resourceType;
+        resourceName = !StringUtils.isBlank(resourceNameRedirect) ? resourceNameRedirect : resourceName;
+        patternType = patternTypeRedirect != null ? patternTypeRedirect : patternType;
+        kafkaPrincipalFilterString =
+                !StringUtils.isBlank(kafkaPrincipalRedirect) ? kafkaPrincipalRedirect : kafkaPrincipalFilterString;
+
+        filter = ResourcePermissionFilter.builder()
+                .resourceType(resourceType)
+                .resourceName(resourceName)
+                .patternType(patternType)
+                .build();
+
+        List<PermissionInfo> resourcePermissions = kafkaManager.getPermissionsOfResource(filter);
+        if (!CollectionUtils.isEmpty(resourcePermissions)) {
+            return "redirect:" + buildResourceUrl(resourceType, resourceName, patternType, kafkaPrincipalFilterString);
+        } else {
+            return "redirect:" + PermissionController.MAPPING_PERMISSIONS;
+        }
     }
 
     @RequestMapping(value = MAPPING_METADATA, method = RequestMethod.GET)
-    public String metadata(ResourceType resourceType,
-            String resourceName,
+    public String metadata(
+            @PathVariable("resourceType") ResourceType resourceType,
+            @PathVariable("resourceName") String resourceName,
+            @PathVariable("patternType") PatternType patternType,
             @RequestParam("kafkaPrincipal") String kafkaPrincipalString,
             Model model) {
-        KafkaPrincipal kafkaPrincipal = SecurityUtils.parseKafkaPrincipal(kafkaPrincipalString);
-
         model.addAttribute(ATTR_RESOURCE_TYPE, resourceType);
         model.addAttribute(ATTR_RESOURCE_NAME, resourceName);
+        model.addAttribute(ATTR_PATTERN_TYPE, patternType);
         model.addAttribute(ATTR_KAFKA_PRINCIPAL, kafkaPrincipalString);
 
+        KafkaPrincipal kafkaPrincipal = SecurityUtils.parseKafkaPrincipal(kafkaPrincipalString);
         getPermissionMetadata(
                 resourceType,
                 resourceName,
+                patternType,
                 kafkaPrincipal).ifPresent(metadata -> {
                     model.addAttribute(ATTR_METADATA, MetadataWrapper.wrap(metadata));
                 });
@@ -138,80 +179,97 @@ public class ResourcePermissionController {
 
     @RequestMapping(value = MAPPING_METADATA, method = RequestMethod.POST)
     public String metadata(
-            ResourceType resourceType,
-            String resourceName,
+            @PathVariable("resourceType") ResourceType resourceType,
+            @PathVariable("resourceName") String resourceName,
+            @PathVariable("patternType") PatternType patternType,
             @RequestParam("kafkaPrincipal") String kafkaPrincipalString,
-            String description,
-            String attributes) {
+            @RequestParam("description") String description,
+            @RequestParam("attributes") String attributes) {
         KafkaPrincipal kafkaPrincipal = SecurityUtils.parseKafkaPrincipal(kafkaPrincipalString);
+        validatePrincipalPresent(resourceType, resourceName, patternType, kafkaPrincipal);
+
         kafkaManager.updatePermission(
                 PermissionMetadataUpdateParams.builder().
                 resourceType(resourceType).
                 resourceName(resourceName).
+                patternType(patternType).
                 principal(kafkaPrincipal).
                 description(description).
                 attributes(!StringUtils.isBlank(attributes) ? MapperUtils.jsonToMap(attributes) : null).
                 build());
-        return "redirect:" + buildResourcePermissionUrl(resourceType, resourceName, kafkaPrincipal);
+
+        return "redirect:" + buildResourceUrl(resourceType, resourceName, patternType, kafkaPrincipal);
     }
 
     @RequestMapping(value = MAPPING_METADATA, method = RequestMethod.DELETE)
     public String metadata(
-            ResourceType resourceType,
-            String resourceName,
+            @PathVariable("resourceType") ResourceType resourceType,
+            @PathVariable("resourceName") String resourceName,
+            @PathVariable("patternType") PatternType patternType,
             @RequestParam("kafkaPrincipal") String kafkaPrincipalString) {
         KafkaPrincipal kafkaPrincipal = SecurityUtils.parseKafkaPrincipal(kafkaPrincipalString);
+        validatePrincipalPresent(resourceType, resourceName, patternType, kafkaPrincipal);
+
         kafkaManager.updatePermission(
                 PermissionMetadataDeleteParams.builder().
                 resourceType(resourceType).
                 resourceName(resourceName).
+                patternType(patternType).
                 principal(kafkaPrincipal).
                 build());
-        return "redirect:" + buildResourcePermissionUrl(resourceType, resourceName, kafkaPrincipal);
+
+        return "redirect:" + buildResourceUrl(resourceType, resourceName, patternType, kafkaPrincipal);
+    }
+
+    private List<PermissionInfo> getResourcePermissions(
+            ResourceType resourceType,
+            String resourceName,
+            PatternType patternType) {
+        ResourcePermissionFilter filter = ResourcePermissionFilter.builder()
+                .resourceType(resourceType)
+                .resourceName(resourceName)
+                .patternType(patternType)
+                .build();
+
+        List<PermissionInfo> resourcePermissions = kafkaManager.getPermissionsOfResource(filter);
+        if (CollectionUtils.isEmpty(resourcePermissions)) {
+            throw new RuntimeException(
+                    String.format(
+                            "Resource %s %s %s has no permissions",
+                            resourceType,
+                            resourceName,
+                            patternType));
+        }
+
+        return resourcePermissions;
     }
 
     private Optional<Metadata> getPermissionMetadata(
             ResourceType resourceType,
             String resourceName,
+            PatternType patternType,
             KafkaPrincipal kafkaPrincipal) {
-        return kafkaManager.getAllPermissions().stream().
-                filter(
-                        permission ->
-                            permission.getKafkaPrincipal().equals(kafkaPrincipal) &&
-                            permission.getResourceType() == resourceType &&
-                            permission.getResourceName().equals(resourceName)).
-                findFirst().
-                map(PermissionInfo::getMetadata).get();
+        List<PermissionInfo> permissions = getResourcePermissions(resourceType, resourceName, patternType);
+        return getPermissionMetadata(permissions, kafkaPrincipal);
     }
 
-    private void checkPrincipalPresent(List<PermissionInfo> permissions, KafkaPrincipal principal) {
-        if (permissions.isEmpty()) {
-            return;
-        }
-
-        for (PermissionInfo permission : permissions) {
-            if (permission.getKafkaPrincipal().equals(principal)) {
-                return;
-            }
-        }
-
-        throw new RuntimeException(
-                String.format(
-                        "Principal %s has no permissions for resource %s (%s)",
-                        principal.getName(), permissions.get(0).getResourceName(), permissions.get(0).getResourceType()));
-    }
-
-    private List<PermissionInfo> getResourcePermissions(ResourceType resourceType, String resourceName) {
-        return kafkaManager.getAllPermissions().stream().
-                filter(
-                        permission ->
-                            permission.getResourceType() == resourceType &&
-                            permission.getResourceName().equals(resourceName)).
-                collect(Collectors.toList());
+    private Optional<Metadata> getPermissionMetadata(List<PermissionInfo> permissions, KafkaPrincipal kafkaPrincipal) {
+        return permissions.stream().
+                filter(permission -> permission.getKafkaPrincipal().equals(kafkaPrincipal)).
+                findAny().
+                orElseThrow(() -> new RuntimeException(
+                        String.format(
+                                "Principal %s has no permissions for resource %s %s %s",
+                                kafkaPrincipal,
+                                permissions.get(0).getResourceType(),
+                                permissions.get(0).getResourceName(),
+                                permissions.get(0).getPatternType()))).
+                getMetadata();
     }
 
     private List<PermissionInfo> getPrincipalPermissions(
-            KafkaPrincipal kafkaPrincipal, Collection<PermissionInfo> permissionsToExclude) {
+            KafkaPrincipal kafkaPrincipal,
+            List<PermissionInfo> permissionsToExclude) {
         Set<PermissionInfo> permissionsToExcludeSet =
                 permissionsToExclude != null ?
                 new HashSet<>(permissionsToExclude) :
@@ -224,6 +282,41 @@ public class ResourcePermissionController {
                 collect(Collectors.toList());
     }
 
+    private void validatePrincipalPresent(
+            ResourceType resourceType,
+            String resourceName,
+            PatternType patternType,
+            KafkaPrincipal principal) {
+        List<PermissionInfo> permissions = getResourcePermissions(resourceType, resourceName, patternType);
+        validatePrincipalPresent(permissions, principal);
+    }
+
+    private void validatePrincipalPresent(List<PermissionInfo> permissions, KafkaPrincipal principal) {
+        if (!isPrincipalPresent(permissions, principal)) {
+            throw new RuntimeException(
+                    String.format(
+                            "Principal %s has no permissions for resource %s %s %s",
+                            principal,
+                            permissions.get(0).getResourceType(),
+                            permissions.get(0).getResourceName(),
+                            permissions.get(0).getPatternType()));
+        }
+    }
+
+    private boolean isPrincipalPresent(List<PermissionInfo> permissions, KafkaPrincipal principal) {
+        if (CollectionUtils.isEmpty(permissions)) {
+            return false;
+        }
+
+        for (PermissionInfo permission : permissions) {
+            if (permission.getKafkaPrincipal().equals(principal)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     private List<PermissionInfoWrapper> wrap(List<PermissionInfo> permissions) {
         return permissions.
                 stream().
@@ -231,15 +324,25 @@ public class ResourcePermissionController {
                 collect(Collectors.toList());
     }
 
-    public static String buildResourcePermissionUrl(
+    public static String buildResourceUrl(
             ResourceType resourceType,
             String resourceName,
+            PatternType patternType,
             KafkaPrincipal kafkaPrincipal) {
-        return
-                MAPPING +
-                "?resourceType=" + resourceType +
-                "&resourceName=" + resourceName +
-                "&kafkaPrincipal=" + kafkaPrincipal;
+        return buildResourceUrl(resourceType, resourceName, patternType, kafkaPrincipal.toString());
+    }
+
+    public static String buildResourceUrl(
+            ResourceType resourceType,
+            String resourceName,
+            PatternType patternType,
+            String kafkaPrincipalString) {
+        String url = MAPPING_RESOURCE;
+        url = url.replace("{resourceType}", resourceType.name());
+        url = url.replace("{resourceName}", resourceName);
+        url = url.replace("{patternType}", patternType.name());
+        url += "?kafkaPrincipal=" + kafkaPrincipalString;
+        return url;
     }
 
 }

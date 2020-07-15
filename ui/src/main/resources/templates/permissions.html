@@ -31,6 +31,7 @@
                         {
                             resourceType: $('#resourceType').val(),
                             resourceName: $('#resourceName').val(),
+                            patternType: $('#patternType').val(),
                             kafkaPrincipal: $('#kafkaPrincipal').val(),
                             permissionType: $('#permissionType').val(),
                             operation: $('#operation').val(),
@@ -80,7 +81,7 @@
                         <div class="panel-body">
 
                             <a
-                                    th:href="@{/permission_create}"
+                                    th:href="@{/permissions/create}"
                                     class="btn btn-primary right-icon">
                                 Create <i class="fa fa-plus"></i>
                             </a>
@@ -98,43 +99,43 @@
                                 <ul class="dropdown-menu" aria-labelledby="exportButton">
                                     <li>
                                         <a 
-                                            th:href="@{/permissions/export(exporterType=PLAIN, resourceType=${searchCriteria.resourceType}, resourceName=${searchCriteria.resourceName}, kafkaPrincipal=${searchCriteria.kafkaPrincipal}, permissionType=${searchCriteria.permissionType}, operation=${searchCriteria.operation}, host=${searchCriteria.host}, description=${searchCriteria.description})}" target="_blank">
+                                            th:href="@{/permissions/export(exporterType=PLAIN, resourceType=${searchCriteria.resourceType}, resourceName=${searchCriteria.resourceName}, patternType=${searchCriteria.patternType}, kafkaPrincipal=${searchCriteria.kafkaPrincipal}, permissionType=${searchCriteria.permissionType}, operation=${searchCriteria.operation}, host=${searchCriteria.host}, description=${searchCriteria.description})}" target="_blank">
                                             Plain
                                         </a>
                                     </li>
                                     <li>
                                         <a 
-                                            th:href="@{/permissions/export(exporterType=JSON, resourceType=${searchCriteria.resourceType}, resourceName=${searchCriteria.resourceName}, kafkaPrincipal=${searchCriteria.kafkaPrincipal}, permissionType=${searchCriteria.permissionType}, operation=${searchCriteria.operation}, host=${searchCriteria.host}, description=${searchCriteria.description})}" target="_blank">
+                                            th:href="@{/permissions/export(exporterType=JSON, resourceType=${searchCriteria.resourceType}, resourceName=${searchCriteria.resourceName}, patternType=${searchCriteria.patternType}, kafkaPrincipal=${searchCriteria.kafkaPrincipal}, permissionType=${searchCriteria.permissionType}, operation=${searchCriteria.operation}, host=${searchCriteria.host}, description=${searchCriteria.description})}" target="_blank">
                                             Json
                                         </a>
                                     </li>
                                     <li>
                                         <a 
-                                            th:href="@{/permissions/export(exporterType=CSV, resourceType=${searchCriteria.resourceType}, resourceName=${searchCriteria.resourceName}, kafkaPrincipal=${searchCriteria.kafkaPrincipal}, permissionType=${searchCriteria.permissionType}, operation=${searchCriteria.operation}, host=${searchCriteria.host}, description=${searchCriteria.description})}" target="_blank">
+                                            th:href="@{/permissions/export(exporterType=CSV, resourceType=${searchCriteria.resourceType}, resourceName=${searchCriteria.resourceName}, patternType=${searchCriteria.patternType}, kafkaPrincipal=${searchCriteria.kafkaPrincipal}, permissionType=${searchCriteria.permissionType}, operation=${searchCriteria.operation}, host=${searchCriteria.host}, description=${searchCriteria.description})}" target="_blank">
                                             Csv
                                         </a>
                                     </li>
                                     <li>
                                         <a 
-                                            th:href="@{/permissions/export(exporterType=GROUPED_BY_RESOURCE_PLAIN, resourceType=${searchCriteria.resourceType}, resourceName=${searchCriteria.resourceName}, kafkaPrincipal=${searchCriteria.kafkaPrincipal}, permissionType=${searchCriteria.permissionType}, operation=${searchCriteria.operation}, host=${searchCriteria.host}, description=${searchCriteria.description})}" target="_blank">
+                                            th:href="@{/permissions/export(exporterType=GROUPED_BY_RESOURCE_PLAIN, resourceType=${searchCriteria.resourceType}, resourceName=${searchCriteria.resourceName}, patternType=${searchCriteria.patternType}, kafkaPrincipal=${searchCriteria.kafkaPrincipal}, permissionType=${searchCriteria.permissionType}, operation=${searchCriteria.operation}, host=${searchCriteria.host}, description=${searchCriteria.description})}" target="_blank">
                                             Grouped By Resource (Plain)
                                         </a>
                                     </li>
                                     <li>
                                         <a 
-                                            th:href="@{/permissions/export(exporterType=GROUPED_BY_RESOURCE_JSON, resourceType=${searchCriteria.resourceType}, resourceName=${searchCriteria.resourceName}, kafkaPrincipal=${searchCriteria.kafkaPrincipal}, permissionType=${searchCriteria.permissionType}, operation=${searchCriteria.operation}, host=${searchCriteria.host}, description=${searchCriteria.description})}" target="_blank">
+                                            th:href="@{/permissions/export(exporterType=GROUPED_BY_RESOURCE_JSON, resourceType=${searchCriteria.resourceType}, resourceName=${searchCriteria.resourceName}, patternType=${searchCriteria.patternType}, kafkaPrincipal=${searchCriteria.kafkaPrincipal}, permissionType=${searchCriteria.permissionType}, operation=${searchCriteria.operation}, host=${searchCriteria.host}, description=${searchCriteria.description})}" target="_blank">
                                             Grouped By Resource (Json)
                                         </a>
                                     </li>
                                     <li>
                                         <a 
-                                            th:href="@{/permissions/export(exporterType=GROUPED_BY_PRINCIPAL_PLAIN, resourceType=${searchCriteria.resourceType}, resourceName=${searchCriteria.resourceName}, kafkaPrincipal=${searchCriteria.kafkaPrincipal}, permissionType=${searchCriteria.permissionType}, operation=${searchCriteria.operation}, host=${searchCriteria.host}, description=${searchCriteria.description})}" target="_blank">
+                                            th:href="@{/permissions/export(exporterType=GROUPED_BY_PRINCIPAL_PLAIN, resourceType=${searchCriteria.resourceType}, resourceName=${searchCriteria.resourceName}, patternType=${searchCriteria.patternType}, kafkaPrincipal=${searchCriteria.kafkaPrincipal}, permissionType=${searchCriteria.permissionType}, operation=${searchCriteria.operation}, host=${searchCriteria.host}, description=${searchCriteria.description})}" target="_blank">
                                             Grouped By Principal (Plain)
                                         </a>
                                     </li>
                                     <li>
                                         <a 
-                                            th:href="@{/permissions/export(exporterType=GROUPED_BY_PRINCIPAL_JSON, resourceType=${searchCriteria.resourceType}, resourceName=${searchCriteria.resourceName}, kafkaPrincipal=${searchCriteria.kafkaPrincipal}, permissionType=${searchCriteria.permissionType}, operation=${searchCriteria.operation}, host=${searchCriteria.host}, description=${searchCriteria.description})}" target="_blank">
+                                            th:href="@{/permissions/export(exporterType=GROUPED_BY_PRINCIPAL_JSON, resourceType=${searchCriteria.resourceType}, resourceName=${searchCriteria.resourceName}, patternType=${searchCriteria.patternType}, kafkaPrincipal=${searchCriteria.kafkaPrincipal}, permissionType=${searchCriteria.permissionType}, operation=${searchCriteria.operation}, host=${searchCriteria.host}, description=${searchCriteria.description})}" target="_blank">
                                             Grouped By Principal (Json)
                                         </a>
                                     </li>
@@ -160,6 +161,15 @@
                             id="resourceName" 
                             placeholder="Resource Name"
                             th:value="${searchCriteria.resourceName}"/>
+                        <select title="Pattern Type" class="form-control" id="patternType">
+                            <option value="">-</option>
+                            <option 
+                                th:each="patternType : ${T(org.apache.kafka.common.resource.PatternType).values()}"
+                                th:value="${patternType}" 
+                                th:text="${patternType}"
+                                th:selected="${patternType == searchCriteria.patternType}">
+                            </option>
+                        </select>
                         <input 
                             type="text"
                             class="form-control"
@@ -216,12 +226,12 @@
                                 <tr>
                                     <td>Resource Type</td>
                                     <td>Resource Name</td>
+                                    <td>Pattern Type</td>
                                     <td>Kafka Principal</td>
                                     <td>Permission Type</td>
                                     <td>Operation</td>
                                     <td>Host</td>
                                     <td>Description</td>
-                                    <td></td>
                                 </tr>
                             </thead>
                             <tbody>
@@ -229,10 +239,11 @@
                                     <td th:text="${permission.resourceType}"></td>
                                     <td>
                                         <a 
-                                            th:href="@{/permissions/resource(resourceType=${permission.resourceType}, resourceName=${permission.resourceName}, kafkaPrincipal=${permission.kafkaPrincipal})}">
+                                            th:href="@{/permissions/resource/{resourceType}/{resourceName}/{patternType}(resourceType=${permission.resourceType}, resourceName=${permission.resourceName}, patternType=${permission.patternType}, kafkaPrincipal=${permission.kafkaPrincipal})}">
                                             <span th:text="${permission.resourceName}"></span>
                                         </a>
                                     </td>
+                                    <td th:text="${permission.patternType}"></td>
                                     <td th:text="${permission.kafkaPrincipal}"></td>
                                     <td th:text="${permission.permissionType}"></td>
                                     <td th:text="${permission.operation}"></td>
@@ -240,47 +251,6 @@
                                     <td 
                                         th:text="${permission.metadataDescription}" 
                                         style="word-wrap:break-word;max-width:150px">
-                                    </td>
-                                    <td>
-                                        <button
-                                                type="button"
-                                                class="btn btn-danger right-icon"
-                                                data-toggle="modal"
-                                                th:data-target="${'#delete-confirm-' + iter.index}">
-                                            Delete <i class="fa fa-trash"></i>
-                                        </button>
-                                        <div th:id="${'delete-confirm-' + iter.index}" class="modal fade" role="dialog">
-                                            <div class="modal-dialog">
-                                                <div class="modal-content">
-                                                    <div class="modal-header">
-                                                        <button type="button" class="close" data-dismiss="modal">&times;</button>
-                                                        <h4 class="modal-title">Confirm Permission Delete</h4>
-                                                    </div>
-                                                    <div class="modal-body">
-                                                        <p>
-                                                            Are you sure you want to delete the permission?
-                                                        </p>
-                                                    </div>
-                                                    <div class="modal-footer">
-                                                        <form
-                                                                th:action="@{/permissions/{resourceType}/{resourceName}/{permissionType}/{operation}/{principal}/{host}/delete(resourceType=${permission.resourceType},resourceName=${permission.resourceName},permissionType=${permission.permissionType},operation=${permission.operation},principal=${permission.kafkaPrincipal},host=${permission.host})}"
-                                                                method="post">
-                                                            <button
-                                                                    type="button"
-                                                                    class="btn btn-primary"
-                                                                    data-dismiss="modal">
-                                                                Cancel
-                                                            </button>
-                                                            <button
-                                                                    type="submit"
-                                                                    class="btn btn-danger">
-                                                                Delete
-                                                            </button>
-                                                        </form>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
                                     </td>
                                 </tr>
                             </tbody>

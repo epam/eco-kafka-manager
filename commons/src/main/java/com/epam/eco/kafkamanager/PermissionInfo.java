@@ -22,6 +22,7 @@ import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.Validate;
 import org.apache.kafka.common.acl.AclOperation;
 import org.apache.kafka.common.acl.AclPermissionType;
+import org.apache.kafka.common.resource.PatternType;
 import org.apache.kafka.common.resource.ResourceType;
 import org.apache.kafka.common.security.auth.KafkaPrincipal;
 
@@ -35,6 +36,7 @@ public class PermissionInfo implements MetadataAware, Comparable<PermissionInfo>
     private final KafkaPrincipal kafkaPrincipal;
     private final ResourceType resourceType;
     private final String resourceName;
+    private final PatternType patternType;
     private final AclPermissionType permissionType;
     private final AclOperation operation;
     private final String host;
@@ -44,6 +46,7 @@ public class PermissionInfo implements MetadataAware, Comparable<PermissionInfo>
             @JsonProperty("kafkaPrincipal") KafkaPrincipal kafkaPrincipal,
             @JsonProperty("resourceType") ResourceType resourceType,
             @JsonProperty("resourceName") String resourceName,
+            @JsonProperty("patternType") PatternType patternType,
             @JsonProperty("permissionType") AclPermissionType permissionType,
             @JsonProperty("operation") AclOperation operation,
             @JsonProperty("host") String host,
@@ -51,6 +54,7 @@ public class PermissionInfo implements MetadataAware, Comparable<PermissionInfo>
         Validate.notNull(kafkaPrincipal, "Kafka principal can't be null");
         Validate.notNull(resourceType, "Resource type can't be null");
         Validate.notBlank(resourceName, "Resource name can't be blank");
+        Validate.notNull(patternType, "Pattern type can't be null");
         Validate.notNull(permissionType, "Permission type can't be null");
         Validate.notNull(operation, "Operation can't be null");
         Validate.notBlank(host, "Host can't be blank");
@@ -58,6 +62,7 @@ public class PermissionInfo implements MetadataAware, Comparable<PermissionInfo>
         this.kafkaPrincipal = kafkaPrincipal;
         this.resourceType = resourceType;
         this.resourceName = resourceName;
+        this.patternType = patternType;
         this.permissionType = permissionType;
         this.operation = operation;
         this.host = host;
@@ -72,6 +77,9 @@ public class PermissionInfo implements MetadataAware, Comparable<PermissionInfo>
     }
     public String getResourceName() {
         return resourceName;
+    }
+    public PatternType getPatternType() {
+        return patternType;
     }
     public AclPermissionType getPermissionType() {
         return permissionType;
@@ -93,6 +101,7 @@ public class PermissionInfo implements MetadataAware, Comparable<PermissionInfo>
                 kafkaPrincipal,
                 resourceType,
                 resourceName,
+                patternType,
                 permissionType,
                 operation,
                 host,
@@ -112,6 +121,7 @@ public class PermissionInfo implements MetadataAware, Comparable<PermissionInfo>
                 Objects.equals(this.kafkaPrincipal, that.kafkaPrincipal) &&
                 Objects.equals(this.resourceType, that.resourceType) &&
                 Objects.equals(this.resourceName, that.resourceName) &&
+                Objects.equals(this.patternType, that.patternType) &&
                 Objects.equals(this.permissionType, that.permissionType) &&
                 Objects.equals(this.operation, that.operation) &&
                 Objects.equals(this.host, that.host) &&
@@ -124,6 +134,7 @@ public class PermissionInfo implements MetadataAware, Comparable<PermissionInfo>
                 "{kafkaPrincipal: " + kafkaPrincipal +
                 ", resourceType: " + resourceType +
                 ", resourceName: " + resourceName +
+                ", patternType: " + patternType +
                 ", permissionType: " + permissionType +
                 ", operation: " + operation +
                 ", host: " + host +
@@ -136,6 +147,9 @@ public class PermissionInfo implements MetadataAware, Comparable<PermissionInfo>
         int result = ObjectUtils.compare(this.resourceType, that.resourceType);
         if (result == 0) {
             result = ObjectUtils.compare(this.resourceName, that.resourceName);
+        }
+        if (result == 0) {
+            result = ObjectUtils.compare(this.patternType, that.patternType);
         }
         if (result == 0) {
             result = ObjectUtils.compare(
@@ -166,6 +180,7 @@ public class PermissionInfo implements MetadataAware, Comparable<PermissionInfo>
         private KafkaPrincipal kafkaPrincipal;
         private ResourceType resourceType;
         private String resourceName;
+        private PatternType patternType;
         private AclPermissionType permissionType;
         private AclOperation operation;
         private String host;
@@ -181,6 +196,10 @@ public class PermissionInfo implements MetadataAware, Comparable<PermissionInfo>
         }
         public Builder resourceName(String resourceName) {
             this.resourceName = resourceName;
+            return this;
+        }
+        public Builder patternType(PatternType patternType) {
+            this.patternType = patternType;
             return this;
         }
         public Builder permissionType(AclPermissionType permissionType) {
@@ -205,6 +224,7 @@ public class PermissionInfo implements MetadataAware, Comparable<PermissionInfo>
                     kafkaPrincipal,
                     resourceType,
                     resourceName,
+                    patternType,
                     permissionType,
                     operation,
                     host,

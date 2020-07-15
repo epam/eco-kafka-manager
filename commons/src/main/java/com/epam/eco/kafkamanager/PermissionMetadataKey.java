@@ -18,6 +18,7 @@ package com.epam.eco.kafkamanager;
 import java.util.Objects;
 
 import org.apache.commons.lang3.Validate;
+import org.apache.kafka.common.resource.PatternType;
 import org.apache.kafka.common.resource.ResourceType;
 import org.apache.kafka.common.security.auth.KafkaPrincipal;
 import org.apache.kafka.common.utils.SecurityUtils;
@@ -35,46 +36,54 @@ public class PermissionMetadataKey extends MetadataKey {
     private final KafkaPrincipal principalObject;
     private final ResourceType resourceType;
     private final String resourceName;
+    private final PatternType patternType;
 
     @JsonCreator
     public PermissionMetadataKey(
             @JsonProperty("principal") String principal,
             @JsonProperty("resourceType") ResourceType resourceType,
-            @JsonProperty("resourceName") String resourceName) {
+            @JsonProperty("resourceName") String resourceName,
+            @JsonProperty("patternType") PatternType patternType) {
         this(
                 principal,
                 principal != null ? SecurityUtils.parseKafkaPrincipal(principal) : null,
                 resourceType,
-                resourceName);
+                resourceName,
+                patternType);
     }
 
     public PermissionMetadataKey(
             KafkaPrincipal principal,
             ResourceType resourceType,
-            String resourceName) {
+            String resourceName,
+            PatternType patternType) {
         this(
                 principal != null ? principal.toString() : null,
                 principal,
                 resourceType,
-                resourceName);
+                resourceName,
+                patternType);
     }
 
     private PermissionMetadataKey(
             String principal,
             KafkaPrincipal principalObject,
             ResourceType resourceType,
-            String resourceName) {
+            String resourceName,
+            PatternType patternType) {
         super(EntityType.PERMISSION);
 
-        Validate.notNull(resourceType, "Resource Type is null");
-        Validate.notBlank(resourceName, "Resource Name is blank");
         Validate.notBlank(principal, "Principal is blank");
         Validate.notNull(principalObject, "Principal Object is null");
+        Validate.notNull(resourceType, "Resource Type is null");
+        Validate.notBlank(resourceName, "Resource Name is blank");
+        // TODO compatibility Validate.notNull(patternType, "Pattern Type is null");
 
         this.principal = principal;
         this.principalObject = principalObject;
         this.resourceType = resourceType;
         this.resourceName = resourceName;
+        this.patternType = patternType != null ? patternType : PatternType.LITERAL; // TODO compatibility
     }
 
     public String getPrincipal() {
@@ -90,6 +99,9 @@ public class PermissionMetadataKey extends MetadataKey {
     public String getResourceName() {
         return resourceName;
     }
+    public PatternType getPatternType() {
+        return patternType;
+    }
 
     @Override
     public Object getEntityId() {
@@ -102,7 +114,8 @@ public class PermissionMetadataKey extends MetadataKey {
                 super.hashCode(),
                 principal,
                 resourceType,
-                resourceName);
+                resourceName,
+                patternType);
     }
 
     @Override
@@ -114,7 +127,8 @@ public class PermissionMetadataKey extends MetadataKey {
         return
                 Objects.equals(this.principal, that.principal) &&
                 Objects.equals(this.resourceType, that.resourceType) &&
-                Objects.equals(this.resourceName, that.resourceName);
+                Objects.equals(this.resourceName, that.resourceName) &&
+                Objects.equals(this.patternType, that.patternType);
     }
 
     @Override
@@ -124,21 +138,24 @@ public class PermissionMetadataKey extends MetadataKey {
                 ", principal: " + principal +
                 ", resourceType: " + resourceType +
                 ", resourceName: " + resourceName +
+                ", patternType: " + patternType +
                 "}";
     }
 
     public static final PermissionMetadataKey with(
             KafkaPrincipal principal,
             ResourceType resourceType,
-            String resourceName) {
-        return new PermissionMetadataKey(principal, resourceType, resourceName);
+            String resourceName,
+            PatternType patternType) {
+        return new PermissionMetadataKey(principal, resourceType, resourceName, patternType);
     }
 
     public static final PermissionMetadataKey with(
             String principal,
             ResourceType resourceType,
-            String resourceName) {
-        return new PermissionMetadataKey(principal, resourceType, resourceName);
+            String resourceName,
+            PatternType patternType) {
+        return new PermissionMetadataKey(principal, resourceType, resourceName, patternType);
     }
 
 }

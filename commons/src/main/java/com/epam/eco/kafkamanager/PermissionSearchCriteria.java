@@ -22,6 +22,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 import org.apache.kafka.common.acl.AclOperation;
 import org.apache.kafka.common.acl.AclPermissionType;
+import org.apache.kafka.common.resource.PatternType;
 import org.apache.kafka.common.resource.ResourceType;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -36,6 +37,7 @@ public class PermissionSearchCriteria implements SearchCriteria<PermissionInfo> 
     private final String kafkaPrincipal;
     private final ResourceType resourceType;
     private final String resourceName;
+    private final PatternType patternType;
     private final AclPermissionType permissionType;
     private final AclOperation operation;
     private final String host;
@@ -45,6 +47,7 @@ public class PermissionSearchCriteria implements SearchCriteria<PermissionInfo> 
             @JsonProperty("kafkaPrincipal") String kafkaPrincipal,
             @JsonProperty("resourceType") ResourceType resourceType,
             @JsonProperty("resourceName") String resourceName,
+            @JsonProperty("patternType") PatternType patternType,
             @JsonProperty("permissionType") AclPermissionType permissionType,
             @JsonProperty("operation") AclOperation operation,
             @JsonProperty("host") String host,
@@ -52,6 +55,7 @@ public class PermissionSearchCriteria implements SearchCriteria<PermissionInfo> 
         this.kafkaPrincipal = kafkaPrincipal;
         this.resourceType = resourceType;
         this.resourceName = resourceName;
+        this.patternType = patternType;
         this.permissionType = permissionType;
         this.operation = operation;
         this.host = host;
@@ -66,6 +70,9 @@ public class PermissionSearchCriteria implements SearchCriteria<PermissionInfo> 
     }
     public String getResourceName() {
         return resourceName;
+    }
+    public PatternType getPatternType() {
+        return patternType;
     }
     public AclPermissionType getPermissionType() {
         return permissionType;
@@ -92,6 +99,7 @@ public class PermissionSearchCriteria implements SearchCriteria<PermissionInfo> 
                 (
                         StringUtils.isBlank(resourceName) ||
                         StringUtils.containsIgnoreCase(obj.getResourceName(), resourceName)) &&
+                (patternType == null || Objects.equals(obj.getPatternType(), patternType)) &&
                 (permissionType == null || Objects.equals(obj.getPermissionType(), permissionType)) &&
                 (operation == null || Objects.equals(obj.getOperation(), operation)) &&
                 (StringUtils.isBlank(host) || StringUtils.containsIgnoreCase(obj.getHost(), host)) &&
@@ -113,6 +121,7 @@ public class PermissionSearchCriteria implements SearchCriteria<PermissionInfo> 
                 Objects.equals(this.kafkaPrincipal, that.kafkaPrincipal) &&
                 Objects.equals(this.resourceType, that.resourceType) &&
                 Objects.equals(this.resourceName, that.resourceName) &&
+                Objects.equals(this.patternType, that.patternType) &&
                 Objects.equals(this.permissionType, that.permissionType) &&
                 Objects.equals(this.operation, that.operation) &&
                 Objects.equals(this.host, that.host) &&
@@ -125,6 +134,7 @@ public class PermissionSearchCriteria implements SearchCriteria<PermissionInfo> 
                 kafkaPrincipal,
                 resourceType,
                 resourceName,
+                patternType,
                 permissionType,
                 operation,
                 host,
@@ -137,6 +147,7 @@ public class PermissionSearchCriteria implements SearchCriteria<PermissionInfo> 
                 "{kafkaPrincipal: " + kafkaPrincipal +
                 ", resourceType: " + resourceType +
                 ", resourceName: " + resourceName +
+                ", patternType: " + patternType +
                 ", permissionType: " + permissionType +
                 ", operation: " + operation +
                 ", host: " + host +
@@ -173,6 +184,7 @@ public class PermissionSearchCriteria implements SearchCriteria<PermissionInfo> 
         private String kafkaPrincipal;
         private ResourceType resourceType;
         private String resourceName;
+        private PatternType patternType;
         private AclPermissionType permissionType;
         private AclOperation operation;
         private String host;
@@ -186,6 +198,7 @@ public class PermissionSearchCriteria implements SearchCriteria<PermissionInfo> 
             this.kafkaPrincipal = origin.kafkaPrincipal;
             this.resourceType = origin.resourceType;
             this.resourceName = origin.resourceName;
+            this.patternType = origin.patternType;
             this.permissionType = origin.permissionType;
             this.operation = origin.operation;
             this.host = origin.host;
@@ -204,6 +217,11 @@ public class PermissionSearchCriteria implements SearchCriteria<PermissionInfo> 
 
         public Builder resourceName(String resourceName) {
             this.resourceName = resourceName;
+            return this;
+        }
+
+        public Builder patternType(PatternType patternType) {
+            this.patternType = patternType;
             return this;
         }
 
@@ -232,6 +250,7 @@ public class PermissionSearchCriteria implements SearchCriteria<PermissionInfo> 
                     kafkaPrincipal,
                     resourceType,
                     resourceName,
+                    patternType,
                     permissionType,
                     operation,
                     host,

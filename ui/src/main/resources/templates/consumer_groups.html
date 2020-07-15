@@ -55,8 +55,6 @@
         });
     </script>
 
-    
-
     <div th:replace="templates :: navbar"></div>
         
     <div class="main-content">
@@ -135,8 +133,9 @@
                             <tbody>
                                 <tr th:each="group : ${page.content}">
                                     <td>
-                                        <a th:href="@{/consumer_groups/{name}(name=${group.name})}"><span
-                                                th:text="${group.name}"></span></a>
+                                        <a th:href="@{/consumer_groups/{name}(name=${group.name})}">
+                                            <span th:text="${group.name}"></span>
+                                        </a>
                                     </td>
                                     <td th:text="${group.storageType}"/>
                                     <td th:text="${group.state}"/>

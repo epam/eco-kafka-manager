@@ -77,11 +77,12 @@ public interface KafkaManager {
     List<PermissionInfo> getPermissions(PermissionSearchCriteria criteria);
     Page<PermissionInfo> getPermissionPage(Pageable pageable);
     Page<PermissionInfo> getPermissionPage(PermissionSearchCriteria criteria, Pageable pageable);
+    List<PermissionInfo> getPermissionsOfResource(ResourcePermissionFilter filter);
     void createPermission(PermissionCreateParams params);
     void updatePermission(PermissionMetadataUpdateParams params);
     void updatePermission(PermissionMetadataDeleteParams params);
-    void deletePermission(PermissionDeleteParams params);
-    void deletePermissions(ResourcePermissionDeleteParams params);
+    void deletePermissions(ResourcePermissionsDeleteParams params);
+    void deletePermissions(PrincipalPermissionsDeleteParams params);
 
     int getTransactionCount();
     boolean transactionExists(String transactionalId);

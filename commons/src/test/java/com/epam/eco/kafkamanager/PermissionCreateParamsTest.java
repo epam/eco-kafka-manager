@@ -20,6 +20,7 @@ import java.util.Map;
 
 import org.apache.kafka.common.acl.AclOperation;
 import org.apache.kafka.common.acl.AclPermissionType;
+import org.apache.kafka.common.resource.PatternType;
 import org.apache.kafka.common.resource.ResourceType;
 import org.junit.Assert;
 import org.junit.Test;
@@ -38,6 +39,7 @@ public class PermissionCreateParamsTest {
         PermissionCreateParams origin = PermissionCreateParams.builder().
                 resourceType(ResourceType.GROUP).
                 resourceName("group").
+                patternType(PatternType.LITERAL).
                 principal("user:user").
                 permissionType(AclPermissionType.ALLOW).
                 operation(AclOperation.CREATE).
@@ -61,15 +63,17 @@ public class PermissionCreateParamsTest {
         Map<String, Object> json = new HashMap<>();
         json.put("resourceType", "GROUP");
         json.put("resourceName", "group1");
+        json.put("patternType", "LITERAL");
         json.put("principal", "user:user1");
-        json.put("permissionType", AclPermissionType.ALLOW);
-        json.put("operation", AclOperation.READ);
+        json.put("permissionType", "ALLOW");
+        json.put("operation", "READ");
         json.put("host", "host");
 
         PermissionCreateParams params = PermissionCreateParams.fromJson(json);
         Assert.assertNotNull(params);
         Assert.assertEquals(ResourceType.GROUP, params.getResourceType());
         Assert.assertEquals("group1", params.getResourceName());
+        Assert.assertEquals(PatternType.LITERAL, params.getPatternType());
         Assert.assertEquals("user:user1", params.getPrincipal());
         Assert.assertEquals(AclPermissionType.ALLOW, params.getPermissionType());
         Assert.assertEquals(AclOperation.READ, params.getOperation());
@@ -82,6 +86,7 @@ public class PermissionCreateParamsTest {
                 "{" +
                 "\"resourceType\": \"GROUP\"" +
                 ", \"resourceName\": \"group1\"" +
+                ", \"patternType\": \"LITERAL\"" +
                 ", \"principal\": \"user:user1\"" +
                 ", \"permissionType\": \"ALLOW\"" +
                 ", \"operation\": \"READ\"" +
@@ -92,6 +97,7 @@ public class PermissionCreateParamsTest {
         Assert.assertNotNull(params);
         Assert.assertEquals(ResourceType.GROUP, params.getResourceType());
         Assert.assertEquals("group1", params.getResourceName());
+        Assert.assertEquals(PatternType.LITERAL, params.getPatternType());
         Assert.assertEquals("user:user1", params.getPrincipal());
         Assert.assertEquals(AclPermissionType.ALLOW, params.getPermissionType());
         Assert.assertEquals(AclOperation.READ, params.getOperation());

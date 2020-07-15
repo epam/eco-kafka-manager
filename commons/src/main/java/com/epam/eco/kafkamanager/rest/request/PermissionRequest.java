@@ -19,6 +19,7 @@ import java.util.Objects;
 
 import org.apache.kafka.common.acl.AclOperation;
 import org.apache.kafka.common.acl.AclPermissionType;
+import org.apache.kafka.common.resource.PatternType;
 import org.apache.kafka.common.resource.ResourceType;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -30,6 +31,7 @@ public class PermissionRequest {
 
     private final ResourceType resourceType;
     private final String resourceName;
+    private final PatternType patternType;
     private final String principal;
     private final AclPermissionType permissionType;
     private final AclOperation operation;
@@ -38,12 +40,14 @@ public class PermissionRequest {
     public PermissionRequest(
             @JsonProperty("resourceType") ResourceType resourceType,
             @JsonProperty("resourceName") String resourceName,
+            @JsonProperty("patternType") PatternType patternType,
             @JsonProperty("principal") String principal,
             @JsonProperty("permissionType") AclPermissionType permissionType,
             @JsonProperty("operation") AclOperation operation,
             @JsonProperty("host") String host) {
         this.resourceType = resourceType;
         this.resourceName = resourceName;
+        this.patternType = patternType;
         this.principal = principal;
         this.permissionType = permissionType;
         this.operation = operation;
@@ -53,23 +57,21 @@ public class PermissionRequest {
     public ResourceType getResourceType() {
         return resourceType;
     }
-
     public String getResourceName() {
         return resourceName;
     }
-
+    public PatternType getPatternType() {
+        return patternType;
+    }
     public String getPrincipal() {
         return principal;
     }
-
     public AclPermissionType getPermissionType() {
         return permissionType;
     }
-
     public AclOperation getOperation() {
         return operation;
     }
-
     public String getHost() {
         return host;
     }
@@ -79,8 +81,10 @@ public class PermissionRequest {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         PermissionRequest that = (PermissionRequest) o;
-        return resourceType == that.resourceType &&
+        return
+                resourceType == that.resourceType &&
                 Objects.equals(resourceName, that.resourceName) &&
+                patternType == that.patternType &&
                 Objects.equals(principal, that.principal) &&
                 permissionType == that.permissionType &&
                 operation == that.operation &&
@@ -89,7 +93,14 @@ public class PermissionRequest {
 
     @Override
     public int hashCode() {
-        return Objects.hash(resourceType, resourceName, principal, permissionType, operation, host);
+        return Objects.hash(
+                resourceType,
+                resourceName,
+                patternType,
+                principal,
+                permissionType,
+                operation,
+                host);
     }
 
     @Override
@@ -97,10 +108,12 @@ public class PermissionRequest {
         return "PermissionRequest{" +
                 "resourceType=" + resourceType +
                 ", resourceName='" + resourceName + '\'' +
+                ", patternType=" + patternType +
                 ", principal='" + principal + '\'' +
                 ", permissionType=" + permissionType +
                 ", operation=" + operation +
                 ", host='" + host +
                 '}';
     }
+
 }

@@ -21,6 +21,7 @@ import java.util.Objects;
 import org.apache.commons.lang3.Validate;
 import org.apache.kafka.common.acl.AclOperation;
 import org.apache.kafka.common.acl.AclPermissionType;
+import org.apache.kafka.common.resource.PatternType;
 import org.apache.kafka.common.resource.ResourceType;
 import org.apache.kafka.common.security.auth.KafkaPrincipal;
 import org.apache.kafka.common.utils.SecurityUtils;
@@ -38,6 +39,7 @@ public class PermissionCreateParams {
 
     private final ResourceType resourceType;
     private final String resourceName;
+    private final PatternType patternType;
     private final String principal;
     private final KafkaPrincipal principalObject;
     private final AclPermissionType permissionType;
@@ -48,6 +50,7 @@ public class PermissionCreateParams {
     public PermissionCreateParams(
             @JsonProperty("resourceType") ResourceType resourceType,
             @JsonProperty("resourceName") String resourceName,
+            @JsonProperty("patternType") PatternType patternType,
             @JsonProperty("principal") String principal,
             @JsonProperty("permissionType") AclPermissionType permissionType,
             @JsonProperty("operation") AclOperation operation,
@@ -55,6 +58,7 @@ public class PermissionCreateParams {
         this(
                 resourceType,
                 resourceName,
+                patternType,
                 principal,
                 SecurityUtils.parseKafkaPrincipal(principal),
                 permissionType,
@@ -65,6 +69,7 @@ public class PermissionCreateParams {
     public PermissionCreateParams(
             ResourceType resourceType,
             String resourceName,
+            PatternType patternType,
             KafkaPrincipal principal,
             AclPermissionType permissionType,
             AclOperation operation,
@@ -72,6 +77,7 @@ public class PermissionCreateParams {
         this(
                 resourceType,
                 resourceName,
+                patternType,
                 principal != null ? principal.toString() : null,
                 principal,
                 permissionType,
@@ -82,6 +88,7 @@ public class PermissionCreateParams {
     private PermissionCreateParams(
             ResourceType resourceType,
             String resourceName,
+            PatternType patternType,
             String principal,
             KafkaPrincipal principalObject,
             AclPermissionType permissionType,
@@ -89,6 +96,7 @@ public class PermissionCreateParams {
             String host) {
         Validate.notNull(resourceType, "Resource Type is null");
         Validate.notBlank(resourceName, "Resource Name is blank");
+        Validate.notNull(patternType, "Pattern Type is null");
         Validate.notBlank(principal,  "Principal is blank");
         Validate.notNull(principalObject, "Principal Object is null");
         Validate.notNull(permissionType, "Permission Type is null");
@@ -97,6 +105,7 @@ public class PermissionCreateParams {
 
         this.resourceType = resourceType;
         this.resourceName = resourceName;
+        this.patternType = patternType;
         this.principal = principal;
         this.principalObject = principalObject;
         this.permissionType = permissionType;
@@ -109,6 +118,9 @@ public class PermissionCreateParams {
     }
     public String getResourceName() {
         return resourceName;
+    }
+    public PatternType getPatternType() {
+        return patternType;
     }
     public String getPrincipal() {
         return principal;
@@ -139,6 +151,7 @@ public class PermissionCreateParams {
         return
                 Objects.equals(this.resourceType, that.resourceType) &&
                 Objects.equals(this.resourceName, that.resourceName) &&
+                Objects.equals(this.patternType, that.patternType) &&
                 Objects.equals(this.principal, that.principal) &&
                 Objects.equals(this.permissionType, that.permissionType) &&
                 Objects.equals(this.operation, that.operation) &&
@@ -150,6 +163,7 @@ public class PermissionCreateParams {
         return Objects.hash(
                 resourceType,
                 resourceName,
+                patternType,
                 principal,
                 permissionType,
                 operation,
@@ -161,6 +175,7 @@ public class PermissionCreateParams {
         return
                 "{resourceType: " + resourceType +
                 ", resourceName: " + resourceName +
+                ", patternType: " + patternType +
                 ", principal: " + principal +
                 ", permissionType: " + permissionType +
                 ", operation: " + operation +
@@ -196,6 +211,7 @@ public class PermissionCreateParams {
 
         private ResourceType resourceType;
         private String resourceName;
+        private PatternType patternType;
         private String principal;
         private KafkaPrincipal principalObject;
         private AclPermissionType permissionType;
@@ -209,6 +225,7 @@ public class PermissionCreateParams {
 
             this.resourceType = origin.resourceType;
             this.resourceName = origin.resourceName;
+            this.patternType = origin.patternType;
             this.principal = origin.principal;
             this.permissionType = origin.permissionType;
             this.operation = origin.operation;
@@ -222,6 +239,11 @@ public class PermissionCreateParams {
 
         public Builder resourceName(String resourceName) {
             this.resourceName = resourceName;
+            return this;
+        }
+
+        public Builder patternType(PatternType patternType) {
+            this.patternType = patternType;
             return this;
         }
 
@@ -256,6 +278,7 @@ public class PermissionCreateParams {
             return new PermissionCreateParams(
                     resourceType,
                     resourceName,
+                    patternType,
                     principal,
                     principalObject,
                     permissionType,

@@ -56,6 +56,7 @@ public class GroupedByPrincipalJsonPermissionExporter extends GroupedByPrincipal
 
             permissionRecord.put(KEY_RESOURCE_TYPE, permissionInfo.getResourceType().name());
             permissionRecord.put(KEY_RESOURCE_NAME, permissionInfo.getResourceName());
+            permissionRecord.put(KEY_PATTERN_TYPE, permissionInfo.getPatternType());
             permissionRecord.put(KEY_PERMISSION_TYPE, permissionInfo.getPermissionType().name());
             permissionRecord.put(KEY_OPERATION, permissionInfo.getOperation().name());
             permissionRecord.put(KEY_HOST, permissionInfo.getHost());

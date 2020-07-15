@@ -32,6 +32,7 @@ public interface PermissionExporter {
     String HEADER_KAFKA_PRINCIPAL = "Kafka Principal";
     String HEADER_RESOURCE_TYPE = "Resource Type";
     String HEADER_RESOURCE_NAME = "Resource Name";
+    String HEADER_PATTERN_TYPE_NAME = "Pattern Type";
     String HEADER_PERMISSION_TYPE = "Permission Type";
     String HEADER_OPERATION = "Operation";
     String HEADER_HOST = "Host";
@@ -41,6 +42,7 @@ public interface PermissionExporter {
             HEADER_KAFKA_PRINCIPAL,
             HEADER_RESOURCE_TYPE,
             HEADER_RESOURCE_NAME,
+            HEADER_PATTERN_TYPE_NAME,
             HEADER_PERMISSION_TYPE,
             HEADER_OPERATION,
             HEADER_HOST,
@@ -51,6 +53,7 @@ public interface PermissionExporter {
     String KEY_KAFKA_PRINCIPAL = "kafkaPrincipal";
     String KEY_RESOURCE_TYPE = "resourceType";
     String KEY_RESOURCE_NAME = "resourceName";
+    String KEY_PATTERN_TYPE = "patternType";
     String KEY_PERMISSION_TYPE = "permissionType";
     String KEY_OPERATION = "operation";
     String KEY_HOST = "host";
