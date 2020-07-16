@@ -47,6 +47,7 @@ import com.epam.eco.kafkamanager.core.utils.ZKPathUtils;
 import kafka.security.auth.Acl;
 import kafka.security.auth.Resource;
 import kafka.security.auth.ResourceType;
+import kafka.zk.ExtendedAclStore;
 import kafka.zk.LiteralAclStore;
 
 /**
@@ -56,14 +57,29 @@ class ZkAclCache {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ZkAclCache.class);
 
-    private static final String ACL_PATH = LiteralAclStore.aclPath();
+    private static final String LITERAL_ACL_PATH = LiteralAclStore.aclPath();
+    private static final String PREFIXED_ACL_PATH = new ExtendedAclStore(PatternType.PREFIXED).aclPath();
 
-    private static final String RESOURCE_REGEX = ACL_PATH + "/[^/]+/[^/]+";
-    private static final Pattern RESOURCE_PATTERN = Pattern.compile("^" + RESOURCE_REGEX + "$");
+    private static final String LITERAL_RESOURCE_REGEX = LITERAL_ACL_PATH + "/[^/]+/[^/]+";
+    private static final Pattern LITERAL_RESOURCE_PATTERN = Pattern.compile("^" + LITERAL_RESOURCE_REGEX + "$");
 
-    private static final int RESOURCE_TYPE_INDEX = 1;
+    private static final String PREFIXED_RESOURCE_REGEX = PREFIXED_ACL_PATH + "/[^/]+/[^/]+";
+    private static final Pattern PREFIXED_RESOURCE_PATTERN = Pattern.compile("^" + PREFIXED_RESOURCE_REGEX + "$");
 
-    private final TreeCache aclTreeCache;
+    private static final int LITERAL_RESOURCE_TYPE_INDEX = 1;
+    private static final int PREFIXED_RESOURCE_TYPE_INDEX = 2;
+
+    private final TreeCache literalAclTreeCache;
+    private final TreeCache prefixedAclTreeCache;
+
+    private final EventHandler literalEventHandler = new EventHandler(
+            PatternType.LITERAL,
+            LITERAL_RESOURCE_PATTERN,
+            LITERAL_RESOURCE_TYPE_INDEX);
+    private final EventHandler prefixedEventHandler = new EventHandler(
+            PatternType.PREFIXED,
+            PREFIXED_RESOURCE_PATTERN,
+            PREFIXED_RESOURCE_TYPE_INDEX);
 
     private final Map<Resource, ACL> aclCache = new HashMap<>();
     private final ReadWriteLock lock = new ReentrantReadWriteLock();
@@ -76,7 +92,11 @@ class ZkAclCache {
         Validate.notNull(curatorFramework, "Curator framework can't be null");
         Validate.notNull(cacheListener, "Cache Listener can't be null");
 
-        aclTreeCache = TreeCache.newBuilder(curatorFramework, ACL_PATH).
+        literalAclTreeCache = TreeCache.newBuilder(curatorFramework, LITERAL_ACL_PATH).
+                setCacheData(true).
+                build();
+
+        prefixedAclTreeCache = TreeCache.newBuilder(curatorFramework, PREFIXED_ACL_PATH).
                 setCacheData(true).
                 build();
 
@@ -84,14 +104,17 @@ class ZkAclCache {
     }
 
     public void start() throws Exception {
-        aclTreeCache.getListenable().addListener((client, event) -> handleEvent(event));
-        InitWaitingTreeCacheStarter.with(aclTreeCache, ACL_PATH).start();
+        literalAclTreeCache.getListenable().addListener((client, event) -> literalEventHandler.handleEvent(event));
+        InitWaitingTreeCacheStarter.with(literalAclTreeCache, LITERAL_ACL_PATH).start();
+
+        prefixedAclTreeCache.getListenable().addListener((client, event) -> prefixedEventHandler.handleEvent(event));
+        InitWaitingTreeCacheStarter.with(prefixedAclTreeCache, PREFIXED_ACL_PATH).start();
 
         LOGGER.info("Started");
     }
 
     public void close() throws IOException {
-        aclTreeCache.close();
+        literalAclTreeCache.close();
 
         LOGGER.info("Closed");
     }
@@ -148,77 +171,6 @@ class ZkAclCache {
         }
     }
 
-    private void handleEvent(TreeCacheEvent event) {
-        if (CuratorUtils.isConnectionStateChangeEvent(event.getType())) {
-            LOGGER.warn("ZK connection state changed: {}", event.getType());
-            return;
-        }
-
-        ACL updatedAcl = null;
-        Resource resourceOfRemovedAcl = null;
-
-        boolean added = event.getType() == Type.NODE_ADDED;
-        boolean updated = event.getType() == Type.NODE_UPDATED;
-        boolean removed = event.getType() == Type.NODE_REMOVED;
-        if ((added || updated || removed) && isResourcePath(event.getData().getPath())) {
-            if (added || updated) {
-                updatedAcl = handleAclUpdated(event.getData());
-            } else if (removed) {
-                resourceOfRemovedAcl = handleAclRemoved(event.getData());
-            }
-        }
-
-        fireCacheListener(updatedAcl, resourceOfRemovedAcl);
-    }
-
-    private ACL handleAclUpdated(ChildData childData) {
-        lock.writeLock().lock();
-        try {
-            String resourceType = getResourceTypeFromPath(childData.getPath());
-            String resourceName = getResourceNameFromPath(childData.getPath());
-            Resource resource = toResource(resourceType, resourceName);
-            ACL acl = toAcl(resource, childData);
-            aclCache.put(resource, acl);
-            return acl;
-        } finally {
-            lock.writeLock().unlock();
-        }
-    }
-
-    private Resource handleAclRemoved(ChildData childData) {
-        lock.writeLock().lock();
-        try {
-            String resourceType = getResourceTypeFromPath(childData.getPath());
-            String resourceName = getResourceNameFromPath(childData.getPath());
-            Resource resource = toResource(resourceType, resourceName);
-            aclCache.remove(resource);
-            return resource;
-        } finally {
-            lock.writeLock().unlock();
-        }
-    }
-
-    private ACL toAcl(Resource resource, ChildData childData) {
-        Set<Acl> acls = ScalaConversions.asJavaSet(Acl.fromBytes(childData.getData()));
-        return new ACL(resource, acls);
-    }
-
-    private boolean isResourcePath(String path) {
-        return RESOURCE_PATTERN.matcher(path).matches();
-    }
-
-    private Resource toResource(String resourceType, String resourceName) {
-        return new Resource(ResourceType.fromString(resourceType), resourceName, PatternType.LITERAL);
-    }
-
-    private String getResourceTypeFromPath(String path) {
-        return ZKPathUtils.getPathToken(path, RESOURCE_TYPE_INDEX);
-    }
-
-    private String getResourceNameFromPath(String path) {
-        return ZKPaths.getNodeFromPath(path);
-    }
-
     private void fireCacheListener(ACL updatedAcl, Resource resourceOfRemovedAcl) {
         if (updatedAcl != null) {
             try {
@@ -244,6 +196,94 @@ class ZkAclCache {
         }
     }
 
+    private class EventHandler {
+
+        private final PatternType patternType;
+        private final Pattern resourceRegex;
+        private final int resourceTypeIndex;
+
+        public EventHandler(
+                PatternType patternType,
+                Pattern resourceRegex,
+                int resourceTypeIndex) {
+            this.patternType = patternType;
+            this.resourceRegex = resourceRegex;
+            this.resourceTypeIndex = resourceTypeIndex;
+        }
+
+        private void handleEvent(TreeCacheEvent event) {
+            if (CuratorUtils.isConnectionStateChangeEvent(event.getType())) {
+                LOGGER.warn("ZK connection state changed: {}", event.getType());
+                return;
+            }
+
+            ACL updatedAcl = null;
+            Resource resourceOfRemovedAcl = null;
+
+            boolean added = event.getType() == Type.NODE_ADDED;
+            boolean updated = event.getType() == Type.NODE_UPDATED;
+            boolean removed = event.getType() == Type.NODE_REMOVED;
+            if ((added || updated || removed) && isResourcePath(event.getData().getPath())) {
+                if (added || updated) {
+                    updatedAcl = handleAclUpdated(event.getData());
+                } else if (removed) {
+                    resourceOfRemovedAcl = handleAclRemoved(event.getData());
+                }
+            }
+
+            fireCacheListener(updatedAcl, resourceOfRemovedAcl);
+        }
+
+        private ACL handleAclUpdated(ChildData childData) {
+            lock.writeLock().lock();
+            try {
+                String resourceType = getResourceTypeFromPath(childData.getPath());
+                String resourceName = getResourceNameFromPath(childData.getPath());
+                Resource resource = toResource(resourceType, resourceName);
+                ACL acl = toAcl(resource, childData);
+                aclCache.put(resource, acl);
+                return acl;
+            } finally {
+                lock.writeLock().unlock();
+            }
+        }
+
+        private Resource handleAclRemoved(ChildData childData) {
+            lock.writeLock().lock();
+            try {
+                String resourceType = getResourceTypeFromPath(childData.getPath());
+                String resourceName = getResourceNameFromPath(childData.getPath());
+                Resource resource = toResource(resourceType, resourceName);
+                aclCache.remove(resource);
+                return resource;
+            } finally {
+                lock.writeLock().unlock();
+            }
+        }
+
+        private ACL toAcl(Resource resource, ChildData childData) {
+            Set<Acl> acls = ScalaConversions.asJavaSet(Acl.fromBytes(childData.getData()));
+            return new ACL(resource, acls);
+        }
+
+        private boolean isResourcePath(String path) {
+            return resourceRegex.matcher(path).matches();
+        }
+
+        private Resource toResource(String resourceType, String resourceName) {
+            return new Resource(ResourceType.fromString(resourceType), resourceName, patternType);
+        }
+
+        private String getResourceTypeFromPath(String path) {
+            return ZKPathUtils.getPathToken(path, resourceTypeIndex);
+        }
+
+        private String getResourceNameFromPath(String path) {
+            return ZKPaths.getNodeFromPath(path);
+        }
+
+    }
+
     public class ACL {
 
         public final Resource resource;
@@ -258,7 +298,7 @@ class ZkAclCache {
 
         public ACL copyOf() {
             return new ACL(
-                    new Resource(resource.resourceType(), resource.name(), PatternType.LITERAL),
+                    new Resource(resource.resourceType(), resource.name(), resource.patternType()),
                     new HashSet<>(permissions));
         }
 
