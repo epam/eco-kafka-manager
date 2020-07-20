@@ -82,7 +82,7 @@ docker run --name kafka-manager-rest \
 
 Name | Environment Variable | Description | Default
 ---  | ---                  | ---         | --- 
-`sever.port` | SERVER_PORT | Server HTTP port. | 8082
+`sever.port` | SERVER_PORT | Server HTTP port. | 8086
 `eco.kafkamanager.core.bootstrapServers` | KAFKA_SERVERS_URL | A comma-separated list of Kafka brokers to connect to. |
 `eco.kafkamanager.core.zkConnect` | ZK_CONNECT | An external representation of Zookeeper connection string (with external host/IP) to connect to Kafka/ZK inside Docker containers. For other cases this property should be left empty. |
 `eco.kafkamanager.core.schemaRegistryUrl` | SCHEMA_REGISTRY_URL | URL to the [Schema Registry](https://docs.confluent.io/current/schema-registry/index.html) REST API, used for reading records in Avro format serialized using the Schema Registry. |
