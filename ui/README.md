@@ -94,9 +94,9 @@ Name | Environment Variable | Description | Default
 `eco.kafkamanager.core.authz.kafka.adminRoles` | | List of admin roles. Users with this roles have all permissions. |
 `eco.kafkamanager.core.authz.kafka.authorizerClass` | | Kafka [Authorizer](https://cwiki.apache.org/confluence/display/KAFKA/KIP-11+-+Authorization+Interface) implementation. | `kafka.security.auth.SimpleAclAuthorizer`
 `eco.kafkamanager.core.authz.kafka.authorizerConfig[property]` | | Kafka [Authorizer](https://cwiki.apache.org/confluence/display/KAFKA/KIP-11+-+Authorization+Interface) properties. | 
-`eco.kafkamanager.udmetrics.enabled` | | Controls whether UDM manager is enabled/disabled.  | `false`
-`eco.kafkamanager.udmetrics.calculationIntervalInMs` | | Interval in milliseconds at which metric values are calculated/refreshed. | 60000
-`eco.kafkamanager.udmetrics.config.repo.kafka.bootstrapTimeoutInMs` | | Max duration in milliseconds for bootstrapping metric configurations. If timeout is too small, you may observe stale data for some time (gets consistent eventually) after service is started. | 60000
+`eco.kafkamanager.udmetrics.enabled` | UDM_ENABLED | Controls whether UDM manager is enabled/disabled.  | `false`
+`eco.kafkamanager.udmetrics.calculationIntervalInMs` | UDM_CALCULATION_INTERVAL | Interval in milliseconds at which metric values are calculated/refreshed. | 60000
+`eco.kafkamanager.udmetrics.config.repo.kafka.bootstrapTimeoutInMs` | UDM_BOOTSTRAP_TIMEOUT_MS | Max duration in milliseconds for bootstrapping metric configurations. If timeout is too small, you may observe stale data for some time (gets consistent eventually) after service is started. | 60000
 `n/a` | SPRING_APPLICATION_JSON | Flexible way to provide a set of configuration properties using inline JSON. For example, `eco.kafkamanager.core.schemaRegistryUrl` can be set as `{"eco":{"kafkamanager":{"store":{"schemaRegistryUrl":"http://schema-registry"}}}}` | 
 
 ## License
