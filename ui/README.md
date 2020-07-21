@@ -47,21 +47,21 @@ To build the image, run the following command sequence:
 ```
 git clone git@github.com:epam/eco-kafka-manager.git
 cd /eco-kafka-manager/ui
-docker build -f ./Dockerfile -t epam/kafka-manager:latest ./../
+docker build -f ./Dockerfile -t epam/eco-kafka-manager:latest ./../
 ```
 
 Run the container:
 ```
-docker run --name kafka-manager \
+docker run --name eco-kafka-manager \
  --rm \
  -p 8082:8082 \
  -v <path-to-config-file>:/app/config/application.properties \
- epam/kafka-manager:latest
+ epam/eco-kafka-manager:latest
 ```
 
 or using environment variables:
 ```
-docker run --name kafka-manager \
+docker run --name eco-kafka-manager \
  --rm \
  -p 8085:8085 \
  -e SERVER_PORT=8085 \
@@ -69,16 +69,16 @@ docker run --name kafka-manager \
  -e SCHEMA_REGISTRY_URL=http://schema-registry \
  -e METADATA_BOOTSTRAP_TIMEOUT_MS=60000 \
  -e TX_BOOTSTRAP_TIMEOUT_MS=60000 \
- epam/kafka-manager:latest
+ epam/eco-kafka-manager:latest
 ```
 
 or using inline JSON configuration:
 ```
-docker run --name kafka-manager \
+docker run --name eco-kafka-manager \
  --rm \
  -p 8082:8082 \
  -e SPRING_APPLICATION_JSON='{"eco":{"kafkamanager":{"core":{"bootstrapServers":"kafka:9092"}}}}' \
- epam/kafka-manager:latest
+ epam/eco-kafka-manager:latest
 ```
 
 To open Kafka Manager UI, go to [http://localhost:8082/](http://localhost:8082/)
@@ -90,14 +90,14 @@ To reference files from the config file, it is possible to mount them with the
 To tune JVM, use `-e 'JAVA_OPTS=<some JVM options>'`.
 For example:
 ```
-docker run --name kafka-manager \
+docker run --name eco-kafka-manager \
  --rm \
  -p 8082:8082 \
  -v <path-to-config-file>:/app/config/application.properties \
  -v <host-path-to-file-referenced-from-config>:<docker-path-to-file-referenced-from-config> \
  -m 3g \
  -e 'JAVA_OPTS=-Xms1g -Xmx1g' \
- epam/kafka-manager:latest
+ epam/eco-kafka-manager:latest
 ```
 
 ## Configuration properties
