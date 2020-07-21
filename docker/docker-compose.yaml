@@ -5,7 +5,7 @@ services:
     build:
       context: '../'
       dockerfile: './ui/Dockerfile'
-    image: 'epam/kafka-manager:latest'
+    image: 'epam/eco-kafka-manager:latest'
     hostname: 'kafka-manager'
     environment:
       - 'KAFKA_SERVERS_URL=${KAFKA_SERVERS_URL:-}'
