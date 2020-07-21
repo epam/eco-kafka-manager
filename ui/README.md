@@ -90,14 +90,14 @@ To reference files from the config file, it is possible to mount them with the
 To tune JVM, use `-e 'JAVA_OPTS=<some JVM options>'`.
 For example:
 ```
-docker run --name kafka-manager-ui \
+docker run --name kafka-manager \
  --rm \
  -p 8082:8082 \
  -v <path-to-config-file>:/app/config/application.properties \
  -v <host-path-to-file-referenced-from-config>:<docker-path-to-file-referenced-from-config> \
  -m 3g \
  -e 'JAVA_OPTS=-Xms1g -Xmx1g' \
- epam/kafka-manager-ui:latest
+ epam/kafka-manager:latest
 ```
 
 ## Configuration properties
