@@ -10,8 +10,6 @@ services:
     environment:
       - 'KAFKA_SERVERS_URL=${KAFKA_SERVERS_URL:-}'
       - 'JAVA_OPTS=${JAVA_OPTS:-}'
-    volumes:
-      - './kafka-manager.properties:/app/config/application.properties'
     ports:
       - '8082:8082'
     restart: 'on-failure'

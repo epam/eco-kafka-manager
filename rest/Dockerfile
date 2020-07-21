@@ -34,6 +34,8 @@ VOLUME /config
 
 COPY --from=build /app/rest/target/kafka-manager-rest-*.jar /app/kafka-manager-rest.jar
 
-HEALTHCHECK --interval=5s --timeout=1s --retries=20 CMD wget --quiet --tries=1 --spider http://localhost:8086/actuator/health || exit 1
+ENV SERVER_PORT=${SERVER_PORT:-8086}
+
+HEALTHCHECK --interval=5s --timeout=1s --retries=20 CMD wget --quiet --tries=1 --spider http://localhost:$SERVER_PORT/actuator/health || exit 1
 
 ENTRYPOINT exec java $JAVA_OPTS -jar kafka-manager-rest.jar

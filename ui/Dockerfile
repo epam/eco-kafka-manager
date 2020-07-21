@@ -34,6 +34,8 @@ VOLUME /config
 
 COPY --from=build /app/ui/target/kafka-manager-ui-*.jar /app/kafka-manager.jar
 
-HEALTHCHECK --interval=5s --timeout=1s --retries=20 CMD wget --quiet --tries=1 --spider http://localhost:8082/actuator/health || exit 1
+ENV SERVER_PORT=${SERVER_PORT:-8082}
+
+HEALTHCHECK --interval=5s --timeout=1s --retries=20 CMD wget --quiet --tries=1 --spider http://localhost:$SERVER_PORT/actuator/health || exit 1
 
 ENTRYPOINT exec java $JAVA_OPTS -jar kafka-manager.jar
