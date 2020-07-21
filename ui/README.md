@@ -79,6 +79,7 @@ docker run --name kafka-manager \
  -p 8082:8082 \
  -e SPRING_APPLICATION_JSON='{"eco":{"kafkamanager":{"core":{"bootstrapServers":"kafka:9092"}}}}' \
  epam/kafka-manager:latest
+```
 
 To open Kafka Manager UI, go to [http://localhost:8082/](http://localhost:8082/)
 
