@@ -59,6 +59,29 @@ docker run --name kafka-manager-rest \
  epam/kafka-manager-rest:latest
 ```
 
+or using environment variables:
+```
+docker run --name kafka-manager-rest \
+ --rm \
+ -p 8085:8085 \
+ -e SERVER_PORT=8085 \
+ -e KAFKA_SERVERS_URL=kafka:9092 \
+ -e SCHEMA_REGISTRY_URL=http://schema-registry \
+ -e METADATA_BOOTSTRAP_TIMEOUT_MS=60000 \
+ -e TX_BOOTSTRAP_TIMEOUT_MS=60000 \
+ -e ASYNC_REQUEST_TIMEOUT_MS=60000 \
+ epam/kafka-manager-rest:latest
+```
+
+or using inline JSON configuration:
+```
+docker run --name kafka-manager-rest \
+ --rm \
+ -p 8082:8082 \
+ -e SPRING_APPLICATION_JSON='{"eco":{"kafkamanager":{"core":{"bootstrapServers":"kafka:9092"}}}}' \
+ epam/kafka-manager-rest:latest
+```
+
 To open Eco Kafka Manager REST API (swagger), go to [http://localhost:8086/swagger-ui.html#](http://localhost:8086/swagger-ui.html#)
 
 ### Note:
