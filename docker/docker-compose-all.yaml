@@ -49,9 +49,9 @@ services:
     restart: 'on-failure'
 
   kafka-manager:
-    build:
-      context: '../'
-      dockerfile: './ui/Dockerfile'
+#    build:
+#      context: '../'
+#      dockerfile: './ui/Dockerfile'
     image: 'epam/eco-kafka-manager:latest'
     hostname: 'kafka-manager'
     depends_on:

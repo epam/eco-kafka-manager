@@ -2,9 +2,9 @@ version: '3.5'
 services:
 
   kafka-manager:
-    build:
-      context: '../'
-      dockerfile: './ui/Dockerfile'
+#    build:
+#      context: '../'
+#      dockerfile: './ui/Dockerfile'
     image: 'epam/eco-kafka-manager:latest'
     hostname: 'kafka-manager'
     environment:
