@@ -47,17 +47,38 @@ To build the image, run the following command sequence:
 ```
 git clone git@github.com:epam/eco-kafka-manager.git
 cd /eco-kafka-manager/ui
-docker build -f ./Dockerfile -t epam/kafka-manager-ui:latest ./../
+docker build -f ./Dockerfile -t epam/kafka-manager:latest ./../
 ```
 
 Run the container:
 ```
-docker run --name kafka-manager-ui \
+docker run --name kafka-manager \
  --rm \
  -p 8082:8082 \
  -v <path-to-config-file>:/app/config/application.properties \
- epam/kafka-manager-ui:latest
+ epam/kafka-manager:latest
 ```
+
+or using environment variables:
+```
+docker run --name kafka-manager \
+ --rm \
+ -p 8085:8085 \
+ -e SERVER_PORT=8085 \
+ -e KAFKA_SERVERS_URL=kafka:9092 \
+ -e SCHEMA_REGISTRY_URL=http://schema-registry \
+ -e METADATA_BOOTSTRAP_TIMEOUT_MS=60000 \
+ -e TX_BOOTSTRAP_TIMEOUT_MS=60000 \
+ epam/kafka-manager:latest
+```
+
+or using inline JSON configuration:
+```
+docker run --name kafka-manager \
+ --rm \
+ -p 8082:8082 \
+ -e SPRING_APPLICATION_JSON='{"eco":{"kafkamanager":{"core":{"bootstrapServers":"kafka:9092"}}}}' \
+ epam/kafka-manager:latest
 
 To open Kafka Manager UI, go to [http://localhost:8082/](http://localhost:8082/)
 
