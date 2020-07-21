@@ -83,7 +83,7 @@ docker run --name eco-kafka-manager \
 
 To open Kafka Manager UI, go to [http://localhost:8082/](http://localhost:8082/)
 
-### Note:
+#### Note:
 
 To reference files from the config file, it is possible to mount them with the
 `-v` option. <br />
@@ -99,6 +99,10 @@ docker run --name eco-kafka-manager \
  -e 'JAVA_OPTS=-Xms1g -Xmx1g' \
  epam/eco-kafka-manager:latest
 ```
+
+#### Dockerhub repo
+
+[https://hub.docker.com/r/epam/eco-kafka-manager/tags](https://hub.docker.com/r/epam/eco-kafka-manager/tags)
 
 ## Configuration properties
 
