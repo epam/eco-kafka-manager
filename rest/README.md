@@ -47,21 +47,21 @@ To build the image, run the following command sequence:
 ```
 git clone git@github.com:epam/eco-kafka-manager.git
 cd /eco-kafka-manager/rest
-docker build -f ./Dockerfile -t epam/kafka-manager-rest:latest ./../
+docker build -f ./Dockerfile -t epam/eco-kafka-manager-rest:latest ./../
 ```
 
 Run the container:
 ```
-docker run --name kafka-manager-rest \
+docker run --name eco-kafka-manager-rest \
  --rm \
  -p 8086:8086 \
  -v <path-to-config-file>:/app/config/application.properties \
- epam/kafka-manager-rest:latest
+ epam/eco-kafka-manager-rest:latest
 ```
 
 or using environment variables:
 ```
-docker run --name kafka-manager-rest \
+docker run --name eco-kafka-manager-rest \
  --rm \
  -p 8085:8085 \
  -e SERVER_PORT=8085 \
@@ -70,16 +70,16 @@ docker run --name kafka-manager-rest \
  -e METADATA_BOOTSTRAP_TIMEOUT_MS=60000 \
  -e TX_BOOTSTRAP_TIMEOUT_MS=60000 \
  -e ASYNC_REQUEST_TIMEOUT_MS=60000 \
- epam/kafka-manager-rest:latest
+ epam/eco-kafka-manager-rest:latest
 ```
 
 or using inline JSON configuration:
 ```
-docker run --name kafka-manager-rest \
+docker run --name eco-kafka-manager-rest \
  --rm \
  -p 8082:8082 \
  -e SPRING_APPLICATION_JSON='{"eco":{"kafkamanager":{"core":{"bootstrapServers":"kafka:9092"}}}}' \
- epam/kafka-manager-rest:latest
+ epam/eco-kafka-manager-rest:latest
 ```
 
 To open Eco Kafka Manager REST API (swagger), go to [http://localhost:8086/swagger-ui.html#](http://localhost:8086/swagger-ui.html#)
@@ -91,14 +91,14 @@ To reference files from the config file, it is possible to mount them with the
 To tune JVM, use `-e 'JAVA_OPTS=<some JVM options>'`.
 For example:
 ```
-docker run --name kafka-manager-rest \
+docker run --name eco-kafka-manager-rest \
  --rm \
  -p 8086:8086 \
  -v <path-to-config-file>:/app/config/application.properties \
  -v <host-path-to-file-referenced-from-config>:<docker-path-to-file-referenced-from-config> \
  -m 3g \
  -e 'JAVA_OPTS=-Xms1g -Xmx1g' \
- epam/kafka-manager-rest:latest
+ epam/eco-kafka-manager-rest:latest
 ```
 
 ## Configuration properties
