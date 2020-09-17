@@ -175,7 +175,7 @@
                                         </a>
                                     </li>
                                     <li th:if="${groupLagUdm != null}">
-                                        <a class="delete-udm-link" href="#" th:attr="data-action=${groupLagUdm.url}">
+                                        <a class="delete-udm-link" href="#" th:attr="data-action=@{${groupLagUdm.url}}">
                                             <span class="glyphicon glyphicon-remove"></span> Delete
                                         </a>
                                     </li>

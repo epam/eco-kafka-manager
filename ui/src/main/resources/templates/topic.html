@@ -267,7 +267,7 @@
                                         </a>
                                     </li>
                                     <li th:if="${topicOffsetIncreaseUdm != null}">
-                                        <a class="delete-udm-link" href="#" th:attr="data-action=${topicOffsetIncreaseUdm.url}">
+                                        <a class="delete-udm-link" href="#" th:attr="data-action=@{${topicOffsetIncreaseUdm.url}}">
                                             <span class="glyphicon glyphicon-remove"></span> Delete
                                         </a>
                                     </li>
