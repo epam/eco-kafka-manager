@@ -20,7 +20,10 @@ import java.net.UnknownHostException;
 
 /**
  * @author Andrei_Tytsik
+ *
+ * @deprecated unused and to be removed
  */
+@Deprecated
 public class InetAddressUtils {
 
     public static String getHostName() {
