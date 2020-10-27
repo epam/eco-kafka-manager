@@ -9,6 +9,7 @@ services:
     hostname: 'kafka-manager'
     environment:
       - 'KAFKA_SERVERS_URL=${KAFKA_SERVERS_URL:-}'
+      - 'ZK_CONNECT=${ZK_CONNECT:-}'
       - 'JAVA_OPTS=${JAVA_OPTS:-}'
     ports:
       - '8082:8082'
