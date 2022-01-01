@@ -1,9 +1,9 @@
-@import "../components/header/header.css";
+/*@import "../components/header/header.css";*/
 @import "../components/header/header-menu.css";
 @import "../components/header/header-menu-item.css";
 @import "../components/footer/footer.css";
 
-@import "./css/main.css";
+@import "css/main.css";
 
 body {
   display: flex;
