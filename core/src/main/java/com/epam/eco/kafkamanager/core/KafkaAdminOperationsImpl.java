@@ -170,12 +170,12 @@ public class KafkaAdminOperationsImpl implements KafkaAdminOperations {
 
     @Override
     public Map<String, ConsumerGroupDescription> describeAllConsumerGroups() {
-        return AdminClientUtils.describeAllConsumerGroups(adminClient);
+        return AdminClientUtils.describeAllConsumerGroupsInParallel(properties.getCommonAdminClientConfig());
     }
 
     @Override
     public Map<String, Map<TopicPartition, OffsetAndMetadata>> listAllConsumerGroupOffsets() {
-        return AdminClientUtils.listAllConsumerGroupOffsets(adminClient);
+        return AdminClientUtils.listAllConsumerGroupOffsetsInParallel(properties.getCommonAdminClientConfig());
     }
 
     @Override
