@@ -22,7 +22,7 @@ import java.util.Set;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
-import kafka.security.auth.SimpleAclAuthorizer;
+import kafka.security.authorizer.AclAuthorizer;
 
 /**
  * @author Andrei_Tytsik
@@ -32,7 +32,7 @@ public class KafkaAuthorizerProperties {
 
     private boolean enabled = false;
     private Set<String> adminRoles = new HashSet<>();
-    private String authorizerClass = SimpleAclAuthorizer.class.getName();
+    private String authorizerClass = AclAuthorizer.class.getName();
     private Map<String, Object> authorizerConfig = new HashMap<>();
 
     public boolean isEnabled() {
