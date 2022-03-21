@@ -61,8 +61,8 @@ public class ClientMemberMetadata implements MemberMetadataAdapter {
     }
 
     @Override
-    public Long getLatestHeartbeatDate() {
-        return null;
+    public boolean isHeartbeatSatisfied() {
+        return false;
     }
 
     @Override

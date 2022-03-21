@@ -200,7 +200,7 @@
                                         <td>Client Host</td>
                                         <td>Rebalance Timeout (ms)</td>
                                         <td>Session Timeout (ms)</td>
-                                        <td>Latest Heartbeat Date</td>
+                                        <td>Heartbeat Satisfied</td>
                                         <td>Assignment</td>
                                     </tr>
                                 </thead>
@@ -211,7 +211,7 @@
                                         <td th:text="${member.clientHost}"></td>
                                         <td th:text="${member.rebalanceTimeoutMs}"></td>
                                         <td th:text="${member.sessionTimeoutMs}"></td>
-                                        <td th:text="${member.latestHeartbeatDate}"></td>
+                                        <td th:text="${member.heartbeatSatisfied}"></td>
                                         <td>
 											<th:block th:each="partition,iter : ${member.assignment}">
                                                 <span th:if="${iter.index &gt; 0}" th:text="${', '}"></span>

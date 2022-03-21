@@ -15,13 +15,10 @@
  *******************************************************************************/
 package com.epam.eco.kafkamanager;
 
-import java.time.Instant;
-import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
-import java.util.TimeZone;
 import java.util.stream.Collectors;
 
 import org.apache.commons.collections4.CollectionUtils;
@@ -43,7 +40,7 @@ public class ConsumerGroupMemberInfo implements Comparable<ConsumerGroupMemberIn
     private final String clientHost;
     private final Integer rebalanceTimeoutMs;
     private final Integer sessionTimeoutMs;
-    private final LocalDateTime latestHeartbeatDate;
+    private final boolean heartbeatSatisfied;
     private final List<TopicPartition> assignment;
 
     public ConsumerGroupMemberInfo(
@@ -52,7 +49,7 @@ public class ConsumerGroupMemberInfo implements Comparable<ConsumerGroupMemberIn
             @JsonProperty("clientHost") String clientHost,
             @JsonProperty("rebalanceTimeoutMs") Integer rebalanceTimeoutMs,
             @JsonProperty("sessionTimeoutMs") Integer sessionTimeoutMs,
-            @JsonProperty("latestHeartbeatDate") LocalDateTime latestHeartbeatDate,
+            @JsonProperty("heartbeatSatisfied") boolean heartbeatSatisfied,
             @JsonProperty("assignment") Collection<TopicPartition> assignment) {
         Validate.notBlank(clientId, "Client id is blank");
         if (assignment != null) {
@@ -64,7 +61,7 @@ public class ConsumerGroupMemberInfo implements Comparable<ConsumerGroupMemberIn
         this.clientHost = clientHost;
         this.rebalanceTimeoutMs = rebalanceTimeoutMs;
         this.sessionTimeoutMs = sessionTimeoutMs;
-        this.latestHeartbeatDate = latestHeartbeatDate;
+        this.heartbeatSatisfied = heartbeatSatisfied;
         this.assignment =
                 !CollectionUtils.isEmpty(assignment) ?
                 assignment.stream().
@@ -91,8 +88,8 @@ public class ConsumerGroupMemberInfo implements Comparable<ConsumerGroupMemberIn
     public Integer getSessionTimeoutMs() {
         return sessionTimeoutMs;
     }
-    public LocalDateTime getLatestHeartbeatDate() {
-        return latestHeartbeatDate;
+    public boolean isHeartbeatSatisfied() {
+        return heartbeatSatisfied;
     }
     public List<TopicPartition> getAssignment() {
         return assignment;
@@ -106,7 +103,7 @@ public class ConsumerGroupMemberInfo implements Comparable<ConsumerGroupMemberIn
                 clientHost,
                 rebalanceTimeoutMs,
                 sessionTimeoutMs,
-                latestHeartbeatDate,
+                heartbeatSatisfied,
                 assignment);
     }
 
@@ -125,7 +122,7 @@ public class ConsumerGroupMemberInfo implements Comparable<ConsumerGroupMemberIn
                 Objects.equals(this.clientHost, that.clientHost) &&
                 Objects.equals(this.rebalanceTimeoutMs, that.rebalanceTimeoutMs) &&
                 Objects.equals(this.sessionTimeoutMs, that.sessionTimeoutMs) &&
-                Objects.equals(this.latestHeartbeatDate, that.latestHeartbeatDate) &&
+                Objects.equals(this.heartbeatSatisfied, that.heartbeatSatisfied) &&
                 Objects.equals(this.assignment, that.assignment);
     }
 
@@ -137,7 +134,7 @@ public class ConsumerGroupMemberInfo implements Comparable<ConsumerGroupMemberIn
                 ", clientHost: " + clientHost +
                 ", rebalanceTimeoutMs: " + rebalanceTimeoutMs +
                 ", sessionTimeoutMs: " + sessionTimeoutMs +
-                ", latestHeartbeatDate: " + latestHeartbeatDate +
+                ", heartbeatSatisfied: " + heartbeatSatisfied +
                 ", assignment: " + assignment +
                 "}";
     }
@@ -162,7 +159,7 @@ public class ConsumerGroupMemberInfo implements Comparable<ConsumerGroupMemberIn
         private String clientHost;
         private Integer rebalanceTimeoutMs;
         private Integer sessionTimeoutMs;
-        private LocalDateTime latestHeartbeatDate;
+        private boolean heartbeatSatisfied = false;
         private Collection<TopicPartition> assignment;
 
         public Builder clientId(String clientId) {
@@ -185,18 +182,8 @@ public class ConsumerGroupMemberInfo implements Comparable<ConsumerGroupMemberIn
             this.sessionTimeoutMs = sessionTimeoutMs;
             return this;
         }
-        public Builder latestHeartbeatDate(Long latestHeartbeatDate) {
-            if (latestHeartbeatDate == null) {
-                return latestHeartbeatDate((LocalDateTime)null);
-            } else {
-                return latestHeartbeatDate(
-                        LocalDateTime.ofInstant(
-                                Instant.ofEpochMilli(latestHeartbeatDate),
-                                TimeZone.getDefault().toZoneId()));
-            }
-        }
-        public Builder latestHeartbeatDate(LocalDateTime latestHeartbeatDate) {
-            this.latestHeartbeatDate = latestHeartbeatDate;
+        public Builder heartbeatSatisfied(boolean heartbeatSatisfied) {
+            this.heartbeatSatisfied = heartbeatSatisfied;
             return this;
         }
         public Builder assignment(Collection<TopicPartition> assignment) {
@@ -211,7 +198,7 @@ public class ConsumerGroupMemberInfo implements Comparable<ConsumerGroupMemberIn
                     clientHost,
                     rebalanceTimeoutMs,
                     sessionTimeoutMs,
-                    latestHeartbeatDate,
+                    heartbeatSatisfied,
                     assignment);
         }
 

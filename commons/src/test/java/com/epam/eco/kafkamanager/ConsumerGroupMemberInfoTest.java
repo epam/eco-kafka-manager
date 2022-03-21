@@ -15,7 +15,6 @@
  *******************************************************************************/
 package com.epam.eco.kafkamanager;
 
-import java.time.LocalDateTime;
 import java.util.Collections;
 
 import org.apache.kafka.common.TopicPartition;
@@ -38,7 +37,7 @@ public class ConsumerGroupMemberInfoTest {
                 memberId("memberId").
                 clientHost("localhost").
                 rebalanceTimeoutMs(3000).
-                latestHeartbeatDate(LocalDateTime.now()).
+                heartbeatSatisfied(true).
                 sessionTimeoutMs(10000).
                 assignment(Collections.singleton(new TopicPartition("topic", 0))).
                 build();

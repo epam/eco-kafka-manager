@@ -301,7 +301,7 @@ public class KafkaConsumerGroupRepo extends AbstractKeyValueRepo<String, Consume
                         clientHost(metadata.getClientHost()).
                         rebalanceTimeoutMs(metadata.getRebalanceTimeoutMs()).
                         sessionTimeoutMs(metadata.getSessionTimeoutMs()).
-                        latestHeartbeatDate(metadata.getLatestHeartbeatDate()).
+                        heartbeatSatisfied(metadata.isHeartbeatSatisfied()).
                         assignment(metadata.getAssignment()).
                         build()).
                 sorted().

@@ -63,8 +63,8 @@ class ServerMemberMetadata implements MemberMetadataAdapter {
     }
 
     @Override
-    public Long getLatestHeartbeatDate() {
-        return metadata.latestHeartbeat();
+    public boolean isHeartbeatSatisfied() {
+        return metadata.heartbeatSatisfied();
     }
 
     @Override
