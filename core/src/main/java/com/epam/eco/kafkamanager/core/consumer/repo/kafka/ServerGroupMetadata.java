@@ -67,7 +67,7 @@ class ServerGroupMetadata implements GroupMetadataAdapter {
 
     @Override
     public String getPartitionAssignor() {
-        return metadata.protocolOrNull();
+        return metadata.protocolName().getOrElse(() -> null);
     }
 
     @Override

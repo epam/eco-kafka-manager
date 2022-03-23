@@ -312,8 +312,8 @@ class ZkTopicCache {
         String topicName = getTopicNameFromTopicPath(childData.getPath());
 
         Integer version = (Integer)topicInfoMap.get(VERSION);
-        if (version == 1) {
-            return toPartitionsV1(topicName, topicInfoMap);
+        if (version >= 1 && version <= 3) {
+            return toPartitions_V1_V2_V3(topicName, topicInfoMap);
         } else {
             throw new RuntimeException(
                     String.format("Unsupported topic version: %s", topicInfoString));
@@ -321,7 +321,7 @@ class ZkTopicCache {
     }
 
     @SuppressWarnings("unchecked")
-    private Map<TopicPartition, PartitionMetadata> toPartitionsV1(
+    private Map<TopicPartition, PartitionMetadata> toPartitions_V1_V2_V3(
             String topicName,
             Map<String, Object> topicInfoMap) {
         Map<String, Object> partitionsInfoMap = (Map<String, Object>)topicInfoMap.get(TOPIC_PARTITIONS);

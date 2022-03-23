@@ -27,6 +27,7 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.Validate;
 import org.apache.curator.framework.CuratorFramework;
@@ -35,7 +36,10 @@ import org.apache.curator.framework.recipes.cache.TreeCache;
 import org.apache.curator.framework.recipes.cache.TreeCacheEvent;
 import org.apache.curator.framework.recipes.cache.TreeCacheEvent.Type;
 import org.apache.curator.utils.ZKPaths;
+import org.apache.kafka.common.acl.AccessControlEntry;
 import org.apache.kafka.common.resource.PatternType;
+import org.apache.kafka.common.resource.ResourcePattern;
+import org.apache.kafka.common.resource.ResourceType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -44,9 +48,7 @@ import com.epam.eco.kafkamanager.core.utils.CuratorUtils;
 import com.epam.eco.kafkamanager.core.utils.InitWaitingTreeCacheStarter;
 import com.epam.eco.kafkamanager.core.utils.ZKPathUtils;
 
-import kafka.security.auth.Acl;
-import kafka.security.auth.Resource;
-import kafka.security.auth.ResourceType;
+import kafka.security.authorizer.AclEntry;
 import kafka.zk.ExtendedAclStore;
 import kafka.zk.LiteralAclStore;
 
@@ -81,7 +83,7 @@ class ZkAclCache {
             PREFIXED_RESOURCE_PATTERN,
             PREFIXED_RESOURCE_TYPE_INDEX);
 
-    private final Map<Resource, ACL> aclCache = new HashMap<>();
+    private final Map<ResourcePattern, ACL> aclCache = new HashMap<>();
     private final ReadWriteLock lock = new ReentrantReadWriteLock();
 
     private final CacheListener cacheListener;
@@ -137,7 +139,7 @@ class ZkAclCache {
         }
     }
 
-    public ACL getAcl(Resource resource) {
+    public ACL getAcl(ResourcePattern resource) {
         lock.readLock().lock();
         try {
             ACL acl = aclCache.get(resource);
@@ -147,7 +149,7 @@ class ZkAclCache {
         }
     }
 
-    public List<Resource> listResources() {
+    public List<ResourcePattern> listResources() {
         lock.readLock().lock();
         try {
             return new ArrayList<>(aclCache.keySet());
@@ -171,7 +173,7 @@ class ZkAclCache {
         }
     }
 
-    private void fireCacheListener(ACL updatedAcl, Resource resourceOfRemovedAcl) {
+    private void fireCacheListener(ACL updatedAcl, ResourcePattern resourceOfRemovedAcl) {
         if (updatedAcl != null) {
             try {
                 cacheListener.onAclUpdated(updatedAcl);
@@ -218,7 +220,7 @@ class ZkAclCache {
             }
 
             ACL updatedAcl = null;
-            Resource resourceOfRemovedAcl = null;
+            ResourcePattern resourceOfRemovedAcl = null;
 
             boolean added = event.getType() == Type.NODE_ADDED;
             boolean updated = event.getType() == Type.NODE_UPDATED;
@@ -239,7 +241,7 @@ class ZkAclCache {
             try {
                 String resourceType = getResourceTypeFromPath(childData.getPath());
                 String resourceName = getResourceNameFromPath(childData.getPath());
-                Resource resource = toResource(resourceType, resourceName);
+                ResourcePattern resource = toResource(resourceType, resourceName);
                 ACL acl = toAcl(resource, childData);
                 aclCache.put(resource, acl);
                 return acl;
@@ -248,12 +250,12 @@ class ZkAclCache {
             }
         }
 
-        private Resource handleAclRemoved(ChildData childData) {
+        private ResourcePattern handleAclRemoved(ChildData childData) {
             lock.writeLock().lock();
             try {
                 String resourceType = getResourceTypeFromPath(childData.getPath());
                 String resourceName = getResourceNameFromPath(childData.getPath());
-                Resource resource = toResource(resourceType, resourceName);
+                ResourcePattern resource = toResource(resourceType, resourceName);
                 aclCache.remove(resource);
                 return resource;
             } finally {
@@ -261,17 +263,23 @@ class ZkAclCache {
             }
         }
 
-        private ACL toAcl(Resource resource, ChildData childData) {
-            Set<Acl> acls = ScalaConversions.asJavaSet(Acl.fromBytes(childData.getData()));
-            return new ACL(resource, acls);
+        private ACL toAcl(ResourcePattern resource, ChildData childData) {
+            Set<AclEntry> aclEntries = ScalaConversions.asJavaSet(AclEntry.fromBytes(childData.getData()));
+            Set<AccessControlEntry> accessControlEntries = aclEntries.stream().
+                    map(AclEntry::ace).
+                    collect(Collectors.toSet());
+            return new ACL(resource, accessControlEntries);
         }
 
         private boolean isResourcePath(String path) {
             return resourceRegex.matcher(path).matches();
         }
 
-        private Resource toResource(String resourceType, String resourceName) {
-            return new Resource(ResourceType.fromString(resourceType), resourceName, patternType);
+        private ResourcePattern toResource(String resourceType, String resourceName) {
+            return new ResourcePattern(
+                    ResourceType.fromString(resourceType),
+                    resourceName,
+                    patternType);
         }
 
         private String getResourceTypeFromPath(String path) {
@@ -286,10 +294,10 @@ class ZkAclCache {
 
     public class ACL {
 
-        public final Resource resource;
-        public final Set<Acl> permissions;
+        public final ResourcePattern resource;
+        public final Set<AccessControlEntry> permissions;
 
-        public ACL(Resource resource, Set<Acl> permissions) {
+        public ACL(ResourcePattern resource, Set<AccessControlEntry> permissions) {
             Validate.notNull(resource, "Resource is null");
 
             this.resource = resource;
@@ -298,7 +306,7 @@ class ZkAclCache {
 
         public ACL copyOf() {
             return new ACL(
-                    new Resource(resource.resourceType(), resource.name(), resource.patternType()),
+                    resource,
                     new HashSet<>(permissions));
         }
 
@@ -306,7 +314,7 @@ class ZkAclCache {
 
     public static interface CacheListener {
         void onAclUpdated(ACL acl);
-        void onAclRemoved(Resource resource);
+        void onAclRemoved(ResourcePattern resource);
     }
 
 }

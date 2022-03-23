@@ -42,15 +42,11 @@ import com.epam.eco.kafkamanager.EntityType;
 import com.epam.eco.kafkamanager.KafkaAdminOperations;
 import com.epam.eco.kafkamanager.SecurityContextAdapter;
 
-import kafka.network.RequestChannel.Session;
-import kafka.security.auth.Resource;
-import kafka.security.auth.ResourceType$;
 import kafka.server.KafkaConfig;
 
 /**
  * @author Andrei_Tytsik
  */
-@SuppressWarnings("deprecation")
 public class KafkaAuthorizer implements Authorizer {
 
     @Autowired
@@ -60,7 +56,6 @@ public class KafkaAuthorizer implements Authorizer {
     @Autowired
     private KafkaAuthorizerProperties authzProperties;
 
-    private kafka.security.auth.Authorizer authorizerOld;
     private org.apache.kafka.server.authorizer.Authorizer authorizer;
 
     @PostConstruct
@@ -70,7 +65,7 @@ public class KafkaAuthorizer implements Authorizer {
 
     private void initAuthorizer() {
         try {
-            Object authorizer = Class.forName(
+            authorizer = (org.apache.kafka.server.authorizer.Authorizer)Class.forName(
                     authzProperties.getAuthorizerClass()).newInstance();
 
             Map<String, Object> authorizerConfig =
@@ -79,16 +74,7 @@ public class KafkaAuthorizer implements Authorizer {
                     KafkaConfig.ZkConnectProp(),
                     adminOperations.getZkConnect());
 
-            if (authorizer instanceof kafka.security.auth.Authorizer) {
-                this.authorizerOld = (kafka.security.auth.Authorizer)authorizer;
-                this.authorizerOld.configure(authorizerConfig);
-            } else if (authorizer instanceof org.apache.kafka.server.authorizer.Authorizer) {
-                this.authorizer = (org.apache.kafka.server.authorizer.Authorizer)authorizer;
-                this.authorizer.configure(authorizerConfig);
-            } else {
-                throw new RuntimeException(
-                        "Unsupported type of Authorizer: " + authzProperties.getAuthorizerClass());
-            }
+            authorizer.configure(authorizerConfig);
         } catch (InstantiationException | IllegalAccessException | ClassNotFoundException ex) {
             throw new IllegalArgumentException("Failed to initialize authorizer", ex);
         }
@@ -116,10 +102,6 @@ public class KafkaAuthorizer implements Authorizer {
     }
 
     private boolean authorize(EntityType entityType, Object entityId, Operation operation) {
-        if (authorizerOld != null) {
-            return authorizeOld(entityType, entityId, operation);
-        }
-
         ResourcePattern resourcePattern = toResourcePattern(entityType, entityId);
         if (resourcePattern == null) {
             return false;
@@ -141,24 +123,6 @@ public class KafkaAuthorizer implements Authorizer {
                 get(0) == AuthorizationResult.ALLOWED;
     }
 
-    private boolean authorizeOld(EntityType entityType, Object entityId, Operation operation) {
-        Resource resource = toScalaResource(entityType, entityId);
-        if (resource == null) {
-            return false;
-        }
-
-        return authorizerOld.authorize(
-                createSession(),
-                toScalaOperation(operation),
-                resource);
-    }
-
-    private Session createSession() {
-        KafkaPrincipal kafkaPrincipal = getCurrentKafkaPrincipal();
-        InetAddress inetAddress = getCurrentInetAddress();
-        return new Session(kafkaPrincipal, inetAddress);
-    }
-
     private KafkaPrincipal getCurrentKafkaPrincipal() {
         return new KafkaPrincipal(
                 KafkaPrincipal.USER_TYPE,
@@ -173,10 +137,6 @@ public class KafkaAuthorizer implements Authorizer {
         }
     }
 
-    private static kafka.security.auth.Operation toScalaOperation(Operation operation) {
-        return kafka.security.auth.Operation$.MODULE$.fromJava(toAclOperation(operation));
-    }
-
     private static AclOperation toAclOperation(Operation operation) {
         switch (operation) {
         case READ: return AclOperation.READ;
@@ -189,22 +149,6 @@ public class KafkaAuthorizer implements Authorizer {
         default: throw new IllegalArgumentException(
                 String.format("Operation '%s' not supported", operation));
         }
-    }
-
-    private static Resource toScalaResource(EntityType entityType, Object entityId) {
-        kafka.security.auth.ResourceType resourceType = toScalaResourceType(entityType);
-        String resourceName = toResourceName(entityId);
-        if (resourceType == null || resourceName == null) {
-            return null;
-        }
-
-        return Resource.apply(resourceType, resourceName, PatternType.LITERAL);
-    }
-
-    private static kafka.security.auth.ResourceType toScalaResourceType(EntityType entityType) {
-        ResourceType resourceType = toResourceType(entityType);
-        return
-                resourceType != null ? ResourceType$.MODULE$.fromJava(resourceType) : null;
     }
 
     private static ResourcePattern toResourcePattern(EntityType entityType, Object entityId) {

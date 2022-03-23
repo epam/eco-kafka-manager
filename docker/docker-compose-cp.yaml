@@ -2,7 +2,7 @@ version: '3.5'
 services:
 
   zookeeper:
-    image: 'confluentinc/cp-zookeeper:5.4.6'
+    image: 'confluentinc/cp-zookeeper:7.0.1'
     hostname: 'zookeeper'
     ports:
       - '2181:2181'
@@ -29,7 +29,7 @@ services:
     # See https://rmoff.net/2018/08/02/kafka-listeners-explained/ for details
     # "`-._,-'"`-._,-'"`-._,-'"`-._,-'"`-._,-'"`-._,-'"`-._,-'"`-._,-'"`-._,-
     #
-    image: 'confluentinc/cp-kafka:5.4.6'
+    image: 'confluentinc/cp-kafka:7.0.1'
     hostname: 'kafka'
     depends_on:
       - 'zookeeper'
@@ -44,12 +44,12 @@ services:
       - 'KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR=1'
       - 'KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR=1'
       - 'KAFKA_TRANSACTION_STATE_LOG_MIN_ISR=1'
-      - 'KAFKA_AUTHORIZER_CLASS_NAME=kafka.security.auth.SimpleAclAuthorizer'
+      - 'KAFKA_AUTHORIZER_CLASS_NAME=kafka.security.authorizer.AclAuthorizer'
       - 'KAFKA_ALLOW_EVERYONE_IF_NO_ACL_FOUND=true'
     restart: 'on-failure'
 
   schema-registry:
-    image: 'confluentinc/cp-schema-registry:5.4.6'
+    image: 'confluentinc/cp-schema-registry:7.0.1'
     hostname: 'schema-registry'
     depends_on:
       - 'zookeeper'
@@ -57,6 +57,7 @@ services:
     ports:
       - '8081:8081'
     environment:
+      SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS: 'PLAINTEXT://kafka:29092'
       SCHEMA_REGISTRY_HOST_NAME: 'schema-registry'
       SCHEMA_REGISTRY_KAFKASTORE_CONNECTION_URL: 'zookeeper:2181'
     restart: 'on-failure'

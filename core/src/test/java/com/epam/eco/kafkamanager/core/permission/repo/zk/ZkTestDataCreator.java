@@ -100,8 +100,6 @@ public class ZkTestDataCreator {
     private static void delete() throws Exception {
         List<AclBindingFilter> bindings = new ArrayList<>();
         for (String topic : TOPICS) {
-            org.apache.kafka.common.resource.ResourceFilter resourceFilter =
-                    new org.apache.kafka.common.resource.ResourceFilter(ResourceType.TOPIC, topic);
             for (AclOperation operation : OPERATIONS) {
                 AccessControlEntryFilter entry = new AccessControlEntryFilter(
                         PRINCIPAL,
@@ -111,8 +109,8 @@ public class ZkTestDataCreator {
                 bindings.add(
                         new AclBindingFilter(
                                 new ResourcePatternFilter(
-                                        resourceFilter.resourceType(),
-                                        resourceFilter.name(),
+                                        ResourceType.TOPIC,
+                                        topic,
                                         PatternType.LITERAL),
                                 entry));
             }

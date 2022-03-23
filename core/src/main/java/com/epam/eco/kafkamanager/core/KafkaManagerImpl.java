@@ -19,11 +19,11 @@ import java.security.Principal;
 import java.util.List;
 
 import org.apache.commons.lang3.Validate;
+import org.apache.kafka.common.resource.ResourcePattern;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
-import com.epam.eco.commons.kafka.ScalaConversions;
 import com.epam.eco.kafkamanager.BrokerConfigUpdateParams;
 import com.epam.eco.kafkamanager.BrokerInfo;
 import com.epam.eco.kafkamanager.BrokerMetadataDeleteParams;
@@ -74,8 +74,6 @@ import com.epam.eco.kafkamanager.TransactionInfo;
 import com.epam.eco.kafkamanager.TransactionRepo;
 import com.epam.eco.kafkamanager.TransactionSearchCriteria;
 import com.epam.eco.kafkamanager.repo.CachedRepo;
-
-import kafka.security.auth.Resource;
 
 /**
  * @author Andrei_Tytsik
@@ -508,7 +506,7 @@ public class KafkaManagerImpl implements KafkaManager {
                 params.getHost());
 
         if (permissionRepo instanceof CachedRepo) {
-            ((CachedRepo<Resource>)permissionRepo).evict(ScalaConversions.asScalaResource(
+            ((CachedRepo<ResourcePattern>)permissionRepo).evict(new ResourcePattern(
                     params.getResourceType(),
                     params.getResourceName(),
                     params.getPatternType()));
@@ -536,7 +534,7 @@ public class KafkaManagerImpl implements KafkaManager {
                         build());
 
         if (permissionRepo instanceof CachedRepo) {
-            ((CachedRepo<Resource>)permissionRepo).evict(ScalaConversions.asScalaResource(
+            ((CachedRepo<ResourcePattern>)permissionRepo).evict(new ResourcePattern(
                     params.getResourceType(),
                     params.getResourceName(),
                     params.getPatternType()));
@@ -556,7 +554,7 @@ public class KafkaManagerImpl implements KafkaManager {
                         params.getPatternType()));
 
         if (permissionRepo instanceof CachedRepo) {
-            ((CachedRepo<Resource>)permissionRepo).evict(ScalaConversions.asScalaResource(
+            ((CachedRepo<ResourcePattern>)permissionRepo).evict(new ResourcePattern(
                     params.getResourceType(),
                     params.getResourceName(),
                     params.getPatternType()));

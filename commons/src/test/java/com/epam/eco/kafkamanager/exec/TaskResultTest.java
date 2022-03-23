@@ -21,6 +21,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.common.TopicPartition;
@@ -77,12 +78,12 @@ public class TaskResultTest {
                         j,
                         new Date().getTime(),
                         TimestampType.NO_TIMESTAMP_TYPE,
-                        -1L,
                         -1,
                         -1,
                         i + " " + j,
                         i + " " + j,
-                        headers));
+                        headers,
+                        Optional.empty()));
             }
             recordsInPartitions.put(
                     topicPartition,
@@ -110,7 +111,6 @@ public class TaskResultTest {
         assertEqualsResults(origin, deserialized);
     }
 
-    @SuppressWarnings("deprecation")
     private void assertEqualsResults(TaskResult<RecordFetchResult<Object, Object>> a, TaskResult<RecordFetchResult<Object, Object>> b) {
         Assert.assertEquals(a.getError(), b.getError());
         Assert.assertEquals(a.getStartedAt(), b.getStartedAt());
@@ -130,7 +130,6 @@ public class TaskResultTest {
             Assert.assertEquals(recordA.serializedValueSize(), recordB.serializedValueSize());
             Assert.assertEquals(recordA.offset(), recordB.offset());
             Assert.assertEquals(recordA.headers(), recordB.headers());
-            Assert.assertEquals(recordA.checksum(), recordB.checksum());
             Assert.assertEquals(recordA.key(), recordB.key());
             Assert.assertEquals(recordA.value(), recordB.value());
         }
