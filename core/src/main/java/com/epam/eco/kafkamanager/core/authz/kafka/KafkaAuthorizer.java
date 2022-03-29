@@ -15,6 +15,7 @@
  *******************************************************************************/
 package com.epam.eco.kafkamanager.core.authz.kafka;
 
+import java.lang.reflect.InvocationTargetException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Collections;
@@ -66,7 +67,7 @@ public class KafkaAuthorizer implements Authorizer {
     private void initAuthorizer() {
         try {
             authorizer = (org.apache.kafka.server.authorizer.Authorizer)Class.forName(
-                    authzProperties.getAuthorizerClass()).newInstance();
+                    authzProperties.getAuthorizerClass()).getDeclaredConstructor().newInstance();
 
             Map<String, Object> authorizerConfig =
                     new HashMap<>(authzProperties.getAuthorizerConfig());
@@ -75,7 +76,14 @@ public class KafkaAuthorizer implements Authorizer {
                     adminOperations.getZkConnect());
 
             authorizer.configure(authorizerConfig);
-        } catch (InstantiationException | IllegalAccessException | ClassNotFoundException ex) {
+        } catch (
+                SecurityException |
+                InstantiationException |
+                IllegalAccessException |
+                IllegalArgumentException |
+                InvocationTargetException |
+                NoSuchMethodException |
+                ClassNotFoundException ex) {
             throw new IllegalArgumentException("Failed to initialize authorizer", ex);
         }
     }

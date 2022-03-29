@@ -91,7 +91,7 @@ class TransactionProjection {
     private Set<String> extractTopicsFromHistory() {
         Set<String> topics = new HashSet<>();
         for (TransactionMetadata metadata : history) {
-            if (metadata.topicPartitions().size() > 0) {
+            if (metadata.topicPartitions().iterator().size() > 0) {
                 topics.addAll(
                         ScalaConversions.asJavaSet(metadata.topicPartitions()).stream().
                             map(TopicPartition::topic).
