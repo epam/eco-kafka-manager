@@ -84,13 +84,13 @@
             </resource>
         </resources>
         <plugins>
-            <plugin>
+            <!--plugin>
                 <groupId>com.github.spotbugs</groupId>
                 <artifactId>spotbugs-maven-plugin</artifactId>
                 <configuration>
                     <excludeFilterFile>spotbugs-exclude.xml</excludeFilterFile>
                 </configuration>
-            </plugin>
+            </plugin-->
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>

@@ -103,13 +103,13 @@
 
     <build>
         <plugins>
-            <plugin>
+            <!--plugin>
                 <groupId>com.github.spotbugs</groupId>
                 <artifactId>spotbugs-maven-plugin</artifactId>
                 <configuration>
                     <excludeFilterFile>spotbugs-exclude.xml</excludeFilterFile>
                 </configuration>
-            </plugin>
+            </plugin-->
         </plugins>
     </build>
     
