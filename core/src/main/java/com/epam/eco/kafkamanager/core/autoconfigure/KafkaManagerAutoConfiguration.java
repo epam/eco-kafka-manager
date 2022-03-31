@@ -15,12 +15,17 @@
  *******************************************************************************/
 package com.epam.eco.kafkamanager.core.autoconfigure;
 
+import java.util.Map.Entry;
+
 import javax.cache.CacheManager;
 import javax.cache.Caching;
 
+import org.apache.commons.collections4.MapUtils;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.CuratorFrameworkFactory;
 import org.apache.curator.retry.RetryForever;
+import org.apache.zookeeper.client.ZKClientConfig;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -76,6 +81,9 @@ import com.epam.eco.kafkamanager.core.utils.RetriableZookeeperFactory;
 @EnableGlobalMethodSecurity(prePostEnabled=true)
 @Import(KafkaAuthorizerConfiguration.class)
 public class KafkaManagerAutoConfiguration {
+
+    @Autowired
+    private KafkaManagerProperties properties;
 
     @Bean
     @ConditionalOnMissingBean
@@ -176,12 +184,22 @@ public class KafkaManagerAutoConfiguration {
 
     @Bean(destroyMethod="close")
     public CuratorFramework curatorFramework(KafkaAdminOperations adminOperations) {
+        ZKClientConfig clientConfig = null;
+        if (MapUtils.isNotEmpty(properties.getZkClientConfig())) {
+            clientConfig = new ZKClientConfig();
+            for (Entry<String, String> entry : properties.getZkClientConfig().entrySet()) {
+                clientConfig.setProperty(entry.getKey(), entry.getValue());
+            }
+        }
+
         CuratorFramework client = CuratorFrameworkFactory.builder().
+                zkClientConfig(clientConfig).
                 connectString(adminOperations.getZkConnect()).
                 retryPolicy(new RetryForever(3000)).
                 zookeeperFactory(new RetriableZookeeperFactory()).
                 build();
         client.start();
+
         return client;
     }
 

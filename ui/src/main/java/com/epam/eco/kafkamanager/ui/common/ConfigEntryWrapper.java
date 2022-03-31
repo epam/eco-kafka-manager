@@ -48,25 +48,38 @@ public class ConfigEntryWrapper {
     public static ConfigEntryWrapper wrapForTopic(ConfigEntry entry) {
         Validate.notNull(entry, "Entry is null");
 
+        ConfigKey key = TopicConfigDef.INSTANCE.key(entry.name());
         return new ConfigEntryWrapper(
                 entry,
-                TopicConfigDef.INSTANCE.key(entry.name()));
+                key == null ? defaultConfigKey(entry.name()) : key);
     }
 
     public static ConfigEntryWrapper wrapForBroker(ConfigEntry entry) {
         Validate.notNull(entry, "Entry is null");
 
         ConfigKey key = BrokerConfigDef.INSTANCE.key(entry.name());
-        return new ConfigEntryWrapper(entry, key == null ? defaultConfigKey(entry.name()) : key);
+        return new ConfigEntryWrapper(
+                entry,
+                key == null ? defaultConfigKey(entry.name()) : key);
     }
 
     private static ConfigKey defaultConfigKey(String name) {
         Validate.notBlank(name, "Name can't be blank");
 
         return new ConfigKey(
-                name, ConfigDef.Type.STRING, ConfigDef.NO_DEFAULT_VALUE, null, ConfigDef.Importance.MEDIUM,
-                "N/A", null, 0,  ConfigDef.Width.MEDIUM, name, Collections.emptyList(),
-                null, false);
+                name,
+                ConfigDef.Type.STRING,
+                ConfigDef.NO_DEFAULT_VALUE,
+                null,
+                ConfigDef.Importance.MEDIUM,
+                "N/A",
+                null,
+                0,
+                ConfigDef.Width.MEDIUM,
+                name,
+                Collections.emptyList(),
+                null,
+                false);
     }
 
     public String getName() {

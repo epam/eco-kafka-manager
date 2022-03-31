@@ -42,6 +42,7 @@ public class KafkaManagerProperties {
     private String zkConnect;
     private String schemaRegistryUrl;
     private Map<String, Object> clientConfig;
+    private Map<String, String> zkClientConfig;
     private long metadataStoreBootstrapTimeoutInMs = 3 * 60 * 1000;
     private long transactionStoreBootstrapTimeoutInMs = 3 * 60 * 1000;
     private DatePeriod transactionStoreBootstrapDataFreshness = DatePeriod.ONE_HOUR;
@@ -80,6 +81,12 @@ public class KafkaManagerProperties {
     }
     public void setClientConfig(Map<String, Object> clientConfig) {
         this.clientConfig = clientConfig;
+    }
+    public Map<String, String> getZkClientConfig() {
+        return zkClientConfig;
+    }
+    public void setZkClientConfig(Map<String, String> zkClientConfig) {
+        this.zkClientConfig = zkClientConfig;
     }
     public long getMetadataStoreBootstrapTimeoutInMs() {
         return metadataStoreBootstrapTimeoutInMs;
