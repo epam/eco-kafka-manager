@@ -19,5 +19,5 @@ package com.epam.eco.kafkamanager.core.topic.repo.zk;
  * @author Raman_Babich
  */
 enum TopicOperation {
-    UPDATE, DELETE
+    UPDATE, DELETE, CONFIG_UPDATE, CONFIG_DELETE
 }

@@ -236,7 +236,7 @@ public class ZkTopicRepo extends AbstractKeyValueRepo<String, TopicInfo, TopicSe
                     topicName,
                     topic -> {
                         ResourceSemaphores.ResourceSemaphore<String, TopicOperation> updateSemaphore =
-                                semaphores.createSemaphore(topicName, TopicOperation.UPDATE);
+                                semaphores.createSemaphore(topicName, TopicOperation.CONFIG_UPDATE);
 
                         adminOperations.alterTopicConfigs(topicName, configs);
 
@@ -318,7 +318,7 @@ public class ZkTopicRepo extends AbstractKeyValueRepo<String, TopicInfo, TopicSe
     public void onTopicConfigUpdated(TopicConfig topicConfig) {
         Validate.notNull(topicConfig, "Topic config can't be null");
 
-        semaphores.signalDoneFor(topicConfig.name, TopicOperation.UPDATE);
+        semaphores.signalDoneFor(topicConfig.name, TopicOperation.CONFIG_UPDATE);
 
         removeTopicFromInfoCache(topicConfig.name);
     }
@@ -327,7 +327,7 @@ public class ZkTopicRepo extends AbstractKeyValueRepo<String, TopicInfo, TopicSe
     public void onTopicConfigRemoved(String topicName) {
         Validate.notBlank(topicName, "Topic name is blank");
 
-        semaphores.signalDoneFor(topicName, TopicOperation.UPDATE);
+        semaphores.signalDoneFor(topicName, TopicOperation.CONFIG_DELETE);
 
         removeTopicFromInfoCache(topicName);
     }
