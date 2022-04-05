@@ -75,7 +75,7 @@
         
         <kafka.version>7.0.1-ccs</kafka.version>
         <cp.version>7.0.1</cp.version>
-        <eco-commons.version>0.1.1</eco-commons.version>
+        <eco-commons.version>0.1.5</eco-commons.version>
         <eco-commons-kafka.version>2.0.1</eco-commons-kafka.version>
         <ehcache.version>3.5.2</ehcache.version>
         <curator.version>5.2.0</curator.version>
@@ -83,9 +83,11 @@
         <commons-csv.version>1.5</commons-csv.version>
         <commons-math3.version>3.6.1</commons-math3.version>
         <commons-io.version>2.7</commons-io.version>
-        <avro.version>1.8.2</avro.version>
+        <avro.version>1.10.1</avro.version>
         <slf4j.version>1.7.25</slf4j.version>
         <swagger.version>2.9.2</swagger.version>
+        <jackson.version>2.13.2</jackson.version>
+        <jackson-databind.version>2.13.2.1</jackson-databind.version>
 
         <maven-release-plugin.version>2.5.3</maven-release-plugin.version>
         <maven-compiler-plugin.version>3.9.0</maven-compiler-plugin.version>
@@ -212,6 +214,26 @@
                 <groupId>io.springfox</groupId>
                 <artifactId>springfox-swagger2</artifactId>
                 <version>${swagger.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.fasterxml.jackson.core</groupId>
+                <artifactId>jackson-databind</artifactId>
+                <version>${jackson-databind.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.fasterxml.jackson.module</groupId>
+                <artifactId>jackson-module-parameter-names</artifactId>
+                <version>${jackson.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.fasterxml.jackson.datatype</groupId>
+                <artifactId>jackson-datatype-jdk8</artifactId>
+                <version>${jackson.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.fasterxml.jackson.datatype</groupId>
+                <artifactId>jackson-datatype-jsr310</artifactId>
+                <version>${jackson.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
