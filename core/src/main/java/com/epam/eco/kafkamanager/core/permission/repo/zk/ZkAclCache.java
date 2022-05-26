@@ -29,6 +29,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.recipes.cache.ChildData;
@@ -198,6 +199,33 @@ class ZkAclCache {
         }
     }
 
+    /**
+     * Multi-word types (camel case) should be converted to underscore-separated string in order to
+     * be correctly parsed by {@link ResourceType#fromString(String)}.
+     *
+     * Example: 'TransactionalId' -> 'Transactional_Id'
+     *
+     * @param str string to convert from
+     * @return {@link ResourceType}
+     */
+    private static ResourceType resourceTypeFromString(String str) {
+        StringBuilder builder = new StringBuilder();
+
+        char[] chars = str.toCharArray();
+
+        builder.append(chars[0]); // first character is ignored
+
+        for (int i = 1; i < chars.length; i++) {
+            char ch = chars[i];
+            if (Character.isUpperCase(ch)) {
+                builder.append('_');
+            }
+            builder.append(ch);
+        }
+
+        return ResourceType.fromString(builder.toString());
+    }
+
     private class EventHandler {
 
         private final PatternType patternType;
@@ -277,7 +305,7 @@ class ZkAclCache {
 
         private ResourcePattern toResource(String resourceType, String resourceName) {
             return new ResourcePattern(
-                    ResourceType.fromString(resourceType),
+                    resourceTypeFromString(resourceType),
                     resourceName,
                     patternType);
         }
