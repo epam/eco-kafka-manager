@@ -15,13 +15,15 @@
  *******************************************************************************/
 package com.epam.eco.kafkamanager.utils;
 
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import java.io.IOException;
 import java.io.Writer;
 import java.util.Map;
-
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.stream.Collectors;
 
 
 /**
@@ -30,6 +32,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 public class MapperUtils { // TODO: better exception handling.
 
     private static final ObjectMapper MAPPER = new ObjectMapper();
+
     static {
         MAPPER.configure(JsonGenerator.Feature.AUTO_CLOSE_TARGET, false);
         MAPPER.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
@@ -67,6 +70,23 @@ public class MapperUtils { // TODO: better exception handling.
         } catch (IOException ioe) {
             throw new RuntimeException(ioe);
         }
+    }
+
+    public static String toPrettyHtml(Map<String, ?> map) {
+        return map.entrySet()
+                .stream()
+                .map(entry -> "\"<b>" + entry.getKey() + "</b>\": " + objectToString(entry.getValue()))
+                .collect(Collectors.joining(", <br/>"));
+    }
+
+    public static String objectToString(Object object) {
+        String result = "<unknown>";
+        try {
+            result = MAPPER.writeValueAsString(object);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
+        return result;
     }
 
     public static Map<String, Object> jsonToMap(String json) {

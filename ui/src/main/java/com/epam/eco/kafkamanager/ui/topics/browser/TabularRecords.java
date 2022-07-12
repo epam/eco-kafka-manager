@@ -15,6 +15,15 @@
  *******************************************************************************/
 package com.epam.eco.kafkamanager.ui.topics.browser;
 
+import com.epam.eco.kafkamanager.ui.topics.browser.TabularRecords.Record;
+import com.epam.eco.kafkamanager.utils.MapperUtils;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.ObjectUtils;
+import org.apache.commons.lang3.Validate;
+import org.apache.commons.lang3.time.DateFormatUtils;
+import org.apache.kafka.clients.consumer.ConsumerRecord;
+import org.apache.kafka.common.record.TimestampType;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -26,16 +35,6 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
-
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang3.ObjectUtils;
-import org.apache.commons.lang3.Validate;
-import org.apache.commons.lang3.time.DateFormatUtils;
-import org.apache.kafka.clients.consumer.ConsumerRecord;
-import org.apache.kafka.common.record.TimestampType;
-
-import com.epam.eco.kafkamanager.ui.topics.browser.TabularRecords.Record;
-import com.epam.eco.kafkamanager.utils.MapperUtils;
 
 /**
  * @author Andrei_Tytsik
@@ -90,10 +89,10 @@ public class TabularRecords implements Iterable<Record> {
         if (selectedColumnNames != null) {
             selectedColumnNames.forEach(
                     columnName -> {
-                            if (!columns.containsKey(columnName)) {
-                                columns.put(columnName, new Column(columnName, false, true));
-                            }
-                        });
+                        if (!columns.containsKey(columnName)) {
+                            columns.put(columnName, new Column(columnName, false, true));
+                        }
+                    });
         }
 
         return columns;
@@ -144,7 +143,7 @@ public class TabularRecords implements Iterable<Record> {
     }
 
     public int determineColumnsGroupSize(int numberOfGroups, int minGroupSize) {
-        int size = (int)Math.ceil((double)columns.size() / numberOfGroups);
+        int size = (int) Math.ceil((double) columns.size() / numberOfGroups);
         return size < minGroupSize ? minGroupSize : size;
     }
 
@@ -171,47 +170,65 @@ public class TabularRecords implements Iterable<Record> {
         private final Map<String, Object> tabularValue;
         private final Map<String, Object> attributes;
 
+        private final Map<String, String> headers;
         private String attributesJson;
         private String attributesPrettyJson;
+        private String headersJson;
+        private String headersPrettyJson;
 
         public Record(
                 ConsumerRecord<?, ?> consumerRecord,
                 Map<String, Object> tabularValue,
-                Map<String, Object> attributes) {
+                Map<String, Object> attributes,
+                Map<String, String> headers) {
             Validate.notNull(consumerRecord, "Consumer Record is null");
 
             this.consumerRecord = consumerRecord;
             this.tabularValue = tabularValue != null ? new TreeMap<>(tabularValue) : null;
             this.attributes = attributes != null ? new TreeMap<>(attributes) : null;
+            this.headers = headers;
         }
 
         public int getPartition() {
             return consumerRecord.partition();
         }
+
         public long getOffset() {
             return consumerRecord.offset();
         }
+
         public long getTimestamp() {
             return consumerRecord.timestamp();
         }
+
+        public Map<String, String> getHeaders() {
+            return headers;
+        }
+
         public TimestampType getTimestampType() {
             return consumerRecord.timestampType();
         }
+
         public String getTimestampFormatted() {
             return formatTimestamp(getTimestamp(), getTimestampType());
         }
+
         public int getKeySize() {
             return consumerRecord.serializedKeySize();
         }
+
         public String getKeySizeFormatted() {
             return formatSize(getKeySize());
         }
+
         public int getValueSize() {
             return consumerRecord.serializedValueSize();
         }
+
         public String getValueSizeFormatted() {
             return formatSize(getValueSize());
         }
+
         public String getKeyValueSizeFormatted() {
             String keySize = getKeySizeFormatted();
             keySize = keySize != null ? keySize : "-";
@@ -221,47 +238,65 @@ public class TabularRecords implements Iterable<Record> {
 
             return keySize + " / " + valueSize;
         }
+
         public Object getKey() {
             return consumerRecord.key();
         }
+
         public boolean isNullKey() {
             return getKey() == null;
         }
+
         public boolean isNullValue() {
             return tabularValue == null;
         }
+
         public Object get(Column column) {
             return get(column.getName());
         }
+
         public Object get(String columnName) {
             return tabularValue != null ? tabularValue.get(columnName) : null;
         }
+
         public Class<?> type(Column column) {
             return type(column.getName());
         }
+
         public Class<?> type(String columnName) {
             Object value = get(columnName);
             return value != null ? value.getClass() : null;
         }
+
         public String typeSimpleName(Column column) {
             return typeSimpleName(column.getName());
         }
+
         public String typeSimpleName(String columnName) {
             Class<?> type = type(columnName);
             return type != null ? type.getSimpleName() : NA;
         }
+
         public boolean containsColumn(Column column) {
             return containsColumn(column.getName());
         }
+
         public boolean containsColumn(String columnName) {
             return tabularValue != null && tabularValue.containsKey(columnName);
         }
+
         public Set<String> getColumnNames() {
             return tabularValue != null ? tabularValue.keySet() : Collections.emptySet();
         }
+
         public boolean hasAttributes() {
             return attributes != null && !attributes.isEmpty();
         }
+
+        public boolean hasHeaders() {
+            return headers != null && !headers.isEmpty();
+        }
+
         public String getAttributesJson() {
             if (!hasAttributes()) {
                 return null;
@@ -273,6 +308,19 @@ public class TabularRecords implements Iterable<Record> {
             attributesJson = MapperUtils.toJson(attributes);
             return attributesJson;
         }
+
+        public String getHeadersJson() {
+            if (!hasHeaders()) {
+                return null;
+            }
+            if (headersJson != null) {
+                return headersJson;
+            }
+
+            headersJson = MapperUtils.toJson(headers);
+            return headersJson;
+        }
+
         public String getAttributesPrettyJson() {
             if (!hasAttributes()) {
                 return null;
@@ -281,8 +329,21 @@ public class TabularRecords implements Iterable<Record> {
                 return attributesPrettyJson;
             }
 
-            attributesPrettyJson = MapperUtils.toPrettyJson(attributes);
+            attributesPrettyJson = MapperUtils.toPrettyHtml(attributes);
             return attributesPrettyJson;
+        }
+
+        public String getHeadersPrettyJson() {
+            if (!hasHeaders()) {
+                return null;
+            }
+            if (headersPrettyJson != null) {
+                return headersPrettyJson;
+            }
+
+            headersPrettyJson = MapperUtils.toPrettyHtml(headers);
+
+            return headersPrettyJson;
         }
 
         @Override // is not consistent with equals
@@ -351,9 +412,11 @@ public class TabularRecords implements Iterable<Record> {
         public String getName() {
             return name;
         }
+
         public boolean isPresent() {
             return present;
         }
+
         public boolean isSelected() {
             return selected;
         }
@@ -369,14 +432,17 @@ public class TabularRecords implements Iterable<Record> {
             this.selectedColumnNames.add(columnName);
             return this;
         }
+
         public Builder addSelectedColumnNames(Collection<String> columnNames) {
             this.selectedColumnNames.addAll(columnNames);
             return this;
         }
+
         public Builder addRecord(Record record) {
             this.records.add(record);
             return this;
         }
+
         public Builder addRecords(Collection<Record> records) {
             this.records.addAll(records);
             return this;

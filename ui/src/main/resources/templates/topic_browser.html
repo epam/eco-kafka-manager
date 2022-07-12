@@ -20,414 +20,430 @@
 </head>
 <body>
 
-    <script type="text/javascript" th:inline="javascript">
-        
-        /*<![CDATA[*/
-        var nextOffsets = [[${nextOffsets}]];
-        var fetchedValueFormat = [[${browseParams.getValueFormat() != null ? browseParams.getValueFormat().name() : null}]];
-        /*]]>*/
+<script type="text/javascript" th:inline="javascript">
 
-        $(function() {
-            
-            $('.partition-checkbox').change(function () {
-                var partition = $(this).data('partition');
-                var enabled = $(this).is(':checked');
-                $('#pe_' + partition).val(enabled ? '1' : '0');
-                $('#p_' + partition).prop('disabled', !enabled);
-            });
-            
-            $('#next-offsets-link').click(function(e) {
-                e.preventDefault();
-                $('.partition-checkbox').each(function(idx, elem) {
-                    if ($(elem).is(':checked')) {
-                        var partition = $(elem).data('partition');
-                        var nextOffset = nextOffsets[partition];
-                        if (nextOffset != undefined) {
-                            $('#p_' + partition).val(nextOffset);
-                        }
+    /*<![CDATA[*/
+    var nextOffsets = [[${nextOffsets}]];
+    var fetchedValueFormat = [[${browseParams.getValueFormat() != null ? browseParams.getValueFormat().name() : null}]];
+    /*]]>*/
+
+    $(function () {
+
+        $('.partition-checkbox').change(function () {
+            var partition = $(this).data('partition');
+            var enabled = $(this).is(':checked');
+            $('#pe_' + partition).val(enabled ? '1' : '0');
+            $('#p_' + partition).prop('disabled', !enabled);
+        });
+
+        $('#next-offsets-link').click(function (e) {
+            e.preventDefault();
+            $('.partition-checkbox').each(function (idx, elem) {
+                if ($(elem).is(':checked')) {
+                    var partition = $(elem).data('partition');
+                    var nextOffset = nextOffsets[partition];
+                    if (nextOffset != undefined) {
+                        $('#p_' + partition).val(nextOffset);
                     }
-                });
-                $('#fetch-form').submit();
-            });
-
-            $('#all-partitions-link').click(function(e) {
-                e.preventDefault();
-                $('.partition-checkbox').each(function(idx, elem) {
-                    $(elem).prop('checked', true);
-                    $(elem).trigger('change');
-                });
-            });
-            
-            $('#none-partitions-link').click(function(e) {
-                e.preventDefault();
-                $('.partition-checkbox').each(function(idx, elem) {
-                    $(elem).prop('checked', false);
-                    $(elem).trigger('change');
-                });
-            });
-            
-            $('#all-columns-link').click(function(e) {
-                e.preventDefault();
-                $('.column-checkbox').each(function(idx, elem) {
-                    $(elem).prop('checked', true);
-                    $(elem).trigger('change');
-                });
-            });
-            
-            $('#none-columns-link').click(function(e) {
-                e.preventDefault();
-                $('.column-checkbox').each(function(idx, elem) {
-                    $(elem).prop('checked', false);
-                    $(elem).trigger('change');
-                });
-            });
-
-            $('#search-offsets-for-time-link').click(function(e) {
-                e.preventDefault();
-                var date = $('#offsets-timestamp').data('DateTimePicker').date();
-                if (date) {
-                	var url = /*[[@{/topics/{name}/browser/offsets_for_times(name=${browseParams.topicName})}]]*/;
-                	url = url + '?timestamp=' + date.unix() * 1000;
-                	
-                	$(this).addClass('disabled');
-                	fetch(url, {credentials: 'include'})
-                		.then(res => res.json())
-                		.then(res => {
-                			$('.partition-checkbox').each(function(idx, elem) {
-                            	var partition = $(elem).data('partition');
-                                var offset = res[partition];
-                                if (offset) {
-                                	$('#p_' + partition).val(offset);
-                                    $(elem).prop('checked', true);
-                                    $(elem).trigger('change');
-                                } else {
-                                    $(elem).prop('checked', false);
-                                    $(elem).trigger('change');
-                                }
-							});
-						})
-					.catch(() => {})
-                	.finally(() => $(this).removeClass('disabled'))
                 }
             });
-            
-            $('#offsets-timestamp').datetimepicker({
-                sideBySide: true,
-                format: 'DD/MM/YYYY hh:mm:ss A',
-                timeZone: 'UTC'
-            });
-            
-            
-            $('#valueFormat').change(function () {
-                showHideColumnSelectorDependingOnFormatSelected(fetchedValueFormat);
-            });
-            
-            $('#fetch-form').submit(function () {
-                removeColumnSelectorIfFormatNotEqualToFecthedOne(fetchedValueFormat);
-                storeOrApplySelectedColumns();
-            });
-            
-            $('[data-toggle="popover"]').popover();
-            
-            $(document).on('click', function (e) {
-                hidePopoverIfClickedOutside(e);
-            });
-            
+            $('#fetch-form').submit();
         });
-       
-    </script>
 
-    <div th:replace="templates :: navbar"></div>
-    
-    <div class="main-content">
-    
-        <div class="container-fluid">
+        $('#all-partitions-link').click(function (e) {
+            e.preventDefault();
+            $('.partition-checkbox').each(function (idx, elem) {
+                $(elem).prop('checked', true);
+                $(elem).trigger('change');
+            });
+        });
 
-            <div class="row">
-        
-                <div class="col-md-10 col-md-offset-1">
-                
-                    <div class="panel panel-default">
-                        <div class="panel-body">
-                            <a
-                                    th:href="@{/topics/{name}(name=${browseParams.topicName})}"
-                                    class="btn btn-primary right-icon">
-                                Back To Topic <i class="fa fa-arrow-left"></i>
-                            </a>
-                        </div>
+        $('#none-partitions-link').click(function (e) {
+            e.preventDefault();
+            $('.partition-checkbox').each(function (idx, elem) {
+                $(elem).prop('checked', false);
+                $(elem).trigger('change');
+            });
+        });
+
+        $('#all-columns-link').click(function (e) {
+            e.preventDefault();
+            $('.column-checkbox').each(function (idx, elem) {
+                $(elem).prop('checked', true);
+                $(elem).trigger('change');
+            });
+        });
+
+        $('#none-columns-link').click(function (e) {
+            e.preventDefault();
+            $('.column-checkbox').each(function (idx, elem) {
+                $(elem).prop('checked', false);
+                $(elem).trigger('change');
+            });
+        });
+
+        $('#search-offsets-for-time-link').click(function (e) {
+            e.preventDefault();
+            var date = $('#offsets-timestamp').data('DateTimePicker').date();
+            if (date) {
+                var url = /*[[@{/topics/{name}/browser/offsets_for_times(name=${browseParams.topicName})}]]*/;
+                url = url + '?timestamp=' + date.unix() * 1000;
+
+                $(this).addClass('disabled');
+                fetch(url, {credentials: 'include'})
+                    .then(res => res.json())
+                    .then(res => {
+                        $('.partition-checkbox').each(function (idx, elem) {
+                            var partition = $(elem).data('partition');
+                            var offset = res[partition];
+                            if (offset) {
+                                $('#p_' + partition).val(offset);
+                                $(elem).prop('checked', true);
+                                $(elem).trigger('change');
+                            } else {
+                                $(elem).prop('checked', false);
+                                $(elem).trigger('change');
+                            }
+                        });
+                    })
+                    .catch(() => {
+                    })
+                    .finally(() => $(this).removeClass('disabled'))
+            }
+        });
+
+        $('#offsets-timestamp').datetimepicker({
+            sideBySide: true,
+            format: 'DD/MM/YYYY hh:mm:ss A',
+            timeZone: 'UTC'
+        });
+
+
+        $('#valueFormat').change(function () {
+            showHideColumnSelectorDependingOnFormatSelected(fetchedValueFormat);
+        });
+
+        $('#fetch-form').submit(function () {
+            removeColumnSelectorIfFormatNotEqualToFecthedOne(fetchedValueFormat);
+            storeOrApplySelectedColumns();
+        });
+
+        $('[data-toggle="popover"]').popover({html: true,});
+
+        $(document).on('click', function (e) {
+            hidePopoverIfClickedOutside(e);
+        });
+
+    });
+
+</script>
+
+<div th:replace="templates :: navbar"></div>
+
+<div class="main-content">
+
+    <div class="container-fluid">
+
+        <div class="row">
+
+            <div class="col-md-10 col-md-offset-1">
+
+                <div class="panel panel-default">
+                    <div class="panel-body">
+                        <a
+                                th:href="@{/topics/{name}(name=${browseParams.topicName})}"
+                                class="btn btn-primary right-icon">
+                            Back To Topic <i class="fa fa-arrow-left"></i>
+                        </a>
                     </div>
-        
-                    <div class="panel panel-default">
-                        <div class="panel-heading">Fetch Params</div>
-                        <div class="panel-body">
-        
-                            <form 
-                                id="fetch-form" 
+                </div>
+
+                <div class="panel panel-default">
+                    <div class="panel-heading">Fetch Params</div>
+                    <div class="panel-body">
+
+                        <form
+                                id="fetch-form"
                                 th:action="@{/topics/{name}/browser(name=${browseParams.topicName})}"
                                 method="post">
-        
-                                <div class="form-group">
-                                    <label for="topicName">Topic</label>
-                                    <input type="text" class="form-control" id="topicName" name="topicName" th:value="${browseParams.topicName}" readonly="readonly"/>
-                                </div>
-        
-                                <div class="row">
-                                    <div class="form-group col col-md-4">
-                                        <label for="keyFormat">Key Format</label>
-                                        <select class="form-control" name="keyFormat" id="keyFormat">
-                                            <option 
+
+                            <div class="form-group">
+                                <label for="topicName">Topic</label>
+                                <input type="text" class="form-control" id="topicName" name="topicName"
+                                       th:value="${browseParams.topicName}" readonly="readonly"/>
+                            </div>
+
+                            <div class="row">
+                                <div class="form-group col col-md-4">
+                                    <label for="keyFormat">Key Format</label>
+                                    <select class="form-control" name="keyFormat" id="keyFormat">
+                                        <option
                                                 th:each="format : ${T(com.epam.eco.kafkamanager.TopicRecordFetchParams$DataFormat).values()}"
-                                                th:value="${format}" 
+                                                th:value="${format}"
                                                 th:text="${format}"
                                                 th:selected="${browseParams.getKeyFormat() == format}">
-                                            </option>
-                                        </select>
-                                    </div>
-                                    <div class="form-group col col-md-4">
-                                        <label for="valueFormat">Value Format</label>
-                                        <select class="form-control" name="valueFormat" id="valueFormat">
-                                            <option 
+                                        </option>
+                                    </select>
+                                </div>
+                                <div class="form-group col col-md-4">
+                                    <label for="valueFormat">Value Format</label>
+                                    <select class="form-control" name="valueFormat" id="valueFormat">
+                                        <option
                                                 th:each="format : ${T(com.epam.eco.kafkamanager.TopicRecordFetchParams$DataFormat).values()}"
-                                                th:value="${format}" 
+                                                th:value="${format}"
                                                 th:text="${format}"
                                                 th:selected="${browseParams.getValueFormat() == format}">
-                                            </option>
-                                        </select>
-                                    </div>
+                                        </option>
+                                    </select>
                                 </div>
+                            </div>
 
-                                <div class="row">
-                                    <div class="form-group col col-md-2">
-                                        <a id="all-partitions-link" href="#" class="btn btn-default transparent right-icon small">
-                                            All <span class="glyphicon glyphicon-ok-circle"></span>
-                                        </a>
-                                        <a id="none-partitions-link" href="#" class="btn btn-default transparent right-icon small">
-                                            None <span class="glyphicon glyphicon-ban-circle"></span>
-                                        </a>
-                                    </div>
-                                    <div class="form-group col col-md-2">
-                                        <div class="input-group">
-                                            <input 
-                                                id="offsets-timestamp" 
-                                                type="text" 
-                                                name="offsetsTimestamp" 
+                            <div class="row">
+                                <div class="form-group col col-md-2">
+                                    <a id="all-partitions-link" href="#"
+                                       class="btn btn-default transparent right-icon small">
+                                        All <span class="glyphicon glyphicon-ok-circle"></span>
+                                    </a>
+                                    <a id="none-partitions-link" href="#"
+                                       class="btn btn-default transparent right-icon small">
+                                        None <span class="glyphicon glyphicon-ban-circle"></span>
+                                    </a>
+                                </div>
+                                <div class="form-group col col-md-2">
+                                    <div class="input-group">
+                                        <input
+                                                id="offsets-timestamp"
+                                                type="text"
+                                                name="offsetsTimestamp"
                                                 th:value="${browseParams.offsetsTimestamp}"
-                                                class="form-control" 
+                                                class="form-control"
                                                 title="Search offsets for time"/>
-                                            <span class="input-group-btn">
-                                                <a 
-                                                    id="search-offsets-for-time-link" href="#" 
-                                                    class="btn btn-primary"
-                                                    title="Search offsets for time">
+                                        <span class="input-group-btn">
+                                                <a
+                                                        id="search-offsets-for-time-link" href="#"
+                                                        class="btn btn-primary"
+                                                        title="Search offsets for time">
                                                     <span class="glyphicon glyphicon-search"></span>
                                                 </a>
                                             </span>
-                                        </div>
                                     </div>
                                 </div>
+                            </div>
 
-                                <div class="row" th:each="batch : ${browseParams.listPartitionBatches(3)}">
-                                    <th:block 
-                                        th:each="partition : ${batch}" 
+                            <div class="row" th:each="batch : ${browseParams.listPartitionBatches(3)}">
+                                <th:block
+                                        th:each="partition : ${batch}"
                                         th:with="enabled=${browseParams.isPartitionEnabled(partition)},offset=${browseParams.getPartitionOffset(partition)},range=${offsetRanges.get(partition)}">
-                                        <div class="form-group col col-md-4">
-                                            <div class="input-group">
-                                                <span class="input-group-addon" th:text="${partition}"></span>
-                                                <span class="input-group-addon">
-                                                    <input 
-                                                        type="checkbox" 
-                                                        class="partition-checkbox" 
-                                                        th:attr="data-partition=${partition}" 
-                                                        th:checked="${enabled}"/>
+                                    <div class="form-group col col-md-4">
+                                        <div class="input-group">
+                                            <span class="input-group-addon" th:text="${partition}"></span>
+                                            <span class="input-group-addon">
+                                                    <input
+                                                            type="checkbox"
+                                                            class="partition-checkbox"
+                                                            th:attr="data-partition=${partition}"
+                                                            th:checked="${enabled}"/>
                                                 </span>
-                                                <span class="input-group-addon" th:text="${'[' + range.smallest}"></span>
-                                                <input 
+                                            <span class="input-group-addon" th:text="${'[' + range.smallest}"></span>
+                                            <input
                                                     type="number"
                                                     class="form-control"
                                                     th:min="${range.smallest}"
                                                     th:max="${range.largest}"
-                                                    th:disabled="${!enabled}" 
-                                                    th:id="${'p_' + partition}" 
-                                                    th:name="${'p_' + partition}" 
+                                                    th:disabled="${!enabled}"
+                                                    th:id="${'p_' + partition}"
+                                                    th:name="${'p_' + partition}"
                                                     th:value="${offset}"/>
-                                                <span class="input-group-addon" th:text="${range.largest + (range.largestInclusive ? ']' : ')')}"></span>
-                                                <input 
-                                                    type="hidden" 
-                                                    th:id="${'pe_' + partition}" 
-                                                    th:name="${'pe_' + partition}" 
+                                            <span class="input-group-addon"
+                                                  th:text="${range.largest + (range.largestInclusive ? ']' : ')')}"></span>
+                                            <input
+                                                    type="hidden"
+                                                    th:id="${'pe_' + partition}"
+                                                    th:name="${'pe_' + partition}"
                                                     th:value="${enabled ? '1' : '0'}"/>
-                                            </div>
                                         </div>
-                                    </th:block>
-                                </div>
-                                
-                                <div 
-                                    class="panel panel-default" 
-                                    id="column-selector-panel" 
-                                    th:if="${fetchedRecords != null AND !fetchedRecords.isEmpty()}">
-                                    <div class="panel-heading">
-                                        <h4 class="panel-title">
-                                            <a data-toggle="collapse" href="#column-selector">Columns</a>
-                                        </h4>
                                     </div>
-                                    <div id="column-selector" class="panel-collapse collapse">
-                                        <div class="panel-body">
-                                            <a id="all-columns-link" href="#" class="btn btn-default right-icon small">
-                                                All <span class="glyphicon glyphicon-ok-circle"></span>
-                                            </a>
-                                            <a id="none-columns-link" href="#" class="btn btn-default right-icon small">
-                                                None <span class="glyphicon glyphicon-ban-circle"></span>
-                                            </a>
-                                            <div 
-                                                class="row" 
+                                </th:block>
+                            </div>
+
+                            <div
+                                    class="panel panel-default"
+                                    id="column-selector-panel"
+                                    th:if="${fetchedRecords != null AND !fetchedRecords.isEmpty()}">
+                                <div class="panel-heading">
+                                    <h4 class="panel-title">
+                                        <a data-toggle="collapse" href="#column-selector">Columns</a>
+                                    </h4>
+                                </div>
+                                <div id="column-selector" class="panel-collapse collapse">
+                                    <div class="panel-body">
+                                        <a id="all-columns-link" href="#" class="btn btn-default right-icon small">
+                                            All <span class="glyphicon glyphicon-ok-circle"></span>
+                                        </a>
+                                        <a id="none-columns-link" href="#" class="btn btn-default right-icon small">
+                                            None <span class="glyphicon glyphicon-ban-circle"></span>
+                                        </a>
+                                        <div
+                                                class="row"
                                                 th:with="groupSize=${fetchedRecords.determineColumnsGroupSize(4,30)}">
-                                                <th:block th:each="groupIndex : ${#numbers.sequence(0, 3)}">
-                                                    <div class="col col-md-3">
-                                                        <th:block th:each="columnGroup : ${fetchedRecords.getColumnsGroup(groupIndex,groupSize)}">
-                                                            <div 
-                                                                class="checkbox" 
+                                            <th:block th:each="groupIndex : ${#numbers.sequence(0, 3)}">
+                                                <div class="col col-md-3">
+                                                    <th:block
+                                                            th:each="columnGroup : ${fetchedRecords.getColumnsGroup(groupIndex,groupSize)}">
+                                                        <div
+                                                                class="checkbox"
                                                                 style="margin: 0px auto;"
                                                                 th:each="column : ${columnGroup}">
-                                                                <label
-                                                                    th:class="${!column.present ? 'text-muted' : ''}" 
+                                                            <label
+                                                                    th:class="${!column.present ? 'text-muted' : ''}"
                                                                     style="word-wrap:break-word;">
-                                                                    <input 
+                                                                <input
                                                                         class="column-checkbox"
-                                                                        type="checkbox" 
-                                                                        th:name="${'ce_' + column.name}" 
+                                                                        type="checkbox"
+                                                                        th:name="${'ce_' + column.name}"
                                                                         th:attr="data-column=${column.name}"
                                                                         th:checked="${browseParams.isColumnEnabled(column.name)}"/>
-                                                                    <span th:text="${column.name}"></span>
-                                                                </label>
-                                                            </div>
-                                                        </th:block>
-                                                    </div>
-                                                </th:block>
-                                            </div>
+                                                                <span th:text="${column.name}"></span>
+                                                            </label>
+                                                        </div>
+                                                    </th:block>
+                                                </div>
+                                            </th:block>
                                         </div>
                                     </div>
                                 </div>
-        
-                                <div class="row">
-                                    <div class="form-group col col-md-2">
-                                        <label for="timeout">Timeout (MS)</label>
-                                        <input 
-                                            type="number" 
-                                            class="form-control" 
+                            </div>
+
+                            <div class="row">
+                                <div class="form-group col col-md-2">
+                                    <label for="timeout">Timeout (MS)</label>
+                                    <input
+                                            type="number"
+                                            class="form-control"
                                             min="-1"
                                             max="300000"
-                                            id="timeout" 
-                                            name="timeout" 
+                                            id="timeout"
+                                            name="timeout"
                                             th:value="${browseParams.timeout}"/>
-                                    </div>
-                                    <div class="form-group col col-md-1">
-                                        <label for="limit">Limit</label>
-                                        <input 
+                                </div>
+                                <div class="form-group col col-md-1">
+                                    <label for="limit">Limit</label>
+                                    <input
                                             type="number"
                                             style="min-width: 80px"
-                                            class="form-control" 
+                                            class="form-control"
                                             min="10"
                                             max="100"
-                                            id="limit" 
-                                            name="limit" 
+                                            id="limit"
+                                            name="limit"
                                             th:value="${browseParams.limit}"/>
-                                    </div>
                                 </div>
-        
-                                <button type="submit" class="btn btn-primary">Fetch</button>
-                                
-                                <a 
-                                    th:if="${nextOffsets != null AND !nextOffsets.isEmpty()}" 
-                                    id="next-offsets-link" 
-                                    href="#" 
+                            </div>
+
+                            <button type="submit" class="btn btn-primary">Fetch</button>
+
+                            <a
+                                    th:if="${nextOffsets != null AND !nextOffsets.isEmpty()}"
+                                    id="next-offsets-link"
+                                    href="#"
                                     class="btn btn-primary right-icon">
-                                    Next <i class="fa fa-forward"></i>
-                                </a>
-                            </form>
-                        
-                        </div>
+                                Next <i class="fa fa-forward"></i>
+                            </a>
+                        </form>
+
                     </div>
-        
-                    <div class="panel panel-default" th:if="${fetchedRecords != null}">
-                        <div class="panel-body pre-scrollable" style="padding-top: 0;">
-                        
-                            <span th:text="${fetchSummary}"></span>
-                            
-                            <table
-                                th:if="${!fetchedRecords.isEmpty()}" 
-                                class="table table-bordered table-striped table-hover table-condensed">
-                                <thead>
-                                    <tr>
-                                        <td class="sticky-col">Partition</td>
-                                        <td class="sticky-col">Offset</td>
-                                        <td class="sticky-col">Timestamp (UTC)</td>
-                                        <td class="sticky-col">Key/Value Size</td>
-                                        <td class="sticky-col">Key</td>
-                                        <td class="sticky-col">Attributes</td>
-                                        <td 
-                                            class="sticky-col" 
-                                            th:each="column : ${fetchedRecords.listSelectedColumns()}"
-                                        >
-                                            <span 
-                                                th:text="${column.name}" 
-                                                th:class="${!column.present ? 'text-muted' : ''}">
-                                            </span>
-                                        </td>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr th:each="record : ${fetchedRecords}">
-                                        <td th:text="${record.partition}"></td>
-                                        <td th:text="${record.offset}"></td>
-                                        <td th:text="${record.timestampFormatted}"></td>
-                                        <td th:text="${record.keyValueSizeFormatted}"></td>
-                                        <td 
-                                            th:if="${record.nullKey}"
-                                            class="danger"
-                                            title="Record Key is NULL">
-                                        </td>
-                                        <td 
-                                            th:if="${!record.nullKey}"
-                                            th:text="${record.key}"
-                                            style="word-wrap: break-word;min-width:50px;max-width:300px;">
-                                        </td>
-                                        <td style="max-width:100px;">
-                                            <a 
-                                                th:if="${record.hasAttributes()}"
-                                                href="javascript:void(0);"
-                                                data-toggle="popover"
-                                                th:attr="data-content=${record.attributesPrettyJson}">
-                                                <span class="glyphicon glyphicon-list"></span>
-                                            </a>
-                                        </td>
-                                        <td 
-                                            th:if="${record.nullValue}"
-                                            th:colspan="${fetchedRecords.listSelectedColumns().size()}"
-                                            class="danger"
-                                            title="Record Value is NULL">
-                                        </td>
-                                        <td 
-                                            th:if="${!record.nullValue}"
-                                            th:each="column : ${fetchedRecords.listSelectedColumns()}"
-                                            th:title="${record.typeSimpleName(column)}">
-                                            <span th:text="${record.get(column)}"></span>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        
-                        </div>
-                    </div>
-        
                 </div>
-        
+
+                <div class="panel panel-default" th:if="${fetchedRecords != null}">
+                    <div class="panel-body pre-scrollable" style="padding-top: 0;">
+
+                        <span th:text="${fetchSummary}"></span>
+
+                        <table
+                                th:if="${!fetchedRecords.isEmpty()}"
+                                class="table table-bordered table-striped table-hover table-condensed">
+                            <thead>
+                            <tr>
+                                <td class="sticky-col">Partition</td>
+                                <td class="sticky-col">Offset</td>
+                                <td class="sticky-col">Timestamp (UTC)</td>
+                                <td class="sticky-col">Key/Value Size</td>
+                                <td class="sticky-col">Key</td>
+                                <td class="sticky-col">Headers</td>
+                                <td class="sticky-col">Attributes</td>
+                                <td
+                                        class="sticky-col"
+                                        th:each="column : ${fetchedRecords.listSelectedColumns()}">
+                                            <span
+                                                    th:text="${column.name}"
+                                                    th:class="${!column.present ? 'text-muted' : ''}">
+                                            </span>
+                                </td>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr th:each="record : ${fetchedRecords}">
+                                <td th:text="${record.partition}"></td>
+                                <td th:text="${record.offset}"></td>
+                                <td th:text="${record.timestampFormatted}"></td>
+                                <td th:text="${record.keyValueSizeFormatted}"></td>
+                                <td
+                                        th:if="${record.nullKey}"
+                                        class="danger"
+                                        title="Record Key is NULL">
+                                </td>
+                                <td
+                                        th:if="${!record.nullKey}"
+                                        th:text="${record.key}"
+                                        style="word-wrap: break-word;min-width:50px;max-width:300px;">
+                                </td>
+                                <td style="max-width:50px;width:50px;">
+                                    <a
+                                            th:if="${record.hasHeaders()}"
+                                            href="javascript:void(0)"
+                                            th:attr="data-container='body',data-content=${record.headersPrettyJson},title='Headers',data-html=true"
+                                            data-toggle="popover"
+                                            data-html="true">
+                                        <span class="glyphicon glyphicon-eye-open"></span>
+                                    </a>
+                                </td>
+                                <td style="max-width:50px;width:50px;">
+                                    <a
+                                            th:if="${record.hasAttributes()}"
+                                            href="javascript:void(0);"
+                                            data-toggle="popover"
+                                            th:attr="data-container='body',data-content=${record.attributesPrettyJson}, title='Attributes',data-html=true">
+                                        <span class="glyphicon glyphicon-list-alt"></span>
+                                    </a>
+                                </td>
+                                <td
+                                        th:if="${record.nullValue}"
+                                        th:colspan="${fetchedRecords.listSelectedColumns().size()}"
+                                        class="danger"
+                                        title="Record Value is NULL">
+                                </td>
+                                <td
+                                        th:if="${!record.nullValue}"
+                                        th:each="column : ${fetchedRecords.listSelectedColumns()}"
+                                        th:title="${record.typeSimpleName(column)}">
+                                    <span th:text="${record.get(column)}"></span>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+
+                    </div>
+                </div>
+
             </div>
-        
+
         </div>
 
     </div>
-    
-    <div th:replace="templates :: footer"></div>
-    
+
+</div>
+
+<div th:replace="templates :: footer"></div>
+
 </body>
 </html>
