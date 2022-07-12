@@ -235,7 +235,7 @@ public class TabularRecordsTest {
 
     @Test
     public void testAttributesHaveExpectedValues() throws Exception {
-        Record record = new Record(createTestConsumerRecord(null), null, null);
+        Record record = new Record(createTestConsumerRecord(null), null, null, null);
 
         Assert.assertNull(record.getAttributesJson());
         Assert.assertNull(record.getAttributesPrettyJson());
@@ -243,7 +243,8 @@ public class TabularRecordsTest {
         record = new Record(
                 createTestConsumerRecord(null),
                 null,
-                Collections.singletonMap("attr_key", "attr_value"));
+                Collections.singletonMap("attr_key", "attr_value"),
+                new HashMap<>());
 
         Assert.assertNotNull(record.getAttributesJson());
         Assert.assertEquals("{\"attr_key\":\"attr_value\"}", record.getAttributesJson());
@@ -270,7 +271,7 @@ public class TabularRecordsTest {
                 values.put(columnName, columnName + "_value");
             }
         }
-        return new Record(createTestConsumerRecord(key), values, null);
+        return new Record(createTestConsumerRecord(key), values, null, null);
     }
 
     private ConsumerRecord<?, ?> createTestConsumerRecord(String key) {

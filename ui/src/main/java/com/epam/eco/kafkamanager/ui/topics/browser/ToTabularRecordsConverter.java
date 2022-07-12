@@ -15,6 +15,7 @@
  *******************************************************************************/
 package com.epam.eco.kafkamanager.ui.topics.browser;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -60,7 +61,9 @@ public class ToTabularRecordsConverter {
                 valueTabulator.toTabularValue((ConsumerRecord)consumerRecord);
         Map<String, Object> attributes =
                 valueTabulator.getAttributes((ConsumerRecord)consumerRecord);
-        return new Record(consumerRecord, tabularValue, attributes);
+        Map<String, String> headers = new HashMap<>();
+        consumerRecord.headers().forEach( header -> headers.put(header.key(),new String(header.value())));
+        return new Record(consumerRecord, tabularValue, attributes, headers);
     }
 
     private static RecordValueTabulator<?> determineValueTabulator(
