@@ -17,6 +17,7 @@ package com.epam.eco.kafkamanager.ui.topics.browser;
 
 import com.epam.eco.kafkamanager.ui.topics.browser.TabularRecords.Record;
 import com.epam.eco.kafkamanager.utils.MapperUtils;
+import com.epam.eco.kafkamanager.utils.PrettyHtmlMapper;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.Validate;
@@ -329,7 +330,7 @@ public class TabularRecords implements Iterable<Record> {
                 return attributesPrettyJson;
             }
 
-            attributesPrettyJson = MapperUtils.toPrettyHtml(attributes);
+            attributesPrettyJson = PrettyHtmlMapper.toPrettyHtml(attributes);
             return attributesPrettyJson;
         }
 
@@ -341,7 +342,7 @@ public class TabularRecords implements Iterable<Record> {
                 return headersPrettyJson;
             }
 
-            headersPrettyJson = MapperUtils.toPrettyHtml(headers);
+            headersPrettyJson = PrettyHtmlMapper.toPrettyHtml(headers);
 
             return headersPrettyJson;
         }
