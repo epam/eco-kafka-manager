@@ -12,7 +12,7 @@ import java.util.stream.Collectors;
 
 public class PrettyHtmlMapper {
 
-    private static final int PADDING = 4;
+    public static final int PADDING = 4;
 
     private static final ObjectMapper MAPPER = new ObjectMapper();
 
