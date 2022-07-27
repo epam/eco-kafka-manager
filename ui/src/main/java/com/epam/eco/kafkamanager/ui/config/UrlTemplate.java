@@ -15,27 +15,26 @@
  *******************************************************************************/
 package com.epam.eco.kafkamanager.ui.config;
 
-import org.springframework.boot.context.properties.ConfigurationProperties;
-
 /**
- * @author Andrei_Tytsik
+ * @author Mikhail_Vershkov
  */
-@ConfigurationProperties(prefix = "eco.kafkamanager.ui")
-public class KafkaManagerUiProperties {
+public class UrlTemplate {
+    private String name;
+    private String urlTemplate;
 
-    private String gaTrackingId;
-    private UrlTemplate dataCatalogTool;
-
-    public UrlTemplate getDataCatalogTool() {return dataCatalogTool;}
-
-    public void setDataCatalogTool(UrlTemplate dataCatalogTool) {this.dataCatalogTool = dataCatalogTool;}
-
-    public String getGaTrackingId() {
-        return gaTrackingId;
+    public String getName() {
+        return name;
     }
 
-    public void setGaTrackingId(String gaTrackingId) {
-        this.gaTrackingId = gaTrackingId;
+    public void setName(String name) {
+        this.name = name;
     }
 
+    public String getUrlTemplate() {
+        return urlTemplate;
+    }
+
+    public void setUrlTemplate(String urlTemplate) {
+        this.urlTemplate = urlTemplate;
+    }
 }

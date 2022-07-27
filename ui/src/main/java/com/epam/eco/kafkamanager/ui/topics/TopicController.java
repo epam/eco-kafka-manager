@@ -86,6 +86,7 @@ public class TopicController {
     public static final String ATTR_MAX_REPLICATION_FACTOR = "maxReplicationFactor";
     public static final String ATTR_TOTAL_COUNT = "totalCount";
     public static final String ATTR_METADATA = "metadata";
+    public static final String ATTR_DATA_CATALOG_URL_RESOLVER = "dataCatalogUrlResolver";
 
     public static final String MAPPING_TOPICS = "/topics";
     public static final String MAPPING_TOPIC = MAPPING_TOPICS + "/{name}";
@@ -99,6 +100,9 @@ public class TopicController {
     public static final String MAPPING_METADATA = MAPPING_TOPIC + "/metadata";
 
     private static final int PAGE_SIZE = 30;
+
+    @Autowired
+    private DataCatalogUrlResolver dataCatalogUrlResolver;
 
     @Autowired
     private KafkaAdminOperations kafkaAdminOperations;
@@ -122,6 +126,7 @@ public class TopicController {
                 PageRequest.of(page, PAGE_SIZE));
 
         model.addAttribute(ATTR_SEARCH_CRITERIA, searchCriteria);
+        model.addAttribute(ATTR_DATA_CATALOG_URL_RESOLVER, dataCatalogUrlResolver);
         model.addAttribute(ATTR_PAGE, wrap(topicPage));
         model.addAttribute(ATTR_TOTAL_COUNT, kafkaManager.getTopicCount());
 

@@ -209,6 +209,8 @@
                                     <td>Config</td>
                                     <td>Consumer Groups</td>
                                     <td>Description</td>
+                                    <td>Topic data</td>
+                                    <td th:if="${dataCatalogUrlResolver.showDataCatalogColumn()}" th:text="${dataCatalogUrlResolver.toolName}"></td>
                                 </tr>
                             </thead>
                             <tbody>
@@ -236,6 +238,16 @@
                                     <td 
                                         th:text="${topic.metadataDescription}" 
                                         style="word-wrap:break-word;max-width:150px">
+                                    </td>
+                                    <td style="text-align: center;width:50px;">
+                                        <a th:href="@{/topics/{name}/browser(name=${topic.name})}">
+                                            <span class="glyphicon glyphicon-search"></span>
+                                        </a>
+                                    </td>
+                                    <td th:if="${dataCatalogUrlResolver.showDataCatalogColumn()}" style="text-align: center;width:50px;">
+                                        <a th:href="@{|${dataCatalogUrlResolver.resolve(topic.name)}|}" target="_blank">
+                                            <span class="glyphicon glyphicon-share"></span>
+                                        </a>
                                     </td>
                                 </tr>
                             </tbody>
