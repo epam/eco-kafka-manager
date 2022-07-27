@@ -15,11 +15,13 @@
  *******************************************************************************/
 package com.epam.eco.kafkamanager.ui.home;
 
+import org.apache.kafka.common.internals.Topic;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 import com.epam.eco.kafkamanager.ui.brokers.BrokerController;
+import com.epam.eco.kafkamanager.ui.topics.TopicController;
 
 /**
  * @author Andrei_Tytsik
@@ -31,7 +33,7 @@ public class HomeController {
 
     @RequestMapping(value=MAPPING_ROOT, method=RequestMethod.GET)
     public String root() {
-        return "redirect:" + BrokerController.MAPPING_BROKERS;
+        return "redirect:" + TopicController.MAPPING_TOPICS;
     }
 
 }
