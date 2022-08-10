@@ -32,7 +32,7 @@ public class CsvPermissionExporter implements PermissionExporter {
 
     @Override
     public void export(Collection<PermissionInfo> permissionInfos, Writer out) throws IOException {
-        CSVPrinter csvPrinter = CSVFormat.DEFAULT.withHeader((String[]) HEADERS.toArray()).print(out);
+        CSVPrinter csvPrinter = CSVFormat.DEFAULT.withHeader(HEADERS.toArray(new String[0])).print(out);
         for (PermissionInfo permissionInfo : permissionInfos) {
             csvPrinter.printRecord(toCsvRecord(permissionInfo));
         }
