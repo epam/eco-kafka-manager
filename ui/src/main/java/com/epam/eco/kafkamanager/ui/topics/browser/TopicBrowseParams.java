@@ -25,6 +25,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import org.apache.commons.collections4.ListUtils;
+import org.apache.kafka.clients.admin.Config;
 
 import com.epam.eco.kafkamanager.TopicRecordFetchParams;
 import com.epam.eco.kafkamanager.TopicRecordFetchParams.DataFormat;
@@ -38,6 +39,8 @@ public class TopicBrowseParams extends HashMap<String, Object> {
 
     public static final String TOPIC_NAME = "topicName";
     public static final String KEY_FORMAT = "keyFormat";
+
+    public static final String KAFKA_TOPIC_CONFIG = "kafkaTopicConfig";
     public static final String VALUE_FORMAT = "valueFormat";
     public static final String OFFSETS_TIMESTAMP = "offsetsTimestamp";
     public static final String TIMEOUT = "timeout";
@@ -53,6 +56,18 @@ public class TopicBrowseParams extends HashMap<String, Object> {
         if (requestParams != null) {
             putAll(requestParams);
         }
+    }
+
+    public boolean isAvroOrProtobufValueFormat() {
+        return getAsDataFormat(VALUE_FORMAT) == DataFormat.AVRO || getAsDataFormat(VALUE_FORMAT) == DataFormat.PROTOCOL_BUFFERS;
+    }
+
+    public Config getKafkaTopicConfig() {
+        return (Config)get(KAFKA_TOPIC_CONFIG);
+    }
+
+    public void setKafkaTopicConfig(Config kafkaTopicConfig) {
+        put(KAFKA_TOPIC_CONFIG, kafkaTopicConfig);
     }
 
     public String getTopicName() {

@@ -370,7 +370,8 @@
                                 <td class="sticky-col">Key/Value Size</td>
                                 <td class="sticky-col">Key</td>
                                 <td class="sticky-col">Headers</td>
-                                <td class="sticky-col">Attributes</td>
+                                <td th:if="${browseParams.isAvroOrProtobufValueFormat()}" class="sticky-col">Attributes</td>
+                                <td th:if="${browseParams.isAvroOrProtobufValueFormat() and schemaCatalogUrlResolver.showColumn()}" class="sticky-col">Schema</td>
                                 <td
                                         class="sticky-col"
                                         th:each="column : ${fetchedRecords.listSelectedColumns()}">
@@ -397,25 +398,44 @@
                                         th:text="${record.key}"
                                         style="word-wrap: break-word;min-width:50px;max-width:300px;">
                                 </td>
-                                <td style="max-width:50px;width:50px;text-align:center;">
-                                    <a
-                                            th:if="${record.hasHeaders()}"
-                                            href="javascript:void(0)"
-                                            th:attr="data-container='body',data-content=${record.headersPrettyJson},title='Headers',data-html=true"
-                                            data-toggle="popover"
-                                            data-html="true">
+                                <td style="text-align: center;vertical-align: middle;">
+                                    <a style="vertical-align: middle"
+                                       th:if="${record.hasHeaders()}"
+                                       href="javascript:void(0)"
+                                       th:attr="data-container='body',data-content=${record.headersPrettyJson},title='Headers',data-html=true"
+                                       data-toggle="popover"
+                                       data-html="true">
                                         <span class="glyphicon glyphicon-eye-open"></span>
                                     </a>
                                 </td>
-                                <td style="max-width:50px;width:50px;text-align:center;">
-                                    <a
-                                            th:if="${record.hasAttributes()}"
-                                            href="javascript:void(0);"
-                                            data-toggle="popover"
-                                            th:attr="data-container='body',data-content=${record.attributesPrettyJson}, title='Attributes',data-html=true">
+
+                                <td th:if="${browseParams.isAvroOrProtobufValueFormat()}"
+                                    style="text-align: center;vertical-align: middle;">
+                                    <a style="vertical-align: middle"
+                                       th:if="${record.hasAttributes()}"
+                                       href="javascript:void(0);"
+                                       data-toggle="popover"
+                                       th:attr="data-container='body',data-content=${record.attributesPrettyJson}, title='Attributes',data-html=true">
                                         <span class="glyphicon glyphicon-list-alt"></span>
                                     </a>
                                 </td>
+
+                                <td th:if="${record.hasAttributes() and schemaCatalogUrlResolver.showColumn()}">
+                                    <div style="justify-content:center;display:flex;flex-direction:row;align-items: center;">
+                                        <a th:href="@{|${schemaCatalogUrlResolver.resolve(record.RegistrySchema.schemaName)}|}"
+                                           target="_blank">
+                                            <span th:text="${record.RegistrySchema.schemaName}"></span>
+                                        </a>
+                                        <a
+                                                th:if="${record.hasAttributes()}"
+                                                href="javascript:void(0);"
+                                                data-toggle="popover"
+                                                th:attr="data-container='body',data-content=${record.RegistrySchema.schemaAsString}, title=${record.RegistrySchema.schemaType.name() + ' schema'},data-html=true">
+                                            <span class="glyphicon glyphicon-list-alt"></span>
+                                        </a>
+                                    </div>
+                                </td>
+
                                 <td
                                         th:if="${record.nullValue}"
                                         th:colspan="${fetchedRecords.listSelectedColumns().size()}"

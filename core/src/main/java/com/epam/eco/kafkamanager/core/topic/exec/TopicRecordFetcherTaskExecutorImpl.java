@@ -37,6 +37,7 @@ import com.epam.eco.kafkamanager.exec.AbstractTaskExecutor;
 import com.epam.eco.kafkamanager.exec.TaskResult;
 
 import io.confluent.kafka.serializers.KafkaAvroDeserializer;
+import io.confluent.kafka.serializers.protobuf.KafkaProtobufDeserializer;
 
 /**
  * @author Andrei_Tytsik
@@ -89,6 +90,8 @@ public class TopicRecordFetcherTaskExecutorImpl<K, V> extends AbstractTaskExecut
             builder.deserializer(JsonStringDeserializer.class, isKey);
         } else if (DataFormat.HEX_STRING == dataFormat) {
             builder.deserializer(HexStringDeserializer.class, isKey);
+        } else if (DataFormat.PROTOCOL_BUFFERS == dataFormat) {
+            builder.deserializer(KafkaProtobufDeserializer.class, isKey);
         } else {
             throw new IllegalArgumentException(
                     String.format("Data format '%s' not supported", dataFormat));

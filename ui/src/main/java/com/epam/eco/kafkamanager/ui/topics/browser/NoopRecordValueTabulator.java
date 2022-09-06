@@ -18,12 +18,21 @@ package com.epam.eco.kafkamanager.ui.topics.browser;
 import java.util.Collections;
 import java.util.Map;
 
+import org.apache.kafka.clients.admin.Config;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
+
+import com.epam.eco.kafkamanager.TopicRecordFetchParams;
 
 /**
  * @author Andrei_Tytsik
  */
 public class NoopRecordValueTabulator implements RecordValueTabulator<Object> {
+
+    private final Config kafkaTopicConfig;
+
+    public NoopRecordValueTabulator(Config kafkaTopicConfig) {
+        this.kafkaTopicConfig = kafkaTopicConfig;
+    }
 
     @Override
     public Map<String, Object> toTabularValue(ConsumerRecord<?, Object> record) {
@@ -34,6 +43,16 @@ public class NoopRecordValueTabulator implements RecordValueTabulator<Object> {
     @Override
     public Map<String, Object> getAttributes(ConsumerRecord<?, Object> record) {
         return null;
+    }
+
+    @Override
+    public RegistrySchema getSchema(ConsumerRecord<?, ?> record) {
+        return new RegistrySchema(record,"",this.kafkaTopicConfig,TopicRecordFetchParams.DataFormat.STRING);
+    }
+
+    @Override
+    public Config getKafkaTopicConfig() {
+        return this.kafkaTopicConfig;
     }
 
     private String columnName(Object value) {

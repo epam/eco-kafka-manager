@@ -1,0 +1,13 @@
+syntax = "proto2";
+
+package kafkaManager.test;
+
+option java_multiple_files = true;
+option java_package = "com.epam.eco.kafkamanager.ui.browser.protobuf";
+
+message ProtobufRecord {
+  required string operationId = 1;
+  required int32 docId = 2;
+  optional string metadataTt = 3;
+  optional string metadataBt = 4;
+}

@@ -73,7 +73,7 @@ public class TopicRecordFetchParams {
     }
 
     public enum DataFormat {
-        AVRO, STRING, JSON_STRING, HEX_STRING
+        AVRO, STRING, JSON_STRING, HEX_STRING, PROTOCOL_BUFFERS
     }
 
 }

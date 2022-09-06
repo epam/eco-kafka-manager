@@ -25,6 +25,15 @@ public class KafkaManagerUiProperties {
 
     private String gaTrackingId;
     private UrlTemplate dataCatalogTool;
+    private UrlTemplate schemaCatalogTool;
+
+    public UrlTemplate getSchemaCatalogTool() {
+        return schemaCatalogTool;
+    }
+
+    public void setSchemaCatalogTool(UrlTemplate schemaCatalogTool) {
+        this.schemaCatalogTool = schemaCatalogTool;
+    }
 
     public UrlTemplate getDataCatalogTool() {return dataCatalogTool;}
 

@@ -210,7 +210,7 @@
                                     <td>Consumer Groups</td>
                                     <td>Description</td>
                                     <td>Topic data</td>
-                                    <td th:if="${dataCatalogUrlResolver.showDataCatalogColumn()}" th:text="${dataCatalogUrlResolver.toolName}"></td>
+                                    <td th:if="${dataCatalogUrlResolver.showColumn()}" th:text="${dataCatalogUrlResolver.toolName}"></td>
                                 </tr>
                             </thead>
                             <tbody>
@@ -244,7 +244,7 @@
                                             <span class="glyphicon glyphicon-search"></span>
                                         </a>
                                     </td>
-                                    <td th:if="${dataCatalogUrlResolver.showDataCatalogColumn()}" style="text-align: center;width:50px;">
+                                    <td th:if="${dataCatalogUrlResolver.showColumn()}" style="text-align: center;width:50px;">
                                         <a th:href="@{|${dataCatalogUrlResolver.resolve(topic.name)}|}" target="_blank">
                                             <span class="glyphicon glyphicon-share"></span>
                                         </a>

@@ -36,10 +36,12 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import com.epam.eco.commons.kafka.OffsetRange;
 import com.epam.eco.commons.kafka.helpers.PartitionRecordFetchResult;
 import com.epam.eco.commons.kafka.helpers.RecordFetchResult;
+import com.epam.eco.kafkamanager.KafkaAdminOperations;
 import com.epam.eco.kafkamanager.KafkaManager;
 import com.epam.eco.kafkamanager.TopicRecordFetchParams;
 import com.epam.eco.kafkamanager.TopicRecordFetchParams.DataFormat;
 import com.epam.eco.kafkamanager.exec.TaskResult;
+import com.epam.eco.kafkamanager.ui.topics.SchemaCatalogUrlResolver;
 import com.epam.eco.kafkamanager.ui.topics.TopicController;
 
 /**
@@ -52,32 +54,38 @@ public class TopicBrowserController {
 
     public static final String MAPPING = TopicController.MAPPING_TOPIC + "/browser";
     public static final String MAPPING_OFFSETS_FOR_TIMES = MAPPING + "/offsets_for_times";
-
-    public static final String ATTR_TOPIC_NAME = "topicName";
     public static final String ATTR_BROWSE_PARAMS = "browseParams";
     public static final String ATTR_OFFSET_RANGES = "offsetRanges";
     public static final String ATTR_FETCHED_RECORDS = "fetchedRecords";
     public static final String ATTR_FETCH_SUMMARY = "fetchSummary";
     public static final String ATTR_NEXT_OFFSETS = "nextOffsets";
-    public static final String ATTR_OFFSETS_FOR_TIMES = "offsetsForTimes";
+
+    public static final String ATTR_SCHEMA_CATALOG_URL_RESOLVER = "schemaCatalogUrlResolver";
 
     private static final long DEFAULT_FETCH_TIMEOUT = 30_000;
 
     @Autowired
     private KafkaManager kafkaManager;
 
+    @Autowired
+    private KafkaAdminOperations kafkaAdminOperations;
+
+    @Autowired
+    private SchemaCatalogUrlResolver schemaCatalogUrlResolver;
+
     @PreAuthorize("@authorizer.isPermitted('TOPIC', #topicName, 'READ')")
     @RequestMapping(value=MAPPING, method=RequestMethod.GET)
     public String params(
             @PathVariable("name") String topicName,
             Model model) {
-        TopicBrowseParams browseParams = (TopicBrowseParams)model.asMap().get(ATTR_BROWSE_PARAMS);
-        if (browseParams == null) {
+        TopicBrowseParams browseParams = (TopicBrowseParams) model.asMap().get(ATTR_BROWSE_PARAMS);
+        if (browseParams==null) {
             browseParams = TopicBrowseParams.with(null);
             browseParams.setTopicName(topicName);
         }
 
         handleParamsRequest(browseParams, model::addAttribute);
+        model.addAttribute(ATTR_SCHEMA_CATALOG_URL_RESOLVER, schemaCatalogUrlResolver);
 
         return VIEW;
     }
@@ -105,7 +113,7 @@ public class TopicBrowserController {
         Map<TopicPartition, Long> offsetsForTimes =
                 kafkaManager.getTopicOffsetForTimeFetcherTaskExecutor().execute(topicName, timestamp);
         Map<Integer, Long> offsets = offsetsForTimes.entrySet().stream().
-                filter(e -> e.getValue() != null).
+                filter(e -> e.getValue()!=null).
                 collect(Collectors.toMap(
                         entry -> entry.getKey().partition(),
                         entry -> entry.getValue()));
@@ -120,8 +128,14 @@ public class TopicBrowserController {
         setDefaultDataFormatsIfMissing(browseParams);
         populateMissingAndFixInvalidOffsets(offsetRanges, browseParams);
 
+        addTopicConfigParams(browseParams);
+
         modelAttributes.accept(ATTR_BROWSE_PARAMS, browseParams);
         modelAttributes.accept(ATTR_OFFSET_RANGES, offsetRanges);
+    }
+
+    private void addTopicConfigParams(TopicBrowseParams browserParams) {
+        browserParams.setKafkaTopicConfig(kafkaAdminOperations.describeTopicConfig(browserParams.getTopicName()));
     }
 
     private void handleFetchRequest(TopicBrowseParams browseParams, BiConsumer<String, Object> modelAttributes) {
@@ -161,9 +175,9 @@ public class TopicBrowserController {
     private Map<Integer, Long> getNextOffsetsOrNullIfEndOfTopic(
             RecordFetchResult<Object, Object> fetchResult) {
         Map<Integer, Long> nextOffsets = null;
-        for (PartitionRecordFetchResult<Object, Object> perPartinionResult : fetchResult.getPerPartitionResults()) {
+        for(PartitionRecordFetchResult<Object, Object> perPartinionResult : fetchResult.getPerPartitionResults()) {
             if (perPartinionResult.getScannedOffsets().getLargest() < perPartinionResult.getPartitionOffsets().getLargest()) {
-                nextOffsets = nextOffsets != null ? nextOffsets : new HashMap<>();
+                nextOffsets = nextOffsets!=null ? nextOffsets : new HashMap<>();
                 nextOffsets.put(
                         perPartinionResult.getPartition().partition(),
                         perPartinionResult.getScannedOffsets().getLargest() + 1);
@@ -180,7 +194,7 @@ public class TopicBrowserController {
 
     private void setDefaultDataFormatsIfMissing(TopicBrowseParams fetchRequestParams) {
         fetchRequestParams.setKeyFormatIfMissing(DataFormat.STRING);
-        fetchRequestParams.setValueFormatIfMissing(DataFormat.STRING);
+        fetchRequestParams.setValueFormatIfMissing(DataFormat.AVRO);
     }
 
     private void populateMissingAndFixInvalidOffsets(

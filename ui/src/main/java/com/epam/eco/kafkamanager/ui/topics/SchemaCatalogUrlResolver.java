@@ -22,24 +22,24 @@ import static java.util.Objects.nonNull;
 /**
  * @author Mikhail_Vershkov
  */
-public class DataCatalogUrlResolver {
+public class SchemaCatalogUrlResolver {
     private final KafkaManagerUiProperties kafkaManagerUiProperties;
 
-    public DataCatalogUrlResolver(KafkaManagerUiProperties kafkaManagerUiProperties) {
+    public SchemaCatalogUrlResolver(KafkaManagerUiProperties kafkaManagerUiProperties) {
         this.kafkaManagerUiProperties = kafkaManagerUiProperties;
     }
 
     public Boolean showColumn() {
-        return (nonNull(kafkaManagerUiProperties.getDataCatalogTool())
-                && nonNull(kafkaManagerUiProperties.getDataCatalogTool().getUrlTemplate()));
+        return (nonNull(kafkaManagerUiProperties.getSchemaCatalogTool())
+                && nonNull(kafkaManagerUiProperties.getSchemaCatalogTool().getUrlTemplate()));
     }
 
-    public String resolve(String topicName) {
-        return kafkaManagerUiProperties.getDataCatalogTool().getUrlTemplate().replace("{topicname}", topicName);
+    public String resolve(String schemaName) {
+        return kafkaManagerUiProperties.getSchemaCatalogTool().getUrlTemplate().replace("{schemaname}", schemaName);
     }
 
     public String getToolName() {
-        return kafkaManagerUiProperties.getDataCatalogTool().getName();
+        return kafkaManagerUiProperties.getSchemaCatalogTool().getName();
     }
 
 }
