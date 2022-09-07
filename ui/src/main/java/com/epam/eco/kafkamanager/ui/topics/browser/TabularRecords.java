@@ -173,7 +173,7 @@ public class TabularRecords implements Iterable<Record> {
 
         private final Map<String, String> headers;
 
-        private final RegistrySchema registrySchema;
+        private final RecordSchema registrySchema;
 
         private String attributesJson;
         private String attributesPrettyJson;
@@ -185,7 +185,7 @@ public class TabularRecords implements Iterable<Record> {
                 Map<String, Object> tabularValue,
                 Map<String, Object> attributes,
                 Map<String, String> headers,
-                RegistrySchema registrySchema) {
+                RecordSchema registrySchema) {
 
             Validate.notNull(consumerRecord, "Consumer Record is null");
 
@@ -236,7 +236,7 @@ public class TabularRecords implements Iterable<Record> {
             return formatSize(getValueSize());
         }
 
-        public RegistrySchema getRegistrySchema() {
+        public RecordSchema getRegistrySchema() {
             return registrySchema;
         }
 

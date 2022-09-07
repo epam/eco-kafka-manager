@@ -17,7 +17,6 @@ package com.epam.eco.kafkamanager.ui.topics.browser;
 
 import java.util.Map;
 
-import org.apache.kafka.clients.admin.Config;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 
 /**
@@ -26,6 +25,5 @@ import org.apache.kafka.clients.consumer.ConsumerRecord;
 public interface RecordValueTabulator<V> {
     Map<String, Object> toTabularValue(ConsumerRecord<?, V> record);
     Map<String, Object> getAttributes(ConsumerRecord<?, V> record);
-    RegistrySchema getSchema(ConsumerRecord<?, ?> record);
-    Config getKafkaTopicConfig();
+    RecordSchema getSchema(ConsumerRecord<?, ?> record);
 }

@@ -29,7 +29,7 @@ import com.google.protobuf.DynamicMessage;
 
 import com.epam.eco.kafkamanager.ui.browser.protobuf.Schema;
 import com.epam.eco.kafkamanager.ui.topics.browser.ProtobufRecordValueTabulator;
-import com.epam.eco.kafkamanager.ui.topics.browser.RegistrySchema;
+import com.epam.eco.kafkamanager.ui.topics.browser.RecordSchema;
 
 import static com.epam.eco.kafkamanager.ui.utils.SchemaSubjectUtils.KEY_STRATEGY_PROPERTY;
 import static com.epam.eco.kafkamanager.ui.utils.SchemaSubjectUtils.RECORD_NAME_STRATEGY;
@@ -76,7 +76,7 @@ public class ProtobufRecordValueTabulatorTest {
                 new ConfigEntry(VALUE_STRATEGY_PROPERTY, TOPIC_NAME_STRATEGY)));
         ProtobufRecordValueTabulator tabulator = new ProtobufRecordValueTabulator(config);
         DynamicMessage dynamicMessage = createDynamicMessage();
-        RegistrySchema schema = tabulator.getSchema(createConsumerRecord(dynamicMessage));
+        RecordSchema schema = tabulator.getSchema(createConsumerRecord(dynamicMessage));
         Assert.assertEquals(schema.getSchemaKey(), "testTopic-key");
         Assert.assertEquals(schema.getSchemaValue(), "testTopic-value");
     }
@@ -88,7 +88,7 @@ public class ProtobufRecordValueTabulatorTest {
                 new ConfigEntry(VALUE_STRATEGY_PROPERTY, RECORD_NAME_STRATEGY)));
         ProtobufRecordValueTabulator tabulator = new ProtobufRecordValueTabulator(config);
         DynamicMessage dynamicMessage = createDynamicMessage();
-        RegistrySchema schema = tabulator.getSchema(createConsumerRecord(dynamicMessage));
+        RecordSchema schema = tabulator.getSchema(createConsumerRecord(dynamicMessage));
         Assert.assertEquals(schema.getSchemaKey(), "kafkaManager.test.ProtobufRecord");
         Assert.assertEquals(schema.getSchemaValue(), "kafkaManager.test.ProtobufRecord");
     }
@@ -100,7 +100,7 @@ public class ProtobufRecordValueTabulatorTest {
                 new ConfigEntry(VALUE_STRATEGY_PROPERTY, TOPIC_RECORD_NAME_STRATEGY)));
         ProtobufRecordValueTabulator tabulator = new ProtobufRecordValueTabulator(config);
         DynamicMessage dynamicMessage = createDynamicMessage();
-        RegistrySchema schema = tabulator.getSchema(createConsumerRecord(dynamicMessage));
+        RecordSchema schema = tabulator.getSchema(createConsumerRecord(dynamicMessage));
         Assert.assertEquals(schema.getSchemaKey(), "testTopic-kafkaManager.test.ProtobufRecord");
         Assert.assertEquals(schema.getSchemaValue(), "testTopic-kafkaManager.test.ProtobufRecord");
     }

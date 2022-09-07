@@ -30,6 +30,7 @@ import com.google.protobuf.Descriptors;
 import com.google.protobuf.DynamicMessage;
 
 import com.epam.eco.kafkamanager.TopicRecordFetchParams;
+import com.epam.eco.kafkamanager.ui.utils.SchemaSubjectUtils;
 
 /**
  * @author Andrei_Tytsik
@@ -39,10 +40,12 @@ public class ProtobufRecordValueTabulator implements RecordValueTabulator<Object
     public static final String NA = "N/A";
     public static final String SEPARATOR = ".";
 
-    private final Config kafkaTopicConfig;
+    private final Config topicConfig;
 
-    public ProtobufRecordValueTabulator(Config kafkaTopicConfig) {
-        this.kafkaTopicConfig = kafkaTopicConfig;
+    public ProtobufRecordValueTabulator(Config topicConfig) {
+        Validate.notNull(topicConfig, "Topic config is null");
+
+        this.topicConfig = topicConfig;
     }
 
     @Override
@@ -78,14 +81,26 @@ public class ProtobufRecordValueTabulator implements RecordValueTabulator<Object
     }
 
     @Override
-    public RegistrySchema getSchema(ConsumerRecord<?, ?> record) {
-        DynamicMessage message = (DynamicMessage) record.value();
-        return new RegistrySchema(record, message.getDescriptorForType().getFullName(), kafkaTopicConfig, TopicRecordFetchParams.DataFormat.PROTOCOL_BUFFERS);
-    }
+    public RecordSchema getSchema(ConsumerRecord<?, ?> record) {
+        Validate.notNull(record, "Record is null");
 
-    @Override
-    public Config getKafkaTopicConfig() {
-        return this.kafkaTopicConfig;
+        if(record.value() == null || !(record.value() instanceof DynamicMessage)) {
+            return null;
+        }
+
+        DynamicMessage message = (DynamicMessage) record.value();
+
+        String schemaName = message.getDescriptorForType().getFullName();
+        String schemaKey = SchemaSubjectUtils.getSchemaSubjectKey(record.topic(), schemaName, topicConfig);
+        String schemaValue = SchemaSubjectUtils.getSchemaSubjectValue(record.topic(), schemaName, topicConfig);
+        String schemaAsString = message.getDescriptorForType().getFile().toProto().toString();
+
+        return new RecordSchema(
+                schemaName,
+                schemaKey,
+                schemaValue,
+                schemaAsString,
+                TopicRecordFetchParams.DataFormat.PROTOCOL_BUFFERS);
     }
 
     @SuppressWarnings("rawtypes")

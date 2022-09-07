@@ -88,6 +88,7 @@
         <openapi.version>1.6.9</openapi.version>
         <jackson.version>2.13.2</jackson.version>
         <jackson-databind.version>2.13.2.1</jackson-databind.version>
+        <protobuf.version>3.21.5</protobuf.version>
 
         <maven-release-plugin.version>2.5.3</maven-release-plugin.version>
         <maven-compiler-plugin.version>3.9.0</maven-compiler-plugin.version>
@@ -100,8 +101,6 @@
         <spotbugs-maven-plugin.version>4.6.0.0</spotbugs-maven-plugin.version>
         <findsecbugs-plugin.version>1.11.0</findsecbugs-plugin.version>
         <fb-contrib.version>7.4.3.sb</fb-contrib.version>
-        <protobuf.version>3.21.5</protobuf.version>
-        <protobuf.serializer.version>7.0.1</protobuf.serializer.version>
     </properties>
 
     <modules>
@@ -240,20 +239,18 @@
             <dependency>
                 <groupId>io.confluent</groupId>
                 <artifactId>kafka-protobuf-serializer</artifactId>
-                <version>${protobuf.serializer.version}</version>
+                <version>${cp.version}</version>
             </dependency>
             <dependency>
                 <groupId>io.confluent</groupId>
                 <artifactId>kafka-protobuf-provider</artifactId>
-                <version>${protobuf.serializer.version}</version>
+                <version>${cp.version}</version>
             </dependency>
             <dependency>
                 <groupId>io.confluent</groupId>
                 <artifactId>kafka-protobuf-types</artifactId>
-                <version>${protobuf.serializer.version}</version>
+                <version>${cp.version}</version>
             </dependency>
-
-
         </dependencies>
     </dependencyManagement>
 

@@ -119,9 +119,7 @@ public class TopicController {
         for(Entry<String, String> entry : paramsMap.entrySet()) {
             String key = entry.getKey();
             String value = entry.getValue();
-            if (
-                    TopicConfigDef.INSTANCE.key(key)==null ||
-                            (skipNulls && StringUtils.isBlank(value))) {
+            if (TopicConfigDef.INSTANCE.key(key) == null || (skipNulls && StringUtils.isBlank(value))) {
                 continue;
             }
             configs.put(key, StringUtils.stripToNull(value));

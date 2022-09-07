@@ -59,11 +59,19 @@ public class ToTabularRecordsConverter {
             RecordValueTabulator<?> valueTabulator) {
         Map<String, Object> tabularValue =
                 valueTabulator.toTabularValue((ConsumerRecord)consumerRecord);
+
         Map<String, Object> attributes =
                 valueTabulator.getAttributes((ConsumerRecord)consumerRecord);
+
         Map<String, String> headers = new HashMap<>();
         consumerRecord.headers().forEach( header -> headers.put(header.key(),new String(header.value())));
-        return new Record(consumerRecord, tabularValue, attributes, headers, valueTabulator.getSchema(consumerRecord));
+
+        return new Record(
+                consumerRecord,
+                tabularValue,
+                attributes,
+                headers,
+                valueTabulator.getSchema(consumerRecord));
     }
 
     private static RecordValueTabulator<?> determineValueTabulator(
@@ -71,13 +79,13 @@ public class ToTabularRecordsConverter {
         DataFormat dataFormat = browseParams.getValueFormat();
         if (DataFormat.AVRO == dataFormat) {
             return new AvroRecordValueTabulator(browseParams.getKafkaTopicConfig());
-        } else if (DataFormat.PROTOCOL_BUFFERS==dataFormat) {
+        } else if (DataFormat.PROTOCOL_BUFFERS == dataFormat) {
             return new ProtobufRecordValueTabulator(browseParams.getKafkaTopicConfig());
         } else if (
                 DataFormat.STRING == dataFormat ||
                 DataFormat.JSON_STRING == dataFormat ||
                 DataFormat.HEX_STRING == dataFormat) {
-            return new NoopRecordValueTabulator(browseParams.getKafkaTopicConfig());
+            return new NoopRecordValueTabulator();
         } else {
             throw new RuntimeException(
                     String.format("Data format not supported: %s", dataFormat));

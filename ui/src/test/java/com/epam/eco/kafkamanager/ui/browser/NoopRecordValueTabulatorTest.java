@@ -30,7 +30,7 @@ public class NoopRecordValueTabulatorTest {
 
     @Test
     public void testNullIsTabulated() throws Exception {
-        NoopRecordValueTabulator tabulator = new NoopRecordValueTabulator(null);
+        NoopRecordValueTabulator tabulator = new NoopRecordValueTabulator();
 
         Map<String, Object> tabularValue = tabulator.toTabularValue(createConsumerRecord(null));
         Assert.assertNull(tabularValue);
@@ -38,7 +38,7 @@ public class NoopRecordValueTabulatorTest {
 
     @Test
     public void testObjectIsTabulated() throws Exception {
-        NoopRecordValueTabulator tabulator = new NoopRecordValueTabulator(null);
+        NoopRecordValueTabulator tabulator = new NoopRecordValueTabulator();
 
         Object[] values = new Object[]{"stringvalue", new Object(), 1L, 1, 1f, 1d, false};
         for(Object value : values) {

@@ -30,7 +30,7 @@ import org.junit.Test;
 import com.google.common.collect.ImmutableList;
 
 import com.epam.eco.kafkamanager.ui.topics.browser.AvroRecordValueTabulator;
-import com.epam.eco.kafkamanager.ui.topics.browser.RegistrySchema;
+import com.epam.eco.kafkamanager.ui.topics.browser.RecordSchema;
 
 import static com.epam.eco.kafkamanager.ui.utils.SchemaSubjectUtils.KEY_STRATEGY_PROPERTY;
 import static com.epam.eco.kafkamanager.ui.utils.SchemaSubjectUtils.RECORD_NAME_STRATEGY;
@@ -101,7 +101,7 @@ public class AvroRecordValueTabulatorTest {
                 new ConfigEntry(VALUE_STRATEGY_PROPERTY, TOPIC_NAME_STRATEGY)));
         AvroRecordValueTabulator tabulator = new AvroRecordValueTabulator(config);
         GenericRecord record = createEmptyTestRecord();
-        RegistrySchema schema = tabulator.getSchema(createConsumerRecord(record));
+        RecordSchema schema = tabulator.getSchema(createConsumerRecord(record));
         Assert.assertEquals(schema.getSchemaKey(), "topic-key");
         Assert.assertEquals(schema.getSchemaValue(), "topic-value");
     }
@@ -113,7 +113,7 @@ public class AvroRecordValueTabulatorTest {
                 new ConfigEntry(VALUE_STRATEGY_PROPERTY, RECORD_NAME_STRATEGY)));
         AvroRecordValueTabulator tabulator = new AvroRecordValueTabulator(config);
         GenericRecord record = createEmptyTestRecord();
-        RegistrySchema schema = tabulator.getSchema(createConsumerRecord(record));
+        RecordSchema schema = tabulator.getSchema(createConsumerRecord(record));
         Assert.assertEquals(schema.getSchemaKey(), "TestRecord");
         Assert.assertEquals(schema.getSchemaValue(), "TestRecord");
     }
@@ -125,7 +125,7 @@ public class AvroRecordValueTabulatorTest {
                 new ConfigEntry(VALUE_STRATEGY_PROPERTY, TOPIC_RECORD_NAME_STRATEGY)));
         AvroRecordValueTabulator tabulator = new AvroRecordValueTabulator(config);
         GenericRecord record = createEmptyTestRecord();
-        RegistrySchema schema = tabulator.getSchema(createConsumerRecord(record));
+        RecordSchema schema = tabulator.getSchema(createConsumerRecord(record));
         Assert.assertEquals(schema.getSchemaKey(), "topic-TestRecord");
         Assert.assertEquals(schema.getSchemaValue(), "topic-TestRecord");
     }

@@ -31,6 +31,7 @@ import org.apache.kafka.clients.admin.Config;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 
 import com.epam.eco.kafkamanager.TopicRecordFetchParams;
+import com.epam.eco.kafkamanager.ui.utils.SchemaSubjectUtils;
 
 /**
  * @author Andrei_Tytsik
@@ -40,14 +41,16 @@ public class AvroRecordValueTabulator implements RecordValueTabulator<Object> {
     public static final String NA = "N/A";
     public static final String SEPARATOR = ".";
 
-    private final Config kafkaTopicConfig;
+    private final Config topicConfig;
 
-    public AvroRecordValueTabulator(Config kafkaTopicConfig) {
-        this.kafkaTopicConfig = kafkaTopicConfig;
+    public AvroRecordValueTabulator(Config topicConfig) {
+        Validate.notNull(topicConfig, "Topic config is null");
+
+        this.topicConfig = topicConfig;
     }
 
     public Config getKafkaTopicConfig() {
-        return kafkaTopicConfig;
+        return topicConfig;
     }
 
     @Override
@@ -78,9 +81,26 @@ public class AvroRecordValueTabulator implements RecordValueTabulator<Object> {
     }
 
     @Override
-    public RegistrySchema getSchema(ConsumerRecord<?, ?> record) {
+    public RecordSchema getSchema(ConsumerRecord<?, ?> record) {
+        Validate.notNull(record, "Record is null");
+
+        if (record.value() == null) {
+            return null;
+        }
+
         Schema schema = ((GenericContainer)record.value()).getSchema();
-        return new RegistrySchema(record, schema.getFullName(), kafkaTopicConfig, TopicRecordFetchParams.DataFormat.AVRO);
+
+        String schemaName = schema.getFullName();
+        String schemaKey = SchemaSubjectUtils.getSchemaSubjectKey(record.topic(), schemaName, topicConfig);
+        String schemaValue = SchemaSubjectUtils.getSchemaSubjectValue(record.topic(), schemaName, topicConfig);
+        String schemaAsString = schema.toString(true);
+
+        return new RecordSchema(
+                schemaName,
+                schemaKey,
+                schemaValue,
+                schemaAsString,
+                TopicRecordFetchParams.DataFormat.AVRO);
     }
 
     @SuppressWarnings("rawtypes")
