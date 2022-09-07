@@ -22,75 +22,80 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
 
-import org.apache.avro.Schema;
-import org.apache.avro.Schema.Field;
-import org.apache.avro.generic.GenericContainer;
-import org.apache.avro.generic.GenericRecord;
 import org.apache.commons.lang3.Validate;
 import org.apache.kafka.clients.admin.Config;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
+
+import com.google.protobuf.Descriptors;
+import com.google.protobuf.DynamicMessage;
 
 import com.epam.eco.kafkamanager.TopicRecordFetchParams;
 
 /**
  * @author Andrei_Tytsik
  */
-public class AvroRecordValueTabulator implements RecordValueTabulator<Object> {
+public class ProtobufRecordValueTabulator implements RecordValueTabulator<Object> {
 
     public static final String NA = "N/A";
     public static final String SEPARATOR = ".";
 
     private final Config kafkaTopicConfig;
 
-    public AvroRecordValueTabulator(Config kafkaTopicConfig) {
+    public ProtobufRecordValueTabulator(Config kafkaTopicConfig) {
         this.kafkaTopicConfig = kafkaTopicConfig;
-    }
-
-    public Config getKafkaTopicConfig() {
-        return kafkaTopicConfig;
     }
 
     @Override
     public Map<String, Object> toTabularValue(ConsumerRecord<?, Object> record) {
         Validate.notNull(record, "Record is null");
 
-        return record.value() != null ? doConvert(null, record.value()) : null;
+        return record.value()!=null ? doConvert(null, record.value()) : null;
     }
 
     @Override
     public Map<String, Object> getAttributes(ConsumerRecord<?, Object> record) {
         Validate.notNull(record, "Record is null");
 
-        if (record.value() == null) {
+        if(record.value()==null || !(record.value() instanceof DynamicMessage)) {
             return null;
         }
 
-        Schema schema = ((GenericContainer)record.value()).getSchema();
+        // Schema schema = ((GenericContainer) record.value()).getSchema();
+        DynamicMessage message = (DynamicMessage) record.value();
 
         Map<String, Object> attributes = new HashMap<>();
-        attributes.put("fullName", schema.getFullName());
-        attributes.put("type", schema.getType());
-        if (schema.getDoc() != null) {
-            attributes.put("doc", schema.getDoc());
-        }
-        attributes.putAll(schema.getObjectProps());
+        attributes.put("fullName", message.getDescriptorForType().getName());
+        attributes.put("type", message.getDescriptorForType().toString());
+        message.getAllFields().keySet().stream()
+                .filter(key -> "docId".equals(key.getName()))
+                .forEach(key -> attributes.put("doc", message.getAllFields().get(key)));
+
+        message.getAllFields().keySet().stream()
+                .filter(key -> !"docId".equals(key.getName()))
+                .forEach(key -> attributes.put(key.getName(), message.getAllFields().get(key)));
+
         return attributes;
     }
 
     @Override
     public RegistrySchema getSchema(ConsumerRecord<?, ?> record) {
-        Schema schema = ((GenericContainer)record.value()).getSchema();
-        return new RegistrySchema(record, schema.getFullName(), kafkaTopicConfig, TopicRecordFetchParams.DataFormat.AVRO);
+        DynamicMessage message = (DynamicMessage) record.value();
+        return new RegistrySchema(record, message.getDescriptorForType().getFullName(), kafkaTopicConfig, TopicRecordFetchParams.DataFormat.PROTOCOL_BUFFERS);
+    }
+
+    @Override
+    public Config getKafkaTopicConfig() {
+        return this.kafkaTopicConfig;
     }
 
     @SuppressWarnings("rawtypes")
     private Map<String, Object> doConvert(String path, Object value) {
-        if (value instanceof GenericRecord) {
-            return doConvertRecord(path, (GenericRecord)value);
-        } else if (value instanceof Map) {
-            return doConvertMap(path, (Map)value);
-        } else if (value instanceof List) {
-            return doConvertList(path, (List)value);
+        if(value instanceof DynamicMessage) {
+            return doConvertRecord(path, (DynamicMessage) value);
+        } else if(value instanceof Map) {
+            return doConvertMap(path, (Map) value);
+        } else if(value instanceof List) {
+            return doConvertList(path, (List) value);
         } else {
             return doConvertOther(path, value);
         }
@@ -106,11 +111,11 @@ public class AvroRecordValueTabulator implements RecordValueTabulator<Object> {
         return doConvertOther(path, map);
     }
 
-    private Map<String, Object> doConvertRecord(String path, GenericRecord record) {
+    private Map<String, Object> doConvertRecord(String path, DynamicMessage message) {
         Map<String, Object> tabular = new LinkedHashMap<>();
-        for (Field field : record.getSchema().getFields()) {
-            String name = field.name();
-            Object value = record.get(name);
+        for(Descriptors.FieldDescriptor field : message.getAllFields().keySet()) {
+            String name = field.getName();
+            Object value = message.getAllFields().get(field);
             tabular.putAll(
                     doConvert(
                             append(path, name),
@@ -121,16 +126,16 @@ public class AvroRecordValueTabulator implements RecordValueTabulator<Object> {
 
     private Map<String, Object> doConvertOther(String path, Object value) {
         return Collections.singletonMap(
-                orDefault(path, () -> value != null ? value.getClass().getSimpleName() : NA),
+                orDefault(path, () -> value!=null ? value.getClass().getSimpleName() : NA),
                 value);
     }
 
     private String orDefault(String value, Supplier<String> defaultValue) {
-        return value != null ? value : defaultValue.get();
+        return value!=null ? value : defaultValue.get();
     }
 
     private String append(String parent, String path) {
-        return parent != null ? parent + SEPARATOR + path : path;
+        return parent!=null ? parent + SEPARATOR + path : path;
     }
 
 }

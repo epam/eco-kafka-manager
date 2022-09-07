@@ -91,14 +91,13 @@ public class TopicController {
     public static final String MAPPING_TOPICS = "/topics";
     public static final String MAPPING_TOPIC = MAPPING_TOPICS + "/{name}";
     public static final String MAPPING_COUNT_RECORDS = MAPPING_TOPIC + "/count_records";
-    public static final String MAPPING_EXPORT = "/topics_export";
     public static final String MAPPING_PURGER = MAPPING_TOPIC + "/purger";
     public static final String MAPPING_DELETE = MAPPING_TOPIC + "/delete";
-    public static final String MAPPING_CREATE = "/topic_create";
     public static final String MAPPING_CONFIG = MAPPING_TOPIC + "/config";
     public static final String MAPPING_PARTITIONS = MAPPING_TOPIC + "/partitions";
     public static final String MAPPING_METADATA = MAPPING_TOPIC + "/metadata";
-
+    public static final String MAPPING_EXPORT = "/topics_export";
+    public static final String MAPPING_CREATE = "/topic_create";
     private static final int PAGE_SIZE = 30;
 
     @Autowired
@@ -112,6 +111,27 @@ public class TopicController {
 
     @Autowired(required=false)
     private UDMetricManager udMetricManager;
+
+    public static Map<String, String> extractConfigsFromParams(
+            Map<String, String> paramsMap,
+            boolean skipNulls) {
+        Map<String, String> configs = new HashMap<>((int) Math.ceil(paramsMap.size() / 0.75));
+        for(Entry<String, String> entry : paramsMap.entrySet()) {
+            String key = entry.getKey();
+            String value = entry.getValue();
+            if (
+                    TopicConfigDef.INSTANCE.key(key)==null ||
+                            (skipNulls && StringUtils.isBlank(value))) {
+                continue;
+            }
+            configs.put(key, StringUtils.stripToNull(value));
+        }
+        return configs;
+    }
+
+    public static String buildTopicUrl(String topicName) {
+        return MAPPING_TOPIC.replace("{name}", topicName);
+    }
 
     @RequestMapping(value=MAPPING_TOPICS, method = RequestMethod.GET)
     public String topics(
@@ -308,27 +328,6 @@ public class TopicController {
 
     private Page<TopicInfoWrapper> wrap(Page<TopicInfo> page) {
         return page.map((topicInfo) -> TopicInfoWrapper.wrap(topicInfo, kafkaManager, kafkaAdminOperations));
-    }
-
-    public static Map<String, String> extractConfigsFromParams(
-            Map<String, String> paramsMap,
-            boolean skipNulls) {
-        Map<String, String> configs = new HashMap<>((int) Math.ceil(paramsMap.size() / 0.75));
-        for (Entry<String, String> entry : paramsMap.entrySet()) {
-            String key = entry.getKey();
-            String value = entry.getValue();
-            if (
-                    TopicConfigDef.INSTANCE.key(key) == null ||
-                    (skipNulls && StringUtils.isBlank(value))) {
-                continue;
-            }
-            configs.put(key, StringUtils.stripToNull(value));
-        }
-        return configs;
-    }
-
-    public static String buildTopicUrl(String topicName) {
-        return MAPPING_TOPIC.replace("{name}", topicName);
     }
 
 }

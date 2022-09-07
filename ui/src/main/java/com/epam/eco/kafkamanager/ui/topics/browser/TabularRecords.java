@@ -172,6 +172,9 @@ public class TabularRecords implements Iterable<Record> {
         private final Map<String, Object> attributes;
 
         private final Map<String, String> headers;
+
+        private final RegistrySchema registrySchema;
+
         private String attributesJson;
         private String attributesPrettyJson;
         private String headersJson;
@@ -181,9 +184,12 @@ public class TabularRecords implements Iterable<Record> {
                 ConsumerRecord<?, ?> consumerRecord,
                 Map<String, Object> tabularValue,
                 Map<String, Object> attributes,
-                Map<String, String> headers) {
+                Map<String, String> headers,
+                RegistrySchema registrySchema) {
+
             Validate.notNull(consumerRecord, "Consumer Record is null");
 
+            this.registrySchema = registrySchema;
             this.consumerRecord = consumerRecord;
             this.tabularValue = tabularValue != null ? new TreeMap<>(tabularValue) : null;
             this.attributes = attributes != null ? new TreeMap<>(attributes) : null;
@@ -228,6 +234,10 @@ public class TabularRecords implements Iterable<Record> {
 
         public String getValueSizeFormatted() {
             return formatSize(getValueSize());
+        }
+
+        public RegistrySchema getRegistrySchema() {
+            return registrySchema;
         }
 
         public String getKeyValueSizeFormatted() {

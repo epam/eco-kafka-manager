@@ -80,8 +80,8 @@ public class TopicBrowseParamsTest {
         params.deleteValueFormat();
         Assert.assertEquals(null, params.getValueFormat());
 
-        params.setValueFormatIfMissing(DataFormat.STRING);
-        Assert.assertEquals(DataFormat.STRING, params.getValueFormat());
+        params.setValueFormatIfMissing(DataFormat.AVRO);
+        Assert.assertEquals(DataFormat.AVRO, params.getValueFormat());
 
         params.setTimeout(10000);
         Assert.assertEquals(10000, params.getTimeout());

@@ -63,19 +63,21 @@ public class ToTabularRecordsConverter {
                 valueTabulator.getAttributes((ConsumerRecord)consumerRecord);
         Map<String, String> headers = new HashMap<>();
         consumerRecord.headers().forEach( header -> headers.put(header.key(),new String(header.value())));
-        return new Record(consumerRecord, tabularValue, attributes, headers);
+        return new Record(consumerRecord, tabularValue, attributes, headers, valueTabulator.getSchema(consumerRecord));
     }
 
     private static RecordValueTabulator<?> determineValueTabulator(
             TopicBrowseParams browseParams) {
         DataFormat dataFormat = browseParams.getValueFormat();
         if (DataFormat.AVRO == dataFormat) {
-            return new AvroRecordValueTabulator();
+            return new AvroRecordValueTabulator(browseParams.getKafkaTopicConfig());
+        } else if (DataFormat.PROTOCOL_BUFFERS==dataFormat) {
+            return new ProtobufRecordValueTabulator(browseParams.getKafkaTopicConfig());
         } else if (
                 DataFormat.STRING == dataFormat ||
                 DataFormat.JSON_STRING == dataFormat ||
                 DataFormat.HEX_STRING == dataFormat) {
-            return new NoopRecordValueTabulator();
+            return new NoopRecordValueTabulator(browseParams.getKafkaTopicConfig());
         } else {
             throw new RuntimeException(
                     String.format("Data format not supported: %s", dataFormat));

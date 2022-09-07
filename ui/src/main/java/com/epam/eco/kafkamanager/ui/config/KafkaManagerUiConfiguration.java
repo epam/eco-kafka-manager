@@ -26,6 +26,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import com.epam.eco.kafkamanager.ui.GlobalModelEnrichingInterceptor;
 import com.epam.eco.kafkamanager.ui.LogoutListener;
 import com.epam.eco.kafkamanager.ui.topics.DataCatalogUrlResolver;
+import com.epam.eco.kafkamanager.ui.topics.SchemaCatalogUrlResolver;
 
 /**
  * @author Andrei_Tytsik
@@ -62,6 +63,11 @@ public class KafkaManagerUiConfiguration implements WebMvcConfigurer {
     @Bean
     public DataCatalogUrlResolver dataCatalogUrlResolver(KafkaManagerUiProperties properties) {
         return new DataCatalogUrlResolver(properties);
+    }
+
+    @Bean
+    public SchemaCatalogUrlResolver schemaCatalogUrlResolver(KafkaManagerUiProperties properties) {
+        return new SchemaCatalogUrlResolver(properties);
     }
 
 }
