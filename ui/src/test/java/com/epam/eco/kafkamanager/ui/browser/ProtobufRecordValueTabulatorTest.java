@@ -15,6 +15,7 @@
  *******************************************************************************/
 package com.epam.eco.kafkamanager.ui.browser;
 
+import java.util.Collections;
 import java.util.Map;
 
 import org.apache.kafka.clients.admin.Config;
@@ -49,14 +50,14 @@ public class ProtobufRecordValueTabulatorTest {
 
     @Test
     public void testNullIsTabulated() {
-        ProtobufRecordValueTabulator tabulator = new ProtobufRecordValueTabulator(null);
+        ProtobufRecordValueTabulator tabulator = new ProtobufRecordValueTabulator(new Config(Collections.emptyList()));
         Map<String, Object> tabular = tabulator.toTabularValue(createConsumerRecord(null));
         Assert.assertNull(tabular);
     }
 
     @Test
     public void testRecordIsTabulated() {
-        ProtobufRecordValueTabulator tabulator = new ProtobufRecordValueTabulator(null);
+        ProtobufRecordValueTabulator tabulator = new ProtobufRecordValueTabulator(new Config(Collections.emptyList()));
 
         DynamicMessage dynamicMessage = createDynamicMessage();
 

@@ -16,6 +16,7 @@
 package com.epam.eco.kafkamanager.ui.browser;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Map;
 
 import org.apache.avro.Schema;
@@ -45,7 +46,7 @@ public class AvroRecordValueTabulatorTest {
 
     @Test
     public void testNullIsTabulated() throws Exception {
-        AvroRecordValueTabulator tabulator = new AvroRecordValueTabulator(null);
+        AvroRecordValueTabulator tabulator = new AvroRecordValueTabulator(new Config(Collections.emptyList()));
 
         Map<String, Object> tabular = tabulator.toTabularValue(createConsumerRecord(null));
         Assert.assertNull(tabular);
@@ -53,7 +54,7 @@ public class AvroRecordValueTabulatorTest {
 
     @Test
     public void testPrimitiveObjectIsTabulated() throws Exception {
-        AvroRecordValueTabulator tabulator = new AvroRecordValueTabulator(null);
+        AvroRecordValueTabulator tabulator = new AvroRecordValueTabulator(new Config(Collections.emptyList()));
 
         Object[] values = new Object[] {"stringvalue", new Object(), 1L, 1, 1f, 1d, false};
         for (Object value : values) {
@@ -67,7 +68,7 @@ public class AvroRecordValueTabulatorTest {
 
     @Test
     public void testRecordIsTabulated() throws Exception {
-        AvroRecordValueTabulator tabulator = new AvroRecordValueTabulator(null);
+        AvroRecordValueTabulator tabulator = new AvroRecordValueTabulator(new Config(Collections.emptyList()));
 
         GenericRecord record = createEmptyTestRecord();
 
