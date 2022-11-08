@@ -29,6 +29,8 @@ public interface UDMetricManager {
             UDMetricType type,
             String resourceName,
             Map<String, Object> config);
+    void updateAllFailed();
+    boolean hasErrors();
     void remove(String name);
     UDMetric get(String name);
     Page<UDMetric> page(Pageable pageable);

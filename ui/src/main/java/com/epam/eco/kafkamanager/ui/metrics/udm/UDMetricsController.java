@@ -40,11 +40,12 @@ public class UDMetricsController extends UDMAbstractController {
     public static final String VIEW = "udmetrics";
 
     public static final String ATTR_PAGE = "page";
-    public static final String ATTR_UDM_NAME = "udmName";
     public static final String ATTR_SEARCH_CRITERIA = "searchCriteria";
     public static final String ATTR_TOTAL_COUNT = "totalCount";
+    public static final String HAS_ERRORS = "hasErrors";
 
     public static final String MAPPING = "/udmetrics";
+    public static final String UPDATE_URL = "updateUrl";
 
     @RequestMapping(value=MAPPING, method=RequestMethod.GET)
     public String metrics(
@@ -65,8 +66,15 @@ public class UDMetricsController extends UDMAbstractController {
         model.addAttribute(ATTR_SEARCH_CRITERIA, searchCriteria);
         model.addAttribute(ATTR_PAGE, wrap(metricPage));
         model.addAttribute(ATTR_TOTAL_COUNT, udMetricManager.getCount());
+        model.addAttribute(HAS_ERRORS, udMetricManager.hasErrors());
 
         return VIEW;
+    }
+
+    @RequestMapping(value=MAPPING, method=RequestMethod.PATCH)
+    public String updateFailed() {
+        udMetricManager.updateAllFailed();
+        return "redirect:/" + VIEW;
     }
 
     private Page<UDMetricWrapper> wrap(Page<UDMetric> page) {

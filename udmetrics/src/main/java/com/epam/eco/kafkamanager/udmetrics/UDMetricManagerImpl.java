@@ -90,6 +90,19 @@ public class UDMetricManagerImpl implements UDMetricManager, UpdateListener {
     }
 
     @Override
+    public void updateAllFailed() {
+        listAll().stream()
+                .filter(UDMetric::hasErrors)
+                .forEach(udMetric -> createOrReplace(udMetric.getType(),
+                                                     udMetric.getResourceName(),
+                                                     udMetric.getConfig()));
+    }
+    @Override
+    public boolean hasErrors() {
+        return listAll().stream().anyMatch(UDMetric::hasErrors);
+    }
+
+    @Override
     public void remove(String name) {
         Validate.notBlank(name, "UDM name is blank");
 
