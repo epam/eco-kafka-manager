@@ -60,7 +60,10 @@
                 $('#delete-udm-form').prop('action', action);
                 $('#delete-udm-form').submit();
             });
-            
+
+            $('#update-failed-button').click( () => {
+                $('#update-failed-form').submit();
+            });
         });
     </script>
     
@@ -110,6 +113,17 @@
                             class="btn btn-primary">
                             Find
                         </button>
+                        <button
+                            type="button"
+                            id="update-failed-button"
+                            class="btn btn-primary"
+                            th:disabled="${!hasErrors}">
+                            Update failed metrics
+                        </button>
+                    </form>
+                    <form id="update-failed-form" action="/udmetrics" method="post">
+                        <input type="hidden" name="_method" value="patch"/>
+                        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
                     </form>
                 </div>
             </div>
