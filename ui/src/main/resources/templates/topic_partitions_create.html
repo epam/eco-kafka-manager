@@ -27,13 +27,13 @@
 
             <div class="row">
         
-                <div class="col-md-10 col-md-offset-1">
+                <div class="col-md-10 offset-1">
 
-                    <div class="panel panel-default">
-                        <div class="panel-body">
+                    <div class="card mb-3">
+                        <div class="card-body">
                             <a
                                     th:href="@{/topics/{name}(name=${topic.name})}"
-                                    class="btn btn-primary right-icon">
+                                    class="btn btn-primary btn-sm">
                                 Back To Topic <i class="fa fa-arrow-left"></i>
                             </a>
                         </div>
@@ -43,12 +43,12 @@
                         th:action="@{/topics/{name}/partitions(name=${topic.name})}" 
                         method="post">
                         
-                        <div class="panel panel-default">
-                            <div class="panel-heading">Topic</div>
-                            <div class="panel-body">
+                        <div class="card mb-3">
+                            <h7 class="card-header">Topic</h7>
+                            <div class="card-body">
                             
-                                <div class="form-group">
-                                    <label for="topicName">Name</label>
+                                <div class="form-group mb-3">
+                                    <label class="form-label mb-2" for="topicName">Name</label>
                                     <input 
                                         type="text" 
                                         class="form-control" 
@@ -60,7 +60,7 @@
                                 
                                 <div class="row">
                                     <div class="form-group col col-md-2">
-                                        <label for="newPartitionCount">Partition Count</label>
+                                        <label class="form-label mb-2" for="newPartitionCount">Partition Count</label>
                                         <input 
                                             type="number" 
                                             class="form-control" 
@@ -74,7 +74,7 @@
                             </div>
                         </div>
                         
-                        <button type="submit" class="btn btn-primary">Create</button>
+                        <button type="submit" class="btn btn-primary btn-sm">Create</button>
                                 
                     </form>
                 

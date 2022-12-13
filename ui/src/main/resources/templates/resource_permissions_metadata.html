@@ -38,33 +38,33 @@
 
             <div class="row">
         
-                <div class="col-md-10 col-md-offset-1">
+                <div class="col-md-10 offset-1">
                 
-                    <div class="panel panel-default">
-                        <div class="panel-body">
+                    <div class="card mb-3">
+                        <div class="card-body">
                             <a  
                                 th:href="@{/permissions/resource/{resourceType}/{resourceName}/{patternType}(resourceType=${resourceType}, resourceName=${resourceName}, patternType=${patternType}, kafkaPrincipal=${kafkaPrincipal})}"
-                                class="btn btn-primary right-icon">
-                                Back To Resource Permissions <span class="glyphicon glyphicon-arrow-left"></span>
+                                class="btn btn-primary btn-sm">
+                                Back To Resource Permissions <i class="fa fa-arrow-left"></i>
                             </a>
                             
                             <a 
                                 id="delete-metadata-link" 
                                 href="#"
-                                class="btn btn-danger right-icon">
-                                Delete <span class="glyphicon glyphicon-remove"></span>
+                                class="btn btn-danger btn-sm">
+                                Delete <i class="fa fa-trash"></i>
                             </a>
                             
                         </div>
                     </div>
                 
-                    <div class="panel panel-default">
+                    <div class="card mb-3">
                     
-                        <div th:if="${metadata != null}" class="panel-heading">
+                        <div th:if="${metadata != null}" class="card-header">
                             Last updated at <b><span th:text="${metadata.updated}"></span></b> by <b><span th:text="${metadata.updatedBy}"></span></b>
                         </div>
                         
-                        <div class="panel-body">
+                        <div class="card-body">
                             
                             <form 
                                 th:action="@{/permissions/resource/{resourceType}/{resourceName}/{patternType}/metadata(resourceType=${resourceType}, resourceName=${resourceName}, patternType=${patternType}, kafkaPrincipal=${kafkaPrincipal})}" 
@@ -87,7 +87,7 @@
                                     <span th:text="${kafkaPrincipal}"></span>
                                 </p>
                                 
-                                <div class="form-group">
+                                <div class="form-group mb-3">
                                     <label for="description">Description</label>
                                     <textarea 
                                         rows="5" cols="70" 
@@ -97,7 +97,7 @@
                                         th:text="${metadata != null ? metadata.description : null}"></textarea>
                                 </div>
                                 
-                                <div class="form-group">
+                                <div class="form-group mb-3">
                                     <label for="attributes">Attributes (JSON)</label>
                                     <textarea 
                                         rows="5" cols="70" 
@@ -107,7 +107,7 @@
                                         th:text="${metadata != null ? metadata.attributesJson : null}"></textarea>
                                 </div>
                                 
-                                <button type="submit" class="btn btn-primary">Save</button>
+                                <button type="submit" class="btn btn-primary btn-sm">Save</button>
                         
                             </form>
                             

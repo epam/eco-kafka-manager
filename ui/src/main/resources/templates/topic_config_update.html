@@ -29,7 +29,7 @@
                 });
             });
 
-            $('[data-toggle="popover"]').popover();
+            $('[data-bs-toggle="popover"]').popover();
             
             $(document).on('click', function (e) {
                 hidePopoverIfClickedOutside(e);
@@ -46,13 +46,13 @@
 
             <div class="row">
         
-                <div class="col-md-10 col-md-offset-1">
+                <div class="col-md-10 offset-1">
 
-                    <div class="panel panel-default">
-                        <div class="panel-body">
+                    <div class="card mb-3">
+                        <div class="card-body">
                             <a
                                     th:href="@{/topics/{name}(name=${topic.name})}"
-                                    class="btn btn-primary right-icon">
+                                    class="btn btn-primary btn-sm">
                                 Back To Topic <i class="fa fa-arrow-left"></i>
                             </a>
                         </div>
@@ -62,12 +62,12 @@
                         th:action="@{/topics/{name}/config(name=${topic.name})}" 
                         method="post">
                         
-                        <div class="panel panel-default">
-                            <div class="panel-heading">Topic</div>
-                            <div class="panel-body">
+                        <div class="card mb-3">
+                            <h7 class="card-header">Topic</h7>
+                            <div class="card-body">
                             
-                                <div class="form-group">
-                                    <label for="name">Name</label>
+                                <div class="form-group mb-3">
+                                    <label for="topicName">Name</label>
                                     <input 
                                         type="text" 
                                         class="form-control" 
@@ -80,12 +80,13 @@
                             </div>
                         </div>
                         
-                        <div class="panel panel-default">
-                            <div class="panel-heading">Configs</div>
-                            <div class="panel-body">
+                        <div class="card mb-3">
+                            <h7 class="card-header">Configs</h7>
+                            <div class="card-body">
                             
-                                <a id="clear-all-configs-link" href="#" class="btn btn-default transparent right-icon small">
-                                    Clear All <i class="fa fa-remove"></i>
+                                <a id="clear-all-configs-link" href="#"
+                                   class="btn btn-danger btn-sm">
+                                    Clear All <i class="fa fa-remove-circle"></i>
                                 </a>
                             
                                 <table class="table table-bordered table-striped table-hover">
@@ -100,15 +101,15 @@
                                     <tbody>
                                         <tr 
                                             th:each="config : ${topic.allConfigEntries.values()}"
-                                            th:classappend="${!config.default} ? 'info' : ''">
+                                            th:classappend="${!config.default} ? 'table-info' : ''">
                                             <td>
                                                 <span th:text="${config.name}"></span>
                                                 <a 
                                                     href="javascript:void(0);"
-                                                    data-toggle="popover"
-                                                    data-html="true"
-                                                    th:attr="data-content=${config.def.documentation}">
-                                                    <span class="glyphicon glyphicon-info-sign"></span>
+                                                    data-bs-toggle="popover"
+                                                    data-bs-html="true"
+                                                    th:attr="data-bs-content=${config.def.documentation}">
+                                                    <i class="fa fa-info-circle"></i>
                                                 </a>
                                             </td>
                                             <td>
@@ -133,7 +134,7 @@
                             </div>
                         </div>
                         
-                        <button type="submit" class="btn btn-primary">Update</button>
+                        <button type="submit" class="btn btn-primary btn-sm">Update</button>
                                 
                     </form>
                 

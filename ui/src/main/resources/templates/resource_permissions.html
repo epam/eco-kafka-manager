@@ -27,32 +27,32 @@
 
             <div class="row">
         
-                <div class="col-md-10 col-md-offset-1">
+                <div class="col-md-10 offset-1">
                 
-                    <div class="panel panel-default">
-                        <div class="panel-body">
+                    <div class="card mb-3">
+                        <div class="card-body">
                             <a 
                                 th:href="@{/permissions}" 
-                                class="btn btn-primary right-icon">
-                                Back To Permissions <span class="glyphicon glyphicon-arrow-left"></span>
+                                class="btn btn-primary btn-sm">
+                                Back To Permissions <i class="fa fa-arrow-left"></i>
                             </a>
                             <a
                                     th:href="@{/permissions/create(resourceType=${resourceType}, resourceName=${resourceName}, patternType=${patternType}, kafkaPrincipal=${kafkaPrincipal})}"
-                                    class="btn btn-primary right-icon">
+                                    class="btn btn-primary btn-sm">
                                 Create <i class="fa fa-plus"></i>
                             </a>
                             <a
                                     th:if="${kafkaPrincipalPresent}"
                                     th:href="@{/permissions/resource/{resourceType}/{resourceName}/{patternType}/metadata(resourceType=${resourceType}, resourceName=${resourceName}, patternType=${patternType}, kafkaPrincipal=${kafkaPrincipal})}"
-                                    class="btn btn-primary right-icon">
-                                Edit Metadata <span class="glyphicon glyphicon-tags"></span>
+                                    class="btn btn-primary btn-sm">
+                                Edit Metadata <i class="fa fa-tags"></i>
                             </a>
                         </div>
                     </div>
         
-                    <div class="panel panel-default">
-                        <div class="panel-heading">Resource</div>
-                        <div class="panel-body">
+                    <div class="card mb-3">
+                        <div class="card-header">Resource</div>
+                        <div class="card-body">
                             <p>
                                 <b>Resource Type:</b>
                                 <span th:text="${resourceType}"></span>
@@ -113,17 +113,17 @@
                                 <td>
                                     <button
                                             type="button"
-                                            class="btn btn-danger right-icon"
-                                            data-toggle="modal"
-                                            data-target="#delete-all-resource-permissions-confirm">
+                                            class="btn btn-danger btn-sm"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#delete-all-resource-permissions-confirm">
                                         Delete All <i class="fa fa-trash"></i>
                                     </button>
                                     <div id="delete-all-resource-permissions-confirm" class="modal fade" role="dialog">
                                         <div class="modal-dialog">
                                             <div class="modal-content">
                                                 <div class="modal-header">
-                                                    <button type="button" class="close" data-dismiss="modal">&times;</button>
                                                     <h4 class="modal-title">Confirm Resource Permission Delete</h4>
+                                                    <button type="button" class="btn-close" data-bs-dismiss="modal">&times;</button>
                                                 </div>
                                                 <div class="modal-body">
                                                     <p>
@@ -137,13 +137,13 @@
                                                         <input type="hidden" name="_method" value="delete"/>
                                                         <button
                                                                 type="button"
-                                                                class="btn btn-primary"
-                                                                data-dismiss="modal">
+                                                                class="btn btn-primary btn-sm"
+                                                                data-bs-dismiss="modal">
                                                             Cancel
                                                         </button>
                                                         <button
                                                                 type="submit"
-                                                                class="btn btn-danger">
+                                                                class="btn btn-danger btn-sm">
                                                             Delete
                                                         </button>
                                                     </form>
@@ -172,17 +172,17 @@
                                 <td>
                                     <button
                                             type="button"
-                                            class="btn btn-danger right-icon"
-                                            data-toggle="modal"
-                                            th:data-target="${'#delete-permission-confirm' + iter.index}">
+                                            class="btn btn-danger btn-sm"
+                                            data-bs-toggle="modal"
+                                            th:data-bs-target="${'#delete-permission-confirm' + iter.index}">
                                         Delete <i class="fa fa-trash"></i>
                                     </button>
                                     <div th:id="${'delete-permission-confirm' + iter.index}" class="modal fade" role="dialog">
                                         <div class="modal-dialog">
                                             <div class="modal-content">
                                                 <div class="modal-header">
-                                                    <button type="button" class="close" data-dismiss="modal">&times;</button>
                                                     <h4 class="modal-title">Confirm Permission Delete</h4>
+                                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">&times;</button>
                                                 </div>
                                                 <div class="modal-body">
                                                     <p>
@@ -196,13 +196,13 @@
                                                         <input type="hidden" name="_method" value="delete"/>
                                                         <button
                                                                 type="button"
-                                                                class="btn btn-primary"
-                                                                data-dismiss="modal">
+                                                                class="btn btn-primary btn-sm"
+                                                                data-bs-dismiss="modal">
                                                             Cancel
                                                         </button>
                                                         <button
                                                                 type="submit"
-                                                                class="btn btn-danger">
+                                                                class="btn btn-danger btn-sm">
                                                             Delete
                                                         </button>
                                                     </form>
@@ -239,17 +239,17 @@
                                 <td>
                                     <button
                                             type="button"
-                                            class="btn btn-danger right-icon"
-                                            data-toggle="modal"
-                                            th:data-target="${'#delete-other-permission-confirm' + iter.index}">
+                                            class="btn btn-danger btn-sm"
+                                            data-bs-toggle="modal"
+                                            th:data-bs-target="${'#delete-other-permission-confirm' + iter.index}">
                                         Delete <i class="fa fa-trash"></i>
                                     </button>
                                     <div th:id="${'delete-other-permission-confirm' + iter.index}" class="modal fade" role="dialog">
                                         <div class="modal-dialog">
                                             <div class="modal-content">
                                                 <div class="modal-header">
-                                                    <button type="button" class="close" data-dismiss="modal">&times;</button>
                                                     <h4 class="modal-title">Confirm Permission Delete</h4>
+                                                    <button type="button" class="btn-close" data-bs-dismiss="modal">&times;</button>
                                                 </div>
                                                 <div class="modal-body">
                                                     <p>
@@ -264,7 +264,7 @@
                                                         <button
                                                                 type="button"
                                                                 class="btn btn-primary"
-                                                                data-dismiss="modal">
+                                                                data-bs-dismiss="modal">
                                                             Cancel
                                                         </button>
                                                         <button

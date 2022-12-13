@@ -38,40 +38,40 @@
 
             <div class="row">
         
-                <div class="col-md-10 col-md-offset-1">
+                <div class="col-md-10 offset-1">
                 
-                    <div class="panel panel-default">
-                        <div class="panel-body">
+                    <div class="card mb-2">
+                        <div class="card-body">
                             <a  
                                 th:href="@{/topics/{name}(name=${topic.name})}"
-                                class="btn btn-primary right-icon">
-                                Back To Topic <span class="glyphicon glyphicon-arrow-left"></span>
+                                class="btn btn-primary btn-sm">
+                                Back To Topic <i class="fa fa-arrow-left"></i>
                             </a>
                             
                             <a 
                                 id="delete-metadata-link" 
                                 href="#"
-                                class="btn btn-danger right-icon">
-                                Delete <span class="glyphicon glyphicon-remove"></span>
+                                class="btn btn-danger btn-sm">
+                                Delete <i class="fa fa-trash"></i>
                             </a>
                             
                         </div>
                     </div>
                 
-                    <div class="panel panel-default">
+                    <div class="card mb-2">
                     
-                        <div th:if="${metadata != null}" class="panel-heading">
+                        <div th:if="${metadata != null}" class="card-header">
                             Last updated at <b><span th:text="${metadata.updated}"></span></b> by <b><span th:text="${metadata.updatedBy}"></span></b>
                         </div>
                         
-                        <div class="panel-body">
+                        <div class="card-body">
                             
                             <form 
                                 th:action="@{/topics/{name}/metadata(name=${topic.name})}" 
                                 method="post">
 
-                                <div class="form-group">
-                                    <label for="topicName">Topic Name</label>
+                                <div class="form-group mb-2">
+                                    <label class="form-label mb-2" for="topicName">Topic Name</label>
                                     <input 
                                         type="text" 
                                         class="form-control" 
@@ -81,8 +81,8 @@
                                         th:value="${topic.name}"/>
                                 </div>
                                 
-                                <div class="form-group">
-                                    <label for="description">Description</label>
+                                <div class="form-group mb-2">
+                                    <label class="form-label mb-2" for="description">Description</label>
                                     <textarea 
                                         rows="5" cols="70" 
                                         class="form-control" 
@@ -91,8 +91,8 @@
                                         th:text="${metadata != null ? metadata.description : null}"></textarea>
                                 </div>
                                 
-                                <div class="form-group">
-                                    <label for="attributes">Attributes (JSON)</label>
+                                <div class="form-group mb-2">
+                                    <label class="form-label mb-2" for="attributes">Attributes (JSON)</label>
                                     <textarea 
                                         rows="5" cols="70" 
                                         class="form-control" 
@@ -101,7 +101,7 @@
                                         th:text="${metadata != null ? metadata.attributesJson : null}"></textarea>
                                 </div>
                                 
-                                <button type="submit" class="btn btn-primary">Save</button>
+                                <button type="submit" class="btn btn-primary btn-sm">Save</button>
                         
                             </form>
                             

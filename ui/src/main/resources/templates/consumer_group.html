@@ -40,49 +40,49 @@
         
             <div class="row">
         
-                <div class="col-md-10 col-md-offset-1">
+                <div class="col-md-10 offset-1">
                 
-                    <div class="panel panel-default">
-                        <div class="panel-body panel-flex">
+                    <div class="card mb-3">
+                        <div class="card-body card-flex">
                             <a
                                 th:href="@{/consumer_groups}" 
-                                class="btn btn-primary right-icon">
-                                Back To Consumer Groups <span class="glyphicon glyphicon-arrow-left"></span>
+                                class="btn btn-primary btn-sm">
+                                Back To Consumer Groups <i class="fa fa-arrow-left"></i>
                             </a>
                             <a 
                                 th:href="@{/consumer_groups/{name}/metadata(name=${group.name})}"
-                                class="btn btn-primary right-icon">
-                                Edit Metadata <span class="glyphicon glyphicon-tags"></span>
+                                class="btn btn-primary btn-sm">
+                                Edit Metadata <i class="fa fa-tags"></i>
                             </a>
                             <a
                                 th:href="@{/permissions/(resourceType=${T(org.apache.kafka.common.resource.ResourceType).GROUP}, resourceName=${group.name})}"
-                                class="btn btn-primary right-icon">
-                                View Permissions <span class="glyphicon glyphicon-list"></span>
+                                class="btn btn-primary btn-sm">
+                                View Permissions <i class="fa fa-list"></i>
                             </a>
                             <a
                                 th:href="@{/permissions/create(resourceType=${T(org.apache.kafka.common.resource.ResourceType).GROUP}, resourceName=${group.name})}"
-                                class="btn btn-primary right-icon">
+                                class="btn btn-primary btn-sm">
                                 Create Permission <i class="fa fa-plus"></i>
                             </a>
 
                             <a
                                 th:href="@{/consumer_groups/{name}/offset_resetter(name=${group.name})}"
-                                class="to-right btn btn-primary right-icon">
-                                Reset Offsets <span class="glyphicon glyphicon-off"></span>
+                                class="to-right btn btn-primary btn-sm">
+                                Reset Offsets <i class="fa fa-refresh"></i>
                             </a>
                             <button
                                     type="button"
-                                    class="btn btn-danger right-icon"
-                                    data-toggle="modal"
-                                    data-target="#delete-confirm">
+                                    class="btn btn-danger btn-sm"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#delete-confirm">
                                 Delete <i class="fa fa-trash"></i>
                             </button>
                             <div id="delete-confirm" class="modal fade" role="dialog">
                                 <div class="modal-dialog">
                                     <div class="modal-content">
                                         <div class="modal-header">
-                                            <button type="button" class="close" data-dismiss="modal">&times;</button>
                                             <h4 class="modal-title">Confirm Consumer Group Delete</h4>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal">&times;</button>
                                         </div>
                                         <div class="modal-body">
                                             <p>
@@ -95,13 +95,13 @@
                                                     method="post">
                                                 <button
                                                         type="button"
-                                                        class="btn btn-primary"
-                                                        data-dismiss="modal">
+                                                        class="btn btn-primary btn-sm"
+                                                        data-bs-dismiss="modal">
                                                     Cancel
                                                 </button>
                                                 <button
                                                         type="submit"
-                                                        class="btn btn-danger">
+                                                        class="btn btn-danger btn-sm">
                                                     Delete
                                                 </button>
                                             </form>
@@ -112,9 +112,9 @@
                         </div>
                     </div>
         
-                    <div class="panel panel-default">
-                        <div class="panel-heading">Consumer Group</div>
-                        <div class="panel-body">
+                    <div class="card mb-3">
+                        <div class="card-header">Consumer Group</div>
+                        <div class="card-body">
                             <p>
                                 <b>Name:</b>
                                 <span th:text="${group.name}"></span>
@@ -153,16 +153,16 @@
                         </div>
                     </div>
         
-                    <div class="panel panel-default">
-                        <div class="panel-heading">User-Defined Metrics</div>
-                        <div class="panel-body">
+                    <div class="card mb-3">
+                        <div class="card-header">User-Defined Metrics</div>
+                        <div class="card-body">
                             
                             <div class="btn-group">
                                 <button 
                                     type="button" 
-                                    class="btn btn-default dropdown-toggle right-icon" 
+                                    class="btn btn-sm dropdown-toggle"
                                     th:classappend="${groupLagUdm != null ? 'btn-success' : 'btn-default'}"
-                                    data-toggle="dropdown" 
+                                    data-bs-toggle="dropdown"
                                     aria-haspopup="true" 
                                     aria-expanded="false"
                                     th:title="${groupLagUdmName}">
@@ -170,13 +170,13 @@
                                 </button>
                                 <ul class="dropdown-menu">
                                     <li>
-                                        <a th:href="@{/udmetrics/consumer_group_lag/{name}(name=${group.name})}">
-                                            <span class="glyphicon glyphicon-edit"></span> <span th:text="${groupLagUdm != null ? 'Edit' : 'Create'}"></span>
+                                        <a  class="dropdown-item" th:href="@{/udmetrics/consumer_group_lag/{name}(name=${group.name})}">
+                                            <i class="fa fa-edit"></i> <span th:text="${groupLagUdm != null ? 'Edit' : 'Create'}"></span>
                                         </a>
                                     </li>
                                     <li th:if="${groupLagUdm != null}">
-                                        <a class="delete-udm-link" href="#" th:attr="data-action=@{${groupLagUdm.url}}">
-                                            <span class="glyphicon glyphicon-remove"></span> Delete
+                                        <a class="dropdown-item" href="#" th:attr="data-action=@{${groupLagUdm.url}}">
+                                            <i class="fa fa-trash"></i> Delete
                                         </a>
                                     </li>
                                 </ul>
@@ -189,9 +189,9 @@
                         </div>
                     </div>
 
-                    <div th:if="${group.hasMembers()}" class="panel panel-default">
-                        <div class="panel-heading">Members</div>
-                        <div class="panel-body">
+                    <div th:if="${group.hasMembers()}" class="card mb-3">
+                        <div class="card-header">Members</div>
+                        <div class="card-body">
                             <table class="table table-bordered table-striped table-hover">
                                 <thead>
                                     <tr>
@@ -224,9 +224,9 @@
                         </div>
                     </div>
                     
-                    <div th:if="${group.hasOffsets()}" class="panel panel-default">
-                        <div class="panel-heading">Offsets</div>
-                        <div class="panel-body">
+                    <div th:if="${group.hasOffsets()}" class="card mb-3">
+                        <div class="card-header">Offsets</div>
+                        <div class="card-body">
                             <table class="table table-bordered table-striped table-hover">
                                 <thead>
                                     <tr>

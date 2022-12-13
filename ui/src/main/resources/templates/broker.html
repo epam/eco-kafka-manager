@@ -23,7 +23,7 @@
         
         $(function() {
             
-            $('[data-toggle="popover"]').popover();
+            $('[data-bs-toggle="popover"]').popover();
             
             $(document).on('click', function (e) {
                 hidePopoverIfClickedOutside(e);
@@ -41,30 +41,30 @@
 
             <div class="row">
         
-                <div class="col-md-10 col-md-offset-1">
+                <div class="col-md-10 offset-1">
                 
-                    <div class="panel panel-default">
-                        <div class="panel-body">
-                            <a th:href="@{/brokers}" class="btn btn-primary">
+                    <div class="card mb-3">
+                        <div class="card-body">
+                            <a th:href="@{/brokers}" class="btn btn-primary btn-sm">
                                 Back To Brokers <i class="fa fa-long-arrow-left"></i>
                             </a>
                             <a 
                                 th:href="@{/brokers/{id}/config(id=${broker.id})}"
-                                class="btn btn-primary right-icon">
+                                class="btn btn-primary btn-sm">
                                 Update Config <i class="fa fa-pencil"></i>
                             </a>
                             <a 
                                 th:href="@{/brokers/{id}/metadata(id=${broker.id})}"
-                                class="btn btn-primary">
+                                class="btn btn-primary btn-sm">
                                 Edit Metadata 
                                 <i class="fa fa-tags"></i>
                             </a>
                         </div>
                     </div>
         
-                    <div class="panel panel-default">
-                        <div class="panel-heading">Broker</div>
-                        <div class="panel-body">
+                    <div class="card mb-3">
+                        <h7 class="card-header">Broker</h7>
+                        <div class="card-body">
                             <p>
                                 <b>Id:</b>
                                 <span th:text="${broker.id}"></span>
@@ -98,9 +98,9 @@
                         </div>
                     </div>
         
-                    <div class="panel panel-default">
-                        <div class="panel-heading">Configs</div>
-                        <div class="panel-body">
+                    <div class="card mb-3">
+                        <h7 class="card-header">Configs</h7>
+                        <div class="card-body">
                             <table class="table table-bordered table-striped table-hover">
                                 <thead>
                                     <tr>
@@ -111,18 +111,19 @@
                                 <tbody>
                                     <tr 
                                         th:each="config : ${broker.allConfigEntries.values()}"
-                                        th:classappend="${!config.default} ? 'info' : ''">
+                                        th:classappend="${!config.default} ? 'table-info' : ''">
                                         <td>
                                             <span th:text="${config.name}"></span>
                                             <a 
                                                 href="javascript:void(0);"
-                                                data-toggle="popover"
-                                                data-html="true"
-                                                th:attr="data-content=${config.def.documentation}">
-                                                <span class="glyphicon glyphicon-info-sign"></span>
+                                                data-bs-toggle="popover"
+                                                data-bs-html="true"
+                                                th:attr="data-bs-content=${config.def.documentation}">
+                                                <i class="fa fa-info-circle"></i>
                                             </a>
                                         </td>
-                                        <td th:text="${config.valueOrMaskIfSensitive}">
+                                        <td style="word-break: break-word;"
+                                            th:text="${config.valueOrMaskIfSensitive}">
                                         </td>
                                     </tr>
                                 </tbody>
