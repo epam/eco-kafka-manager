@@ -68,103 +68,103 @@
         <div class="container-fluid">
 
             <div class="row">
-                <div class="col-md-10 col-md-offset-1">
+                <div class="col-md-10 offset-1">
                     <h3>Topics (<span th:text="${totalCount}"></span>)</h3>
                 </div>
             </div>
         
             <div class="row">
             
-                <div class="col-md-10 col-md-offset-1">
+                <div class="col-md-10 offset-1">
                 
-                    <div class="panel panel-default ">
-                        <div class="panel-body">
+                    <div class="card mb-3">
+                        <div class="card-body">
                         
                             <a 
                                 th:href="@{/topic_create}" 
-                                class="btn btn-primary right-icon">
+                                class="btn btn-primary btn-sm">
                                 Create <i class="fa fa-plus"></i>
                             </a>
                         
                             <div class="dropdown" style="display:inline-block;">
-                                <button 
-                                    class="btn btn-primary right-icon dropdown-toggle" 
+                                <button
+                                    class="btn btn-primary btn-sm dropdown-toggle"
                                     type="button" 
-                                    id="exportButton" 
-                                    data-toggle="dropdown" 
-                                    aria-haspopup="true" 
+                                    id="exportButton"
+                                    data-bs-toggle="dropdown"
+                                    aria-haspopup="true"
                                     aria-expanded="true">
-                                    Export <i class="fa fa-external-link"></i>
+                                    Export
                                 </button>
                                 <ul class="dropdown-menu" aria-labelledby="exportButton">
                                     <li>
-                                        <a 
+                                        <a class="dropdown-item"
                                             th:href="@{/topics_export(exporterType=PLAIN, topicName=${searchCriteria.topicName}, minPartitionCount=${searchCriteria.minPartitionCount}, maxPartitionCount=${searchCriteria.maxPartitionCount}, minReplicationFactor=${searchCriteria.minReplicationFactor}, maxReplicationFactor=${searchCriteria.maxReplicationFactor}, minConsumerCount=${searchCriteria.minConsumerCount}, maxConsumerCount=${searchCriteria.maxConsumerCount}, replicationState=${searchCriteria.replicationState}, configString=${searchCriteria.configString}, description=${searchCriteria.description})}" target="_blank">
                                             Plain
                                         </a>
                                     </li>
                                     <li>
-                                        <a 
+                                        <a class="dropdown-item"
                                             th:href="@{/topics_export(exporterType=JSON, topicName=${searchCriteria.topicName}, minPartitionCount=${searchCriteria.minPartitionCount}, maxPartitionCount=${searchCriteria.maxPartitionCount}, minReplicationFactor=${searchCriteria.minReplicationFactor}, maxReplicationFactor=${searchCriteria.maxReplicationFactor}, minConsumerCount=${searchCriteria.minConsumerCount}, maxConsumerCount=${searchCriteria.maxConsumerCount}, replicationState=${searchCriteria.replicationState}, configString=${searchCriteria.configString}, description=${searchCriteria.description})}" target="_blank">
                                             Json
                                         </a>
                                     </li>
                                 </ul>
                             </div>
-                            
+
                         </div>
                     </div>            
                 
-                    <form class="form-inline form-flex" id="search_form">
-                        <input 
+                    <form class="form-inline form-flex flex-wrap" id="search_form">
+                        <input
                             type="text"
-                            class="form-control" 
+                            class="form-control col-auto"
                             id="topicName" 
                             placeholder="Topic Name"
                             th:value="${searchCriteria.topicName}"/>
                         <input
                             type="number"
-                            class="form-control"
+                            class="form-control col-auto"
                             min="1"
                             id="minPartitionCount" 
                             placeholder="Min Partition Count"
                             th:value="${searchCriteria.minPartitionCount}"/>
                         <input 
                             type="number"
-                            class="form-control"
+                            class="form-control col-auto"
                             min="1"
                             id="maxPartitionCount" 
                             placeholder="Max Partition Count"
                             th:value="${searchCriteria.maxPartitionCount}"/>
                         <input 
                             type="number"
-                            class="form-control"
+                            class="form-control col-auto"
                             min="1"
                             id="minReplicationFactor" 
                             placeholder="Min Replication Factor"
                             th:value="${searchCriteria.minReplicationFactor}"/>
                         <input 
                             type="number"
-                            class="form-control"
+                            class="form-control col-auto"
                             min="1"
                             id="maxReplicationFactor" 
                             placeholder="Max Replication Factor"
                             th:value="${searchCriteria.maxReplicationFactor}"/>
                         <input 
                             type="number"
-                            class="form-control"
+                            class="form-control col-auto"
                             min="1"
                             id="minConsumerCount" 
                             placeholder="Min Consumer Count"
                             th:value="${searchCriteria.minConsumerCount}"/>
                         <input 
                             type="number"
-                            class="form-control"
+                            class="form-control col-auto"
                             min="1"
                             id="maxConsumerCount" 
                             placeholder="Max Consumer Count"
                             th:value="${searchCriteria.maxConsumerCount}"/>
-                        <select title="Replication State" class="form-control" id="replicationState">
+                        <select title="Replication State" class="form-select col-auto" id="replicationState">
                             <option 
                                 th:each="state : ${T(com.epam.eco.kafkamanager.TopicSearchCriteria$ReplicationState).values()}"
                                 th:value="${state}" 
@@ -174,19 +174,19 @@
                         </select>
                         <input
                             type="text"
-                            class="form-control" 
+                            class="form-control col-auto"
                             id="configString" 
                             placeholder="Config: Value;..."
                             th:value="${searchCriteria.configString}"/>
                         <input
                             type="text"
-                            class="form-control"
+                            class="form-control col-auto"
                             id="description" 
                             placeholder="Description"
                             th:value="${searchCriteria.description}"/>
                         <button
                             type="submit"
-                            class="btn btn-primary">
+                            class="btn btn-primary btn-sm">
                             Find
                         </button>
                     </form>
@@ -197,7 +197,7 @@
             
             <div class="row">
         
-                <div class="col-md-10 col-md-offset-1">
+                <div class="col-md-10 offset-1">
                 
                     <div th:if="${page != null}">
                         <table class="table table-bordered table-striped table-hover">

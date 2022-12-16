@@ -38,39 +38,39 @@
 
             <div class="row">
         
-                <div class="col-md-10 col-md-offset-1">
+                <div class="col-md-10 offset-1">
                 
-                    <div class="panel panel-default">
-                        <div class="panel-body">
+                    <div class="card mb-3">
+                        <div class="card-body">
                             <a  
                                 th:href="@{/brokers/{id}(id=${broker.id})}"
-                                class="btn btn-primary">
-                                Back To Broker <span class="glyphicon glyphicon-arrow-left"></span>
+                                class="btn btn-primary btn-sm">
+                                Back To Broker <i class="fa fa-arrow-left"></i>
                             </a>
                             
                             <a 
                                 id="delete-metadata-link" 
                                 href="#"
-                                class="btn btn-primary">
-                                Delete <span class="glyphicon glyphicon-remove"></span>
+                                class="btn btn-danger btn-sm">
+                                Delete <i class="fa fa-trash"></i>
                             </a>
                             
                         </div>
                     </div>
                 
-                    <div class="panel panel-default">
+                    <div class="card mb-3">
                     
-                        <div th:if="${metadata != null}" class="panel-heading">
+                        <div th:if="${metadata != null}" class="card-header">
                             Last updated at <b><span th:text="${metadata.updated}"></span></b> by <b><span th:text="${metadata.updatedBy}"></span></b>
                         </div>
                         
-                        <div class="panel-body">
+                        <div class="card-body">
                             
                             <form 
                                 th:action="@{/brokers/{id}/metadata(id=${broker.id})}" 
                                 method="post">
 
-                                <div class="form-group">
+                                <div class="form-group mb-3">
                                     <label for="brokerId">Broker Id</label>
                                     <input 
                                         type="text" 
@@ -81,7 +81,7 @@
                                         th:value="${broker.id}"/>
                                 </div>
                                 
-                                <div class="form-group">
+                                <div class="form-group mb-3">
                                     <label for="description">Description</label>
                                     <textarea 
                                         rows="5" cols="70" 
@@ -91,7 +91,7 @@
                                         th:text="${metadata != null ? metadata.description : null}"></textarea>
                                 </div>
                                 
-                                <div class="form-group">
+                                <div class="form-group mb-3">
                                     <label for="attributes">Attributes (JSON)</label>
                                     <textarea 
                                         rows="5" cols="70" 
@@ -101,7 +101,7 @@
                                         th:text="${metadata != null ? metadata.attributesJson : null}"></textarea>
                                 </div>
                                 
-                                <button type="submit" class="btn btn-primary blue">Save</button>
+                                <button type="submit" class="btn btn-primary blue btn-sm">Save</button>
                         
                             </form>
                             

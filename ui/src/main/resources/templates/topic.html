@@ -29,7 +29,7 @@
                 $('#delete-udm-form').submit();
             });
             
-            $('[data-toggle="popover"]').popover();
+            $('[data-bs-toggle="popover"]').popover();
             
             $(document).on('click', function (e) {
                 hidePopoverIfClickedOutside(e);
@@ -56,61 +56,61 @@
 
             <div class="row">
         
-                <div class="col-md-10 col-md-offset-1">
+                <div class="col-md-10 offset-1">
                 
-                    <div class="panel panel-default">
-                        <div class="panel-body panel-flex">
+                    <div class="card mb-3">
+                        <div class="card-body card-flex">
 
                             <a
                                 th:href="@{/topics}" 
-                                class="btn btn-primary right-icon">
+                                class="btn btn-sm btn-primary">
                                 Back To Topics <i class="fa fa-arrow-left"></i>
                             </a>
 
                             <a 
                                 th:href="@{/topics/{name}/config(name=${topic.name})}"
-                                class="btn btn-primary right-icon">
+                                class="btn btn-sm btn-primary">
                                 Update Config <i class="fa fa-pencil"></i>
                             </a>
                             <a 
                                 th:href="@{/topics/{name}/partitions(name=${topic.name})}"
-                                class="btn btn-primary right-icon">
+                                class="btn btn-sm btn-primary">
                                 Add Partitions <i class="fa fa-plus"></i>
                             </a>
                             <a
                                 th:href="@{/topics/{name}/browser(name=${topic.name})}"
-                                class="btn btn-primary right-icon">
+                                class="btn btn-sm btn-primary">
                                 Browse Data <i class="fa fa-search"></i>
                             </a>
                             <a 
                                 th:href="@{/topics/{name}/metadata(name=${topic.name})}"
-                                class="btn btn-primary right-icon">
+                                class="btn btn-sm btn-primary">
                                 Edit Metadata <i class="fa fa-tags"></i>
                             </a>
                             <a
                                 th:href="@{/permissions/(resourceType=${T(org.apache.kafka.common.resource.ResourceType).TOPIC}, resourceName=${topic.name})}"
-                                class="btn btn-primary right-icon">
-                                View Permissions <span class="glyphicon glyphicon-list"></span>
+                                class="btn btn-sm btn-primary">
+                                View Permissions <i class="fa fa-list"></i>
                             </a>
                             <a
                                 th:href="@{/permissions/create(resourceType=${T(org.apache.kafka.common.resource.ResourceType).TOPIC}, resourceName=${topic.name})}"
-                                class="btn btn-primary right-icon">
+                                class="btn btn-sm btn-primary">
                                 Create Permission <i class="fa fa-plus"></i>
                             </a>
                             
                             <button 
                                 type="button"
-                                class="to-right btn btn-danger right-icon"
-                                data-toggle="modal" 
-                                data-target="#purge-confirm">
+                                class="to-right btn btn-danger btn-sm"
+                                data-bs-toggle="modal"
+                                data-bs-target="#purge-confirm">
                                 Purge <i class="fa fa-eraser"></i>
                             </button>
                             <div id="purge-confirm" class="modal fade" role="dialog">
                                 <div class="modal-dialog">
                                     <div class="modal-content">
                                         <div class="modal-header">
-                                            <button type="button" class="close" data-dismiss="modal">&times;</button>
                                             <h4 class="modal-title">Confirm Topic Purge</h4>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal">&times;</button>
                                         </div>
                                         <div class="modal-body">
                                             <p>
@@ -133,7 +133,7 @@
                                                 <button 
                                                     type="button" 
                                                     class="btn btn-primary" 
-                                                    data-dismiss="modal">
+                                                    data-bs-dismiss="modal">
                                                     Cancel
                                                 </button>
                                                 <button 
@@ -148,17 +148,17 @@
                             </div>
                             <button 
                                 type="button"
-                                class="btn btn-danger right-icon"
-                                data-toggle="modal"
-                                data-target="#delete-confirm">
+                                class="btn btn-danger btn-sm"
+                                data-bs-toggle="modal"
+                                data-bs-target="#delete-confirm">
                                 Delete <i class="fa fa-trash"></i>
                             </button>
                             <div id="delete-confirm" class="modal fade" role="dialog">
                                 <div class="modal-dialog">
                                     <div class="modal-content">
                                         <div class="modal-header">
-                                            <button type="button" class="close" data-dismiss="modal">&times;</button>
                                             <h4 class="modal-title">Confirm Topic Delete</h4>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal">&times;</button>
                                         </div>
                                         <div class="modal-body">
                                             <p>
@@ -172,7 +172,7 @@
                                                 <button 
                                                     type="button" 
                                                     class="btn btn-primary" 
-                                                    data-dismiss="modal">
+                                                    data-bs-dismiss="modal">
                                                     Cancel
                                                 </button>
                                                 <button 
@@ -188,9 +188,9 @@
                         </div>
                     </div>
                 
-                    <div class="panel panel-default">
-                        <div class="panel-heading">Topic</div>
-                        <div class="panel-body">
+                    <div class="card mb-3">
+                        <h7 class="card-header">Topic</h7>
+                        <div class="card-body">
                             <p>
                                 <b>Name:</b>
                                 <span th:text="${topic.name}"></span>
@@ -214,7 +214,7 @@
                                 <a
                                         id="count_records"
                                         href="#"
-                                        class="btn btn-success"
+                                        class="btn btn-success btn-sm"
                                         th:title="${topic.countRecordsTaskResultAsString}"
                                         th:classappend="${topic.countRecordsTaskRunning} ? 'disabled' : ''">
                                     <span
@@ -241,20 +241,20 @@
                                     </a>
                                 </th:block>
                             </p>
-                            
+
                         </div>
                     </div>
         
-                    <div class="panel panel-default">
-                        <div class="panel-heading">User-Defined Metrics</div>
-                        <div class="panel-body">
+                    <div class="card mb-3">
+                        <h7 class="card-header">User-Defined Metrics</h7>
+                        <div class="card-body">
                             
                             <div class="btn-group">
                                 <button
                                     type="button" 
-                                    class="btn dropdown-toggle" 
+                                    class="btn dropdown-toggle btn-sm"
                                     th:classappend="${topicOffsetIncreaseUdm != null ? 'btn-success' : 'btn-default'}"
-                                    data-toggle="dropdown" 
+                                    data-bs-toggle="dropdown"
                                     aria-haspopup="true" 
                                     aria-expanded="false"
                                     th:title="${topicOffsetIncreaseUdmName}">
@@ -262,13 +262,13 @@
                                 </button>
                                 <ul class="dropdown-menu">
                                     <li>
-                                        <a th:href="@{/udmetrics/topic_offset_increase/{name}(name=${topic.name})}">
-                                            <span class="glyphicon glyphicon-edit"></span> <span th:text="${topicOffsetIncreaseUdm != null ? 'Edit' : 'Create'}"></span>
+                                        <a class="dropdown-item" th:href="@{/udmetrics/topic_offset_increase/{name}(name=${topic.name})}">
+                                            <i class="fa fa-edit"></i> <span th:text="${topicOffsetIncreaseUdm != null ? 'Edit' : 'Create'}"></span>
                                         </a>
                                     </li>
                                     <li th:if="${topicOffsetIncreaseUdm != null}">
-                                        <a class="delete-udm-link" href="#" th:attr="data-action=@{${topicOffsetIncreaseUdm.url}}">
-                                            <span class="glyphicon glyphicon-remove"></span> Delete
+                                        <a class="dropdown-item" href="#" th:attr="data-action=@{${topicOffsetIncreaseUdm.url}}">
+                                            <i class="fa fa-trash"></i> Delete
                                         </a>
                                     </li>
                                 </ul>
@@ -281,9 +281,9 @@
                         </div>
                     </div>
                     
-                    <div class="panel panel-default">
-                        <div class="panel-heading">Partitions</div>
-                        <div class="panel-body">
+                    <div class="card mb-3">
+                        <h7 class="card-header">Partitions</h7>
+                        <div class="card-body">
                             <table th:if="${!topic.partitions.isEmpty()}" class="table table-bordered table-striped table-hover">
                                 <thead>
                                     <tr>
@@ -332,9 +332,9 @@
                         </div>
                     </div>
                     
-                    <div class="panel panel-default">
-                        <div class="panel-heading">Consumer Group(s) Offsets</div>
-                        <div class="panel-body">
+                    <div class="card mb-3">
+                        <h7 class="card-headerg">Consumer Group(s) Offsets</h7>
+                        <div class="card-body">
                             <div th:with="offsets=${topic.consumerGroupOffsets}">
                                 
                                 <div th:if="${offsets.isEmpty()}" class="alert alert-warning">
@@ -391,28 +391,28 @@
                         </div>
                     </div>
                     
-                    <div class="panel panel-default">
-                        <div class="panel-heading">Configs</div>
-                        <div class="panel-body">
+                    <div class="card mb-3">
+                        <h7 class="card-header">Configs</h7>
+                        <div class="card-body">
                             <table class="table table-bordered table-striped table-hover">
                                 <thead>
                                     <tr>
-                                        <td>Name</td>
-                                        <td>Value</td>
+                                        <th>Name</th>
+                                        <th>Value</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     <tr
                                         th:each="config : ${topic.allConfigEntries.values()}"
-                                        th:classappend="${!config.default} ? 'info' : ''">
+                                        th:classappend="${!config.default} ? 'table-info' : ''">
                                         <td>
                                             <span th:text="${config.name}"></span>
                                             <a 
                                                 href="javascript:void(0);"
-                                                data-toggle="popover"
-                                                data-html="true"
-                                                th:attr="data-content=${config.def.documentation}">
-                                                <span class="glyphicon glyphicon-info-sign"></span>
+                                                data-bs-toggle="popover"
+                                                data-bs-html="true"
+                                                th:attr="data-bs-content=${config.def.documentation}">
+                                                <i class="fa fa-info-circle"></i>
                                             </a>
                                         </td>
                                         <td th:text="${config.valueOrMaskIfSensitive}">

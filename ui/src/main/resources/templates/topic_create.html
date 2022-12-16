@@ -29,7 +29,7 @@
                 });
             });
             
-            $('[data-toggle="popover"]').popover();
+            $('[data-bs-toggle="popover"]').popover();
             
             $(document).on('click', function (e) {
                 hidePopoverIfClickedOutside(e);
@@ -46,13 +46,13 @@
 
             <div class="row">
         
-                <div class="col-md-10 col-md-offset-1">
+                <div class="col-md-10 offset-1">
                     
-                    <div class="panel panel-default">
-                        <div class="panel-body">
+                    <div class="card mb-3">
+                        <div class="card-body">
                             <a 
                                 th:href="@{/topics}" 
-                                class="btn btn-primary right-icon">
+                                class="btn btn-primary btn-sm">
                                 Back To Topics <i class="fa fa-arrow-left"></i>
                             </a>
                         </div>
@@ -60,22 +60,22 @@
                     
                     <form th:action="@{/topic_create}" method="post">
                     
-                        <div class="panel panel-default">
-                            <div class="panel-heading">Topic</div>
-                            <div class="panel-body">
+                        <div class="card mb-3">
+                            <h5 class="card-header">Topic</h5>
+                            <div class="card-body">
                             
-                                <div class="row form-group">
-                                    <div class="form-group col col-md-4">
-                                        <label for="name">Name</label>
+                                <div class="row form-group mb-3">
+                                    <div class="form-group col col-md-8">
+                                        <label for="topicName">Name</label>
                                         <input 
                                             type="text" 
-                                            class="form-control" 
+                                            class="form-control"
                                             id="topicName" 
                                             name="topicName"/>
                                     </div>
                                 </div>
                                 
-                                <div class="row form-group">
+                                <div class="row form-group mb-3">
                                     <div class="form-group col col-md-2">
                                         <label for="partitionCount">Partition Count</label>
                                         <input 
@@ -99,8 +99,8 @@
                                     </div>
                                 </div>
                                 
-                                <div class="row form-group">
-                                    <div class="form-group col col-md-4">
+                                <div class="row form-group mb-3">
+                                    <div class="form-group col col-md-8">
                                         <label for="description">Description</label>
                                         <textarea 
                                             rows="5" cols="70" 
@@ -110,8 +110,8 @@
                                     </div>
                                 </div>
                                 
-                                <div class="row form-group">
-                                    <div class="form-group col col-md-4">
+                                <div class="row form-group mb-3">
+                                    <div class="form-group col col-md-8">
                                         <label for="attributes">Attributes (JSON)</label>
                                         <textarea 
                                             rows="5" cols="70" 
@@ -124,11 +124,11 @@
                             </div>
                         </div>
                         
-                        <div class="panel panel-default">
-                            <div class="panel-heading">Configs</div>
-                            <div class="panel-body">
+                        <div class="card mb-3">
+                            <h5 class="card-header">Configs</h5>
+                            <div class="card-body">
                             
-                                <a id="clear-all-configs-link" href="#" class="btn btn-default small righ-icon">
+                                <a id="clear-all-configs-link" href="#" class="btn btn-danger btn-sm">
                                     Clear All <i class="fa fa-remove-circle"></i>
                                 </a>
                             
@@ -147,10 +147,10 @@
                                                 <span th:text="${configKey.name}"></span>
                                                 <a 
                                                     href="javascript:void(0);"
-                                                    data-toggle="popover"
-                                                    data-html="true"
-                                                    th:attr="data-content=${configKey.documentation}">
-                                                    <span class="glyphicon glyphicon-info-sign"></span>
+                                                    data-bs-toggle="popover"
+                                                    data-bs-html="true"
+                                                    th:attr="data-bs-content=${configKey.documentation}">
+                                                    <i class="fa fa-info-circle"></i>
                                                 </a>
                                             </td>
                                             <td>
@@ -169,9 +169,9 @@
                                 </table>
                             </div>
                         </div>
-                        
-                        <button type="submit" class="btn btn-primary">Create</button>
-                                
+
+                        <button type="submit" class="btn btn-primary btn-sm">Create</button>
+
                     </form>
                 
                 </div>

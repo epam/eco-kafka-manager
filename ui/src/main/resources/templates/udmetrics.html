@@ -76,15 +76,15 @@
         <div class="container-fluid">
 
             <div class="row">
-                <div class="col-md-10 col-md-offset-1">
+                <div class="col-md-10 offset-1">
                     <h3>User-Defined Metrics (<span th:text="${totalCount}"></span>)</h3>
                 </div>
             </div>
         
             <div class="row">
-                <div class="col-md-10 col-md-offset-1">
+                <div class="col-md-10 offset-1">
                     <form class="form-inline form-flex" id="search_form">
-                        <select title="Type" class="form-control" id="type">
+                        <select title="Type" class="form-select col-4" id="type">
                             <option value="">-</option>
                             <option 
                                 th:each="type : ${T(com.epam.eco.kafkamanager.udmetrics.UDMetricType).values()}"
@@ -95,11 +95,11 @@
                         </select>
                         <input 
                             type="text" 
-                            class="form-control"
+                            class="form-control col"
                             id="resourceName" 
                             placeholder="Resource Name"
                             th:value="${searchCriteria.resourceName}"/>
-                        <select title="Status" class="form-control" id="status">
+                        <select title="Status" class="form-select col-2" id="status">
                             <option value="">-</option>
                             <option 
                                 th:each="status : ${T(com.epam.eco.kafkamanager.udmetrics.UDMetricSearchCriteria$Status).values()}"
@@ -110,13 +110,13 @@
                         </select>
                         <button 
                             type="submit" 
-                            class="btn btn-primary">
+                            class="btn btn-primary btn-sm">
                             Find
                         </button>
                         <button
                             type="button"
                             id="update-failed-button"
-                            class="btn btn-primary"
+                            class="btn btn-primary btn-sm"
                             th:disabled="${!hasErrors}">
                             Update failed metrics
                         </button>
@@ -130,7 +130,7 @@
             
             <div class="row">
         
-                <div class="col-md-10 col-md-offset-1">
+                <div class="col-md-10 offset-1">
         
                     <div th:if="${page != null}">
                         <table class="table table-bordered table-striped table-hover">
@@ -169,18 +169,22 @@
                                     </td>
                                     <td>
                                         <div class="btn-group">
-                                            <button class="btn btn-default transparent dropdown-toggle right-icon" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                            <button class="btn transparent dropdown-toggle btn-sm"
+                                                    type="button"
+                                                    data-bs-toggle="dropdown"
+                                                    aria-haspopup="true"
+                                                    aria-expanded="false">
                                                 Action <span class="caret"></span>
                                             </button>
                                             <ul class="dropdown-menu">
                                                 <li>
-                                                    <a th:href="@{${udm.url}}">
-                                                        <span class="glyphicon glyphicon-edit"></span> Edit
+                                                    <a class="dropdown-item" th:href="@{${udm.url}}">
+                                                        <i class="fa fa-edit"></i> Edit
                                                     </a>
                                                 </li>
                                                 <li>
-                                                    <a class="delete-udm-link" href="#" th:attr="data-action=@{${udm.url}}">
-                                                        <span class="glyphicon glyphicon-remove"></span> Delete
+                                                    <a class="dropdown-item" href="#" th:attr="data-action=@{${udm.url}}">
+                                                        <i class="fa fa-trash"></i> Delete
                                                     </a>
                                                 </li>
                                             </ul>

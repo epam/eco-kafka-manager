@@ -27,31 +27,31 @@
 
             <div class="row">
         
-                <div class="col-md-10 col-md-offset-1">
+                <div class="col-md-10 offset-1">
                 
-                    <div class="panel panel-default">
-                        <div class="panel-body panel-flex">
+                    <div class="card mb-3">
+                        <div class="card-body card-flex">
                             <a
                                 th:href="@{/transactions}" 
-                                class="btn btn-primary right-icon">
+                                class="btn btn-primary btn-sm">
                                 Back To Transactions <i class="fa fa-arrow-left"></i>
                             </a>
                             <a
                                 th:href="@{/permissions/(resourceType=${T(org.apache.kafka.common.resource.ResourceType).TRANSACTIONAL_ID}, resourceName=${transaction.transactionalId})}"
-                                class="btn btn-primary right-icon">
-                                View Permissions <span class="glyphicon glyphicon-list"></span>
+                                class="btn btn-primary btn-sm">
+                                View Permissions <i class="fa fa-list"></i>
                             </a>
                             <a
                                 th:href="@{/permissions/create(resourceType=${T(org.apache.kafka.common.resource.ResourceType).TRANSACTIONAL_ID}, resourceName=${transaction.transactionalId})}"
-                                class="btn btn-primary right-icon">
+                                class="btn btn-primary btn-sm">
                                 Create Permission <i class="fa fa-plus"></i>
                             </a>
                         </div>
                     </div>
                 
-                    <div class="panel panel-default">
-                        <div class="panel-heading">Transaction</div>
-                        <div class="panel-body">
+                    <div class="card mb-3">
+                        <div class="card-header">Transaction</div>
+                        <div class="card-body">
                             <p>
                                 <b>Transactional Id:</b>
                                 <span th:text="${transaction.transactionalId}"></span>
@@ -97,9 +97,9 @@
                         </div>
                     </div>
                     
-                    <div class="panel panel-default">
-                        <div class="panel-heading">History</div>
-                        <div class="panel-body">
+                    <div class="card mb-3">
+                        <div class="card-header">History</div>
+                        <div class="card-body">
                             <table th:if="${!transaction.history.isEmpty()}" class="table table-bordered table-striped table-hover">
                                 <thead>
                                     <tr>

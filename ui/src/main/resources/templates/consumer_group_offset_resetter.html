@@ -76,21 +76,21 @@
 
             <div class="row">
         
-                <div class="col-md-10 col-md-offset-1">
+                <div class="col-md-10 offset-1">
                 
-                    <div class="panel panel-default">
-                        <div class="panel-body">
+                    <div class="card mb-3">
+                        <div class="card-body">
                             <a
                                     th:href="@{/consumer_groups/{name}(name=${resetParams.groupName})}"
-                                    class="btn btn-primary right-icon">
-                                Back To Consumer Group <span class="glyphicon glyphicon-arrow-left"></span>
+                                    class="btn btn-primary btn-sm">
+                                Back To Consumer Group <i class="fa fa-arrow-left"></i>
                             </a>
                         </div>
                     </div>
         
-                    <div class="panel panel-default">
-                        <div class="panel-heading">Reset Params</div>
-                        <div class="panel-body">
+                    <div class="card mb-3">
+                        <div class="card-header">Reset Params</div>
+                        <div class="card-body">
                         
                             <div th:if="${!group.members.isEmpty()}" class="alert alert-warning">
                                 Consumer group has <b><span th:text="${group.members.size()}"></span></b> active member(s), so resetting offsets might fail and lead to unexpected results!   
@@ -105,38 +105,40 @@
                                 th:action="@{/consumer_groups/{name}/offset_resetter(name=${resetParams.groupName})}"
                                 method="post">
                             
-                                <div class="form-group">
+                                <div class="form-group mb-3">
                                     <label for="groupName">Consumer Group</label>
                                     <input type="text" class="form-control" id="groupName" name="groupName" th:value="${resetParams.groupName}" readonly="readonly"/>
                                 </div>
-                                
-                                <a id="all-partitions-link" href="#" class="btn btn-default transparent right-icon">
-                                    All <span class="glyphicon glyphicon-ok-circle"></span>
-                                </a>
-                                <a id="none-partitions-link" href="#" class="btn btn-default transparent right-icon">
-                                    None <span class="glyphicon glyphicon-ban-circle"></span>
-                                </a>
-                                <a id="smallest-partitions-link" href="#" class="btn btn-default transparent right-icon">
-                                    Smallest <span class="glyphicon glyphicon-arrow-down"></span>
-                                </a>
-                                <a id="largest-partitions-link" href="#" class="btn btn-default transparent right-icon">
-                                    Largest <span class="glyphicon glyphicon-arrow-up"></span>
-                                </a>
-                                <div class="row" th:each="batch, batchIterator : ${resetParams.listPartitionBatches(3)}">
+
+                                <div class="mb-3">
+                                    <a id="all-partitions-link" href="#" class="btn btn-primary btn-sm">
+                                        All <i class="fa fa-check-circle-o"></i>
+                                    </a>
+                                    <a id="none-partitions-link" href="#" class="btn btn-primary btn-sm">
+                                        None <i class="fa fa-circle-o"></i>
+                                    </a>
+                                    <a id="smallest-partitions-link" href="#" class="btn btn-primary btn-sm">
+                                        Smallest <i class="fa fa-arrow-circle-o-down"></i>
+                                    </a>
+                                    <a id="largest-partitions-link" href="#" class="btn btn-primary btn-sm">
+                                        Largest <i class="fa fa-arrow-circle-o-up"></i>
+                                    </a>
+                                </div>
+                                <div class="row mb-3" th:each="batch, batchIterator : ${resetParams.listPartitionBatches(3)}">
                                     <th:block 
                                         th:each="partition, partitionIterator : ${batch}" 
                                         th:with="partitionElemId=${'' + batchIterator.index + partitionIterator.index},enabled=${resetParams.isPartitionEnabled(partition)},offset=${resetParams.getPartitionOffset(partition)},range=${resettableRanges.get(partition)}">
                                         <div class="form-group col col-md-4">
                                             <label th:for="${'p_' + partitionElemId}" th:text="${partition}"></label>
                                             <div class="input-group">
-                                                <span class="input-group-addon">
+                                                <div class="input-group-text">
                                                     <input 
                                                         type="checkbox" 
                                                         class="partition-checkbox" 
                                                         th:attr="data-partition-elem-id=${partitionElemId},data-offset-smallest=${range.smallest},data-offset-largest=${range.largest}" 
                                                         th:checked="${enabled}"/>
-                                                </span>
-                                                <span class="input-group-addon" th:text="${range.smallest}"></span>
+                                                </div>
+                                                <span class="input-group-text" th:text="${range.smallest}"></span>
                                                 <input 
                                                     type="number"
                                                     class="form-control"
@@ -146,7 +148,7 @@
                                                     th:id="${'p_' + partitionElemId}" 
                                                     th:name="${'p_' + partition}" 
                                                     th:value="${offset}"/>
-                                                <span class="input-group-addon" th:text="${range.largest}"></span>
+                                                <span class="input-group-text" th:text="${range.largest}"></span>
                                                 <input 
                                                     type="hidden" 
                                                     th:id="${'pe_' + partitionElemId}" 
@@ -157,7 +159,7 @@
                                     </th:block>
                                 </div>
         
-                                <button type="submit" class="btn btn-danger">Reset</button>
+                                <button type="submit" class="btn btn-danger btn-sm">Reset</button>
                                 
                             </form>
                         

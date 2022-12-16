@@ -71,7 +71,7 @@ location.params = function(params_set, params_append, params_subtract) {
 };
 
 function hidePopoverIfClickedOutside(e) {
-    $('[data-toggle="popover"],[data-original-title]').each(function () {
+    $('[data-bs-toggle="popover"],[data-original-title]').each(function () {
         //the 'is' for buttons that trigger popups
         //the 'has' for icons within a button that triggers a popup
         if (!$(this).is(e.target) && $(this).has(e.target).length === 0 && $('.popover').has(e.target).length === 0) {

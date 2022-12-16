@@ -68,73 +68,73 @@
         <div class="container-fluid">
 
             <div class="row">
-                <div class="col-md-10 col-md-offset-1">
+                <div class="col-md-10 offset-1">
                     <h3>Permissions (<span th:text="${totalCount}"></span>)</h3>
                 </div>
             </div>
         
             <div class="row">
             
-                <div class="col-md-10 col-md-offset-1">
+                <div class="col-md-10 offset-1">
                 
-                    <div class="panel panel-default">
-                        <div class="panel-body">
+                    <div class="card mb-3">
+                        <div class="card-body">
 
                             <a
                                     th:href="@{/permissions/create}"
-                                    class="btn btn-primary right-icon">
+                                    class="btn btn-primary btn-sm">
                                 Create <i class="fa fa-plus"></i>
                             </a>
 
                             <div class="dropdown" style="display:inline-block;">
                                 <button
-                                        class="btn btn-primary right-icon dropdown-toggle"
+                                        class="btn btn-primary btn-sm dropdown-toggle"
                                         type="button"
                                         id="exportButton"
-                                        data-toggle="dropdown"
+                                        data-bs-toggle="dropdown"
                                         aria-haspopup="true"
                                         aria-expanded="true">
-                                    Export <i class="fa fa-external-link"></i>
+                                    Export
                                 </button>
                                 <ul class="dropdown-menu" aria-labelledby="exportButton">
                                     <li>
-                                        <a 
+                                        <a class="dropdown-item"
                                             th:href="@{/permissions/export(exporterType=PLAIN, resourceType=${searchCriteria.resourceType}, resourceName=${searchCriteria.resourceName}, patternType=${searchCriteria.patternType}, kafkaPrincipal=${searchCriteria.kafkaPrincipal}, permissionType=${searchCriteria.permissionType}, operation=${searchCriteria.operation}, host=${searchCriteria.host}, description=${searchCriteria.description})}" target="_blank">
                                             Plain
                                         </a>
                                     </li>
                                     <li>
-                                        <a 
+                                        <a class="dropdown-item"
                                             th:href="@{/permissions/export(exporterType=JSON, resourceType=${searchCriteria.resourceType}, resourceName=${searchCriteria.resourceName}, patternType=${searchCriteria.patternType}, kafkaPrincipal=${searchCriteria.kafkaPrincipal}, permissionType=${searchCriteria.permissionType}, operation=${searchCriteria.operation}, host=${searchCriteria.host}, description=${searchCriteria.description})}" target="_blank">
                                             Json
                                         </a>
                                     </li>
                                     <li>
-                                        <a 
+                                        <a class="dropdown-item"
                                             th:href="@{/permissions/export(exporterType=CSV, resourceType=${searchCriteria.resourceType}, resourceName=${searchCriteria.resourceName}, patternType=${searchCriteria.patternType}, kafkaPrincipal=${searchCriteria.kafkaPrincipal}, permissionType=${searchCriteria.permissionType}, operation=${searchCriteria.operation}, host=${searchCriteria.host}, description=${searchCriteria.description})}" target="_blank">
                                             Csv
                                         </a>
                                     </li>
                                     <li>
-                                        <a 
+                                        <a class="dropdown-item"
                                             th:href="@{/permissions/export(exporterType=GROUPED_BY_RESOURCE_PLAIN, resourceType=${searchCriteria.resourceType}, resourceName=${searchCriteria.resourceName}, patternType=${searchCriteria.patternType}, kafkaPrincipal=${searchCriteria.kafkaPrincipal}, permissionType=${searchCriteria.permissionType}, operation=${searchCriteria.operation}, host=${searchCriteria.host}, description=${searchCriteria.description})}" target="_blank">
                                             Grouped By Resource (Plain)
                                         </a>
                                     </li>
                                     <li>
-                                        <a 
+                                        <a class="dropdown-item"
                                             th:href="@{/permissions/export(exporterType=GROUPED_BY_RESOURCE_JSON, resourceType=${searchCriteria.resourceType}, resourceName=${searchCriteria.resourceName}, patternType=${searchCriteria.patternType}, kafkaPrincipal=${searchCriteria.kafkaPrincipal}, permissionType=${searchCriteria.permissionType}, operation=${searchCriteria.operation}, host=${searchCriteria.host}, description=${searchCriteria.description})}" target="_blank">
                                             Grouped By Resource (Json)
                                         </a>
                                     </li>
                                     <li>
-                                        <a 
+                                        <a class="dropdown-item"
                                             th:href="@{/permissions/export(exporterType=GROUPED_BY_PRINCIPAL_PLAIN, resourceType=${searchCriteria.resourceType}, resourceName=${searchCriteria.resourceName}, patternType=${searchCriteria.patternType}, kafkaPrincipal=${searchCriteria.kafkaPrincipal}, permissionType=${searchCriteria.permissionType}, operation=${searchCriteria.operation}, host=${searchCriteria.host}, description=${searchCriteria.description})}" target="_blank">
                                             Grouped By Principal (Plain)
                                         </a>
                                     </li>
                                     <li>
-                                        <a 
+                                        <a class="dropdown-item"
                                             th:href="@{/permissions/export(exporterType=GROUPED_BY_PRINCIPAL_JSON, resourceType=${searchCriteria.resourceType}, resourceName=${searchCriteria.resourceName}, patternType=${searchCriteria.patternType}, kafkaPrincipal=${searchCriteria.kafkaPrincipal}, permissionType=${searchCriteria.permissionType}, operation=${searchCriteria.operation}, host=${searchCriteria.host}, description=${searchCriteria.description})}" target="_blank">
                                             Grouped By Principal (Json)
                                         </a>
@@ -146,7 +146,7 @@
                     </div>
                 
                     <form class="form-inline form-flex" id="search_form">
-                        <select title="Resource Type" class="form-control" id="resourceType">
+                        <select title="Resource Type" class="form-select col-auto" id="resourceType">
                             <option value="">-</option>
                             <option 
                                 th:each="resourceType : ${T(org.apache.kafka.common.resource.ResourceType).values()}"
@@ -157,11 +157,11 @@
                         </select>
                         <input 
                             type="text"
-                            class="form-control" 
+                            class="form-control col-auto"
                             id="resourceName" 
                             placeholder="Resource Name"
                             th:value="${searchCriteria.resourceName}"/>
-                        <select title="Pattern Type" class="form-control" id="patternType">
+                        <select title="Pattern Type" class="form-select col-auto" id="patternType">
                             <option value="">-</option>
                             <option 
                                 th:each="patternType : ${T(org.apache.kafka.common.resource.PatternType).values()}"
@@ -172,11 +172,11 @@
                         </select>
                         <input 
                             type="text"
-                            class="form-control"
+                            class="form-control col-auto"
                             id="kafkaPrincipal" 
                             placeholder="Kafka Principal"
                             th:value="${searchCriteria.kafkaPrincipal}"/>
-                        <select title="Permission Type" class="form-control" id="permissionType">
+                        <select title="Permission Type" class="form-select col-auto" id="permissionType">
                             <option value="">-</option>
                             <option 
                                 th:each="permissionType : ${T(org.apache.kafka.common.acl.AclPermissionType).values()}"
@@ -185,7 +185,7 @@
                                 th:selected="${permissionType == searchCriteria.permissionType}">
                             </option>
                         </select>
-                        <select title="Operation" class="form-control" id="operation">
+                        <select title="Operation" class="form-select col-auto" id="operation">
                             <option value="">-</option>
                             <option 
                                 th:each="operation : ${T(org.apache.kafka.common.acl.AclOperation).values()}"
@@ -196,19 +196,19 @@
                         </select>
                         <input 
                             type="text"
-                            class="form-control"
+                            class="form-control col-auto"
                             id="host" 
                             placeholder="Host"
                             th:value="${searchCriteria.host}"/>
                         <input 
                             type="text"
-                            class="form-control"
+                            class="form-control col-auto"
                             id="description" 
                             placeholder="Description"
                             th:value="${searchCriteria.description}"/>
                         <button 
                             type="submit"
-                            class="btn btn-primary">
+                            class="btn btn-primary btn-sm">
                             Find
                         </button>
                     </form>
@@ -218,7 +218,7 @@
             
             <div class="row">
         
-                <div class="col-md-10 col-md-offset-1">
+                <div class="col-md-10 offset-1">
                 
                     <div th:if="${page != null}">
                         <table class="table table-bordered table-striped table-hover">

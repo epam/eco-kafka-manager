@@ -62,14 +62,14 @@
         <div class="container-fluid">
 
             <div class="row">
-                <div class="col-md-10 col-md-offset-1">
+                <div class="col-md-10 offset-1">
                     <h3>Consumer Groups (<span th:text="${totalCount}"></span>)</h3>
                 </div>
             </div>
         
             <div class="row">
                 
-                <div class="col-md-10 col-md-offset-1">
+                <div class="col-md-10 offset-1">
                 
                     <form class="form-inline form-flex" id="search_form">
                         <input 
@@ -78,7 +78,7 @@
                             id="groupName" 
                             placeholder="Group Name"
                             th:value="${searchCriteria.groupName}"/>
-                        <select title="State" class="form-control" id="state">
+                        <select title="State" class="form-select" id="state">
                             <option value="">-</option>
                             <option 
                                 th:each="state : ${T(org.apache.kafka.common.ConsumerGroupState).values()}"
@@ -87,7 +87,7 @@
                                 th:selected="${state == searchCriteria.state}">
                             </option>
                         </select>
-                        <select title="Storage Type" class="form-control" id="storageType">
+                        <select title="Storage Type" class="form-select" id="storageType">
                             <option value="">-</option>
                             <option 
                                 th:each="type : ${T(com.epam.eco.kafkamanager.ConsumerGroupInfo$StorageType).values()}"
@@ -115,7 +115,7 @@
             
             <div class="row">
         
-                <div class="col-md-10 col-md-offset-1">
+                <div class="col-md-10 offset-1">
         
                     <div th:if="${page != null}">
                         <table class="table table-bordered table-striped table-hover">
