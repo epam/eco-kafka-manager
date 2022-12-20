@@ -37,12 +37,25 @@
             
             $('#count_records').click(function(e) {
                 e.preventDefault();
+
                 $('#count_records').addClass('disabled');
                 fetch(/*[[@{/topics/{name}/count_records(name=${topic.name})}]]*/,{credentials: 'include'})
-                	.then(res => res.text())
+                	.then(res => {
+                        if(res.ok)  {
+                            return res.text();
+                        } else {
+                            $('#counting-error-message')
+                                .html( res.status===403 ?
+                                          "<b>ACCESS DENIED</b>: This operation requires <b>READ</b> permission for this topic." :
+                                          "ERROR status: " + res.status + ": " + res.statusText);
+                            $('#counting-errors-alert').modal('show');
+                            return Promise.resolve("N/A");
+                        }
+                    } )
                 	.then(res => $('#count_records_result').html(res))
                 	.catch(() => $('#count_records_result').html('N/A'))
                 	.finally(() => $('#count_records').removeClass('disabled'))
+
             });
             
         });
@@ -223,6 +236,28 @@
                                     </span> 
                                     <span class="glyphicon glyphicon-refresh"></span>
                                 </a>
+                            <div id="counting-errors-alert" class="modal fade" role="dialog">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h6 class="modal-title">Error while topic record counting</h6>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal">&times;</button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <i class="fa fa-warning fa-2x text-danger"></i>
+                                            <div style="display: inline; margin-left: 0.5em" id="counting-error-message"></div>
+                                        </div>
+                                        <div class="modal-footer">
+                                             <button
+                                                    type="button"
+                                                    class="btn btn-primary"
+                                                    data-bs-dismiss="modal">
+                                                 Got it!
+                                             </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                             </p>
                             <p>
                                 <b style="float:left;clear:left;">Consumer Groups:</b>
