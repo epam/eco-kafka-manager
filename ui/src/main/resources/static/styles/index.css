@@ -69,6 +69,11 @@ body {
 .sticky-col {
   position: sticky;
   top: -1px;
-  background-color: lightgrey;
+  background-color: white !important;
   z-index: 10;
+}
+
+.scrollable-table-container {
+  max-height: 340px;
+  overflow-y: scroll;
 }

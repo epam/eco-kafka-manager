@@ -201,87 +201,109 @@
                                 </div>
                             </div>
 
-                            <div class="row mb-3">
-                                <div class="form-group col col-md-2">
-                                    <a id="all-partitions-link" href="#"
-                                       class="btn btn-primary btn-sm">
-                                        All <i class="fa fa-check-circle-o" aria-hidden="true"></i>
-                                    </a>
-                                    <a id="none-partitions-link" href="#"
-                                       class="btn btn-primary btn-sm">
-                                        None <i class="fa fa-times-circle-o" aria-hidden="true"></i>
+                            <div class="card mb-3">
+                                <div class="card-header card-flex">
+                                    <h7>Offsets searcher</h7>
+                                    <a data-bs-toggle="collapse" href="#offsets-searcher"
+                                       role="button"
+                                       class="to-right text-secondary collapse-button"
+                                       id="topic_browser.offsets-button">
+                                        <i class="fa fa-caret-up"></i>
                                     </a>
                                 </div>
-                                <div class="form-group col col-md-3">
-                                    <div class="input-group">
-                                        <input
-                                                id="offsets-timestamp"
-                                                type="text"
-                                                name="offsetsTimestamp"
-                                                autocomplete="off"
-                                                th:value="${browseParams.offsetsTimestamp}"
-                                                class="form-control col-auto"
-                                                title="Search offsets for time"/>
-                                        <button
-                                                id="search-offsets-for-time-link"
-                                                href="#"
-                                                class="btn btn-primary col-md-3 btn-sm"
-                                                title="Search offsets for time">
-                                            <i class="fa fa-search" aria-hidden="true"></i>
-                                        </button>
+                                <div id="offsets-searcher" class="collapse show">
+                                    <div class="card-body">
+                                        <div class="row mb-3">
+                                            <div class="form-group col col-md-2">
+                                                <button id="all-partitions-link" href="#"
+                                                   class="btn btn-primary btn-sm">
+                                                    All <i class="fa fa-check-circle-o"
+                                                           aria-hidden="true"></i>
+                                                </button>
+                                                <button id="none-partitions-link" href="#"
+                                                   class="btn btn-primary btn-sm">
+                                                    None <i class="fa fa-times-circle-o"
+                                                            aria-hidden="true"></i>
+                                                </button>
+                                            </div>
+                                            <div class="form-group col col-md-3">
+                                                <div class="input-group">
+                                                    <input
+                                                            id="offsets-timestamp"
+                                                            type="text"
+                                                            name="offsetsTimestamp"
+                                                            autocomplete="off"
+                                                            th:value="${browseParams.offsetsTimestamp}"
+                                                            class="form-control col-auto"
+                                                            title="Search offsets for time"/>
+                                                    <button
+                                                            id="search-offsets-for-time-link"
+                                                            href="#"
+                                                            class="btn btn-primary col-md-3 btn-sm"
+                                                            title="Search offsets for time">
+                                                        <i class="fa fa-search"
+                                                           aria-hidden="true"></i>
+                                                    </button>
 
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="mb-3">
+                                            <div class="row" th:each="batch : ${browseParams.listPartitionBatches(3)}">
+                                                <th:block
+                                                        th:each="partition : ${batch}"
+                                                        th:with="enabled=${browseParams.isPartitionEnabled(partition)},offset=${browseParams.getPartitionOffset(partition)},range=${offsetRanges.get(partition)}">
+                                                    <div class="form-group col col-md-4">
+                                                        <div class="input-group">
+                                        <span class="input-group-text col-md-2"
+                                              th:text="${partition}"></span>
+                                                            <div class="input-group-text">
+                                                                <input type="checkbox"
+                                                                       class="partition-checkbox form-check-input mt-0"
+                                                                       th:attr="data-partition=${partition}"
+                                                                       th:checked="${enabled}"/>
+                                                            </div>
+                                                            <span class="input-group-text col-md-2"
+                                                                  th:text="${'[' + range.smallest}"></span>
+                                                            <input type="number"
+                                                                   class="form-control"
+                                                                   th:min="${range.smallest}"
+                                                                   th:max="${range.largest}"
+                                                                   th:disabled="${!enabled}"
+                                                                   th:id="${'p_' + partition}"
+                                                                   th:name="${'p_' + partition}"
+                                                                   th:value="${offset}"/>
+                                                            <span class="input-group-text col-md-2"
+                                                                  th:text="${range.largest + (range.largestInclusive ? ']' : ')')}"></span>
+                                                            <input
+                                                                    type="hidden"
+                                                                    th:id="${'pe_' + partition}"
+                                                                    th:name="${'pe_' + partition}"
+                                                                    th:value="${enabled ? '1' : '0'}"/>
+                                                        </div>
+                                                    </div>
+                                                </th:block>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
 
-                            <div class="mb-3">
-                                <div class="row" th:each="batch : ${browseParams.listPartitionBatches(3)}">
-                                    <th:block
-                                            th:each="partition : ${batch}"
-                                            th:with="enabled=${browseParams.isPartitionEnabled(partition)},offset=${browseParams.getPartitionOffset(partition)},range=${offsetRanges.get(partition)}">
-                                        <div class="form-group col col-md-4">
-                                            <div class="input-group">
-                                        <span class="input-group-text col-md-2"
-                                              th:text="${partition}"></span>
-                                                <div class="input-group-text">
-                                                    <input type="checkbox"
-                                                           class="form-check-input mt-0"
-                                                           th:attr="data-partition=${partition}"
-                                                           th:checked="${enabled}"/>
-                                                </div>
-                                                <span class="input-group-text col-md-2"
-                                                      th:text="${'[' + range.smallest}"></span>
-                                                <input type="number"
-                                                       class="form-control"
-                                                       th:min="${range.smallest}"
-                                                       th:max="${range.largest}"
-                                                       th:disabled="${!enabled}"
-                                                       th:id="${'p_' + partition}"
-                                                       th:name="${'p_' + partition}"
-                                                       th:value="${offset}"/>
-                                                <span class="input-group-text col-md-2"
-                                                      th:text="${range.largest + (range.largestInclusive ? ']' : ')')}"></span>
-                                                <input
-                                                        type="hidden"
-                                                        th:id="${'pe_' + partition}"
-                                                        th:name="${'pe_' + partition}"
-                                                        th:value="${enabled ? '1' : '0'}"/>
-                                            </div>
-                                        </div>
-                                    </th:block>
-                                </div>
-                            </div>
-
-                            <div class="card"
+                            <div class="card mb-3"
                                  id="column-selector-panel"
                                  th:if="${fetchedRecords != null AND !fetchedRecords.isEmpty()}">
-                                <div class="card-header">
-                                    <h5 class="panel-title">
-                                        <a data-bs-toggle="collapse"
-                                           href="#column-selector">Columns</a>
-                                    </h5>
+
+                                <div class="card-header card-flex">
+                                    <div>Columns</div>
+                                    <a data-bs-toggle="collapse" href="#column-selector"
+                                       role="button"
+                                       class="to-right text-secondary collapse-button"
+                                       id="topic_browser.columns-collapse-button">
+                                        <i class="fa fa-caret-down"></i>
+                                    </a>
                                 </div>
-                                <div id="column-selector" class="panel-collapse collapse">
+                                <div id="column-selector" class="collapse">
                                     <div class="card-body">
                                         <div class="mb-2">
                                             <a id="all-columns-link"
@@ -358,7 +380,7 @@
                                     th:if="${nextOffsets != null AND !nextOffsets.isEmpty()}"
                                     id="next-offsets-link"
                                     href="#"
-                                    class="btn btn-primary">
+                                    class="btn btn-primary btn-sm">
                                 Next <i class="fa fa-forward"></i>
                             </a>
                         </form>
@@ -366,10 +388,12 @@
                     </div>
                 </div>
 
-                <div class="card mb-3" th:if="${fetchedRecords != null}">
-                    <div class="panel-body pre-scrollable" style="padding-top: 0;">
-
-                        <span th:text="${fetchSummary}"></span>
+                <div class="card" th:if="${fetchedRecords != null}">
+                    <div class="card-header">
+                        <h7><span th:text="${fetchSummary}"></span></h7>
+                    </div>
+                    <div class="pre-scrollable scrollable-table-container"
+                         style="padding-top: 0;">
 
                         <table
                                 th:if="${!fetchedRecords.isEmpty()}"

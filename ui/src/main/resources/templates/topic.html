@@ -202,259 +202,316 @@
                     </div>
                 
                     <div class="card mb-3">
-                        <h7 class="card-header">Topic</h7>
-                        <div class="card-body">
-                            <p>
-                                <b>Name:</b>
-                                <span th:text="${topic.name}"></span>
-                            </p>
-                            <p>
-                                <b>Description:</b>
-                                <span 
-                                    th:text="${topic.metadataDescription}" 
-                                    style="white-space:pre-wrap;"></span>
-                            </p>
-                            <p>
-                                <b>Partition Count:</b>
-                                <span th:text="${topic.partitionCount}"></span>
-                            </p>
-                            <p>
-                                <b>Replication Factor:</b>
-                                <span th:text="${topic.replicationFactor}"></span>
-                            </p>
-                            <p>
-                                <b>Number Of Records:</b>
-                                <a
-                                        id="count_records"
-                                        href="#"
-                                        class="btn btn-success btn-sm"
-                                        th:title="${topic.countRecordsTaskResultAsString}"
-                                        th:classappend="${topic.countRecordsTaskRunning} ? 'disabled' : ''">
-                                    <span
-                                        id="count_records_result" 
-                                        th:text="${topic.countRecordsTaskResultValueAsString}">
-                                    </span> 
-                                    <span class="glyphicon glyphicon-refresh"></span>
-                                </a>
-                            <div id="counting-errors-alert" class="modal fade" role="dialog">
-                                <div class="modal-dialog">
-                                    <div class="modal-content">
-                                        <div class="modal-header">
-                                            <h6 class="modal-title">Error while topic record counting</h6>
-                                            <button type="button" class="btn-close" data-bs-dismiss="modal">&times;</button>
-                                        </div>
-                                        <div class="modal-body">
-                                            <i class="fa fa-warning fa-2x text-danger"></i>
-                                            <div style="display: inline; margin-left: 0.5em" id="counting-error-message"></div>
-                                        </div>
-                                        <div class="modal-footer">
-                                             <button
-                                                    type="button"
-                                                    class="btn btn-primary"
-                                                    data-bs-dismiss="modal">
-                                                 Got it!
-                                             </button>
+                        <div class="card-header card-flex">
+                            <div>Topic</div>
+                            <a data-bs-toggle="collapse" href="#topic-description" role="button"
+                               class="to-right text-secondary collapse-button"
+                               id="topic.topic-collapse-button">
+                                <i class="fa fa-caret-up"></i>
+                            </a>
+                        </div>
+                        <div id="topic-description" class="collapse show">
+                            <div class="card-body d-flex flex-column">
+                                <div class="row mb-2">
+                                    <div class="col-lg-2 col-md-3 col-sm-4"><b>Name:</b></div>
+                                    <div class="col-lg-10 col-md-9 col-sm-8" th:text="${topic.name}"></div>
+                                </div>
+                                <div class="row mb-2">
+                                    <div class="col-lg-2 col-md-3 col-sm-4"><b>Description:</b></div>
+                                    <span class="col-lg-10 col-md-9 col-sm-8"
+                                          th:text="${topic.metadataDescription}"
+                                          style="white-space:pre-wrap;"></span>
+                                </div>
+                                <div class="row mb-2">
+                                    <div class="col-lg-2 col-md-3 col-sm-4"><b>Partition Count:</b></div>
+                                    <span class="col-lg-10 col-md-9 col-sm-8" th:text="${topic.partitionCount}"></span>
+                                </div>
+                                <div class="row mb-2">
+                                    <div class="col-lg-2 col-md-3 col-sm-4"><b>Replication Factor:</b></div>
+                                    <span class="col-lg-10 col-md-9 col-sm-8" th:text="${topic.replicationFactor}"></span>
+                                </div>
+                                <div class="row mb-2">
+                                    <div class="col-lg-2 col-md-3 col-sm-4"><b>Number Of Records:</b></div>
+                                    <div class="col-lg-10 col-md-9 col-sm-8">
+                                        <a
+                                            id="count_records"
+                                            href="#"
+                                            class="btn btn-success btn-sm"
+                                            th:title="${topic.countRecordsTaskResultAsString}"
+                                            th:classappend="${topic.countRecordsTaskRunning} ? 'disabled' : ''">
+                                            <span
+                                                    id="count_records_result"
+                                                    th:text="${topic.countRecordsTaskResultValueAsString}">
+                                            </span>
+                                            <span class="glyphicon glyphicon-refresh"></span>
+                                        </a>
+                                    </div>
+                                </div>
+                                <div id="counting-errors-alert" class="modal fade" role="dialog">
+                                    <div class="modal-dialog">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h6 class="modal-title">Error while topic record counting</h6>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal">&times;</button>
+                                            </div>
+                                            <div class="modal-body">
+                                                <i class="fa fa-warning fa-2x text-danger"></i>
+                                                <div style="display: inline; margin-left: 0.5em" id="counting-error-message"></div>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button
+                                                        type="button"
+                                                        class="btn btn-primary"
+                                                        data-bs-dismiss="modal">
+                                                    Got it!
+                                                </button>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
-                            </p>
-                            <p>
-                                <b style="float:left;clear:left;">Consumer Groups:</b>
-                                <th:block th:each="group : ${topic.getConsumerGroupNamesAsCollapsedCol(-1)}">
-                                    <a th:href="@{/consumer_groups/{name}(name=${group.value})}">
-                                        <span th:text="${group.value}" style="float:left;clear:left;"></span>
-                                    </a>
-                                </th:block>
-                            </p>
-                            <p style="clear:both;float:none;"></p>
-                            <p>
-                                <b style="float:left;clear:left;">Transactions:</b>
-                                <th:block th:each="transaction : ${topic.getTransactionalIdsAsCollapsedCol(-1)}">
-                                    <a th:href="@{/transactions/{id}(id=${transaction.value})}">
-                                        <span th:text="${transaction.value}" style="float:left;clear:left;"></span>
-                                    </a>
-                                </th:block>
-                            </p>
+                                <div class="row mb-2">
+                                    <b style="float:left;clear:left;">Consumer Groups:</b>
+                                    <th:block
+                                            th:each="group : ${topic.getConsumerGroupNamesAsCollapsedCol(-1)}">
+                                        <a th:href="@{/consumer_groups/{name}(name=${group.value})}">
+                                            <span th:text="${group.value}"
+                                                  style="float:left;clear:left;"></span>
+                                        </a>
+                                    </th:block>
+                                </div>
+                                <div style="clear:both;float:none;"></div>
+                                <div class="row mb-2">
+                                    <b style="float:left;clear:left;">Transactions:</b>
+                                    <th:block
+                                            th:each="transaction : ${topic.getTransactionalIdsAsCollapsedCol(-1)}">
+                                        <a th:href="@{/transactions/{id}(id=${transaction.value})}">
+                                            <span th:text="${transaction.value}" style="float:left;clear:left;"></span>
+                                        </a>
+                                    </th:block>
+                                </div>
 
+                            </div>
                         </div>
                     </div>
         
                     <div class="card mb-3">
-                        <h7 class="card-header">User-Defined Metrics</h7>
-                        <div class="card-body">
-                            
-                            <div class="btn-group">
-                                <button
-                                    type="button" 
-                                    class="btn dropdown-toggle btn-sm"
-                                    th:classappend="${topicOffsetIncreaseUdm != null ? 'btn-success' : 'btn-default'}"
-                                    data-bs-toggle="dropdown"
-                                    aria-haspopup="true" 
-                                    aria-expanded="false"
-                                    th:title="${topicOffsetIncreaseUdmName}">
-                                    <span th:text="${topicOffsetIncreaseUdmType}"></span> <span class="caret"></span>
-                                </button>
-                                <ul class="dropdown-menu">
-                                    <li>
-                                        <a class="dropdown-item" th:href="@{/udmetrics/topic_offset_increase/{name}(name=${topic.name})}">
-                                            <i class="fa fa-edit"></i> <span th:text="${topicOffsetIncreaseUdm != null ? 'Edit' : 'Create'}"></span>
-                                        </a>
-                                    </li>
-                                    <li th:if="${topicOffsetIncreaseUdm != null}">
-                                        <a class="dropdown-item" href="#" th:attr="data-action=@{${topicOffsetIncreaseUdm.url}}">
-                                            <i class="fa fa-trash"></i> Delete
-                                        </a>
-                                    </li>
-                                </ul>
-                                <form id="delete-udm-form" method="post">
-                                    <input type="hidden" name="_method" value="delete"/>
-                                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
-                                </form>
-                            </div>
-                            
+                        <div class="card-header card-flex">
+                            <h7>User-Defined Metrics</h7>
+                            <a data-bs-toggle="collapse" href="#topic-metrics" role="button"
+                               class="to-right text-secondary collapse-button"
+                               id="topic.metrics-collapse-button">
+                                <i class="fa fa-caret-down"></i>
+                            </a>
                         </div>
-                    </div>
-                    
-                    <div class="card mb-3">
-                        <h7 class="card-header">Partitions</h7>
-                        <div class="card-body">
-                            <table th:if="${!topic.partitions.isEmpty()}" class="table table-bordered table-striped table-hover">
-                                <thead>
-                                    <tr>
-                                        <td>Id</td>
-                                        <td>Replicas</td>
-                                        <td title="In-Sync Replicas">ISR</td>
-                                        <td>Leader</td>
-                                        <td title="Offsets / Rate Per Minute">Offsets / RPM</td>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr th:each="partition : ${topic.partitions.values()}">
-                                        <td th:text="${partition.id}"></td>
-                                        <td th:classappend="${partition.underReplicated} ? 'warning' : ''">
-                                            <th:block th:each="brokerId,iter : ${partition.replicas}">
-                                                <span th:if="${iter.index &gt; 0}" th:text="${', '}"></span>
-                                                <a th:href="@{/brokers/{id}(id=${brokerId})}">
-                                                    <span th:text="${brokerId}"></span>
-                                                </a>
-                                            </th:block>
-                                        </td>
-                                        <td th:classappend="${partition.underReplicated} ? 'warning' : ''">
-                                            <th:block th:each="brokerId,iter : ${partition.isr}">
-                                                <span th:if="${iter.index &gt; 0}" th:text="${', '}"></span>
-                                                <a th:href="@{/brokers/{id}(id=${brokerId})}">
-                                                    <span th:text="${brokerId}"></span>
-                                                </a>
-                                            </th:block>
-                                        </td>
-                                        <td>
-                                            <a th:if="${partition.leader != null}"
-                                            th:href="@{/brokers/{id}(id=${partition.leader})}"><span
-                                                    th:text="${partition.leader}"></span></a>
-                                        </td>
-                                        <td>
-                                            <span th:text="${topic.getPartitionOffsets(partition.id)}"></span>
-                                            <span
-                                                th:if="${topic.getOffsetRpm(partition.id) != null AND topic.getOffsetRpm(partition.id) > 0}" 
-                                                th:text="${'/' + topic.getOffsetRpm(partition.id)}"
-                                                th:classappend="text-success">
-                                            </span>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                    
-                    <div class="card mb-3">
-                        <h7 class="card-headerg">Consumer Group(s) Offsets</h7>
-                        <div class="card-body">
-                            <div th:with="offsets=${topic.consumerGroupOffsets}">
-                                
-                                <div th:if="${offsets.isEmpty()}" class="alert alert-warning">
-                                    Consumer group(s) have no commited offsets for this topic.   
+                        <div class="collapse" id="topic-metrics">
+                            <div class="card-body">
+
+                                <div class="btn-group">
+                                    <button
+                                            type="button"
+                                            class="btn dropdown-toggle btn-sm"
+                                            th:classappend="${topicOffsetIncreaseUdm != null ? 'btn-success' : 'btn-default'}"
+                                            data-bs-toggle="dropdown"
+                                            aria-haspopup="true"
+                                            aria-expanded="false"
+                                            th:title="${topicOffsetIncreaseUdmName}">
+                                        <span th:text="${topicOffsetIncreaseUdmType}"></span> <span
+                                                class="caret"></span>
+                                    </button>
+                                    <ul class="dropdown-menu">
+                                        <li>
+                                            <a class="dropdown-item"
+                                               th:href="@{/udmetrics/topic_offset_increase/{name}(name=${topic.name})}">
+                                                <i class="fa fa-edit"></i> <span
+                                                    th:text="${topicOffsetIncreaseUdm != null ? 'Edit' : 'Create'}"></span>
+                                            </a>
+                                        </li>
+                                        <li th:if="${topicOffsetIncreaseUdm != null}">
+                                            <a class="dropdown-item" href="#"
+                                               th:attr="data-action=@{${topicOffsetIncreaseUdm.url}}">
+                                                <i class="fa fa-trash"></i> Delete
+                                            </a>
+                                        </li>
+                                -    </ul>
+                                    <form id="delete-udm-form" method="post">
+                                        <input type="hidden" name="_method" value="delete"/>
+                                        <input type="hidden" th:name="${_csrf.parameterName}"
+                                               th:value="${_csrf.token}"/>
+                                    </form>
                                 </div>
-                                
-                                <table th:if="${!offsets.isEmpty()}" class="table table-bordered table-striped table-hover">
+
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card mb-3">
+                        <div class="card-header card-flex">
+                            <h7>Partitions</h7>
+                            <a data-bs-toggle="collapse" href="#topic-partitions" role="button"
+                               class="to-right text-secondary collapse-button"
+                               id="topic.partitions-collapse-button">
+                               <i class="fa fa-caret-down"></i>
+                            </a>
+                        </div>
+                        <div id="topic-partitions" class="collapse">
+                            <div class="card-body">
+                                <table th:if="${!topic.partitions.isEmpty()}" class="table table-bordered table-striped table-hover">
                                     <thead>
                                         <tr>
-                                            <td>Consumer Group</td>
-                                            <td>Partition</td>
-                                            <td title="Topic Offsets / Rate Per Minute">Topic Offsets / RPM</td>
-                                            <td title="Consumer Offset / Rate Per Minute">Consumer Offset / RPM</td>
-                                            <td>Consumer Commit Date</td>
-                                            <td>Lag</td>
+                                            <td>Id</td>
+                                            <td>Replicas</td>
+                                            <td title="In-Sync Replicas">ISR</td>
+                                            <td>Leader</td>
+                                            <td title="Offsets / Rate Per Minute">Offsets / RPM</td>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <tr th:each="offset : ${offsets}">
-                                            <td>
-                                                <a th:href="@{/consumer_groups/{name}(name=${offset.groupName})}">
-                                                    <span th:text="${offset.groupName}"></span>
-                                                </a>
+                                        <tr th:each="partition : ${topic.partitions.values()}">
+                                            <td th:text="${partition.id}"></td>
+                                            <td th:classappend="${partition.underReplicated} ? 'warning' : ''">
+                                                <th:block th:each="brokerId,iter : ${partition.replicas}">
+                                                    <span th:if="${iter.index &gt; 0}" th:text="${', '}"></span>
+                                                    <a th:href="@{/brokers/{id}(id=${brokerId})}">
+                                                        <span th:text="${brokerId}"></span>
+                                                    </a>
+                                                </th:block>
                                             </td>
-                                            <td th:text="${offset.partition}"></td>
+                                            <td th:classappend="${partition.underReplicated} ? 'warning' : ''">
+                                                <th:block th:each="brokerId,iter : ${partition.isr}">
+                                                    <span th:if="${iter.index &gt; 0}" th:text="${', '}"></span>
+                                                    <a th:href="@{/brokers/{id}(id=${brokerId})}">
+                                                        <span th:text="${brokerId}"></span>
+                                                    </a>
+                                                </th:block>
+                                            </td>
                                             <td>
-                                                <span th:text="${offset.topicOffsets}"></span>
+                                                <a th:if="${partition.leader != null}"
+                                                   th:href="@{/brokers/{id}(id=${partition.leader})}"><span
+                                                   th:text="${partition.leader}"></span></a>
+                                            </td>
+                                            <td>
+                                                <span th:text="${topic.getPartitionOffsets(partition.id)}"></span>
                                                 <span
-                                                    th:if="${offset.topicOffsetRpm != null AND offset.topicOffsetRpm > 0}" 
-                                                    th:text="${'/' + offset.topicOffsetRpm}"
+                                                    th:if="${topic.getOffsetRpm(partition.id) != null AND topic.getOffsetRpm(partition.id) > 0}"
+                                                    th:text="${'/' + topic.getOffsetRpm(partition.id)}"
                                                     th:classappend="text-success">
                                                 </span>
-                                            </td>
-                                            <td>
-                                                <span th:text="${offset.consumerOffset}"></span>
-                                                <span
-                                                    th:if="${offset.consumerOffsetRpm != null AND offset.consumerOffsetRpm > 0}" 
-                                                    th:text="${'/' + offset.consumerOffsetRpm}"
-                                                    th:classappend="text-success">
-                                                </span>
-                                            </td>
-                                            <td 
-                                                th:text="${offset.consumerCommitDate}"
-                                                th:classappend="${!offset.consumerOffsetActualForMinute ? 'warning' : ''}">
-                                            </td>
-                                            <td th:classappend="${offset.lag == null ? 'warning' : ''}">
-                                                <span th:if="${offset.lag != null}" th:text="${offset.lag}"></span>
                                             </td>
                                         </tr>
                                     </tbody>
                                 </table>
-                            
                             </div>
                         </div>
                     </div>
-                    
+
                     <div class="card mb-3">
-                        <h7 class="card-header">Configs</h7>
-                        <div class="card-body">
-                            <table class="table table-bordered table-striped table-hover">
-                                <thead>
-                                    <tr>
-                                        <th>Name</th>
-                                        <th>Value</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr
-                                        th:each="config : ${topic.allConfigEntries.values()}"
-                                        th:classappend="${!config.default} ? 'table-info' : ''">
-                                        <td>
-                                            <span th:text="${config.name}"></span>
-                                            <a 
-                                                href="javascript:void(0);"
-                                                data-bs-toggle="popover"
-                                                data-bs-html="true"
-                                                th:attr="data-bs-content=${config.def.documentation}">
-                                                <i class="fa fa-info-circle"></i>
-                                            </a>
-                                        </td>
-                                        <td th:text="${config.valueOrMaskIfSensitive}">
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
+                        <div class="card-header card-flex">
+                            <h7>Consumer Group(s) Offsets</h7>
+                            <a data-bs-toggle="collapse" href="#consumer-group-offsets" role="button"
+                               class="to-right text-secondary collapse-button" id="topic.consumer-group-offsets-button">
+                                <i class="fa fa-caret-down"></i>
+                            </a>
+                        </div>
+                        <div id="consumer-group-offsets" class="collapse">
+
+                            <div class="card-body">
+                                <div th:with="offsets=${topic.consumerGroupOffsets}">
+
+                                    <div th:if="${offsets.isEmpty()}" class="alert alert-warning">
+                                        Consumer group(s) have no commited offsets for this topic.
+                                    </div>
+
+                                    <table th:if="${!offsets.isEmpty()}"
+                                       class="table table-bordered table-striped table-hover">
+                                        <thead>
+                                            <tr>
+                                                <td>Consumer Group</td>
+                                                <td>Partition</td>
+                                                <td title="Topic Offsets / Rate Per Minute">Topic Offsets / RPM</td>
+                                                <td title="Consumer Offset / Rate Per Minute">Consumer Offset / RPM</td>
+                                                <td>Consumer Commit Date</td>
+                                                <td>Lag</td>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr th:each="offset : ${offsets}">
+                                                <td>
+                                                    <a th:href="@{/consumer_groups/{name}(name=${offset.groupName})}">
+                                                        <span th:text="${offset.groupName}"></span>
+                                                    </a>
+                                                </td>
+                                                <td th:text="${offset.partition}"></td>
+                                                <td>
+                                                    <span th:text="${offset.topicOffsets}"></span>
+                                                    <span
+                                                        th:if="${offset.topicOffsetRpm != null AND offset.topicOffsetRpm > 0}"
+                                                        th:text="${'/' + offset.topicOffsetRpm}"
+                                                        th:classappend="text-success">
+                                                    </span>
+                                                </td>
+                                                <td>
+                                                    <span th:text="${offset.consumerOffset}"></span>
+                                                    <span
+                                                        th:if="${offset.consumerOffsetRpm != null AND offset.consumerOffsetRpm > 0}"
+                                                        th:text="${'/' + offset.consumerOffsetRpm}"
+                                                        th:classappend="text-success">
+                                                    </span>
+                                                </td>
+                                                <td
+                                                    th:text="${offset.consumerCommitDate}"
+                                                    th:classappend="${!offset.consumerOffsetActualForMinute ? 'warning' : ''}">
+                                                </td>
+                                                <td th:classappend="${offset.lag == null ? 'warning' : ''}">
+                                                    <span th:if="${offset.lag != null}" th:text="${offset.lag}"></span>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                            
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card mb-3">
+                        <div class="card-header card-flex">
+                            <h7>Configs</h7>
+                            <a data-bs-toggle="collapse" href="#configs-card" role="button"
+                               class="to-right text-secondary collapse-button"
+                               id="topic.configs-collapse-button">
+                                <i class="fa fa-caret-down"></i>
+                            </a>
+                        </div>
+                        <div id="configs-card" class="collapse">
+
+                            <div class="card-body">
+                                <table class="table table-bordered table-striped table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>Name</th>
+                                            <th>Value</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr
+                                            th:each="config : ${topic.allConfigEntries.values()}"
+                                            th:classappend="${!config.default} ? 'table-info' : ''">
+                                            <td>
+                                                <span th:text="${config.name}"></span>
+                                                <a
+                                                    href="javascript:void(0);"
+                                                    data-bs-toggle="popover"
+                                                    data-bs-html="true"
+                                                    th:attr="data-bs-content=${config.def.documentation}">
+                                                    <i class="fa fa-info-circle"></i>
+                                                </a>
+                                            </td>
+                                            <td th:text="${config.valueOrMaskIfSensitive}">
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
                     </div>
                 
