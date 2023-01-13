@@ -112,6 +112,7 @@ public class PermissionController {
         ResourcePermissionFilter filter = ResourcePermissionFilter.builder()
                 .resourceType(resourceType)
                 .resourceName(resourceName)
+                .patternType(patternType)
                 .principalFilter(principalFilter)
                 .permissionTypeFilter(permissionTypeFilter)
                 .operationFilter(operationFilter)
@@ -134,6 +135,7 @@ public class PermissionController {
         ResourcePermissionFilter filter = ResourcePermissionFilter.builder()
                 .resourceType(resourceType)
                 .resourceName(resourceName)
+                .patternType(patternType)
                 .principalFilter(principalFilter)
                 .permissionTypeFilter(permissionTypeFilter)
                 .operationFilter(operationFilter)
@@ -164,6 +166,7 @@ public class PermissionController {
         PermissionMetadataUpdateParams params = PermissionMetadataUpdateParams.builder()
                 .resourceType(resourceType)
                 .resourceName(resourceName)
+                .patternType(patternType)
                 .principal(principal)
                 .description(request.getDescription())
                 .attributes(request.getAttributes())
@@ -181,6 +184,7 @@ public class PermissionController {
         PermissionMetadataDeleteParams params = PermissionMetadataDeleteParams.builder()
                 .resourceType(resourceType)
                 .resourceName(resourceName)
+                .patternType(patternType)
                 .principal(principal)
                 .build();
         kafkaManager.updatePermission(params);
