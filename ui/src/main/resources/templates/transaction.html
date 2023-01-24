@@ -33,17 +33,17 @@
                         <div class="card-body card-flex">
                             <a
                                 th:href="@{/transactions}" 
-                                class="btn btn-primary btn-sm">
+                                class="btn btn-primary">
                                 Back To Transactions <i class="fa fa-arrow-left"></i>
                             </a>
                             <a
                                 th:href="@{/permissions/(resourceType=${T(org.apache.kafka.common.resource.ResourceType).TRANSACTIONAL_ID}, resourceName=${transaction.transactionalId})}"
-                                class="btn btn-primary btn-sm">
+                                class="btn btn-primary">
                                 View Permissions <i class="fa fa-list"></i>
                             </a>
                             <a
                                 th:href="@{/permissions/create(resourceType=${T(org.apache.kafka.common.resource.ResourceType).TRANSACTIONAL_ID}, resourceName=${transaction.transactionalId})}"
-                                class="btn btn-primary btn-sm">
+                                class="btn btn-primary">
                                 Create Permission <i class="fa fa-plus"></i>
                             </a>
                         </div>

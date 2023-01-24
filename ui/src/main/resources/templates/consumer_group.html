@@ -46,33 +46,33 @@
                         <div class="card-body card-flex">
                             <a
                                 th:href="@{/consumer_groups}" 
-                                class="btn btn-primary btn-sm">
+                                class="btn btn-primary">
                                 Back To Consumer Groups <i class="fa fa-arrow-left"></i>
                             </a>
                             <a 
                                 th:href="@{/consumer_groups/{name}/metadata(name=${group.name})}"
-                                class="btn btn-primary btn-sm">
+                                class="btn btn-primary">
                                 Edit Metadata <i class="fa fa-tags"></i>
                             </a>
                             <a
                                 th:href="@{/permissions/(resourceType=${T(org.apache.kafka.common.resource.ResourceType).GROUP}, resourceName=${group.name})}"
-                                class="btn btn-primary btn-sm">
+                                class="btn btn-primary">
                                 View Permissions <i class="fa fa-list"></i>
                             </a>
                             <a
                                 th:href="@{/permissions/create(resourceType=${T(org.apache.kafka.common.resource.ResourceType).GROUP}, resourceName=${group.name})}"
-                                class="btn btn-primary btn-sm">
+                                class="btn btn-primary">
                                 Create Permission <i class="fa fa-plus"></i>
                             </a>
 
                             <a
                                 th:href="@{/consumer_groups/{name}/offset_resetter(name=${group.name})}"
-                                class="to-right btn btn-primary btn-sm">
+                                class="to-right btn btn-primary">
                                 Reset Offsets <i class="fa fa-refresh"></i>
                             </a>
                             <button
                                     type="button"
-                                    class="btn btn-danger btn-sm"
+                                    class="btn btn-danger"
                                     data-bs-toggle="modal"
                                     data-bs-target="#delete-confirm">
                                 Delete <i class="fa fa-trash"></i>
@@ -95,13 +95,13 @@
                                                     method="post">
                                                 <button
                                                         type="button"
-                                                        class="btn btn-primary btn-sm"
+                                                        class="btn btn-primary"
                                                         data-bs-dismiss="modal">
                                                     Cancel
                                                 </button>
                                                 <button
                                                         type="submit"
-                                                        class="btn btn-danger btn-sm">
+                                                        class="btn btn-danger">
                                                     Delete
                                                 </button>
                                             </form>
@@ -160,7 +160,7 @@
                             <div class="btn-group">
                                 <button 
                                     type="button" 
-                                    class="btn btn-sm dropdown-toggle"
+                                    class="btn dropdown-toggle btn-outline"
                                     th:classappend="${groupLagUdm != null ? 'btn-success' : 'btn-default'}"
                                     data-bs-toggle="dropdown"
                                     aria-haspopup="true" 

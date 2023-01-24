@@ -44,14 +44,14 @@
                         <div class="card-body">
                             <a  
                                 th:href="@{/permissions/resource/{resourceType}/{resourceName}/{patternType}(resourceType=${resourceType}, resourceName=${resourceName}, patternType=${patternType}, kafkaPrincipal=${kafkaPrincipal})}"
-                                class="btn btn-primary btn-sm">
+                                class="btn btn-primary">
                                 Back To Resource Permissions <i class="fa fa-arrow-left"></i>
                             </a>
                             
                             <a 
                                 id="delete-metadata-link" 
                                 href="#"
-                                class="btn btn-danger btn-sm">
+                                class="btn btn-danger">
                                 Delete <i class="fa fa-trash"></i>
                             </a>
                             
@@ -107,7 +107,7 @@
                                         th:text="${metadata != null ? metadata.attributesJson : null}"></textarea>
                                 </div>
                                 
-                                <button type="submit" class="btn btn-primary btn-sm">Save</button>
+                                <button type="submit" class="btn btn-primary">Save</button>
                         
                             </form>
                             

@@ -45,17 +45,17 @@
                 
                     <div class="card mb-3">
                         <div class="card-body">
-                            <a th:href="@{/brokers}" class="btn btn-primary btn-sm">
+                            <a th:href="@{/brokers}" class="btn btn-primary">
                                 Back To Brokers <i class="fa fa-long-arrow-left"></i>
                             </a>
                             <a 
                                 th:href="@{/brokers/{id}/config(id=${broker.id})}"
-                                class="btn btn-primary btn-sm">
+                                class="btn btn-primary">
                                 Update Config <i class="fa fa-pencil"></i>
                             </a>
                             <a 
                                 th:href="@{/brokers/{id}/metadata(id=${broker.id})}"
-                                class="btn btn-primary btn-sm">
+                                class="btn btn-primary">
                                 Edit Metadata 
                                 <i class="fa fa-tags"></i>
                             </a>
@@ -101,7 +101,7 @@
                     <div class="card mb-3">
                         <h7 class="card-header">Configs</h7>
                         <div class="card-body">
-                            <table class="table table-bordered table-striped table-hover">
+                            <table class="table table-bordered table-hover">
                                 <thead>
                                     <tr>
                                         <td>Name</td>
@@ -119,7 +119,7 @@
                                                 data-bs-toggle="popover"
                                                 data-bs-html="true"
                                                 th:attr="data-bs-content=${config.def.documentation}">
-                                                <i class="fa fa-info-circle"></i>
+                                                <i class="fa fa-info-circle info"></i>
                                             </a>
                                         </td>
                                         <td style="word-break: break-word;"

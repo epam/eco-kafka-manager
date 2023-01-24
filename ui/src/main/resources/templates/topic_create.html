@@ -52,7 +52,7 @@
                         <div class="card-body">
                             <a 
                                 th:href="@{/topics}" 
-                                class="btn btn-primary btn-sm">
+                                class="btn btn-primary">
                                 Back To Topics <i class="fa fa-arrow-left"></i>
                             </a>
                         </div>
@@ -128,7 +128,7 @@
                             <h5 class="card-header">Configs</h5>
                             <div class="card-body">
                             
-                                <a id="clear-all-configs-link" href="#" class="btn btn-danger btn-sm">
+                                <a id="clear-all-configs-link" href="#" class="btn btn-danger">
                                     Clear All <i class="fa fa-remove-circle"></i>
                                 </a>
                             
@@ -150,7 +150,7 @@
                                                     data-bs-toggle="popover"
                                                     data-bs-html="true"
                                                     th:attr="data-bs-content=${configKey.documentation}">
-                                                    <i class="fa fa-info-circle"></i>
+                                                    <i class="fa fa-info-circle info"></i>
                                                 </a>
                                             </td>
                                             <td>
@@ -170,7 +170,7 @@
                             </div>
                         </div>
 
-                        <button type="submit" class="btn btn-primary btn-sm">Create</button>
+                        <button type="submit" class="btn btn-primary">Create</button>
 
                     </form>
                 

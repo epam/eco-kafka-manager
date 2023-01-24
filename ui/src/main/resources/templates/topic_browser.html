@@ -155,15 +155,24 @@
                 <div class="card mb-3">
                     <div class="card-body">
                         <a th:href="@{/topics/{name}(name=${browseParams.topicName})}"
-                            class="btn btn-primary btn-sm">
+                           class="btn btn-primary">
                             Back To Topic <i class="fa fa-arrow-left"></i>
                         </a>
                     </div>
                 </div>
 
                 <div class="card mb-3">
-                    <div class="card-header">Fetch Params</div>
-                    <div class="card-body">
+
+                    <div class="card-header collapsed-header card-flex">
+                        <h7>Fetch Params</h7>
+                        <a data-bs-toggle="collapse" href="#fetch-params-card" role="button"
+                           class="to-right text-secondary collapse-button"
+                           id="topic_browser.fetch-params-collapse-button">
+                            <i class="fa fa-caret-up"></i>
+                        </a>
+                    </div>
+
+                    <div id="fetch-params-card" class="card-body collapse show">
 
                         <form
                                 id="fetch-form"
@@ -204,15 +213,15 @@
                             <div class="row mb-3">
                                 <div class="form-group col col-md-2">
                                     <a id="all-partitions-link" href="#"
-                                       class="btn btn-primary btn-sm">
+                                       class="btn btn-primary">
                                         All <i class="fa fa-check-circle-o" aria-hidden="true"></i>
                                     </a>
                                     <a id="none-partitions-link" href="#"
-                                       class="btn btn-primary btn-sm">
+                                       class="btn btn-primary">
                                         None <i class="fa fa-times-circle-o" aria-hidden="true"></i>
                                     </a>
                                 </div>
-                                <div class="form-group col col-md-3">
+                                <div class="form-group col col-auto">
                                     <div class="input-group">
                                         <input
                                                 id="offsets-timestamp"
@@ -225,7 +234,7 @@
                                         <button
                                                 id="search-offsets-for-time-link"
                                                 href="#"
-                                                class="btn btn-primary col-md-3 btn-sm"
+                                                class="btn btn-primary col-auto"
                                                 title="Search offsets for time">
                                             <i class="fa fa-search" aria-hidden="true"></i>
                                         </button>
@@ -235,21 +244,20 @@
                             </div>
 
                             <div class="mb-3">
-                                <div class="row" th:each="batch : ${browseParams.listPartitionBatches(3)}">
+                                <div class="row mb-2" th:each="batch : ${browseParams.listPartitionBatches(3)}">
                                     <th:block
                                             th:each="partition : ${batch}"
                                             th:with="enabled=${browseParams.isPartitionEnabled(partition)},offset=${browseParams.getPartitionOffset(partition)},range=${offsetRanges.get(partition)}">
                                         <div class="form-group col col-md-4">
                                             <div class="input-group">
-                                        <span class="input-group-text col-md-2"
-                                              th:text="${partition}"></span>
+                                                <span class="input-group-text col-md-2" th:text="${partition}"></span>
                                                 <div class="input-group-text">
                                                     <input type="checkbox"
                                                            class="form-check-input mt-0"
                                                            th:attr="data-partition=${partition}"
                                                            th:checked="${enabled}"/>
                                                 </div>
-                                                <span class="input-group-text col-md-2"
+                                                <span class="input-group-text col-auto"
                                                       th:text="${'[' + range.smallest}"></span>
                                                 <input type="number"
                                                        class="form-control"
@@ -259,7 +267,7 @@
                                                        th:id="${'p_' + partition}"
                                                        th:name="${'p_' + partition}"
                                                        th:value="${offset}"/>
-                                                <span class="input-group-text col-md-2"
+                                                <span class="input-group-text auto"
                                                       th:text="${range.largest + (range.largestInclusive ? ']' : ')')}"></span>
                                                 <input
                                                         type="hidden"
@@ -286,18 +294,18 @@
                                         <div class="mb-2">
                                             <a id="all-columns-link"
                                                href="#"
-                                               class="btn btn-primary btn-sm small">
+                                               class="btn btn-primary small">
                                                 All <i class="fa fa-check-circle-o"></i>
                                             </a>
                                             <a id="none-columns-link"
                                                href="#"
-                                               class="btn btn-primary btn-sm small">
+                                               class="btn btn-primary small">
                                                 None <i class="fa fa-times-circle-o"></i>
                                             </a>
                                         </div>
                                         <div class="row"
                                              th:with="groupSize=${fetchedRecords.determineColumnsGroupSize(4,30)}">
-                                             <th:block
+                                            <th:block
                                                     th:each="groupIndex : ${#numbers.sequence(0, 3)}">
                                                 <div class="col col-md-6">
                                                     <th:block
@@ -352,7 +360,7 @@
                                 </div>
                             </div>
 
-                            <button type="submit" class="btn btn-primary btn-sm col">Fetch</button>
+                            <button type="submit" class="btn btn-primary col">Fetch</button>
 
                             <a
                                     th:if="${nextOffsets != null AND !nextOffsets.isEmpty()}"
@@ -367,7 +375,7 @@
                 </div>
 
                 <div class="card mb-3" th:if="${fetchedRecords != null}">
-                    <div class="panel-body pre-scrollable" style="padding-top: 0;">
+                    <div class="panel-body pre-scrollable scrollable-table-container" style="padding-top: 0;">
 
                         <span th:text="${fetchSummary}"></span>
 

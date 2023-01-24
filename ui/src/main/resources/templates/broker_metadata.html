@@ -44,14 +44,14 @@
                         <div class="card-body">
                             <a  
                                 th:href="@{/brokers/{id}(id=${broker.id})}"
-                                class="btn btn-primary btn-sm">
+                                class="btn btn-primary">
                                 Back To Broker <i class="fa fa-arrow-left"></i>
                             </a>
                             
                             <a 
                                 id="delete-metadata-link" 
                                 href="#"
-                                class="btn btn-danger btn-sm">
+                                class="btn btn-danger">
                                 Delete <i class="fa fa-trash"></i>
                             </a>
                             
@@ -101,7 +101,7 @@
                                         th:text="${metadata != null ? metadata.attributesJson : null}"></textarea>
                                 </div>
                                 
-                                <button type="submit" class="btn btn-primary blue btn-sm">Save</button>
+                                <button type="submit" class="btn btn-primary blue">Save</button>
                         
                             </form>
                             
