@@ -110,18 +110,18 @@
                         </select>
                         <button 
                             type="submit" 
-                            class="btn btn-primary btn-sm">
+                            class="btn btn-primary">
                             Find
                         </button>
                         <button
                             type="button"
                             id="update-failed-button"
-                            class="btn btn-primary btn-sm"
+                            class="btn btn-primary"
                             th:disabled="${!hasErrors}">
                             Update failed metrics
                         </button>
                     </form>
-                    <form id="update-failed-form" action="/udmetrics" method="post">
+                    <form id="update-failed-form" action="udmetrics" method="post">
                         <input type="hidden" name="_method" value="patch"/>
                         <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
                     </form>
@@ -169,7 +169,7 @@
                                     </td>
                                     <td>
                                         <div class="btn-group">
-                                            <button class="btn transparent dropdown-toggle btn-sm"
+                                            <button class="btn transparent dropdown-toggle"
                                                     type="button"
                                                     data-bs-toggle="dropdown"
                                                     aria-haspopup="true"
