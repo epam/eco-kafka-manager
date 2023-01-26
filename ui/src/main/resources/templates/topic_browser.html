@@ -426,10 +426,10 @@
                                     <a style="vertical-align: middle"
                                        th:if="${record.hasHeaders()}"
                                        href="javascript:void(0)"
-                                       th:attr="data-container='body',data-content=${record.headersPrettyJson},title='Headers',data-html=true"
+                                       th:attr="data-bs-container='body',data-bs-content=${record.headersPrettyJson},title='Headers',data-html=true"
                                        data-bs-toggle="popover"
                                        data-html="true">
-                                        <span class="glyphicon glyphicon-eye-open"></span>
+                                        <i class="fa fa-eye info"></i>
                                     </a>
                                 </td>
 
@@ -439,8 +439,8 @@
                                        th:if="${record.hasAttributes()}"
                                        href="javascript:void(0);"
                                        data-bs-toggle="popover"
-                                       th:attr="data-container='body',data-content=${record.attributesPrettyJson}, title='Attributes',data-html=true">
-                                        <span class="glyphicon glyphicon-list-alt"></span>
+                                       th:attr="data-bs-container='body',data-bs-content=${record.attributesPrettyJson}, title='Attributes',data-html=true">
+                                        <i class="fa fa-list info"></i>
                                     </a>
                                 </td>
 
@@ -455,7 +455,7 @@
                                                 href="javascript:void(0);"
                                                 data-bs-toggle="popover"
                                                 th:attr="data-container='body',data-content=${record.RegistrySchema.schemaAsString}, title=${record.RegistrySchema.schemaType.name() + ' schema'},data-html=true">
-                                            <span class="glyphicon glyphicon-list-alt"></span>
+                                            <i class="fa fa-list info"></i>
                                         </a>
                                     </div>
                                 </td>

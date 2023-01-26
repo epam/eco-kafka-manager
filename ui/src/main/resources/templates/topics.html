@@ -241,12 +241,12 @@
                                     </td>
                                     <td style="text-align: center;width:50px;">
                                         <a th:href="@{/topics/{name}/browser(name=${topic.name})}">
-                                            <span class="glyphicon glyphicon-search"></span>
+                                            <i class="fa fa-search info"></i>
                                         </a>
                                     </td>
                                     <td th:if="${dataCatalogUrlResolver.showColumn()}" style="text-align: center;width:50px;">
                                         <a th:href="@{|${dataCatalogUrlResolver.resolve(topic.name)}|}" target="_blank">
-                                            <span class="glyphicon glyphicon-share"></span>
+                                            <i class="fa fa-share info"></i>
                                         </a>
                                     </td>
                                 </tr>

@@ -26,7 +26,10 @@
     font-size: 0.8rem;
     border-radius: 0.2rem;
 }
-.btn-primary {
+.btn-primary,
+.btn-primary:visited,
+.btn-primary:active,
+.btn-primary:focus {
     color: var(--epm-button-primary-foreground);
     background-color: var(--epm-button-primary-background);
     border-color: var(--epm-button-primary-border);
@@ -34,7 +37,11 @@
 .btn-primary:hover {
     background-color: var(--epm-button-primary-background-hover);
 }
-.btn-danger {
+
+.btn-danger,
+.btn-danger:visited,
+.btn-danger:active,
+.btn-danger:focus {
     color: var(--epm-button-danger-foreground);
     background-color: var(--epm-button-danger-background);
     border-color: var(--epm-button-danger-border);
@@ -42,7 +49,10 @@
 .btn-danger:hover {
     background-color: var(--epm-button-danger-background-hover);
 }
-.btn-success {
+.btn-success,
+.btn-success:visited,
+.btn-success:active,
+.btn-success:focus  {
     color: var(--epm-button-success-foreground);
     background-color: var(--epm-button-success-background);
     border-color: var(--epm-button-success-border);
@@ -210,4 +220,9 @@ p {
 }
 .dropdown-menu {
     font-size: 0.9rem;
+}
+
+a.dropdown-item:active {
+    background-color: #ddd;
+    color: #212529;
 }
