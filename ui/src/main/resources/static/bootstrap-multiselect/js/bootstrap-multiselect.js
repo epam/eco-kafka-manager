@@ -439,7 +439,7 @@
             includeResetDivider: false,
             resetText: 'Reset',
             templates: {
-                button: '<button type="button" class="multiselect dropdown-toggle" data-toggle="dropdown"><span class="multiselect-selected-text"></span> <b class="caret"></b></button>',
+                button: '<button type="button" class="multiselect dropdown-toggle" data-bs-toggle="dropdown"><span class="multiselect-selected-text"></span> <b class="caret"></b></button>',
                 ul: '<ul class="multiselect-container dropdown-menu"></ul>',
                 filter: '<li class="multiselect-item multiselect-filter"><div class="input-group"><span class="input-group-addon"><i class="glyphicon glyphicon-search"></i></span><input class="form-control multiselect-search" type="text" /></div></li>',
                 filterClearBtn: '<span class="input-group-btn"><button class="btn btn-default multiselect-clear-filter" type="button"><i class="glyphicon glyphicon-remove-circle"></i></button></span>',
@@ -888,7 +888,7 @@
                 $label.text(" " + label);
             }
 
-            var $checkbox = $('<input/>').attr('type', inputType);
+            var $checkbox = $('<input class="form-check-input" style="margin-right: 0.5em;"/>').attr('type', inputType);
 
             var name = this.options.checkboxName($element);
             if (name) {
@@ -962,7 +962,7 @@
             }
 
             if (this.options.enableClickableOptGroups && this.options.multiple) {
-                $('a label', $li).prepend('<input type="checkbox" value="' + value + '"/>');
+                $('a label', $li).prepend('<input class="form-check-input" style="margin-right: 0.5em;" type="checkbox" value="' + value + '"/>');
             }
 
             if ($(group).is(':disabled')) {
@@ -1018,7 +1018,7 @@
             var alreadyHasSelectAll = this.hasSelectAll();
 
             if (!alreadyHasSelectAll && this.options.includeSelectAllOption && this.options.multiple
-                    && $('option', this.$select).length > this.options.includeSelectAllIfMoreThan) {
+                && $('option', this.$select).length > this.options.includeSelectAllIfMoreThan) {
 
                 // Check whether to add a divider after the select all.
                 if (this.options.includeSelectAllDivider) {
@@ -1036,10 +1036,10 @@
                 }
 
                 if (this.options.selectAllName) {
-                    $('label', $li).prepend('<input type="checkbox" name="' + this.options.selectAllName + '" />');
+                    $('label', $li).prepend('<input class="form-check-input" style="margin-right: 0.5em;" type="checkbox" name="' + this.options.selectAllName + '" />');
                 }
                 else {
-                    $('label', $li).prepend('<input type="checkbox" />');
+                    $('label', $li).prepend('<input class="form-check-input" style="margin-right: 0.5em;" type="checkbox" />');
                 }
 
                 var $checkbox = $('input', $li);
@@ -1096,8 +1096,8 @@
                     }).on('input keydown', $.proxy(function(event) {
                         // Cancel enter key default behaviour
                         if (event.which === 13) {
-                          event.preventDefault();
-                      }
+                            event.preventDefault();
+                        }
 
                         // This is useful to catch "keydown" events after the browser has updated the control.
                         clearTimeout(this.searchTimeout);
@@ -1146,12 +1146,12 @@
 
                                         // Toggle current element (group or group item) according to showElement boolean.
                                         if(!showElement){
-                                          $(element).css('display', 'none');
-                                          $(element).addClass('multiselect-filter-hidden');
+                                            $(element).css('display', 'none');
+                                            $(element).addClass('multiselect-filter-hidden');
                                         }
                                         if(showElement){
-                                          $(element).css('display', 'block');
-                                          $(element).removeClass('multiselect-filter-hidden');
+                                            $(element).css('display', 'block');
+                                            $(element).removeClass('multiselect-filter-hidden');
                                         }
 
                                         // Differentiate groups and group items.
@@ -1210,7 +1210,7 @@
         refresh: function () {
             var inputs = {};
             $('li input', this.$ul).each(function() {
-              inputs[$(this).val()] = $(this);
+                inputs[$(this).val()] = $(this);
             });
 
             $('option', this.$select).each($.proxy(function (index, element) {
@@ -1525,10 +1525,10 @@
                         };
 
                         //Loop through attributes object and add key-value for each attribute
-                       for (var key in subOption.attributes) {
+                        for (var key in subOption.attributes) {
                             attributes['data-' + key] = subOption.attributes[key];
-                       }
-                         //Append original attributes + new data attributes to option
+                        }
+                        //Append original attributes + new data attributes to option
                         $tag.append($('<option/>').attr(attributes));
                     });
                 }
@@ -1544,7 +1544,7 @@
                     };
                     //Loop through attributes object and add key-value for each attribute
                     for (var key in option.attributes) {
-                      attributes['data-' + key] = option.attributes[key];
+                        attributes['data-' + key] = option.attributes[key];
                     }
                     //Append original attributes + new data attributes to option
                     $tag = $('<option/>').attr(attributes);

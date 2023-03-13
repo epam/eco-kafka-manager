@@ -15,14 +15,13 @@
  *******************************************************************************/
 package com.epam.eco.kafkamanager.ui.topics.browser;
 
-import java.util.HashMap;
+import java.util.Comparator;
 import java.util.Map;
 import java.util.function.BiConsumer;
 import java.util.stream.Collectors;
 
 import org.apache.kafka.common.TopicPartition;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -30,7 +29,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.epam.eco.commons.kafka.OffsetRange;
@@ -41,6 +39,7 @@ import com.epam.eco.kafkamanager.KafkaManager;
 import com.epam.eco.kafkamanager.TopicRecordFetchParams;
 import com.epam.eco.kafkamanager.TopicRecordFetchParams.DataFormat;
 import com.epam.eco.kafkamanager.exec.TaskResult;
+import com.epam.eco.kafkamanager.ui.config.KafkaManagerUiProperties;
 import com.epam.eco.kafkamanager.ui.topics.SchemaCatalogUrlResolver;
 import com.epam.eco.kafkamanager.ui.topics.TopicController;
 
@@ -51,17 +50,19 @@ import com.epam.eco.kafkamanager.ui.topics.TopicController;
 public class TopicBrowserController {
 
     public static final String VIEW = "topic_browser";
-
     public static final String MAPPING = TopicController.MAPPING_TOPIC + "/browser";
-    public static final String MAPPING_OFFSETS_FOR_TIMES = MAPPING + "/offsets_for_times";
     public static final String ATTR_BROWSE_PARAMS = "browseParams";
+    public static final String ATTR_SHOW_GRID = "showGrid";
     public static final String ATTR_OFFSET_RANGES = "offsetRanges";
+    public static final String ATTR_REAL_RANGE_BOUNDS = "realRangeBounds";
+    public static final String ATTR_OFFSET_RANGES_SUMMARY = "offsetRangesSummary";
+    public static final String ATTR_OFFSET_FETCHED_RANGES_SUMMARY = "offsetFetchedRangesSummary";
     public static final String ATTR_FETCHED_RECORDS = "fetchedRecords";
     public static final String ATTR_FETCH_SUMMARY = "fetchSummary";
-    public static final String ATTR_NEXT_OFFSETS = "nextOffsets";
-
+    public static final String ATTR_CURR_OFFSETS = "currentOffsets";
+    public static final String ATTR_HAS_NEXT_OFFSETS = "hasNextOffsets";
+    public static final String ATTR_HAS_PREVIOUS_OFFSETS = "hasPreviousOffsets";
     public static final String ATTR_SCHEMA_CATALOG_URL_RESOLVER = "schemaCatalogUrlResolver";
-
     private static final long DEFAULT_FETCH_TIMEOUT = 30_000;
 
     @Autowired
@@ -72,6 +73,9 @@ public class TopicBrowserController {
 
     @Autowired
     private SchemaCatalogUrlResolver schemaCatalogUrlResolver;
+
+    @Autowired
+    private KafkaManagerUiProperties properties;
 
     @PreAuthorize("@authorizer.isPermitted('TOPIC', #topicName, 'READ')")
     @RequestMapping(value=MAPPING, method=RequestMethod.GET)
@@ -105,21 +109,6 @@ public class TopicBrowserController {
         return "redirect:" + buildBrowserUrl(topicName);
     }
 
-    @RequestMapping(value=MAPPING_OFFSETS_FOR_TIMES, method=RequestMethod.GET)
-    public @ResponseBody
-    ResponseEntity<?> fetchOffsetsForTimes(
-            @PathVariable("name") String topicName,
-            @RequestParam(name="timestamp", required=true) Long timestamp) {
-        Map<TopicPartition, Long> offsetsForTimes =
-                kafkaManager.getTopicOffsetForTimeFetcherTaskExecutor().execute(topicName, timestamp);
-        Map<Integer, Long> offsets = offsetsForTimes.entrySet().stream().
-                filter(e -> e.getValue()!=null).
-                collect(Collectors.toMap(
-                        entry -> entry.getKey().partition(),
-                        entry -> entry.getValue()));
-        return ResponseEntity.ok().body(offsets);
-    }
-
     private void handleParamsRequest(
             TopicBrowseParams browseParams,
             BiConsumer<String, Object> modelAttributes) {
@@ -127,18 +116,24 @@ public class TopicBrowserController {
 
         setDefaultDataFormatsIfMissing(browseParams);
         populateMissingAndFixInvalidOffsets(offsetRanges, browseParams);
+        OffsetRange offsetRangesSummary = populateOffsetRangesSummary(offsetRanges);
 
         addTopicConfigParams(browseParams);
 
         modelAttributes.accept(ATTR_BROWSE_PARAMS, browseParams);
         modelAttributes.accept(ATTR_OFFSET_RANGES, offsetRanges);
+        modelAttributes.accept(ATTR_SHOW_GRID, properties.getShowGridInTopicBrowser());
+
+        modelAttributes.accept(ATTR_OFFSET_RANGES_SUMMARY, offsetRangesSummary);
+
     }
 
     private void addTopicConfigParams(TopicBrowseParams browserParams) {
         browserParams.setKafkaTopicConfig(kafkaAdminOperations.describeTopicConfig(browserParams.getTopicName()));
     }
 
-    private void handleFetchRequest(TopicBrowseParams browseParams, BiConsumer<String, Object> modelAttributes) {
+    private void handleFetchRequest(TopicBrowseParams browseParams,
+                                    BiConsumer<String, Object> modelAttributes) {
         TopicRecordFetchParams fetchParams = toFetchParams(browseParams);
 
         TaskResult<RecordFetchResult<Object, Object>> taskResult = kafkaManager.getTopicRecordFetcherTaskExecutor().
@@ -150,7 +145,13 @@ public class TopicBrowserController {
 
         modelAttributes.accept(ATTR_FETCHED_RECORDS, tabularRecords);
         modelAttributes.accept(ATTR_FETCH_SUMMARY, buildFetchSummary(taskResult));
-        modelAttributes.accept(ATTR_NEXT_OFFSETS, getNextOffsetsOrNullIfEndOfTopic(fetchResult));
+
+        OffsetRange offsetRangesSummary = populateFetchOffsetRangesSummary(fetchResult);
+        modelAttributes.accept(ATTR_OFFSET_FETCHED_RANGES_SUMMARY, offsetRangesSummary);
+        modelAttributes.accept(ATTR_REAL_RANGE_BOUNDS, getRealRangeBounds(fetchResult));
+        modelAttributes.accept(ATTR_CURR_OFFSETS, getCurrentOffsetRange(fetchResult));
+        modelAttributes.accept(ATTR_HAS_NEXT_OFFSETS, isNextOffsetRangeAvailable(fetchResult));
+        modelAttributes.accept(ATTR_HAS_PREVIOUS_OFFSETS, isPreviousOffsetRangeAvailable(fetchResult));
     }
 
     private TopicRecordFetchParams toFetchParams(TopicBrowseParams browseParams) {
@@ -159,7 +160,11 @@ public class TopicBrowserController {
                 browseParams.getValueFormat(),
                 browseParams.getPartitionOffsets(),
                 browseParams.getLimit(),
-                browseParams.getTimeout() > 0 ? browseParams.getTimeout() : DEFAULT_FETCH_TIMEOUT);
+                browseParams.getTimeout() > 0 ? browseParams.getTimeout() : DEFAULT_FETCH_TIMEOUT,
+                browseParams.getFetchMode(),
+                browseParams.getCalculatedTimestamp(),
+                properties.getTopicBrowser().getUseCache(),
+                properties.getTopicBrowser().getCacheExpirationPeriodMin());
     }
 
     private Map<Integer, OffsetRange> fetchOffsetRanges(String topicName) {
@@ -167,23 +172,65 @@ public class TopicBrowserController {
                 getTopicOffsetRangeFetcherTaskExecutor().getResultIfActualOrRefresh(topicName).getValue();
         return ranges.entrySet().stream().
                 collect(
-                        Collectors.toMap(
-                                entry -> entry.getKey().partition(),
-                                Map.Entry::getValue));
+                Collectors.toMap(
+                        entry -> entry.getKey().partition(),
+                        Map.Entry::getValue));
     }
 
-    private Map<Integer, Long> getNextOffsetsOrNullIfEndOfTopic(
+    private OffsetRange populateOffsetRangesSummary(Map<Integer, OffsetRange> offsetRanges) {
+        long smallest = offsetRanges.values().stream()
+                .map(OffsetRange::getSmallest).min(Comparator.naturalOrder())
+                .orElse(0L);
+        OffsetRange largest = offsetRanges.values().stream()
+                .max(Comparator.comparing(OffsetRange::getLargest))
+                .orElse(OffsetRange.with(smallest,smallest,false));
+        return OffsetRange.with(smallest,largest.getLargest(),largest.isLargestInclusive());
+    }
+
+    private OffsetRange populateFetchOffsetRangesSummary(RecordFetchResult<Object, Object> fetchResult) {
+        long smallest = fetchResult.getPerPartitionResults().stream()
+                .map(result->result.getScannedOffsets().getSmallest())
+                .min(Comparator.naturalOrder())
+                .orElse(0L);
+        OffsetRange largest = fetchResult.getPerPartitionResults().stream()
+                .map(PartitionRecordFetchResult::getScannedOffsets)
+                .max(Comparator.comparing(OffsetRange::getLargest))
+                .orElse(OffsetRange.with(smallest,smallest,false));
+        return OffsetRange.with(smallest,largest.getLargest(),largest.isLargestInclusive());
+    }
+
+    private Map<TopicPartition,OffsetRange> getRealRangeBounds(RecordFetchResult<Object, Object> fetchResult) {
+        return fetchResult.getPerPartitionResults().stream()
+                .collect(Collectors.toMap(
+                        PartitionRecordFetchResult::getPartition,
+                        PartitionRecordFetchResult::getPartitionOffsets));
+
+    }
+
+    private Map<Integer, OffsetRange> getCurrentOffsetRange(
             RecordFetchResult<Object, Object> fetchResult) {
-        Map<Integer, Long> nextOffsets = null;
-        for(PartitionRecordFetchResult<Object, Object> perPartinionResult : fetchResult.getPerPartitionResults()) {
-            if (perPartinionResult.getScannedOffsets().getLargest() < perPartinionResult.getPartitionOffsets().getLargest()) {
-                nextOffsets = nextOffsets!=null ? nextOffsets : new HashMap<>();
-                nextOffsets.put(
-                        perPartinionResult.getPartition().partition(),
-                        perPartinionResult.getScannedOffsets().getLargest() + 1);
+        return fetchResult.getPerPartitionResults().stream()
+                .collect(Collectors.toMap(
+                        perPartitionResult -> perPartitionResult.getPartition().partition(),
+                        PartitionRecordFetchResult::getScannedOffsets));
+    }
+
+    private boolean isNextOffsetRangeAvailable( RecordFetchResult<Object, Object> fetchResult) {
+        for(PartitionRecordFetchResult<Object, Object> perPartitionResult : fetchResult.getPerPartitionResults()) {
+            if(perPartitionResult.getScannedOffsets().getLargest() < perPartitionResult.getPartitionOffsets().getLargest()) {
+                return true;
             }
         }
-        return nextOffsets;
+        return false;
+    }
+
+    private boolean isPreviousOffsetRangeAvailable( RecordFetchResult<Object, Object> fetchResult) {
+        for(PartitionRecordFetchResult<Object, Object> perPartitionResult : fetchResult.getPerPartitionResults()) {
+            if(perPartitionResult.getScannedOffsets().getSmallest() > perPartitionResult.getPartitionOffsets().getSmallest()) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private String buildFetchSummary(TaskResult<RecordFetchResult<Object, Object>> workerResult) {
@@ -207,11 +254,32 @@ public class TopicBrowserController {
         });
         offsetRanges.forEach((key, range) -> {
             int partition = key;
-            long offset = fetchRequestParams.getPartitionOffset(partition);
-            if (offset < range.getSmallest() || !fetchRequestParams.containsPartition(partition)) {
-                fetchRequestParams.addPartitionOffset(partition, range.getSmallest());
-            } else if (offset > range.getLargest()) {
-                fetchRequestParams.addPartitionOffset(partition, range.getLargest());
+            OffsetRange paramOffsets = fetchRequestParams.getPartitionOffset(partition);
+            if(!fetchRequestParams.containsPartition(partition)) {
+                fetchRequestParams.addPartitionOffset(partition, range);
+
+            } else if (paramOffsets.getSmallest() < range.getSmallest() &&
+                    paramOffsets.getLargest() < range.getSmallest()) {
+                fetchRequestParams.addPartitionOffset(partition,
+                        OffsetRange.with(range.getSmallest(), range.isSmallestInclusive(),
+                                range.getLargest(),range.isLargestInclusive()));
+
+            } else if (paramOffsets.getSmallest() < range.getSmallest() &&
+                    paramOffsets.getLargest() >= range.getSmallest()) {
+                fetchRequestParams.addPartitionOffset(partition,
+                        OffsetRange.with(range.getSmallest(), range.isSmallestInclusive(),
+                                paramOffsets.getLargest(),range.isLargestInclusive()));
+
+            } else if (paramOffsets.getLargest() > range.getLargest() &&
+                    paramOffsets.getSmallest() < range.getLargest() ) {
+                fetchRequestParams.addPartitionOffset(partition,
+                        OffsetRange.with(paramOffsets.getSmallest(), paramOffsets.isSmallestInclusive(),
+                                range.getLargest(), range.isLargestInclusive()));
+            }
+            else if (paramOffsets.getLargest()> range.getLargest() &&
+                    paramOffsets.getSmallest()>range.getLargest() ) {
+                fetchRequestParams.addPartitionOffset(partition,
+                        OffsetRange.with(paramOffsets.getSmallest(), range.getLargest(), range.isLargestInclusive()));
             }
         });
     }

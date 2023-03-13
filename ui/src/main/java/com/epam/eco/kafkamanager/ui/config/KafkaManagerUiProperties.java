@@ -15,6 +15,8 @@
  *******************************************************************************/
 package com.epam.eco.kafkamanager.ui.config;
 
+import java.util.Collection;
+
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 /**
@@ -26,7 +28,11 @@ public class KafkaManagerUiProperties {
     private String gaTrackingId;
     private UrlTemplate dataCatalogTool;
     private UrlTemplate schemaCatalogTool;
+    private GrafanaUrlTemplate grafanaMetrics;
 
+    private Collection<ExternalToolTemplate> externalTools;
+    private TopicBrowser topicBrowser;
+    private Boolean showGridInTopicBrowser = Boolean.FALSE;
     public UrlTemplate getSchemaCatalogTool() {
         return schemaCatalogTool;
     }
@@ -47,4 +53,35 @@ public class KafkaManagerUiProperties {
         this.gaTrackingId = gaTrackingId;
     }
 
+    public TopicBrowser getTopicBrowser() {
+        return topicBrowser;
+    }
+
+    public void setTopicBrowser(TopicBrowser topicBrowser) {
+        this.topicBrowser = topicBrowser;
+    }
+
+    public Boolean getShowGridInTopicBrowser() {
+        return showGridInTopicBrowser;
+    }
+
+    public void setShowGridInTopicBrowser(Boolean showGridInTopicBrowser) {
+        this.showGridInTopicBrowser = showGridInTopicBrowser;
+    }
+
+    public GrafanaUrlTemplate getGrafanaMetrics() {
+        return grafanaMetrics;
+    }
+
+    public void setGrafanaMetrics(GrafanaUrlTemplate grafanaMetrics) {
+        this.grafanaMetrics = grafanaMetrics;
+    }
+
+    public Collection<ExternalToolTemplate> getExternalTools() {
+        return externalTools;
+    }
+
+    public void setExternalTools(Collection<ExternalToolTemplate> externalTools) {
+        this.externalTools = externalTools;
+    }
 }

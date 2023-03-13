@@ -79,3 +79,33 @@ function hidePopoverIfClickedOutside(e) {
         }
     });
 }
+
+var infoModal;
+
+$(document).ready(function() {
+    infoModal = new bootstrap.Modal(document.getElementById("infoModal"));
+})
+
+function showInfo(type,infoHeader,infoText) {
+
+    var headerClass = "info-modal-header-info";
+    var textClass = "info-modal-text-info";
+    var buttonClass = "btn-success";
+
+    if(type==="error") {
+        headerClass = "info-modal-header-danger";
+        textClass = "info-modal-text-danger";
+        buttonClass = "btn-danger";
+    }
+    var header = document.getElementById('infoModalHeader');
+    header.textContent = infoHeader;
+    header.classList.add(headerClass);
+
+    var text = document.getElementById('infoModalText');
+    text.textContent = infoText;
+    text.classList.add(textClass)
+
+    document.getElementById('infoModalCloseButton').classList.add(buttonClass);
+
+    infoModal.show();
+}

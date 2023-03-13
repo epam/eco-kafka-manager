@@ -15,6 +15,7 @@
  *******************************************************************************/
 package com.epam.eco.kafkamanager.ui.config;
 
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -26,6 +27,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import com.epam.eco.kafkamanager.ui.GlobalModelEnrichingInterceptor;
 import com.epam.eco.kafkamanager.ui.LogoutListener;
 import com.epam.eco.kafkamanager.ui.topics.DataCatalogUrlResolver;
+import com.epam.eco.kafkamanager.ui.topics.GrafanaMetricsUrlResolver;
 import com.epam.eco.kafkamanager.ui.topics.SchemaCatalogUrlResolver;
 
 /**
@@ -69,5 +71,19 @@ public class KafkaManagerUiConfiguration implements WebMvcConfigurer {
     public SchemaCatalogUrlResolver schemaCatalogUrlResolver(KafkaManagerUiProperties properties) {
         return new SchemaCatalogUrlResolver(properties);
     }
+    @Bean
+    public GrafanaMetricsUrlResolver grafanaMetricsUrlResolver(KafkaManagerUiProperties properties) {
+        return new GrafanaMetricsUrlResolver(properties);
+    }
 
+    @Bean(initMethod = "init")
+    @ConditionalOnProperty(name="eco.kafkamanager.ui.topicBrowser.useCache", havingValue="true")
+    public TopicOffsetCacheCleanerRunner topicOffsetCacheCleanerRunner(KafkaManagerUiProperties properties) {
+        return new TopicOffsetCacheCleanerRunner(properties.getTopicBrowser().getCacheCleanerIntervalMin());
+    }
+
+    @Bean(initMethod = "init")
+    public TopicOffsetRangeCacheCleanerRunner topicOffsetRangeCacheCleanerRunner(KafkaManagerUiProperties properties) {
+        return new TopicOffsetRangeCacheCleanerRunner(properties.getTopicBrowser().getCacheCleanerIntervalMin());
+    }
 }

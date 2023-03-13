@@ -24,10 +24,14 @@ import org.apache.kafka.common.serialization.StringDeserializer;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.epam.eco.commons.kafka.config.ConsumerConfigBuilder;
+import com.epam.eco.commons.kafka.helpers.BiDirectionalTopicRecordFetcher;
+import com.epam.eco.commons.kafka.helpers.CachedTopicRecordFetcher;
+import com.epam.eco.commons.kafka.helpers.RecordBiDirectionalFetcher;
+import com.epam.eco.commons.kafka.helpers.BiDirectionalTopicRecordFetcher.FetchDirection;
 import com.epam.eco.commons.kafka.helpers.RecordFetchResult;
-import com.epam.eco.commons.kafka.helpers.TopicRecordFetcher;
 import com.epam.eco.commons.kafka.serde.HexStringDeserializer;
 import com.epam.eco.commons.kafka.serde.JsonStringDeserializer;
+import com.epam.eco.kafkamanager.FetchMode;
 import com.epam.eco.kafkamanager.KafkaManager;
 import com.epam.eco.kafkamanager.TopicRecordFetchParams;
 import com.epam.eco.kafkamanager.TopicRecordFetchParams.DataFormat;
@@ -59,17 +63,43 @@ public class TopicRecordFetcherTaskExecutorImpl<K, V> extends AbstractTaskExecut
 
         kafkaManager.getTopic(topicName); // sanity check just for case topic doesn't exist
 
-        TopicRecordFetcher<K, V> recordFetcher = TopicRecordFetcher.
-                with(buildConsumerConfig(params));
+        RecordBiDirectionalFetcher<K, V> recordFetcher = params.getUseCache() ?
+                CachedTopicRecordFetcher.with(buildConsumerConfig(params)) :
+                BiDirectionalTopicRecordFetcher.with(buildConsumerConfig(params));
 
-        return recordFetcher.fetchByOffsets(
-                params.getOffsets().entrySet().stream().
-                    collect(Collectors.toMap(
-                            e -> new TopicPartition(topicName, e.getKey()),
-                            e -> e.getValue())),
-                params.getLimit(),
-                params.getTimeoutInMs());
+        return params.getFetchMode() == FetchMode.FETCH_UNTIL_TIME ||
+                params.getFetchMode() == FetchMode.FETCH_FROM_TIME ?
+                recordFetcher.fetchByTimestamps(params.getOffsets().entrySet().stream()
+                                .filter(e -> e.getValue().getSize()>0)
+                                .collect(Collectors.toMap(
+                                        e -> new TopicPartition(topicName, e.getKey()),
+                                        e -> params.getCalculatedTimestamp()) ),
+                        params.getLimit(),
+                        null,
+                        params.getTimeoutInMs(),
+                        params.getFetchMode().getFetchDirection()) :
+                recordFetcher.fetchByOffsets(params.getOffsets().entrySet().stream()
+                                .filter(e -> e.getValue().getSize()>0)
+                                .collect(Collectors.toMap(
+                                        e -> new TopicPartition(topicName, e.getKey()),
+                                        e -> getBaseOffset(params.getFetchMode(),e.getValue().getSmallest(),e.getValue().getLargest())) ),
+                        params.getLimit(),
+                        null,
+                        params.getTimeoutInMs(),
+                        params.getFetchMode().getFetchDirection());
     }
+
+    private long getBaseOffset(FetchMode fetchMode, long smallest, long largest) {
+        if (fetchMode == FetchMode.FETCH_RANGE) {
+            return smallest;
+        } else if(fetchMode.getFetchDirection() == FetchDirection.BACKWARD) {
+            return smallest > 1 ? smallest - 1 : 0;
+        } else if(fetchMode.getFetchDirection() == FetchDirection.FORWARD) {
+            return largest + 1;
+        }
+        return largest;
+    }
+
 
     private Map<String, Object> buildConsumerConfig(TopicRecordFetchParams params) {
         return properties.buildCommonConsumerConfig(builder -> {

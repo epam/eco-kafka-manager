@@ -37,6 +37,8 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
 
+import static java.util.Objects.isNull;
+
 /**
  * @author Andrei_Tytsik
  */
@@ -44,6 +46,8 @@ public class TabularRecords implements Iterable<Record> {
 
     private static final String DATETIME_PATTERN = "dd/MM/yyyy hh:mm:ss a"; // should be the same as in topic_browser.html (see #offsets-timestamp.format)
     private static final String NA = "N/A";
+
+    private static final int TRUNCATE_SIZE = 127;
 
     private final List<Record> records;
     private final Map<String, Column> columns;
@@ -265,9 +269,23 @@ public class TabularRecords implements Iterable<Record> {
         public Object get(Column column) {
             return get(column.getName());
         }
+        public Object getShort(Column column) {
+            return getShort(column.getName());
+        }
 
         public Object get(String columnName) {
             return tabularValue != null ? tabularValue.get(columnName) : null;
+        }
+        public String getShort(String columnName) {
+            if(isNull(tabularValue) || isNull(tabularValue.get(columnName))) {
+                return null;
+            }
+            String truncatedValue = tabularValue.get(columnName).toString();
+            if(truncatedValue.length()>TRUNCATE_SIZE) {
+                truncatedValue = truncatedValue.substring(0,TRUNCATE_SIZE);
+            }
+            return truncatedValue;
+
         }
 
         public Class<?> type(Column column) {

@@ -1,5 +1,5 @@
 /*******************************************************************************
- *  Copyright 2022 EPAM Systems
+ *  Copyright 2023 EPAM Systems
  *
  *  Licensed under the Apache License, Version 2.0 (the "License"); you may not
  *  use this file except in compliance with the License.  You may obtain a copy
@@ -18,33 +18,33 @@ package com.epam.eco.kafkamanager.ui.config;
 /**
  * @author Mikhail_Vershkov
  */
-public class UrlTemplate {
-    private String name;
-    private String urlTemplate;
-    private String icon;
 
+public class TopicBrowser {
+    private Boolean useCache = true;
+    private Long cacheExpirationPeriodMin = 60L;
+    private Long cacheCleanerIntervalMin = 60L;
 
-    public String getName() {
-        return name;
+    public Boolean getUseCache() {
+        return useCache;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setUseCache(Boolean useCache) {
+        this.useCache = useCache;
     }
 
-    public String getUrlTemplate() {
-        return urlTemplate;
+    public Long getCacheExpirationPeriodMin() {
+        return cacheExpirationPeriodMin;
     }
 
-    public void setUrlTemplate(String urlTemplate) {
-        this.urlTemplate = urlTemplate;
+    public void setCacheExpirationPeriodMin(Long cacheExpirationPeriodMin) {
+        this.cacheExpirationPeriodMin = cacheExpirationPeriodMin;
     }
 
-    public String getIcon() {
-        return icon;
+    public Long getCacheCleanerIntervalMin() {
+        return cacheCleanerIntervalMin;
     }
 
-    public void setIcon(String icon) {
-        this.icon = icon;
+    public void setCacheCleanerIntervalMin(Long cacheCleanerIntervalMin) {
+        this.cacheCleanerIntervalMin = cacheCleanerIntervalMin;
     }
 }

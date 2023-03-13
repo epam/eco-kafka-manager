@@ -17,12 +17,15 @@ package com.epam.eco.kafkamanager.ui.topics;
 
 import com.epam.eco.kafkamanager.ui.config.KafkaManagerUiProperties;
 
+import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 
 /**
  * @author Mikhail_Vershkov
  */
 public class DataCatalogUrlResolver {
+
+    private final static String DEFAULT_ICON = "fa-share";
     private final KafkaManagerUiProperties kafkaManagerUiProperties;
 
     public DataCatalogUrlResolver(KafkaManagerUiProperties kafkaManagerUiProperties) {
@@ -40,6 +43,11 @@ public class DataCatalogUrlResolver {
 
     public String getToolName() {
         return kafkaManagerUiProperties.getDataCatalogTool().getName();
+    }
+
+    public String getIcon() {
+        String icon = kafkaManagerUiProperties.getDataCatalogTool().getIcon();
+        return isNull(icon) ? DEFAULT_ICON : icon;
     }
 
 }

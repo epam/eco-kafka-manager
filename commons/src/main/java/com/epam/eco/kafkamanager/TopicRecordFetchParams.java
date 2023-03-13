@@ -22,6 +22,10 @@ import org.apache.commons.lang3.Validate;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import com.epam.eco.commons.kafka.OffsetRange;
+
+import static java.util.Objects.isNull;
+
 /**
  * @author Andrei_Tytsik
  */
@@ -32,16 +36,26 @@ public class TopicRecordFetchParams {
 
     private final DataFormat keyDataFormat;
     private final DataFormat valueDataFormat;
-    private final Map<Integer, Long> offsets;
+    private final Map<Integer, OffsetRange> offsets;
     private final Long timeoutInMs;
     private final Long limit;
+    private final FetchMode fetchMode;
+    private final Long calculatedTimestamp;
+    private final Boolean useCache;
+
+    private final Long cacheExpirationTimeMin;
 
     public TopicRecordFetchParams(
             @JsonProperty("keyDataFormat") DataFormat keyDataFormat,
             @JsonProperty("valueDataFormat") DataFormat valueDataFormat,
-            @JsonProperty("offsets") Map<Integer, Long> offsets,
+            @JsonProperty("offsets") Map<Integer, OffsetRange> offsets,
             @JsonProperty("limit") Long limit,
-            @JsonProperty("timeoutInMs") Long timeoutInMs) {
+            @JsonProperty("timeoutInMs") Long timeoutInMs,
+            @JsonProperty("fetchMode") FetchMode fetchMode,
+            @JsonProperty("calculatedTimestamp") Long calculatedTimestamp,
+            @JsonProperty("useCache") Boolean useCache,
+            @JsonProperty("cacheExpirationTimeMin") Long cacheExpirationTimeMin
+    ) {
         Validate.notNull(keyDataFormat, "Key data format can't be null");
         Validate.notNull(valueDataFormat, "Value data format can't be null");
         Validate.notNull(offsets, "Offsets can't be null");
@@ -54,6 +68,10 @@ public class TopicRecordFetchParams {
         this.offsets = Collections.unmodifiableMap(offsets);
         this.limit = limit;
         this.timeoutInMs = timeoutInMs;
+        this.fetchMode = isNull(fetchMode) ? FetchMode.FETCH_BACKWARD : fetchMode;
+        this.calculatedTimestamp = calculatedTimestamp;
+        this.useCache = useCache;
+        this.cacheExpirationTimeMin = cacheExpirationTimeMin;
     }
 
     public DataFormat getKeyDataFormat() {
@@ -62,7 +80,7 @@ public class TopicRecordFetchParams {
     public DataFormat getValueDataFormat() {
         return valueDataFormat;
     }
-    public Map<Integer, Long> getOffsets() {
+    public Map<Integer, OffsetRange> getOffsets() {
         return offsets;
     }
     public Long getLimit() {
@@ -70,6 +88,19 @@ public class TopicRecordFetchParams {
     }
     public Long getTimeoutInMs() {
         return timeoutInMs;
+    }
+    public FetchMode getFetchMode() {
+        return fetchMode;
+    }
+    public Long getCalculatedTimestamp() {
+        return calculatedTimestamp;
+    }
+    public Boolean getUseCache() {
+        return useCache;
+    }
+
+    public Long getCacheExpirationTimeMin() {
+        return cacheExpirationTimeMin;
     }
 
     public enum DataFormat {

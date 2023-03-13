@@ -23,30 +23,35 @@ import static java.util.Objects.nonNull;
 /**
  * @author Mikhail_Vershkov
  */
-public class SchemaCatalogUrlResolver {
+public class GrafanaMetricsUrlResolver {
 
-    private final static String DEFAULT_ICON = "fa-external-link";
+    private final static String DEFAULT_ICON = "fa-area-chart";
     private final KafkaManagerUiProperties kafkaManagerUiProperties;
 
-    public SchemaCatalogUrlResolver(KafkaManagerUiProperties kafkaManagerUiProperties) {
+    public GrafanaMetricsUrlResolver(KafkaManagerUiProperties kafkaManagerUiProperties) {
         this.kafkaManagerUiProperties = kafkaManagerUiProperties;
     }
 
     public Boolean showColumn() {
-        return (nonNull(kafkaManagerUiProperties.getSchemaCatalogTool())
-                && nonNull(kafkaManagerUiProperties.getSchemaCatalogTool().getUrlTemplate()));
+        return (nonNull(kafkaManagerUiProperties.getGrafanaMetrics())
+                && nonNull(kafkaManagerUiProperties.getGrafanaMetrics().getUrlTemplate()));
     }
 
-    public String resolve(String schemaName) {
-        return kafkaManagerUiProperties.getSchemaCatalogTool().getUrlTemplate().replace("{schemaname}", schemaName);
+    public String resolve(String topicName) {
+        String env = kafkaManagerUiProperties.getGrafanaMetrics().getVarEnv();
+        env = isNull(env) ? "integration" : env;
+        return kafkaManagerUiProperties.getGrafanaMetrics().getUrlTemplate()
+                .replace("{topicname}", topicName)
+                .replace("{varEnv}", env);
     }
 
     public String getToolName() {
-        return kafkaManagerUiProperties.getSchemaCatalogTool().getName();
+        return kafkaManagerUiProperties.getGrafanaMetrics().getName();
     }
 
     public String getIcon() {
-        String icon = kafkaManagerUiProperties.getSchemaCatalogTool().getIcon();
+        String icon = kafkaManagerUiProperties.getGrafanaMetrics().getIcon();
         return isNull(icon) ? DEFAULT_ICON : icon;
     }
+
 }

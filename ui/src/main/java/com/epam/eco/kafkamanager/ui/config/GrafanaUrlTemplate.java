@@ -18,11 +18,12 @@ package com.epam.eco.kafkamanager.ui.config;
 /**
  * @author Mikhail_Vershkov
  */
-public class UrlTemplate {
+public class GrafanaUrlTemplate {
+
     private String name;
     private String urlTemplate;
+    private String varEnv;
     private String icon;
-
 
     public String getName() {
         return name;
@@ -38,6 +39,14 @@ public class UrlTemplate {
 
     public void setUrlTemplate(String urlTemplate) {
         this.urlTemplate = urlTemplate;
+    }
+
+    public String getVarEnv() {
+        return varEnv;
+    }
+
+    public void setVarEnv(String varEnv) {
+        this.varEnv = varEnv;
     }
 
     public String getIcon() {

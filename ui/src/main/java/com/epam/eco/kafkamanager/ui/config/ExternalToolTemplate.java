@@ -13,9 +13,7 @@
  *  License for the specific language governing permissions and limitations under
  *  the License.
  *******************************************************************************/
-package com.epam.eco.kafkamanager.ui.topics;
-
-import com.epam.eco.kafkamanager.ui.config.KafkaManagerUiProperties;
+package com.epam.eco.kafkamanager.ui.config;
 
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
@@ -23,30 +21,43 @@ import static java.util.Objects.nonNull;
 /**
  * @author Mikhail_Vershkov
  */
-public class SchemaCatalogUrlResolver {
+public class ExternalToolTemplate {
 
     private final static String DEFAULT_ICON = "fa-external-link";
-    private final KafkaManagerUiProperties kafkaManagerUiProperties;
+    private String name;
+    private String urlTemplate;
+    private String icon;
 
-    public SchemaCatalogUrlResolver(KafkaManagerUiProperties kafkaManagerUiProperties) {
-        this.kafkaManagerUiProperties = kafkaManagerUiProperties;
+
+    public String getName() {
+        return name;
     }
 
-    public Boolean showColumn() {
-        return (nonNull(kafkaManagerUiProperties.getSchemaCatalogTool())
-                && nonNull(kafkaManagerUiProperties.getSchemaCatalogTool().getUrlTemplate()));
+    public void setName(String name) {
+        this.name = name;
     }
 
-    public String resolve(String schemaName) {
-        return kafkaManagerUiProperties.getSchemaCatalogTool().getUrlTemplate().replace("{schemaname}", schemaName);
+    public String getUrlTemplate() {
+        return urlTemplate;
     }
 
-    public String getToolName() {
-        return kafkaManagerUiProperties.getSchemaCatalogTool().getName();
+    public void setUrlTemplate(String urlTemplate) {
+        this.urlTemplate = urlTemplate;
+    }
+
+    public void setIcon(String icon) {
+        this.icon = icon;
+    }
+
+    private boolean show() {
+        return (nonNull(urlTemplate) && nonNull(name));
+    }
+
+    public String resolve(String topicName) {
+        return urlTemplate.replace("{topicname}", topicName);
     }
 
     public String getIcon() {
-        String icon = kafkaManagerUiProperties.getSchemaCatalogTool().getIcon();
         return isNull(icon) ? DEFAULT_ICON : icon;
     }
 }

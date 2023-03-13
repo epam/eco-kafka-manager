@@ -49,8 +49,8 @@ body {
   flex-wrap: wrap;
 }
 
-.card-flex > .to-right {
-  margin-left: auto;
+.to-right {
+  margin-left: auto !important;
 }
 
 .card-flex > * {
@@ -69,6 +69,41 @@ body {
 .sticky-col {
   position: sticky;
   top: -1px;
-  background-color: lightgrey;
+  background-color: white !important;
   z-index: 10;
+}
+
+.scrollable-table-container {
+  max-height: 70vh;
+  overflow-y: scroll;
+}
+
+.input-timestamp {
+  padding: 0rem 0.75em;
+}
+
+.input-group-text {
+  padding: 0rem 0.75em;
+  /*font-size: 1em;*/
+}
+
+label.centred {
+  margin-top: 0.7em;
+}
+label {
+  font-weight: bold;
+  display: inline-flex;
+}
+
+a {
+  text-decoration: none;
+  font-weight: bold;
+  color: #4f5050;
+}
+
+.topic-title {
+  color: var(--bs-gray-dark);
+  font-weight: bold;
+  margin: 0 5px 0 5px;
+  font-size: 16px;
 }

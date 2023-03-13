@@ -25,8 +25,12 @@
     <link rel="stylesheet" type="text/css" th:href="@{/bootstrap/css/bootstrap-utilities.css}" />
     <link rel="stylesheet" type="text/css" th:href="@{/bootstrap-multiselect/css/bootstrap-multiselect.css}" />
     <link rel="stylesheet" type="text/css" th:href="@{/styles/fonts/font-awesome/css/font-awesome.min.css}" />
-    <link rel="stylesheet" type="text/css" th:href="@{/styles/css/bootstrap.epam.custom.css}" />
     <link rel="stylesheet" type="text/css" th:href="@{/styles/index.css}" />
+    <link rel="stylesheet" type="text/css" th:href="@{/data-tables/dataTables.bootstrap5.min.css}" />
+    <link rel="stylesheet" type="text/css" th:href="@{/data-tables/fixedColumns.dataTables.min.css}" />
+
+    <link rel="stylesheet" type="text/css" th:href="@{/styles/css/bootstrap.epam.custom.css}" />
+    <link rel="stylesheet" type="text/css" th:href="@{/styles/css/copy-text.css}" />
 
     <th:block th:replace="${links}" />
     
@@ -38,8 +42,14 @@
     <script type="text/javascript" th:src="@{/bootstrap-multiselect/js/bootstrap-multiselect.js}"></script>
     <script type="text/javascript" th:src="@{/bootstrap-datetimepicker/js/bootstrap-datetimepicker.js}"></script>
     <script type="text/javascript" th:src="@{/bootstrap-datetimepicker/js/locales/bootstrap-datetimepicker.uk.js}"></script>
-    <script type="text/javascript" th:src="@{/collapsed-panel.js}"></script>
-    <script type="text/javascript" th:src="@{/ui_lib.js}"></script>
+    <script type="text/javascript" th:src="@{/js/ui_lib.js}"></script>
+    <script type="text/javascript" th:src="@{/loading-modal/loading-modal.js}"></script>
+    <script type="text/javascript" th:src="@{/js/collapsed-panel.js}"></script>
+    <script type="text/javascript" th:src="@{/js/collapsed-panel-chevron.js}"></script>
+    <script type="text/javascript" th:src="@{/data-tables/jquery.dataTables.min.js}"></script>
+    <script type="text/javascript" th:src="@{/data-tables/dataTables.bootstrap5.min.js}"></script>
+    <script type="text/javascript" th:src="@{/data-tables/dataTables.fixedColumns.min.js}"></script>
+    <script type="text/javascript" th:src="@{/js/copy-text.js}"></script>
     
     <th:block th:replace="${scripts}" />
     
@@ -143,7 +153,44 @@
         <script th:src="@{/components/header/index.js}"></script>
         
     </div>
-   
+
+    <div th:fragment="loading-modal">
+        <div id="loadingModal" class="modal" tabindex="-1" data-keyboard="false"
+             data-bs-backdrop="static" aria-hidden="true">
+            <div class="modal-dialog modal-sm modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-body">
+                        <div class="mt-3 mb-3" style="text-align:center; font-size: 1.2em;">
+                            <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                            <div id="loadingModalText">Loading...</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div th:fragment="info-modal">
+        <div id="infoModal" class="modal" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <div id="infoModalHeader"></div>
+                    </div>
+                    <div class="modal-body">
+                        <div class="mt-3 mb-3" style="text-align:center; font-size: 1.2em;">
+                            <div id="infoModalText"></div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button id="infoModalCloseButton" class="btn" data-bs-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
     <div th:fragment="footer" class="footer-content">
         <div class="build-info">
             <span th:text="${buildInfo.buildVersion}"></span>
