@@ -13,6 +13,6 @@ public class TopicOffsetRangeCacheCleanerRunner {
         this.intervalMin = intervalMin;
     }
     void init() {
-        CachedTopicOffsetRangeFetcher.TopicOffsetRangeCacheCleaner.with(intervalMin).run();
+        CachedTopicOffsetRangeFetcher.TopicOffsetRangeCacheCleaner.with(intervalMin);
     }
 }

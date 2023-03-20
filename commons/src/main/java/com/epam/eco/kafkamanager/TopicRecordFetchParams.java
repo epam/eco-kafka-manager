@@ -37,24 +37,24 @@ public class TopicRecordFetchParams {
     private final DataFormat keyDataFormat;
     private final DataFormat valueDataFormat;
     private final Map<Integer, OffsetRange> offsets;
-    private final Long timeoutInMs;
-    private final Long limit;
+    private final long timeoutInMs;
+    private final long limit;
     private final FetchMode fetchMode;
-    private final Long calculatedTimestamp;
-    private final Boolean useCache;
+    private final long timestamp;
+    private final boolean useCache;
 
-    private final Long cacheExpirationTimeMin;
+    private final long cacheExpirationTimeMin;
 
     public TopicRecordFetchParams(
             @JsonProperty("keyDataFormat") DataFormat keyDataFormat,
             @JsonProperty("valueDataFormat") DataFormat valueDataFormat,
             @JsonProperty("offsets") Map<Integer, OffsetRange> offsets,
-            @JsonProperty("limit") Long limit,
-            @JsonProperty("timeoutInMs") Long timeoutInMs,
+            @JsonProperty("limit") long limit,
+            @JsonProperty("timeoutInMs") long timeoutInMs,
             @JsonProperty("fetchMode") FetchMode fetchMode,
-            @JsonProperty("calculatedTimestamp") Long calculatedTimestamp,
-            @JsonProperty("useCache") Boolean useCache,
-            @JsonProperty("cacheExpirationTimeMin") Long cacheExpirationTimeMin
+            @JsonProperty("calculatedTimestamp") long timestamp,
+            @JsonProperty("useCache") boolean useCache,
+            @JsonProperty("cacheExpirationTimeMin") long cacheExpirationTimeMin
     ) {
         Validate.notNull(keyDataFormat, "Key data format can't be null");
         Validate.notNull(valueDataFormat, "Value data format can't be null");
@@ -68,8 +68,8 @@ public class TopicRecordFetchParams {
         this.offsets = Collections.unmodifiableMap(offsets);
         this.limit = limit;
         this.timeoutInMs = timeoutInMs;
-        this.fetchMode = isNull(fetchMode) ? FetchMode.FETCH_BACKWARD : fetchMode;
-        this.calculatedTimestamp = calculatedTimestamp;
+        this.fetchMode = isNull(fetchMode) ? FetchMode.FETCH_FORWARD : fetchMode;
+        this.timestamp = timestamp;
         this.useCache = useCache;
         this.cacheExpirationTimeMin = cacheExpirationTimeMin;
     }
@@ -83,19 +83,19 @@ public class TopicRecordFetchParams {
     public Map<Integer, OffsetRange> getOffsets() {
         return offsets;
     }
-    public Long getLimit() {
+    public long getLimit() {
         return limit;
     }
-    public Long getTimeoutInMs() {
+    public long getTimeoutInMs() {
         return timeoutInMs;
     }
     public FetchMode getFetchMode() {
         return fetchMode;
     }
-    public Long getCalculatedTimestamp() {
-        return calculatedTimestamp;
+    public long getTimestamp() {
+        return timestamp;
     }
-    public Boolean getUseCache() {
+    public boolean getUseCache() {
         return useCache;
     }
 

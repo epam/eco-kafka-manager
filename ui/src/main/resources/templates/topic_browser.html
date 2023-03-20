@@ -664,7 +664,7 @@
                                 <th>Headers</th>
                                 <th th:if="${browseParams.isAvroOrProtobufValueFormat()}">Attributes
                                 </th>
-                                <th th:if="${browseParams.isAvroOrProtobufValueFormat() and schemaCatalogUrlResolver.showColumn()}">Schema
+                                <th th:if="${browseParams.isAvroOrProtobufValueFormat() and schemaCatalogUrlTemplate.show()}">Schema
                                 </th>
                                 <th th:each="column : ${fetchedRecords.listSelectedColumns()}">
                                         <span th:text="${column.name}"
@@ -715,11 +715,11 @@
                                     </a>
                                 </td>
 
-                                <td th:if="${record.hasAttributes() and schemaCatalogUrlResolver.showColumn()}">
+                                <td th:if="${record.hasAttributes() and schemaCatalogUrlTemplate.show()}">
                                     <div style="justify-content:start;display:flex;flex-direction:row; gap: 10px;align-items: center;">
-                                        <a th:href="@{|${schemaCatalogUrlResolver.resolve(record.RegistrySchema.schemaName)}|}"
+                                        <a th:href="@{|${schemaCatalogUrlTemplate.resolve(record.RegistrySchema.schemaName)}|}"
                                            target="_blank">
-                                            <i th:class="${'fa '+schemaCatalogUrlResolver.getIcon()+' info'}"></i>
+                                            <i th:class="${'fa '+schemaCatalogUrlTemplate.getIcon()+' info'}"></i>
                                         </a>
                                         <a  th:id="${'schema_content_'+recordId}"
                                             th:if="${record.hasAttributes()}"

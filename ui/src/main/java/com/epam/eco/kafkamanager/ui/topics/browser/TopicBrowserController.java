@@ -40,7 +40,6 @@ import com.epam.eco.kafkamanager.TopicRecordFetchParams;
 import com.epam.eco.kafkamanager.TopicRecordFetchParams.DataFormat;
 import com.epam.eco.kafkamanager.exec.TaskResult;
 import com.epam.eco.kafkamanager.ui.config.KafkaManagerUiProperties;
-import com.epam.eco.kafkamanager.ui.topics.SchemaCatalogUrlResolver;
 import com.epam.eco.kafkamanager.ui.topics.TopicController;
 
 /**
@@ -62,7 +61,7 @@ public class TopicBrowserController {
     public static final String ATTR_CURR_OFFSETS = "currentOffsets";
     public static final String ATTR_HAS_NEXT_OFFSETS = "hasNextOffsets";
     public static final String ATTR_HAS_PREVIOUS_OFFSETS = "hasPreviousOffsets";
-    public static final String ATTR_SCHEMA_CATALOG_URL_RESOLVER = "schemaCatalogUrlResolver";
+    public static final String ATTR_SCHEMA_CATALOG_URL_TEMPLATE = "schemaCatalogUrlTemplate";
     private static final long DEFAULT_FETCH_TIMEOUT = 30_000;
 
     @Autowired
@@ -70,9 +69,6 @@ public class TopicBrowserController {
 
     @Autowired
     private KafkaAdminOperations kafkaAdminOperations;
-
-    @Autowired
-    private SchemaCatalogUrlResolver schemaCatalogUrlResolver;
 
     @Autowired
     private KafkaManagerUiProperties properties;
@@ -89,7 +85,7 @@ public class TopicBrowserController {
         }
 
         handleParamsRequest(browseParams, model::addAttribute);
-        model.addAttribute(ATTR_SCHEMA_CATALOG_URL_RESOLVER, schemaCatalogUrlResolver);
+        model.addAttribute(ATTR_SCHEMA_CATALOG_URL_TEMPLATE, properties.getSchemaCatalogTool());
 
         return VIEW;
     }
@@ -116,7 +112,7 @@ public class TopicBrowserController {
 
         setDefaultDataFormatsIfMissing(browseParams);
         populateMissingAndFixInvalidOffsets(offsetRanges, browseParams);
-        OffsetRange offsetRangesSummary = populateOffsetRangesSummary(offsetRanges);
+        OffsetRange offsetRangesSummary = getOffsetRangesSummary(offsetRanges);
 
         addTopicConfigParams(browseParams);
 
@@ -177,9 +173,10 @@ public class TopicBrowserController {
                         Map.Entry::getValue));
     }
 
-    private OffsetRange populateOffsetRangesSummary(Map<Integer, OffsetRange> offsetRanges) {
+    private OffsetRange getOffsetRangesSummary(Map<Integer, OffsetRange> offsetRanges) {
         long smallest = offsetRanges.values().stream()
-                .map(OffsetRange::getSmallest).min(Comparator.naturalOrder())
+                .map(OffsetRange::getSmallest)
+                .min(Comparator.naturalOrder())
                 .orElse(0L);
         OffsetRange largest = offsetRanges.values().stream()
                 .max(Comparator.comparing(OffsetRange::getLargest))

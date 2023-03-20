@@ -265,10 +265,10 @@
                                     <td>Consumer Groups</td>
                                     <td>Description</td>
                                     <td>Topic data</td>
-                                    <td th:if="${dataCatalogUrlResolver.showColumn()}" th:text="${dataCatalogUrlResolver.toolName}"></td>
-                                    <td th:if="${grafanaMetricsUrlResolver.showColumn()}" th:text="${grafanaMetricsUrlResolver.toolName}"></td>
-                                    <td th:each="tool: ${externalTools}"
-                                        th:if="${externalTools!=null && externalTools.size()>0}"
+                                    <td th:if="${dataCatalogUrlTemplate.show()}" th:text="${dataCatalogUrlTemplate.name}"></td>
+                                    <td th:if="${grafanaMetricsUrlTemplate.show()}" th:text="${grafanaMetricsUrlTemplate.name}"></td>
+                                    <td th:each="tool: ${externalToolTemplates}"
+                                        th:if="${externalToolTemplates!=null && externalToolTemplates.size()>0}"
                                         th:text="${tool.getName()}">
                                     </td>
                                 </tr>
@@ -304,18 +304,18 @@
                                             <i class="fa fa-search info" aria-hidden="true"></i>
                                         </a>
                                     </td>
-                                    <td th:if="${dataCatalogUrlResolver.showColumn()}" style="text-align: center;width:50px;">
-                                        <a th:href="@{|${dataCatalogUrlResolver.resolve(topic.name)}|}" target="_blank">
-                                            <i th:class="${'fa '+dataCatalogUrlResolver.getIcon()+' info'}" aria-hidden="true"></i>
+                                    <td th:if="${dataCatalogUrlTemplate.show()}" style="text-align: center;width:50px;">
+                                        <a th:href="@{|${dataCatalogUrlTemplate.resolve(topic.name)}|}" target="_blank">
+                                            <i th:class="${'fa '+dataCatalogUrlTemplate.getIcon()+' info'}" aria-hidden="true"></i>
                                         </a>
                                     </td>
-                                    <td th:if="${grafanaMetricsUrlResolver.showColumn()}" style="text-align: center;width:50px;">
-                                        <a th:href="@{|${grafanaMetricsUrlResolver.resolve(topic.name)}|}" target="_blank">
-                                            <i th:class="${'fa '+grafanaMetricsUrlResolver.getIcon()+' info'}" aria-hidden="true"></i>
+                                    <td th:if="${grafanaMetricsUrlTemplate.show()}" style="text-align: center;width:50px;">
+                                        <a th:href="@{|${grafanaMetricsUrlTemplate.resolve(topic.name)}|}" target="_blank">
+                                            <i th:class="${'fa '+grafanaMetricsUrlTemplate.getIcon()+' info'}" aria-hidden="true"></i>
                                         </a>
                                      </td>
-                                     <td th:each="tool: ${externalTools}"
-                                         th:if="${externalTools!=null && externalTools.size()>0}"
+                                     <td th:each="tool: ${externalToolTemplates}"
+                                         th:if="${externalToolTemplates!=null && externalToolTemplates.size()>0}"
                                          style="text-align: center;width:50px;">
                                          <a th:href="@{|${tool.resolve(topic.name)}|}" target="_blank">
                                             <i th:class="${'fa '+tool.getIcon()+' info'}" aria-hidden="true"></i>

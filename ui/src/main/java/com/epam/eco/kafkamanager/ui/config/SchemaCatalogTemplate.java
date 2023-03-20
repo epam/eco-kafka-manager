@@ -15,34 +15,12 @@
  *******************************************************************************/
 package com.epam.eco.kafkamanager.ui.config;
 
-import static java.util.Objects.isNull;
-
 /**
  * @author Mikhail_Vershkov
  */
-public class GrafanaUrlTemplate extends ExternalToolTemplate {
-
-    private final static String DEFAULT_ICON = "fa-area-chart";
-    private final static String DEFAULT_ENV = "integration";
-    private String varEnv;
-
-    public String getVarEnv() {
-        return varEnv;
-    }
-
-    public void setVarEnv(String varEnv) {
-        this.varEnv = varEnv;
-    }
-
+public class SchemaCatalogTemplate extends ExternalToolTemplate {
     @Override
-    public String resolve(String topicName) {
-        String env = isNull(varEnv) ? DEFAULT_ENV : varEnv;
-        return super.getUrlTemplate().replace("{topicname}", topicName).replace("{varEnv}", env);
+    public String resolve(String schemaName) {
+        return super.resolveWithSchema(schemaName);
     }
-
-    @Override
-    public String getIcon() {
-        return DEFAULT_ICON;
-    }
-
 }

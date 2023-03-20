@@ -21,43 +21,27 @@ import static java.util.Objects.nonNull;
 /**
  * @author Mikhail_Vershkov
  */
-public class ExternalToolTemplate {
+public class ExternalToolTemplate extends UrlTemplate {
 
     private final static String DEFAULT_ICON = "fa-external-link";
-    private String name;
-    private String urlTemplate;
-    private String icon;
 
-
-    public String getName() {
-        return name;
+    public boolean show() {
+        return (nonNull(super.getUrlTemplate()) && nonNull(super.getName()));
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public String resolveWithTopic(String topicName) {
+        return super.getUrlTemplate().replace("{topicname}", topicName);
     }
-
-    public String getUrlTemplate() {
-        return urlTemplate;
-    }
-
-    public void setUrlTemplate(String urlTemplate) {
-        this.urlTemplate = urlTemplate;
-    }
-
-    public void setIcon(String icon) {
-        this.icon = icon;
-    }
-
-    private boolean show() {
-        return (nonNull(urlTemplate) && nonNull(name));
+    public String resolveWithSchema(String schemaName) {
+        return super.getUrlTemplate().replace("{schemaname}", schemaName);
     }
 
     public String resolve(String topicName) {
-        return urlTemplate.replace("{topicname}", topicName);
+        return resolveWithTopic(topicName);
     }
 
+    @Override
     public String getIcon() {
-        return isNull(icon) ? DEFAULT_ICON : icon;
+        return isNull(super.getIcon()) ? DEFAULT_ICON : super.getIcon();
     }
 }

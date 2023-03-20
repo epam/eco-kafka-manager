@@ -132,7 +132,7 @@ public class RestKafkaManagerIT {
                 10L,
                 10000L,
                 FetchMode.FETCH_FORWARD,
-                null,
+                0,
                 false,
                 60L);
         RecordFetchResult<String, String> recordFetchResult =

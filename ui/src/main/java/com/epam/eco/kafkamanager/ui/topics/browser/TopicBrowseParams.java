@@ -75,7 +75,7 @@ public class TopicBrowseParams extends HashMap<String, Object> {
     }
     public Boolean getFullScreen() {
         Boolean fullScreen = getAsBoolean(FULL_SCREEN);
-        return ! isNull(fullScreen) && fullScreen;
+        return !isNull(fullScreen) && fullScreen;
     }
 
     Long getCalculatedTimestamp() {

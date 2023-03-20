@@ -26,24 +26,24 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 public class KafkaManagerUiProperties {
 
     private String gaTrackingId;
-    private UrlTemplate dataCatalogTool;
-    private UrlTemplate schemaCatalogTool;
+    private DataCatalogUrlTemplate dataCatalogTool;
+    private SchemaCatalogTemplate schemaCatalogTool;
     private GrafanaUrlTemplate grafanaMetrics;
 
     private Collection<ExternalToolTemplate> externalTools;
     private TopicBrowser topicBrowser;
     private Boolean showGridInTopicBrowser = Boolean.FALSE;
-    public UrlTemplate getSchemaCatalogTool() {
+    public ExternalToolTemplate getSchemaCatalogTool() {
         return schemaCatalogTool;
     }
 
-    public void setSchemaCatalogTool(UrlTemplate schemaCatalogTool) {
+    public void setSchemaCatalogTool(SchemaCatalogTemplate schemaCatalogTool) {
         this.schemaCatalogTool = schemaCatalogTool;
     }
 
-    public UrlTemplate getDataCatalogTool() {return dataCatalogTool;}
+    public ExternalToolTemplate getDataCatalogTool() {return dataCatalogTool;}
 
-    public void setDataCatalogTool(UrlTemplate dataCatalogTool) {this.dataCatalogTool = dataCatalogTool;}
+    public void setDataCatalogTool(DataCatalogUrlTemplate dataCatalogTool) {this.dataCatalogTool = dataCatalogTool;}
 
     public String getGaTrackingId() {
         return gaTrackingId;

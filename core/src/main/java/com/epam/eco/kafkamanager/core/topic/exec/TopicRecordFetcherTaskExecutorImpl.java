@@ -67,39 +67,42 @@ public class TopicRecordFetcherTaskExecutorImpl<K, V> extends AbstractTaskExecut
                 CachedTopicRecordFetcher.with(buildConsumerConfig(params)) :
                 BiDirectionalTopicRecordFetcher.with(buildConsumerConfig(params));
 
-        return params.getFetchMode() == FetchMode.FETCH_UNTIL_TIME ||
-                params.getFetchMode() == FetchMode.FETCH_FROM_TIME ?
-                recordFetcher.fetchByTimestamps(params.getOffsets().entrySet().stream()
-                                .filter(e -> e.getValue().getSize()>0)
-                                .collect(Collectors.toMap(
-                                        e -> new TopicPartition(topicName, e.getKey()),
-                                        e -> params.getCalculatedTimestamp()) ),
-                        params.getLimit(),
-                        null,
-                        params.getTimeoutInMs(),
-                        params.getFetchMode().getFetchDirection()) :
-                recordFetcher.fetchByOffsets(params.getOffsets().entrySet().stream()
-                                .filter(e -> e.getValue().getSize()>0)
-                                .collect(Collectors.toMap(
-                                        e -> new TopicPartition(topicName, e.getKey()),
-                                        e -> getBaseOffset(params.getFetchMode(),e.getValue().getSmallest(),e.getValue().getLargest())) ),
-                        params.getLimit(),
-                        null,
-                        params.getTimeoutInMs(),
-                        params.getFetchMode().getFetchDirection());
+        return params.getFetchMode().isItTimeFetch() ?
+               fetchByTime(topicName, params, recordFetcher) :
+               fetchByPosition(topicName, params, recordFetcher);
     }
 
-    private long getBaseOffset(FetchMode fetchMode, long smallest, long largest) {
-        if (fetchMode == FetchMode.FETCH_RANGE) {
-            return smallest;
-        } else if(fetchMode.getFetchDirection() == FetchDirection.BACKWARD) {
-            return smallest > 1 ? smallest - 1 : 0;
-        } else if(fetchMode.getFetchDirection() == FetchDirection.FORWARD) {
-            return largest + 1;
-        }
-        return largest;
+    private RecordFetchResult<K, V> fetchByTime(String topicName,
+                                                TopicRecordFetchParams params,
+                                                RecordBiDirectionalFetcher<K, V> recordFetcher) {
+        return recordFetcher.fetchByTimestamps(
+                params.getOffsets().entrySet().stream()
+                      .filter(e -> e.getValue().getSize() > 0)
+                      .collect(Collectors.toMap(
+                                       e -> new TopicPartition(topicName, e.getKey()),
+                                       e -> params.getTimestamp())),
+                params.getLimit(),
+                record -> true,
+                params.getTimeoutInMs(),
+                params.getFetchMode().getFetchDirection());
     }
 
+    private RecordFetchResult<K, V> fetchByPosition(String topicName,
+                                                    TopicRecordFetchParams params,
+                                                    RecordBiDirectionalFetcher<K, V> recordFetcher) {
+        return recordFetcher.fetchByOffsets(
+                params.getOffsets().entrySet().stream()
+                      .filter(e -> e.getValue().getSize() > 0)
+                      .collect(Collectors.toMap(
+                                         e -> new TopicPartition(topicName, e.getKey()),
+                                         e -> params.getFetchMode()
+                                                    .getBaseOffset(e.getValue().getSmallest(),
+                                                                   e.getValue().getLargest()))),
+                params.getLimit(),
+                record -> true,
+                params.getTimeoutInMs(),
+                params.getFetchMode().getFetchDirection());
+    }
 
     private Map<String, Object> buildConsumerConfig(TopicRecordFetchParams params) {
         return properties.buildCommonConsumerConfig(builder -> {

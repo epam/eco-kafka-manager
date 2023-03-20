@@ -13,6 +13,6 @@ public class TopicOffsetCacheCleanerRunner {
         this.intervalMin = intervalMin;
     }
     void init() {
-        CachedTopicRecordFetcher.TopicCacheCleaner.with(intervalMin).run();
+        CachedTopicRecordFetcher.TopicCacheCleaner.with(intervalMin);
     }
 }
