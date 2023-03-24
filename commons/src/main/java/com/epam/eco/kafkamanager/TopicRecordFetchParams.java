@@ -52,7 +52,7 @@ public class TopicRecordFetchParams {
             @JsonProperty("limit") long limit,
             @JsonProperty("timeoutInMs") long timeoutInMs,
             @JsonProperty("fetchMode") FetchMode fetchMode,
-            @JsonProperty("calculatedTimestamp") long timestamp,
+            @JsonProperty("timestamp") long timestamp,
             @JsonProperty("useCache") boolean useCache,
             @JsonProperty("cacheExpirationTimeMin") long cacheExpirationTimeMin
     ) {
@@ -62,6 +62,7 @@ public class TopicRecordFetchParams {
         Validate.notEmpty(offsets, "Offsets can't be empty");
         Validate.isTrue(limit >= MIN_LIMIT && limit <= MAX_LIMIT,
                 String.format("Limit is invalid, should be within range [%d..%d]", MIN_LIMIT, MAX_LIMIT));
+        Validate.notNull(timestamp,"Timestamp is null!");
 
         this.keyDataFormat = keyDataFormat;
         this.valueDataFormat = valueDataFormat;

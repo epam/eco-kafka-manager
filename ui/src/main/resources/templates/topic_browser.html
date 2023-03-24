@@ -149,7 +149,7 @@
             var stringValue = $('#offsets-timestamp').val();
             var date = moment(stringValue, 'DD/MM/YYYY HH:mm:ss', true);
             if (date && date.isValid()) {
-                document.getElementById('calculated-timestamp').value = date.parseZone(0).unix() * 1000;
+                document.getElementById('timestamp').value = date.parseZone(0).unix() * 1000;
                 submitFetchForm("FETCH_UNTIL_TIME", "Fetching records by timestamp...");
             }
             if(!date.isValid()) {
@@ -162,7 +162,7 @@
             var stringValue = $('#offsets-timestamp').val();
             var date = moment(stringValue, 'DD/MM/YYYY HH:mm:ss', true);
             if (date && date.isValid()) {
-                document.getElementById('calculated-timestamp').value = date.parseZone(0).unix() * 1000;
+                document.getElementById('timestamp').value = date.parseZone(0).unix() * 1000;
                 submitFetchForm("FETCH_FROM_TIME", "Fetching records by timestamp...");
             }
             if(!date.isValid()) {
@@ -324,7 +324,7 @@
 
                         <input id="fetch-mode" name="fetch-mode" type="hidden" value="FETCH_RANGE" />
                         <input id="full-screen" name="full-screen" th:value="${browseParams.getFullScreen()}" type="hidden" value="false" />
-                        <input id="calculated-timestamp" name="calculated-timestamp" type="hidden" value="0"/>
+                        <input id="timestamp" name="timestamp" type="hidden" value="0"/>
                         <div class="card-header card-flex">
                             <div class="col">
                                 <a data-bs-toggle="collapse" href="#fetch-params"
@@ -664,7 +664,7 @@
                                 <th>Headers</th>
                                 <th th:if="${browseParams.isAvroOrProtobufValueFormat()}">Attributes
                                 </th>
-                                <th th:if="${browseParams.isAvroOrProtobufValueFormat() and schemaCatalogUrlTemplate.show()}">Schema
+                                <th th:if="${browseParams.isAvroOrProtobufValueFormat() and schemaCatalogUrlTemplate!=null}">Schema
                                 </th>
                                 <th th:each="column : ${fetchedRecords.listSelectedColumns()}">
                                         <span th:text="${column.name}"
@@ -715,7 +715,7 @@
                                     </a>
                                 </td>
 
-                                <td th:if="${record.hasAttributes() and schemaCatalogUrlTemplate.show()}">
+                                <td th:if="${record.hasAttributes() and schemaCatalogUrlTemplate!=null}">
                                     <div style="justify-content:start;display:flex;flex-direction:row; gap: 10px;align-items: center;">
                                         <a th:href="@{|${schemaCatalogUrlTemplate.resolve(record.RegistrySchema.schemaName)}|}"
                                            target="_blank">

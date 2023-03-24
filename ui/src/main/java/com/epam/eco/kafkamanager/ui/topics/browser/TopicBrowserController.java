@@ -20,6 +20,7 @@ import java.util.Map;
 import java.util.function.BiConsumer;
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.Validate;
 import org.apache.kafka.common.TopicPartition;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -142,7 +143,7 @@ public class TopicBrowserController {
         modelAttributes.accept(ATTR_FETCHED_RECORDS, tabularRecords);
         modelAttributes.accept(ATTR_FETCH_SUMMARY, buildFetchSummary(taskResult));
 
-        OffsetRange offsetRangesSummary = populateFetchOffsetRangesSummary(fetchResult);
+        OffsetRange offsetRangesSummary = getFetchOffsetRangesSummary(fetchResult);
         modelAttributes.accept(ATTR_OFFSET_FETCHED_RANGES_SUMMARY, offsetRangesSummary);
         modelAttributes.accept(ATTR_REAL_RANGE_BOUNDS, getRealRangeBounds(fetchResult));
         modelAttributes.accept(ATTR_CURR_OFFSETS, getCurrentOffsetRange(fetchResult));
@@ -158,7 +159,7 @@ public class TopicBrowserController {
                 browseParams.getLimit(),
                 browseParams.getTimeout() > 0 ? browseParams.getTimeout() : DEFAULT_FETCH_TIMEOUT,
                 browseParams.getFetchMode(),
-                browseParams.getCalculatedTimestamp(),
+                browseParams.getTimestamp(),
                 properties.getTopicBrowser().getUseCache(),
                 properties.getTopicBrowser().getCacheExpirationPeriodMin());
     }
@@ -184,7 +185,7 @@ public class TopicBrowserController {
         return OffsetRange.with(smallest,largest.getLargest(),largest.isLargestInclusive());
     }
 
-    private OffsetRange populateFetchOffsetRangesSummary(RecordFetchResult<Object, Object> fetchResult) {
+    private OffsetRange getFetchOffsetRangesSummary(RecordFetchResult<Object, Object> fetchResult) {
         long smallest = fetchResult.getPerPartitionResults().stream()
                 .map(result->result.getScannedOffsets().getSmallest())
                 .min(Comparator.naturalOrder())

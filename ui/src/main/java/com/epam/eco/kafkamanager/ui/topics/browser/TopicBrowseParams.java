@@ -59,7 +59,7 @@ public class TopicBrowseParams extends HashMap<String, Object> {
 
     public static final String FETCH_MODE = "fetch-mode";
     public static final String FULL_SCREEN = "full-screen";
-    public static final String CALCULATED_TIMESTAMP = "calculated-timestamp";
+    public static final String TIMESTAMP = "timestamp";
 
     private static final Pattern PARTITION_MIN_OFFSET_PATTERN = Pattern.compile("^p_min_(0|[1-9]\\d*)$");
     private static final Pattern COLUMN_ENABLED_PATTERN = Pattern.compile("^ce_(.+)$");
@@ -78,8 +78,8 @@ public class TopicBrowseParams extends HashMap<String, Object> {
         return !isNull(fullScreen) && fullScreen;
     }
 
-    Long getCalculatedTimestamp() {
-        return getAsLong(CALCULATED_TIMESTAMP);
+    Long getTimestamp() {
+        return getAsLong(TIMESTAMP);
     }
     public boolean isAvroOrProtobufValueFormat() {
         return getAsDataFormat(VALUE_FORMAT) == DataFormat.AVRO || getAsDataFormat(VALUE_FORMAT) == DataFormat.PROTOCOL_BUFFERS;

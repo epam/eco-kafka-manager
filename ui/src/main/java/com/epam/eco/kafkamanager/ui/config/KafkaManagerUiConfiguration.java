@@ -15,6 +15,8 @@
  *******************************************************************************/
 package com.epam.eco.kafkamanager.ui.config;
 
+import javax.validation.Valid;
+
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -37,6 +39,10 @@ public class KafkaManagerUiConfiguration implements WebMvcConfigurer {
     @Override
     public void configurePathMatch(PathMatchConfigurer configurer) {
         configurer.setUseSuffixPatternMatch(Boolean.FALSE);
+    }
+    @Bean
+    public static KafkaManagerUiPropertiesValidator configurationPropertiesValidator() {
+        return new KafkaManagerUiPropertiesValidator();
     }
 
     @Override
@@ -61,12 +67,12 @@ public class KafkaManagerUiConfiguration implements WebMvcConfigurer {
 
     @Bean(initMethod = "init")
     @ConditionalOnProperty(name="eco.kafkamanager.ui.topicBrowser.useCache", havingValue="true")
-    public TopicOffsetCacheCleanerRunner topicOffsetCacheCleanerRunner(KafkaManagerUiProperties properties) {
+    public TopicOffsetCacheCleanerRunner topicOffsetCacheCleanerRunner(@Valid KafkaManagerUiProperties properties) {
         return new TopicOffsetCacheCleanerRunner(properties.getTopicBrowser().getCacheCleanerIntervalMin());
     }
 
     @Bean(initMethod = "init")
-    public TopicOffsetRangeCacheCleanerRunner topicOffsetRangeCacheCleanerRunner(KafkaManagerUiProperties properties) {
+    public TopicOffsetRangeCacheCleanerRunner topicOffsetRangeCacheCleanerRunner(@Valid KafkaManagerUiProperties properties) {
         return new TopicOffsetRangeCacheCleanerRunner(properties.getTopicBrowser().getCacheCleanerIntervalMin());
     }
 }

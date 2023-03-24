@@ -17,11 +17,15 @@ package com.epam.eco.kafkamanager.ui.config;
 
 import java.util.Collection;
 
+import javax.validation.Valid;
+
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.validation.annotation.Validated;
 
 /**
  * @author Andrei_Tytsik
  */
+@Validated
 @ConfigurationProperties(prefix = "eco.kafkamanager.ui")
 public class KafkaManagerUiProperties {
 
@@ -29,7 +33,6 @@ public class KafkaManagerUiProperties {
     private DataCatalogUrlTemplate dataCatalogTool;
     private SchemaCatalogTemplate schemaCatalogTool;
     private GrafanaUrlTemplate grafanaMetrics;
-
     private Collection<ExternalToolTemplate> externalTools;
     private TopicBrowser topicBrowser;
     private Boolean showGridInTopicBrowser = Boolean.FALSE;

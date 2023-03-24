@@ -15,7 +15,7 @@
  *******************************************************************************/
 package com.epam.eco.kafkamanager.ui.config;
 
-import static java.util.Objects.isNull;
+import org.springframework.validation.annotation.Validated;
 
 /**
  * @author Mikhail_Vershkov
@@ -23,21 +23,19 @@ import static java.util.Objects.isNull;
 public class GrafanaUrlTemplate extends ExternalToolTemplate {
 
     private final static String DEFAULT_ICON = "fa-area-chart";
-    private final static String DEFAULT_ENV = "integration";
-    private String varEnv;
+    private String env;
 
-    public String getVarEnv() {
-        return varEnv;
+    public String getEnv() {
+        return env;
     }
 
-    public void setVarEnv(String varEnv) {
-        this.varEnv = varEnv;
+    public void setEnv(String env) {
+        this.env = env;
     }
 
     @Override
     public String resolve(String topicName) {
-        String env = isNull(varEnv) ? DEFAULT_ENV : varEnv;
-        return super.getUrlTemplate().replace("{topicname}", topicName).replace("{varEnv}", env);
+        return super.getUrlTemplate().replace("{topicname}", topicName).replace("{env}", env);
     }
 
     @Override

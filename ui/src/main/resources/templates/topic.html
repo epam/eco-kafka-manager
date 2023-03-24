@@ -301,9 +301,9 @@
                     </div>
                 </div>
 
-                <div th:if="${dataCatalogUrlTemplate.show() ||
-                              grafanaMetricsUrlTemplate.show() ||
-                              schemaCatalogUrlTemplate.show() ||
+                <div th:if="${(dataCatalogUrlTemplate!=null) ||
+                              (grafanaMetricsUrlTemplate!=null) ||
+                              (schemaCatalogUrlTemplate!=null) ||
                               (externalToolTemplates!=null && externalToolTemplates.size()>0)}" class="card mb-3">
                     <div class="card-header collapsed-header card-flex">
                         <h7>External tools</h7>
@@ -316,21 +316,21 @@
                     <div class="collapse" id="grafana-topic-metrics">
                         <div class="card-body external-tool-bar">
                             <a class="external-tool-button"
-                               th:if="${dataCatalogUrlTemplate.show()}"
+                               th:if="${dataCatalogUrlTemplate!=null}"
                                th:href="@{|${dataCatalogUrlTemplate.resolve(topic.name)}|}"
                                target="_blank">
                                 <i th:class="${'fa fa-3x '+dataCatalogUrlTemplate.getIcon()}"></i>
                                 <div th:text="${dataCatalogUrlTemplate.getName()}"></div>
                             </a>
                             <a class="external-tool-button"
-                               th:if="${grafanaMetricsUrlTemplate.show()}"
+                               th:if="${grafanaMetricsUrlTemplate!=null}"
                                th:href="@{|${grafanaMetricsUrlTemplate.resolve(topic.name)}|}"
                                target="_blank">
                                 <i th:class="${'fa fa-3x '+grafanaMetricsUrlTemplate.getIcon()}"></i>
                                 <div th:text="${grafanaMetricsUrlTemplate.getName()}"></div>
                             </a>
                             <a class="external-tool-button"
-                               th:if="${schemaCatalogUrlTemplate.show()}"
+                               th:if="${schemaCatalogUrlTemplate!=null}"
                                th:href="@{|${schemaCatalogUrlTemplate.resolve(topic.name)}|}"
                                target="_blank">
                                 <i th:class="${'fa fa-3x '+schemaCatalogUrlTemplate.getIcon()}"></i>
