@@ -27,14 +27,14 @@
 
             <div class="row">
         
-                <div class="col-md-10 offset-1">
+                <div class="col-md-12">
                 
                     <div class="card mb-3">
                         <div class="card-body card-flex">
                             <a
                                 th:href="@{/transactions}" 
                                 class="btn btn-primary">
-                                Back To Transactions <i class="fa fa-arrow-left"></i>
+                                <i class="fa fa-arrow-left"></i> Back To Transactions
                             </a>
                             <a
                                 th:href="@{/permissions/(resourceType=${T(org.apache.kafka.common.resource.ResourceType).TRANSACTIONAL_ID}, resourceName=${transaction.transactionalId})}"

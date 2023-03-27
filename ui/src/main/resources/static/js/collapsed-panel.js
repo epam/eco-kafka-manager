@@ -50,13 +50,14 @@ $(document).ready(function() {
             })
     );
 
-    document.querySelectorAll(".collapse-button").forEach(item => item.addEventListener('click',
-        function (event) {
-            let button = event.currentTarget;
-            let destinationState = getDestanationState(button.children[0]);
-            changeCollapseButtonState(button, destinationState);
-        })
-    );
+    document.querySelectorAll(".collapse-button")
+        .forEach(item => item.addEventListener('click',
+            function (event) {
+                let button = event.currentTarget;
+                let destinationState = getDestanationState(button.children[0]);
+                changeCollapseButtonState(button, destinationState);
+            })
+        );
 
     document.querySelectorAll(".collapse-button").forEach(button => {
         if(isLocalStorageSuports()) {

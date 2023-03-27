@@ -13,33 +13,32 @@
  *  License for the specific language governing permissions and limitations under
  *  the License.
  *******************************************************************************/
-package com.epam.eco.kafkamanager.ui.topics;
-
-import com.epam.eco.kafkamanager.ui.config.KafkaManagerUiProperties;
-
-import static java.util.Objects.nonNull;
+package com.epam.eco.kafkamanager.ui.config;
 
 /**
  * @author Mikhail_Vershkov
  */
-public class DataCatalogUrlResolver {
-    private final KafkaManagerUiProperties kafkaManagerUiProperties;
+public class GrafanaUrlTemplate extends ExternalToolTemplate {
 
-    public DataCatalogUrlResolver(KafkaManagerUiProperties kafkaManagerUiProperties) {
-        this.kafkaManagerUiProperties = kafkaManagerUiProperties;
+    private final static String DEFAULT_ICON = "fa-area-chart";
+    private String env;
+
+    public String getEnv() {
+        return env;
     }
 
-    public Boolean showColumn() {
-        return (nonNull(kafkaManagerUiProperties.getDataCatalogTool())
-                && nonNull(kafkaManagerUiProperties.getDataCatalogTool().getUrlTemplate()));
+    public void setEnv(String env) {
+        this.env = env;
     }
 
+    @Override
     public String resolve(String topicName) {
-        return kafkaManagerUiProperties.getDataCatalogTool().getUrlTemplate().replace("{topicname}", topicName);
+        return super.getUrlTemplate().replace("{topicname}", topicName).replace("{env}", env);
     }
 
-    public String getToolName() {
-        return kafkaManagerUiProperties.getDataCatalogTool().getName();
+    @Override
+    public String getIcon() {
+        return DEFAULT_ICON;
     }
 
 }

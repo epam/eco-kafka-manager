@@ -24,9 +24,13 @@
         var pageCurrent = [[${(page != null)?(page.number + 1):(0)}]];
         var totalPagesCurrent = [[${(page != null)?(page.totalPages):(0)}]];
         /*]]>*/
+
+        var dataTable;
+
         $(function() {
             $('#search_form').submit(function(e) {
                 e.preventDefault();
+                showWaitingSign("Fetch data...");
                 location.params(
                         {
                             topicName: $('#topicName').val(),
@@ -58,25 +62,71 @@
                     location.params({page: pageClicked}, {}, {});
                 }
             });
+            var sortingOrderTopicName = [0, 'asc'];
+            dataTable = $('#topics-table').DataTable({
+                paging: false,
+                info: false,
+                scrollY: "40vh",
+                scrollCollapse: true,
+                order: [sortingOrderTopicName],
+                language: {
+                    searchPlaceholder: "Enter this page search expression"
+                }
+            });
+
+            var toggleFullScreen = ( mode ) => {
+                if(mode==='maximize') {
+                    $('#recordTableContainer').addClass("full-screen");
+                    $('.dataTables_scrollBody').css("min-height","80vh");
+                    $('#topics-table').css("min-height","80vh");
+                    $('#full-screen-button').text("Exit full screen");
+                    dataTable.columns.adjust();
+                    $('#fullScreen').val(true);
+                } else {
+                    $('#recordTableContainer').removeClass("full-screen");
+                    $('#topics-table').css("min-height","45vh");
+                    $('.dataTables_scrollBody').css("min-height","45vh");
+                    $('#full-screen-button').text("Full screen");
+                    dataTable.columns.adjust();
+                    $('#fullScreen').val(false);
+                }
+            }
+
+            $("#topics-table").on('init.dt', function () {
+                $("#recordTableContainer").addClass("d-flex");
+                dataTable.columns.adjust();
+            });
+
+            $('#full-screen-button').click(function (e) {
+                if($('#recordTableContainer')[0].classList.contains("full-screen")) {
+                    toggleFullScreen('minimize');
+                } else {
+                    toggleFullScreen('maximize');
+                }
+            });
+
+            hideWaitingSign();
         });
     </script>
 
     <div th:replace="templates :: navbar"></div>
-    
+
+    <div th:replace="templates :: loading-modal"></div>
+
     <div class="main-content">
 
         <div class="container-fluid">
 
             <div class="row">
-                <div class="col-md-10 offset-1">
+                <div class="col-md-12">
                     <h3>Topics (<span th:text="${totalCount}"></span>)</h3>
                 </div>
             </div>
         
             <div class="row">
-            
-                <div class="col-md-10 offset-1">
-                
+
+                <div class="col-md-12">
+
                     <div class="card mb-3">
                         <div class="card-body">
                         
@@ -189,6 +239,7 @@
                             class="btn btn-primary">
                             Find
                         </button>
+                        <input id="fullScreen" name="fullScreen" th:value="${fullScreen}" type="hidden" value="false" />
                     </form>
                 
                 </div>
@@ -196,11 +247,15 @@
             </div>
             
             <div class="row">
-        
-                <div class="col-md-10 offset-1">
-                
-                    <div th:if="${page != null}">
-                        <table class="table table-bordered table-striped table-hover">
+
+                <div class="col-md-12">
+
+                    <div id="recordTableContainer" th:if="${page != null}" style="background: white;">
+                        <div class="d-flex">
+                            <h6>Topics</h6>
+                            <button id="full-screen-button" class="btn btn-secondary btn-sm to-right">Full screen</button>
+                        </div>
+                        <table id="topics-table" class="table table-bordered table-striped table-hover">
                             <thead>
                                 <tr>
                                     <td>Name</td>
@@ -210,11 +265,16 @@
                                     <td>Consumer Groups</td>
                                     <td>Description</td>
                                     <td>Topic data</td>
-                                    <td th:if="${dataCatalogUrlResolver.showColumn()}" th:text="${dataCatalogUrlResolver.toolName}"></td>
+                                    <td th:if="${dataCatalogUrlTemplate!=null}" th:text="${dataCatalogUrlTemplate.name}"></td>
+                                    <td th:if="${grafanaMetricsUrlTemplate!=null}" th:text="${grafanaMetricsUrlTemplate.name}"></td>
+                                    <td th:each="tool: ${externalToolTemplates}"
+                                        th:if="${externalToolTemplates!=null && externalToolTemplates.size()>0}"
+                                        th:text="${tool.getName()}">
+                                    </td>
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr 
+                                <tr
                                     th:each="topic : ${page.content}"
                                     th:classappend="${topic.hasUnderReplicatedPartitions()} ? 'warning' : ''">
                                     <td>
@@ -224,7 +284,7 @@
                                     </td>
                                     <td th:text="${topic.partitionCount}"></td>
                                     <td th:text="${topic.replicationFactor}"></td>
-                                    <td 
+                                    <td
                                         th:text="${topic.configOverridesAsString}"
                                         style="white-space:pre-wrap;"></td>
                                     <td>
@@ -235,26 +295,38 @@
                                             <span th:if="${group.divider}" th:text="..." style="float:left;clear:left;"></span>
                                         </th:block>
                                     </td>
-                                    <td 
-                                        th:text="${topic.metadataDescription}" 
+                                    <td
+                                        th:text="${topic.metadataDescription}"
                                         style="word-wrap:break-word;max-width:150px">
                                     </td>
                                     <td style="text-align: center;width:50px;">
                                         <a th:href="@{/topics/{name}/browser(name=${topic.name})}">
-                                            <i class="fa fa-search info"></i>
+                                            <i class="fa fa-search info" aria-hidden="true"></i>
                                         </a>
                                     </td>
-                                    <td th:if="${dataCatalogUrlResolver.showColumn()}" style="text-align: center;width:50px;">
-                                        <a th:href="@{|${dataCatalogUrlResolver.resolve(topic.name)}|}" target="_blank">
-                                            <i class="fa fa-share info"></i>
+                                    <td th:if="${dataCatalogUrlTemplate!=null}" style="text-align: center;width:50px;">
+                                        <a th:href="@{|${dataCatalogUrlTemplate.resolve(topic.name)}|}" target="_blank">
+                                            <i th:class="${'fa '+dataCatalogUrlTemplate.getIcon()+' info'}" aria-hidden="true"></i>
                                         </a>
                                     </td>
+                                    <td th:if="${grafanaMetricsUrlTemplate!=null}" style="text-align: center;width:50px;">
+                                        <a th:href="@{|${grafanaMetricsUrlTemplate.resolve(topic.name)}|}" target="_blank">
+                                            <i th:class="${'fa '+grafanaMetricsUrlTemplate.getIcon()+' info'}" aria-hidden="true"></i>
+                                        </a>
+                                     </td>
+                                     <td th:each="tool: ${externalToolTemplates}"
+                                         th:if="${externalToolTemplates!=null && externalToolTemplates.size()>0}"
+                                         style="text-align: center;width:50px;">
+                                         <a th:href="@{|${tool.resolve(topic.name)}|}" target="_blank">
+                                            <i th:class="${'fa '+tool.getIcon()+' info'}" aria-hidden="true"></i>
+                                         </a>
+                                     </td>
                                 </tr>
                             </tbody>
                         </table>
-                        
+
                         <div
-                            th:if="${page.numberOfElements > 0}" 
+                            th:if="${page.numberOfElements > 0}"
                             th:text="${'Showing ' + (page.number * page.size + 1) + ' to ' + (page.number * page.size + page.numberOfElements) + ' of ' + page.totalElements}">
                         </div>
                         

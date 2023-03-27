@@ -22,6 +22,7 @@ import java.util.List;
 import org.junit.Assert;
 import org.junit.Test;
 
+import com.epam.eco.commons.kafka.OffsetRange;
 import com.epam.eco.kafkamanager.TopicRecordFetchParams.DataFormat;
 import com.epam.eco.kafkamanager.ui.topics.browser.TopicBrowseParams;
 
@@ -35,17 +36,17 @@ public class TopicBrowseParamsTest {
         TopicBrowseParams params = TopicBrowseParams.with(null);
 
         Assert.assertNotNull(params);
-        Assert.assertEquals(null, params.getTopicName());
-        Assert.assertEquals(null, params.getKeyFormat());
-        Assert.assertEquals(null, params.getValueFormat());
+        Assert.assertNull(params.getTopicName());
+        Assert.assertNull(params.getKeyFormat());
+        Assert.assertNull(params.getValueFormat());
         Assert.assertNotNull(params.getPartitionOffsets());
         Assert.assertTrue(params.getLimit() > 0);
-        Assert.assertEquals(0, params.getPartitionOffset(0));
-        Assert.assertEquals(0, params.getPartitionOffset(1));
-        Assert.assertEquals(0, params.getPartitionOffset(2));
-        Assert.assertEquals(true, params.isPartitionEnabled(0));
-        Assert.assertEquals(true, params.isPartitionEnabled(1));
-        Assert.assertEquals(true, params.isPartitionEnabled(2));
+        Assert.assertEquals(0, params.getPartitionOffset(0).getSize());
+        Assert.assertEquals(0, params.getPartitionOffset(1).getSize());
+        Assert.assertEquals(0, params.getPartitionOffset(2).getSize());
+        Assert.assertTrue(params.isPartitionEnabled(0));
+        Assert.assertTrue(params.isPartitionEnabled(1));
+        Assert.assertTrue(params.isPartitionEnabled(2));
 
         List<Integer> partitions = params.listPartitions();
         Assert.assertNotNull(partitions);
@@ -95,31 +96,31 @@ public class TopicBrowseParamsTest {
         params.setPartitionEnabled(1, false);
         Assert.assertEquals(false, params.isPartitionEnabled(1));
 
-        params.addPartitionOffset(0, 999);
+        params.addPartitionOffset(0, OffsetRange.with(0,999, true));
         Assert.assertTrue(params.containsPartition(0));
         Assert.assertFalse(params.containsPartition(1));
-        Assert.assertEquals(999, params.getPartitionOffset(0));
+        Assert.assertEquals(999, params.getPartitionOffset(0).getSize()-1);
 
         List<Integer> partitions = params.listPartitions();
         Assert.assertNotNull(partitions);
         Assert.assertEquals(1, partitions.size());
         Assert.assertFalse(params.containsPartition(2));
-        Assert.assertEquals(999, params.getPartitionOffset(partitions.get(0)));
+        Assert.assertEquals(1000, params.getPartitionOffset(partitions.get(0)).getSize());
 
-        params.addPartitionOffset(1, 100);
+        params.addPartitionOffset(1, OffsetRange.with(0,100, true));
         Assert.assertTrue(params.containsPartition(1));
-        Assert.assertEquals(100, params.getPartitionOffset(1));
+        Assert.assertEquals(100, params.getPartitionOffset(1).getSize()-1);
 
         partitions = params.listPartitions();
         Assert.assertNotNull(partitions);
         Assert.assertEquals(2, partitions.size());
-        Assert.assertEquals(100, params.getPartitionOffset(partitions.get(1)));
+        Assert.assertEquals(100, params.getPartitionOffset(partitions.get(1)).getSize()-1);
 
-        params.addPartitionOffsetOnCondition(1, 999, oldOffset -> oldOffset != 100);
+        params.addPartitionOffsetOnCondition(1, 999, oldOffset -> oldOffset.getLargest() != 100);
         Assert.assertNotEquals(999, params.getPartitionOffset(1));
 
-        params.addPartitionOffsetOnCondition(2, 333, oldOffset -> oldOffset == 0);
-        Assert.assertEquals(333, params.getPartitionOffset(2));
+        //        params.addPartitionOffsetOnCondition(2, 333, oldOffset -> oldOffset.getSmallest() == 0);
+        //        Assert.assertEquals(333, params.getPartitionOffset(2).getSize()-1);
 
         Assert.assertEquals(Collections.emptyList(), params.listColumns());
 

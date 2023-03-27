@@ -15,29 +15,38 @@
  *******************************************************************************/
 package com.epam.eco.kafkamanager.ui.config;
 
+import java.util.Collection;
+
+import javax.validation.Valid;
+
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.validation.annotation.Validated;
 
 /**
  * @author Andrei_Tytsik
  */
+@Validated
 @ConfigurationProperties(prefix = "eco.kafkamanager.ui")
 public class KafkaManagerUiProperties {
 
     private String gaTrackingId;
-    private UrlTemplate dataCatalogTool;
-    private UrlTemplate schemaCatalogTool;
-
-    public UrlTemplate getSchemaCatalogTool() {
+    private DataCatalogUrlTemplate dataCatalogTool;
+    private SchemaCatalogTemplate schemaCatalogTool;
+    private GrafanaUrlTemplate grafanaMetrics;
+    private Collection<ExternalToolTemplate> externalTools;
+    private TopicBrowser topicBrowser;
+    private Boolean showGridInTopicBrowser = Boolean.FALSE;
+    public ExternalToolTemplate getSchemaCatalogTool() {
         return schemaCatalogTool;
     }
 
-    public void setSchemaCatalogTool(UrlTemplate schemaCatalogTool) {
+    public void setSchemaCatalogTool(SchemaCatalogTemplate schemaCatalogTool) {
         this.schemaCatalogTool = schemaCatalogTool;
     }
 
-    public UrlTemplate getDataCatalogTool() {return dataCatalogTool;}
+    public ExternalToolTemplate getDataCatalogTool() {return dataCatalogTool;}
 
-    public void setDataCatalogTool(UrlTemplate dataCatalogTool) {this.dataCatalogTool = dataCatalogTool;}
+    public void setDataCatalogTool(DataCatalogUrlTemplate dataCatalogTool) {this.dataCatalogTool = dataCatalogTool;}
 
     public String getGaTrackingId() {
         return gaTrackingId;
@@ -47,4 +56,35 @@ public class KafkaManagerUiProperties {
         this.gaTrackingId = gaTrackingId;
     }
 
+    public TopicBrowser getTopicBrowser() {
+        return topicBrowser;
+    }
+
+    public void setTopicBrowser(TopicBrowser topicBrowser) {
+        this.topicBrowser = topicBrowser;
+    }
+
+    public Boolean getShowGridInTopicBrowser() {
+        return showGridInTopicBrowser;
+    }
+
+    public void setShowGridInTopicBrowser(Boolean showGridInTopicBrowser) {
+        this.showGridInTopicBrowser = showGridInTopicBrowser;
+    }
+
+    public GrafanaUrlTemplate getGrafanaMetrics() {
+        return grafanaMetrics;
+    }
+
+    public void setGrafanaMetrics(GrafanaUrlTemplate grafanaMetrics) {
+        this.grafanaMetrics = grafanaMetrics;
+    }
+
+    public Collection<ExternalToolTemplate> getExternalTools() {
+        return externalTools;
+    }
+
+    public void setExternalTools(Collection<ExternalToolTemplate> externalTools) {
+        this.externalTools = externalTools;
+    }
 }

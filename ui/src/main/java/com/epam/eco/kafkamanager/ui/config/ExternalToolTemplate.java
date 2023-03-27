@@ -13,33 +13,35 @@
  *  License for the specific language governing permissions and limitations under
  *  the License.
  *******************************************************************************/
-package com.epam.eco.kafkamanager.ui.topics;
+package com.epam.eco.kafkamanager.ui.config;
 
-import com.epam.eco.kafkamanager.ui.config.KafkaManagerUiProperties;
-
+import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 
 /**
  * @author Mikhail_Vershkov
  */
-public class SchemaCatalogUrlResolver {
-    private final KafkaManagerUiProperties kafkaManagerUiProperties;
+public class ExternalToolTemplate extends UrlTemplate {
 
-    public SchemaCatalogUrlResolver(KafkaManagerUiProperties kafkaManagerUiProperties) {
-        this.kafkaManagerUiProperties = kafkaManagerUiProperties;
+    private final static String DEFAULT_ICON = "fa-external-link";
+
+    public boolean show() {
+        return (nonNull(super.getUrlTemplate()) && nonNull(super.getName()));
     }
 
-    public Boolean showColumn() {
-        return (nonNull(kafkaManagerUiProperties.getSchemaCatalogTool())
-                && nonNull(kafkaManagerUiProperties.getSchemaCatalogTool().getUrlTemplate()));
+    public String resolveWithTopic(String topicName) {
+        return super.getUrlTemplate().replace("{topicname}", topicName);
+    }
+    public String resolveWithSchema(String schemaName) {
+        return super.getUrlTemplate().replace("{schemaname}", schemaName);
     }
 
-    public String resolve(String schemaName) {
-        return kafkaManagerUiProperties.getSchemaCatalogTool().getUrlTemplate().replace("{schemaname}", schemaName);
+    public String resolve(String topicName) {
+        return resolveWithTopic(topicName);
     }
 
-    public String getToolName() {
-        return kafkaManagerUiProperties.getSchemaCatalogTool().getName();
+    @Override
+    public String getIcon() {
+        return isNull(super.getIcon()) ? DEFAULT_ICON : super.getIcon();
     }
-
 }

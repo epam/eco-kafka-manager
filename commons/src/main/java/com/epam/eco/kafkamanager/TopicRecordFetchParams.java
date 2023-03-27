@@ -22,6 +22,10 @@ import org.apache.commons.lang3.Validate;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import com.epam.eco.commons.kafka.OffsetRange;
+
+import static java.util.Objects.isNull;
+
 /**
  * @author Andrei_Tytsik
  */
@@ -32,28 +36,43 @@ public class TopicRecordFetchParams {
 
     private final DataFormat keyDataFormat;
     private final DataFormat valueDataFormat;
-    private final Map<Integer, Long> offsets;
-    private final Long timeoutInMs;
-    private final Long limit;
+    private final Map<Integer, OffsetRange> offsets;
+    private final long timeoutInMs;
+    private final long limit;
+    private final FetchMode fetchMode;
+    private final long timestamp;
+    private final boolean useCache;
+
+    private final long cacheExpirationTimeMin;
 
     public TopicRecordFetchParams(
             @JsonProperty("keyDataFormat") DataFormat keyDataFormat,
             @JsonProperty("valueDataFormat") DataFormat valueDataFormat,
-            @JsonProperty("offsets") Map<Integer, Long> offsets,
-            @JsonProperty("limit") Long limit,
-            @JsonProperty("timeoutInMs") Long timeoutInMs) {
+            @JsonProperty("offsets") Map<Integer, OffsetRange> offsets,
+            @JsonProperty("limit") long limit,
+            @JsonProperty("timeoutInMs") long timeoutInMs,
+            @JsonProperty("fetchMode") FetchMode fetchMode,
+            @JsonProperty("timestamp") long timestamp,
+            @JsonProperty("useCache") boolean useCache,
+            @JsonProperty("cacheExpirationTimeMin") long cacheExpirationTimeMin
+    ) {
         Validate.notNull(keyDataFormat, "Key data format can't be null");
         Validate.notNull(valueDataFormat, "Value data format can't be null");
         Validate.notNull(offsets, "Offsets can't be null");
         Validate.notEmpty(offsets, "Offsets can't be empty");
         Validate.isTrue(limit >= MIN_LIMIT && limit <= MAX_LIMIT,
                 String.format("Limit is invalid, should be within range [%d..%d]", MIN_LIMIT, MAX_LIMIT));
+        Validate.notNull(timestamp,"Timestamp is null!");
 
         this.keyDataFormat = keyDataFormat;
         this.valueDataFormat = valueDataFormat;
         this.offsets = Collections.unmodifiableMap(offsets);
         this.limit = limit;
         this.timeoutInMs = timeoutInMs;
+        this.fetchMode = isNull(fetchMode) ? FetchMode.FETCH_FORWARD : fetchMode;
+        this.timestamp = timestamp;
+        this.useCache = useCache;
+        this.cacheExpirationTimeMin = cacheExpirationTimeMin;
     }
 
     public DataFormat getKeyDataFormat() {
@@ -62,14 +81,27 @@ public class TopicRecordFetchParams {
     public DataFormat getValueDataFormat() {
         return valueDataFormat;
     }
-    public Map<Integer, Long> getOffsets() {
+    public Map<Integer, OffsetRange> getOffsets() {
         return offsets;
     }
-    public Long getLimit() {
+    public long getLimit() {
         return limit;
     }
-    public Long getTimeoutInMs() {
+    public long getTimeoutInMs() {
         return timeoutInMs;
+    }
+    public FetchMode getFetchMode() {
+        return fetchMode;
+    }
+    public long getTimestamp() {
+        return timestamp;
+    }
+    public boolean getUseCache() {
+        return useCache;
+    }
+
+    public Long getCacheExpirationTimeMin() {
+        return cacheExpirationTimeMin;
     }
 
     public enum DataFormat {

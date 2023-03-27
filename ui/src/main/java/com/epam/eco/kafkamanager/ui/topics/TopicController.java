@@ -56,10 +56,13 @@ import com.epam.eco.kafkamanager.TopicSearchCriteria;
 import com.epam.eco.kafkamanager.udmetrics.UDMetric;
 import com.epam.eco.kafkamanager.udmetrics.UDMetricManager;
 import com.epam.eco.kafkamanager.udmetrics.UDMetricType;
+import com.epam.eco.kafkamanager.ui.config.KafkaManagerUiProperties;
 import com.epam.eco.kafkamanager.ui.metrics.udm.UDMetricWrapper;
 import com.epam.eco.kafkamanager.ui.topics.export.TopicExporterType;
 import com.epam.eco.kafkamanager.ui.utils.MetadataWrapper;
 import com.epam.eco.kafkamanager.utils.MapperUtils;
+
+import static com.epam.eco.kafkamanager.ui.topics.browser.TopicBrowserController.ATTR_SCHEMA_CATALOG_URL_TEMPLATE;
 
 /**
  * @author Andrei_Tytsik
@@ -86,7 +89,10 @@ public class TopicController {
     public static final String ATTR_MAX_REPLICATION_FACTOR = "maxReplicationFactor";
     public static final String ATTR_TOTAL_COUNT = "totalCount";
     public static final String ATTR_METADATA = "metadata";
-    public static final String ATTR_DATA_CATALOG_URL_RESOLVER = "dataCatalogUrlResolver";
+    public static final String ATTR_DATA_CATALOG_URL_TEMPLATE = "dataCatalogUrlTemplate";
+    public static final String ATTR_GRAFANA_METRICS_URL_TEMPLATE = "grafanaMetricsUrlTemplate";
+    public static final String ATTR_EXTERNAL_TOOL_TEMPLATES = "externalToolTemplates";
+    public static final String ATTR_FULL_SCREEN = "fullScreen";
 
     public static final String MAPPING_TOPICS = "/topics";
     public static final String MAPPING_TOPIC = MAPPING_TOPICS + "/{name}";
@@ -101,14 +107,11 @@ public class TopicController {
     private static final int PAGE_SIZE = 30;
 
     @Autowired
-    private DataCatalogUrlResolver dataCatalogUrlResolver;
-
-    @Autowired
     private KafkaAdminOperations kafkaAdminOperations;
-
+    @Autowired
+    private KafkaManagerUiProperties properties;
     @Autowired
     private KafkaManager kafkaManager;
-
     @Autowired(required=false)
     private UDMetricManager udMetricManager;
 
@@ -144,9 +147,12 @@ public class TopicController {
                 PageRequest.of(page, PAGE_SIZE));
 
         model.addAttribute(ATTR_SEARCH_CRITERIA, searchCriteria);
-        model.addAttribute(ATTR_DATA_CATALOG_URL_RESOLVER, dataCatalogUrlResolver);
+        model.addAttribute(ATTR_DATA_CATALOG_URL_TEMPLATE, properties.getDataCatalogTool());
+        model.addAttribute(ATTR_GRAFANA_METRICS_URL_TEMPLATE, properties.getGrafanaMetrics());
+        model.addAttribute(ATTR_EXTERNAL_TOOL_TEMPLATES, properties.getExternalTools());
         model.addAttribute(ATTR_PAGE, wrap(topicPage));
         model.addAttribute(ATTR_TOTAL_COUNT, kafkaManager.getTopicCount());
+        model.addAttribute(ATTR_FULL_SCREEN, paramsMap.get(ATTR_FULL_SCREEN));
 
         return TOPICS_VIEW;
     }
@@ -161,6 +167,11 @@ public class TopicController {
         model.addAttribute(ATTR_TOPIC_OFFSET_INCREASE_UDM_TYPE, UDMetricType.TOPIC_OFFSET_INCREASE);
         model.addAttribute(ATTR_TOPIC_OFFSET_INCREASE_UDM_NAME, topicOffsetIncreaseUdmName);
         model.addAttribute(ATTR_TOPIC_OFFSET_INCREASE_UDM, getAndWrapUdm(topicOffsetIncreaseUdmName));
+
+        model.addAttribute(ATTR_DATA_CATALOG_URL_TEMPLATE, properties.getDataCatalogTool());
+        model.addAttribute(ATTR_GRAFANA_METRICS_URL_TEMPLATE, properties.getGrafanaMetrics());
+        model.addAttribute(ATTR_SCHEMA_CATALOG_URL_TEMPLATE, properties.getSchemaCatalogTool() );
+        model.addAttribute(ATTR_EXTERNAL_TOOL_TEMPLATES, properties.getExternalTools());
 
         return TOPIC_VIEW;
     }

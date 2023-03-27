@@ -44,6 +44,7 @@ import com.epam.eco.kafkamanager.ConsumerGroupInfo;
 import com.epam.eco.kafkamanager.ConsumerGroupMetadataDeleteParams;
 import com.epam.eco.kafkamanager.ConsumerGroupMetadataUpdateParams;
 import com.epam.eco.kafkamanager.ConsumerGroupSearchCriteria;
+import com.epam.eco.kafkamanager.FetchMode;
 import com.epam.eco.kafkamanager.KafkaManager;
 import com.epam.eco.kafkamanager.OffsetTimeSeries;
 import com.epam.eco.kafkamanager.PermissionCreateParams;
@@ -120,16 +121,20 @@ public class RestKafkaManagerIT {
         Assert.assertNotNull(offsetMap);
         Assert.assertFalse("Offset map is empty", offsetMap.isEmpty());
 
-        Map<Integer, Long> offsets = offsetMap.entrySet().stream()
+        Map<Integer, OffsetRange> offsets = offsetMap.entrySet().stream()
                 .collect(Collectors.toMap(
                         entry -> entry.getKey().partition(),
-                        entry -> entry.getValue().getSmallest()));
+                        Map.Entry::getValue));
         TopicRecordFetchParams recordFetchParams = new TopicRecordFetchParams(
                 TopicRecordFetchParams.DataFormat.STRING,
                 TopicRecordFetchParams.DataFormat.STRING,
                 offsets,
                 10L,
-                10000L);
+                10000L,
+                FetchMode.FETCH_FORWARD,
+                0,
+                false,
+                60L);
         RecordFetchResult<String, String> recordFetchResult =
                 kafkaManager.<String, String>getTopicRecordFetcherTaskExecutor()
                 .execute(topicName, recordFetchParams);

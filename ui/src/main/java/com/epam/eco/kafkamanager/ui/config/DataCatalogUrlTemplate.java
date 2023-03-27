@@ -18,33 +18,11 @@ package com.epam.eco.kafkamanager.ui.config;
 /**
  * @author Mikhail_Vershkov
  */
-public class UrlTemplate {
-    private String name;
-    private String urlTemplate;
-    private String icon;
+public class DataCatalogUrlTemplate extends ExternalToolTemplate {
 
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getUrlTemplate() {
-        return urlTemplate;
-    }
-
-    public void setUrlTemplate(String urlTemplate) {
-        this.urlTemplate = urlTemplate;
-    }
+    private final static String DEFAULT_ICON = "fa-share";
 
     public String getIcon() {
-        return icon;
-    }
-
-    public void setIcon(String icon) {
-        this.icon = icon;
+        return DEFAULT_ICON;
     }
 }

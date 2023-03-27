@@ -121,7 +121,7 @@ public class TopicOffsetRangeFetcherTaskExecutorImpl extends AbstractAsyncStatef
                 topicTimeSeries.put(topicPartition, partitionTimeSeries);
             }
 
-            partitionTimeSeries.append(dateTime, offsetRange.getLargest());
+            partitionTimeSeries.append(dateTime, offsetRange.getSmallest() + offsetRange.getLargest());
         }
     }
 

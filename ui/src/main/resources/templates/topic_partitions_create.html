@@ -27,14 +27,14 @@
 
             <div class="row">
         
-                <div class="col-md-10 offset-1">
+                <div class="col-md-12">
 
                     <div class="card mb-3">
                         <div class="card-body">
                             <a
                                     th:href="@{/topics/{name}(name=${topic.name})}"
                                     class="btn btn-primary">
-                                Back To Topic <i class="fa fa-arrow-left"></i>
+                                <i class="fa fa-arrow-left"></i> Back To Topic
                             </a>
                         </div>
                     </div>
@@ -65,7 +65,7 @@
                                             type="number" 
                                             class="form-control" 
                                             th:min="${topic.partitionCount + 1}"
-                                            id="newPartitionCount" 
+                                            id="newPartitionCount"
                                             name="newPartitionCount"
                                             th:value="${topic.partitionCount}"/>
                                     </div>

@@ -37,15 +37,15 @@
         <div class="container-fluid">
 
             <div class="row">
-        
-                <div class="col-md-10 offset-1">
-                
+
+                <div class="col-md-12">
+
                     <div class="card mb-3">
                         <div class="card-body">
                             <a  
                                 th:href="@{/brokers/{id}(id=${broker.id})}"
                                 class="btn btn-primary">
-                                Back To Broker <i class="fa fa-arrow-left"></i>
+                                <i class="fa fa-arrow-left"></i> Back To Broker
                             </a>
                             
                             <a 
@@ -84,7 +84,8 @@
                                 <div class="form-group mb-3">
                                     <label for="description">Description</label>
                                     <textarea 
-                                        rows="5" cols="70" 
+                                        rows="5"
+                                        cols="70"
                                         class="form-control" 
                                         id="description" 
                                         name="description" 
@@ -94,7 +95,8 @@
                                 <div class="form-group mb-3">
                                     <label for="attributes">Attributes (JSON)</label>
                                     <textarea 
-                                        rows="5" cols="70" 
+                                        rows="5"
+                                        cols="70"
                                         class="form-control" 
                                         id="attributes" 
                                         name="attributes" 

@@ -27,8 +27,13 @@ import java.util.stream.Collectors;
 import org.apache.commons.collections4.ListUtils;
 import org.apache.kafka.clients.admin.Config;
 
+import com.epam.eco.commons.kafka.OffsetRange;
+import com.epam.eco.kafkamanager.FetchMode;
 import com.epam.eco.kafkamanager.TopicRecordFetchParams;
 import com.epam.eco.kafkamanager.TopicRecordFetchParams.DataFormat;
+
+import static java.util.Objects.isNull;
+import static java.util.Objects.nonNull;
 
 /**
  * @author Andrei_Tytsik
@@ -45,11 +50,18 @@ public class TopicBrowseParams extends HashMap<String, Object> {
     public static final String OFFSETS_TIMESTAMP = "offsetsTimestamp";
     public static final String TIMEOUT = "timeout";
     public static final String LIMIT = "limit";
-    public static final String PARTITION_OFFSET = "p_%d";
+    public static final String PARTITION_MIN_OFFSET = "p_min_%d";
+    public static final String PARTITION_MIN_INCLUSIVE_OFFSET = "p_min_inc_%d";
+    public static final String PARTITION_MAX_OFFSET = "p_max_%d";
+    public static final String PARTITION_MAX_INCLUSIVE_OFFSET = "p_max_inc_%d";
     public static final String PARTITION_ENABLED = "pe_%d";
     public static final String COLUMN_ENABLED = "ce_%s";
 
-    private static final Pattern PARTITION_OFFSET_PATTERN = Pattern.compile("^p_(0|[1-9]\\d*)$");
+    public static final String FETCH_MODE = "fetch-mode";
+    public static final String FULL_SCREEN = "full-screen";
+    public static final String TIMESTAMP = "timestamp";
+
+    private static final Pattern PARTITION_MIN_OFFSET_PATTERN = Pattern.compile("^p_min_(0|[1-9]\\d*)$");
     private static final Pattern COLUMN_ENABLED_PATTERN = Pattern.compile("^ce_(.+)$");
 
     public TopicBrowseParams(Map<String, Object> requestParams) {
@@ -58,6 +70,17 @@ public class TopicBrowseParams extends HashMap<String, Object> {
         }
     }
 
+    public FetchMode getFetchMode() {
+        return getAsFetchMode(FETCH_MODE);
+    }
+    public Boolean getFullScreen() {
+        Boolean fullScreen = getAsBoolean(FULL_SCREEN);
+        return !isNull(fullScreen) && fullScreen;
+    }
+
+    Long getTimestamp() {
+        return getAsLong(TIMESTAMP);
+    }
     public boolean isAvroOrProtobufValueFormat() {
         return getAsDataFormat(VALUE_FORMAT) == DataFormat.AVRO || getAsDataFormat(VALUE_FORMAT) == DataFormat.PROTOCOL_BUFFERS;
     }
@@ -187,49 +210,57 @@ public class TopicBrowseParams extends HashMap<String, Object> {
         put(formatPartitionEnabledKey(partition), enabled);
     }
 
-    public long getPartitionOffset(int partition) {
-        Long offset = getAsLong(formatPartitionOffsetKey(partition));
-        return offset != null ? offset : 0L;
+    public OffsetRange getPartitionOffset(int partition) {
+        Long offsetMin = getAsLong(formatPartitionMinOffsetKey(partition));
+        Boolean minOffsetInclusive = getAsBoolean(formatPartitionMinInclusiveOffsetKey(partition));
+        Long offsetMax = getAsLong(formatPartitionMaxOffsetKey(partition));
+        Boolean maxOffsetInclusive = getAsBoolean(formatPartitionMaxInclusiveOffsetKey(partition));
+        return OffsetRange.with(nonNull(offsetMin) ? offsetMin : 0L, nonNull(minOffsetInclusive) ? minOffsetInclusive : false,
+                nonNull(offsetMax) ? offsetMax : 0L, nonNull(maxOffsetInclusive) ? maxOffsetInclusive : false);
     }
 
-    public void addPartitionOffset(int partition, long offset) {
-        put(formatPartitionOffsetKey(partition), offset);
+    public void addPartitionOffset(int partition, OffsetRange offset) {
+        put(formatPartitionMinOffsetKey(partition), offset.getSmallest());
+        put(formatPartitionMinInclusiveOffsetKey(partition), offset.isSmallestInclusive());
+        put(formatPartitionMaxOffsetKey(partition), offset.getLargest());
+        put(formatPartitionMaxInclusiveOffsetKey(partition), offset.isLargestInclusive());
     }
 
-    public void addPartitionOffsetOnCondition(int partition, long offset, Predicate<Long> condition) {
-        long offsetOld = getPartitionOffset(partition);
-        if (condition.test(offsetOld)) {
-            addPartitionOffset(partition, offset);
+    public void addPartitionOffsetOnCondition(int partition, long offset, Predicate<OffsetRange> condition) {
+        OffsetRange offsetRangeOld = getPartitionOffset(partition);
+        if (condition.test(offsetRangeOld)) {
+            addPartitionOffset(partition, offsetRangeOld);
         }
     }
 
     public void removePartitionOffset(int partition) {
-        remove(formatPartitionOffsetKey(partition));
+        remove(formatPartitionMinOffsetKey(partition));
+        remove(formatPartitionMaxOffsetKey(partition));
     }
 
     public boolean containsPartition(int partition) {
-        Long offset = getAsLong(formatPartitionOffsetKey(partition));
+        Long offset = getAsLong(formatPartitionMinOffsetKey(partition));
         return offset != null;
     }
 
     public List<Integer> listPartitions() {
         return keySet().stream().
-            filter(key -> PARTITION_OFFSET_PATTERN.matcher(key).matches()).
-            map(this::extractPartitionFromOffsetKey).
-            sorted().
-            collect(Collectors.toList());
+                filter(key -> PARTITION_MIN_OFFSET_PATTERN.matcher(key).matches()).
+                map(this::extractPartitionFromOffsetKey).
+                sorted().
+                collect(Collectors.toList());
     }
 
     public List<List<Integer>> listPartitionBatches(int batchSize) {
         return ListUtils.partition(listPartitions(), batchSize);
     }
 
-    public Map<Integer, Long> getPartitionOffsets() {
+    public Map<Integer, OffsetRange> getPartitionOffsets() {
         return listPartitions().stream().
                 filter(this::isPartitionEnabled).
                 collect(Collectors.toMap(
-                        Function.identity(),
-                        this::getPartitionOffset));
+                Function.identity(),
+                this::getPartitionOffset));
     }
 
     private DataFormat getAsDataFormat(String key) {
@@ -247,6 +278,24 @@ public class TopicBrowseParams extends HashMap<String, Object> {
                     String.format(
                             "Can't convert %s to %s",
                             value.getClass().getName(), DataFormat.class.getName()));
+        }
+    }
+
+    private FetchMode getAsFetchMode(String key) {
+        Object value = get(key);
+        if (value == null) {
+            return null;
+        }
+
+        if (value instanceof FetchMode) {
+            return (FetchMode)value;
+        } else if (value instanceof String) {
+            return FetchMode.valueOf((String)value);
+        } else {
+            throw new RuntimeException(
+                    String.format(
+                            "Can't convert %s to %s",
+                            value.getClass().getName(), FetchMode.class.getName()));
         }
     }
 
@@ -301,12 +350,22 @@ public class TopicBrowseParams extends HashMap<String, Object> {
         return String.format(PARTITION_ENABLED, partition);
     }
 
-    private String formatPartitionOffsetKey(int partition) {
-        return String.format(PARTITION_OFFSET, partition);
+    private String formatPartitionMinOffsetKey(int partition) {
+        return String.format(PARTITION_MIN_OFFSET, partition);
+    }
+    private String formatPartitionMaxOffsetKey(int partition) {
+        return String.format(PARTITION_MAX_OFFSET, partition);
+    }
+
+    private String formatPartitionMinInclusiveOffsetKey(int partition) {
+        return String.format(PARTITION_MIN_INCLUSIVE_OFFSET, partition);
+    }
+    private String formatPartitionMaxInclusiveOffsetKey(int partition) {
+        return String.format(PARTITION_MAX_INCLUSIVE_OFFSET, partition);
     }
 
     private int extractPartitionFromOffsetKey(String key) {
-        Matcher matcher = PARTITION_OFFSET_PATTERN.matcher(key);
+        Matcher matcher = PARTITION_MIN_OFFSET_PATTERN.matcher(key);
         if (!matcher.find()) {
             throw new IllegalArgumentException(
                     String.format("Can't extract partition from key '%s'", key));

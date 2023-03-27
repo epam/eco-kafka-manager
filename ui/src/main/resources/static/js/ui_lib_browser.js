@@ -57,4 +57,26 @@ function storeOrApplySelectedColumns() {
             }));
         }
     }
-};
+}
+
+function setBeginOffsetsToMin(event) {
+    $('.partition-checkbox').each(function (idx, elem) {
+        if ($(elem).is(':checked')) {
+            var partition = $(elem).data('partition');
+            $('#p_min_' + partition).val($('#p_min_range_' + partition).val());
+        }
+    });
+    $('#previous-offsets-link-in-grid').css("display", "none");
+    $('#previous-offsets-link').css("display", "none");
+
+}
+function setEndOffsetsToMax(event) {
+    $('.partition-checkbox').each(function (idx, elem) {
+        if ($(elem).is(':checked')) {
+            var partition = $(elem).data('partition');
+            $('#p_max_' + partition).val($('#p_max_range_' + partition).val());
+        }
+    });
+    $('#next-offsets-link-in-grid').css("display", "none");
+    $('#next-offsets-link').css("display", "none");
+}
