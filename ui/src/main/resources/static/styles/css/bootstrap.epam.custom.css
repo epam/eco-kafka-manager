@@ -340,7 +340,7 @@ thead, tbody, tfoot, tr, td, th {
     height: 100%;
     top: 0;
     left: 0;
-    z-index: 100;
+    z-index: 1100;
 }
 
 .info-modal-header-danger {
@@ -390,4 +390,15 @@ a.external-tool-button>div {
     padding: 1rem 1rem;
     flex-direction: row;
     gap: 1em;
+}
+
+div.schema-content-dialog {
+    min-width:50em;
+    max-width:50em;
+    max-height:50em
+}
+div.schema-content-dialog-body {
+    overflow-y: scroll;
+    text-align: left;
+    padding: 1em 3em 1em 3em;
 }

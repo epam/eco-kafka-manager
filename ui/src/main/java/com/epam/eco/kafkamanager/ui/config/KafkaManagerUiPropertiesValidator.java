@@ -52,8 +52,8 @@ class KafkaManagerUiPropertiesValidator implements Validator {
     private void grafanaMetricsTemplateValidate(@NotNull Errors errors, KafkaManagerUiProperties properties) {
         if(nonNull(properties.getGrafanaMetrics()) &&
                 isNull(properties.getGrafanaMetrics().getEnv())) {
-            errors.rejectValue(ENV, "field.grafanaMetrics.varEnv.required",
-                               "Property eco.kafkamanager.ui.grafanaMetrics.varEnv required!");
+            errors.rejectValue(ENV, "field.grafanaMetrics.env.required",
+                               "Property eco.kafkamanager.ui.grafanaMetrics.env required!");
         }
         if(nonNull(properties.getGrafanaMetrics()) &&
                 isNull(properties.getGrafanaMetrics().getUrlTemplate())) {

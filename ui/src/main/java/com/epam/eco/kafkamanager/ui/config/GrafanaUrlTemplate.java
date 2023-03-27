@@ -15,8 +15,6 @@
  *******************************************************************************/
 package com.epam.eco.kafkamanager.ui.config;
 
-import org.springframework.validation.annotation.Validated;
-
 /**
  * @author Mikhail_Vershkov
  */

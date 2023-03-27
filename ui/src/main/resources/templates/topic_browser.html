@@ -268,7 +268,7 @@
     }
 
     function copySchemaContent(id) {
-        var text = $('#schema_content_'+id).attr("data-bs-content");
+        var text = $('#schema_content_'+id).text();
         var button = document.getElementById('copy_button_'+id);
         copyText(text,button);
     }
@@ -289,6 +289,10 @@
         });
         return result;
     }
+
+    $(document).on('click', function (e) {
+        hidePopoverIfClickedOutside(e);
+    });
 
 
 
@@ -715,27 +719,55 @@
                                     </a>
                                 </td>
 
-                                <td th:if="${record.hasAttributes() and schemaCatalogUrlTemplate!=null}">
-                                    <div style="justify-content:start;display:flex;flex-direction:row; gap: 10px;align-items: center;">
-                                        <a th:href="@{|${schemaCatalogUrlTemplate.resolve(record.RegistrySchema.schemaName)}|}"
-                                           target="_blank">
-                                            <i th:class="${'fa '+schemaCatalogUrlTemplate.getIcon()+' info'}"></i>
-                                        </a>
-                                        <a  th:id="${'schema_content_'+recordId}"
-                                            th:if="${record.hasAttributes()}"
-                                            href="javascript:void(0);"
-                                            data-bs-toggle="popover"
-                                            th:attr="data-bs-container='body',
-                                                         data-bs-toggle='popover',
-                                                         data-bs-content=${record.RegistrySchema.schemaAsString},
-                                                         title=${record.RegistrySchema.schemaType.name() + ' schema'},
-                                                         data-bs-html=true">
-                                            <i class="fa fa-list info"></i>
-                                        </a>
-                                        <button th:attr="onclick=${'copySchemaContent('''+recordId+''')'}"
-                                                th:id="${'copy_button_'+recordId}"
-                                                class="btn btn-sm btn-success copy-button">Copy</button>
+                                <td th:if="${record.hasAttributes() and schemaCatalogUrlTemplate!=null}"
+                                    style="text-align:center;vertical-align:middle;">
+
+                                    <a th:if="${record.hasAttributes()}"
+                                        class="btn btn-sm info"
+                                        type="button"
+                                        th:attr="data-bs-target=${'#schema-modal-dialog-'+recordId},data-bs-html=true"
+                                        data-bs-toggle='modal'
+                                        data-bs-backdrop>
+                                        <i class="fa fa-file-code-o info"></i>
+                                    </a>
+
+                                    <div th:id="${'schema-modal-dialog-'+recordId}"
+                                         th:if="${record.hasAttributes()}"
+                                         class="modal fade"
+                                         role="dialog">
+                                        <div class="modal-dialog schema-content-dialog">
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+                                                    <h4 class="modal-title"
+                                                        th:text="${record.RegistrySchema.schemaType.name() + ' schema   (key=' + record.key + ')'}">
+                                                    </h4>
+                                                    <button type="button" class="btn-close" data-bs-dismiss="modal">&times;</button>
+                                                </div>
+                                                <div class="modal-body schema-content-dialog-body">
+                                                    <pre th:id="${'schema_content_'+recordId}" th:text="${record.RegistrySchema.schemaAsString}"></pre>
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <a th:href="@{|${schemaCatalogUrlTemplate.resolve(record.RegistrySchema.schemaName)}|}"
+                                                       th:text="${schemaCatalogUrlTemplate.getName()}"
+                                                       target="_blank"
+                                                       class="btn btn-success">
+                                                        <i th:class="${'fa '+schemaCatalogUrlTemplate.getIcon()+' info'}"></i>
+                                                    </a>
+                                                    <button th:attr="onclick=${'copySchemaContent('''+recordId+''')'}"
+                                                            th:id="${'copy_button_'+recordId}"
+                                                            class="btn btn-success">
+                                                        Copy
+                                                    </button>
+                                                    <button type="button"
+                                                            class="btn btn-primary"
+                                                            data-bs-dismiss="modal">
+                                                        Exit
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
+
                                 </td>
 
                                 <td th:if="${record.nullValue and browseParams.isAvroOrProtobufValueFormat()}" class="bg-danger"><span></span></td>
