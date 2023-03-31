@@ -87,7 +87,7 @@
         <slf4j.version>1.7.25</slf4j.version>
         <openapi.version>1.6.9</openapi.version>
         <jackson.version>2.13.2</jackson.version>
-        <jackson-databind.version>2.13.4.1</jackson-databind.version>
+        <jackson-databind.version>2.13.4.2</jackson-databind.version>
         <protobuf.version>3.21.7</protobuf.version>
 
         <maven-release-plugin.version>2.5.3</maven-release-plugin.version>
