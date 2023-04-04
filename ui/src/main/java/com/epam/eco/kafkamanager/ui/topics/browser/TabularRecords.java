@@ -37,6 +37,9 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import static java.util.Objects.isNull;
 
 /**
@@ -178,6 +181,8 @@ public class TabularRecords implements Iterable<Record> {
         private final Map<String, String> headers;
 
         private final RecordSchema registrySchema;
+
+        private final ObjectMapper mapper = new ObjectMapper();
 
         private String attributesJson;
         private String attributesPrettyJson;
@@ -383,6 +388,14 @@ public class TabularRecords implements Iterable<Record> {
             return headersPrettyJson;
         }
 
+        public String getContentPrettyJson(Column column) {
+            Object content = get(column);
+            try {
+                return mapper.writerWithDefaultPrettyPrinter().writeValueAsString(mapper.readTree(content.toString()));
+            } catch (JsonProcessingException e) {
+                return content.toString();
+            }
+        }
         @Override // is not consistent with equals
         public int compareTo(Record that) {
             int result = ObjectUtils.compare(this.getPartition(), that.getPartition());

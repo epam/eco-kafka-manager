@@ -379,10 +379,11 @@ thead, tbody, tfoot, tr, td, th {
     text-align: justify;
     align-items: flex-start;
     overflow: scroll;
+    margin: 0;
     min-height: 60vh;
-    max-height: 60vh;
-    min-width: 40vw;
-    max-width: 50vw;
+}
+.over-all-windows {
+    z-index: 20000
 }
 
 
