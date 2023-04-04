@@ -81,9 +81,11 @@ function hidePopoverIfClickedOutside(e) {
 }
 
 var infoModal;
+var dataModal;
 
 $(document).ready(function() {
     infoModal = new bootstrap.Modal(document.getElementById("infoModal"));
+    dataModal = new bootstrap.Modal(document.getElementById("dataModal"));
 })
 
 function showInfo(type,infoHeader,infoText) {
@@ -108,4 +110,24 @@ function showInfo(type,infoHeader,infoText) {
     document.getElementById('infoModalCloseButton').classList.add(buttonClass);
 
     infoModal.show();
+}
+
+function showData(dialogHeader,dialogText) {
+
+    var headerClass = "data-modal-header";
+    var textClass = "data-modal-text";
+
+    var header = document.getElementById('dataModalHeader');
+    header.textContent = dialogHeader;
+    header.classList.add(headerClass);
+
+    var text = document.getElementById('dataModalText');
+    text.textContent = dialogText;
+    text.classList.add(textClass)
+
+    document.getElementById('dataModalCopyButton').onclick = (event) => {
+        copyText(dialogText, event.target)
+    };
+
+    dataModal.show();
 }

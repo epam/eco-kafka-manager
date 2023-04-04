@@ -272,7 +272,9 @@ public class TabularRecords implements Iterable<Record> {
         public Object getShort(Column column) {
             return getShort(column.getName());
         }
-
+        public boolean isTruncated(Column column) {
+            return isTruncated(column.getName());
+        }
         public Object get(String columnName) {
             return tabularValue != null ? tabularValue.get(columnName) : null;
         }
@@ -287,7 +289,13 @@ public class TabularRecords implements Iterable<Record> {
             return truncatedValue;
 
         }
+        public boolean isTruncated(String columnName) {
+            if(isNull(tabularValue) || isNull(tabularValue.get(columnName))) {
+                return false;
+            }
+            return tabularValue.get(columnName).toString().length()>TRUNCATE_SIZE;
 
+        }
         public Class<?> type(Column column) {
             return type(column.getName());
         }

@@ -190,6 +190,26 @@
         </div>
     </div>
 
+    <div th:fragment="data-modal">
+        <div id="dataModal" class="modal" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered" style="max-width:50vw">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <div id="dataModalHeader"></div>
+                    </div>
+                    <div class="modal-body">
+                        <div class="mt-3 mb-3" style="text-align:left; font-size: 1.2em;">
+                            <pre id="dataModalText"></pre>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button id="dataModalCopyButton" class="btn btn-success" >Copy</button>
+                        <button id="dataModalCloseButton" class="btn btn-primary" data-bs-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <div th:fragment="footer" class="footer-content">
         <div class="build-info">

@@ -304,6 +304,8 @@
 
 <div th:replace="templates :: info-modal"></div>
 
+<div th:replace="templates :: data-modal"></div>
+
 <div class="main-content">
 
     <div class="container-fluid">
@@ -736,7 +738,7 @@
                                          class="modal fade"
                                          role="dialog">
                                         <div class="modal-dialog schema-content-dialog">
-                                            <div class="modal-content">
+                                            <div class="modal-content" style="max-height:90vh">
                                                 <div class="modal-header">
                                                     <h4 class="modal-title"
                                                         th:text="${record.RegistrySchema.schemaType.name() + ' schema   (key=' + record.key + ')'}">
@@ -780,7 +782,17 @@
                                     <span th:if="${record.nullValue}"></span>
                                     <span th:if="${!record.nullValue}"
                                           th:utext="${record.getShort(column)}"
-                                          th:title="${record.get(column)}"></span>
+                                          th:title="${record.get(column)}">
+                                    </span>
+                                    <a class="btn btn-sm info"
+                                       type="button"
+                                       th:if="${record.isTruncated(column)}"
+                                       th:data-param-header="${column.name}"
+                                       th:data-param-text="${record.get(column)}"
+                                       th:onclick="showData(this.getAttribute('data-param-header'),
+                                                            this.getAttribute('data-param-text') )">
+                                        <i class="fa fa-eye info"></i>
+                                    </a>
                                 </td>
                             </tr>
                             </tbody>

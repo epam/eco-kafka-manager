@@ -369,6 +369,23 @@ thead, tbody, tfoot, tr, td, th {
     content: "\f06a";
 }
 
+
+.data-modal-header {
+    font-size: 1.5em;
+    color: var(--epm-button-primary-background);
+}
+.data-modal-text {
+    display: flex;
+    text-align: justify;
+    align-items: flex-start;
+    overflow: scroll;
+    min-height: 60vh;
+    max-height: 60vh;
+    min-width: 40vw;
+    max-width: 50vw;
+}
+
+
 .external-tool-button {
     display: flex;
     padding: 1em;
