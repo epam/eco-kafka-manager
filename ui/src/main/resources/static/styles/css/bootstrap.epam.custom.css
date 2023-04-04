@@ -381,6 +381,7 @@ thead, tbody, tfoot, tr, td, th {
     overflow: scroll;
     margin: 0;
     min-height: 60vh;
+    max-height: 70vh;
 }
 .over-all-windows {
     z-index: 20000
