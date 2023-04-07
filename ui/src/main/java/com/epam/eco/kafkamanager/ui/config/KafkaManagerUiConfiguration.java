@@ -71,8 +71,4 @@ public class KafkaManagerUiConfiguration implements WebMvcConfigurer {
         return new TopicOffsetCacheCleanerRunner(properties.getTopicBrowser().getCacheCleanerIntervalMin());
     }
 
-    @Bean(initMethod = "init")
-    public TopicOffsetRangeCacheCleanerRunner topicOffsetRangeCacheCleanerRunner(@Valid KafkaManagerUiProperties properties) {
-        return new TopicOffsetRangeCacheCleanerRunner(properties.getTopicBrowser().getCacheCleanerIntervalMin());
-    }
 }
