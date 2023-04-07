@@ -71,10 +71,16 @@ function setBeginOffsetsToMin(event) {
 
 }
 function setEndOffsetsToMax(event) {
-    $('.partition-checkbox').each(function (idx, elem) {
+    let checkBoxList = $('.partition-checkbox');
+    let partitionsCount = checkBoxList.length;
+    checkBoxList.each(function (idx, elem) {
         if ($(elem).is(':checked')) {
-            var partition = $(elem).data('partition');
-            $('#p_max_' + partition).val($('#p_max_range_' + partition).val());
+            let partition = $(elem).data('partition');
+            let maxRangeValue = parseInt($('#p_max_range_' + partition).val());
+            let minRangeValue = parseInt($('#p_min_range_' + partition).val());
+            let minOffset = parseInt(maxRangeValue - ((parseInt($('#limit').val())/partitionsCount)-2));
+            $('#p_max_' + partition).val(maxRangeValue);
+            $('#p_min_' + partition).val(minOffset < minRangeValue ? minRangeValue : minOffset);
         }
     });
     $('#next-offsets-link-in-grid').css("display", "none");

@@ -371,7 +371,7 @@ public class TabularRecords implements Iterable<Record> {
                 return attributesPrettyJson;
             }
 
-            attributesPrettyJson = PrettyHtmlMapper.toPrettyHtml(attributes);
+            attributesPrettyJson = PrettyHtmlMapper.toPretty(attributes, PrettyHtmlMapper.PrettyFormat.HTML);
             return attributesPrettyJson;
         }
 
@@ -383,19 +383,23 @@ public class TabularRecords implements Iterable<Record> {
                 return headersPrettyJson;
             }
 
-            headersPrettyJson = PrettyHtmlMapper.toPrettyHtml(headers);
+            headersPrettyJson = PrettyHtmlMapper.toPretty(headers,PrettyHtmlMapper.PrettyFormat.HTML);
 
             return headersPrettyJson;
         }
 
         public String getContentPrettyJson(Column column) {
             Object content = get(column);
+            if(content instanceof Map) {
+                return PrettyHtmlMapper.toPretty((Map)content, PrettyHtmlMapper.PrettyFormat.JSON);
+            }
             try {
                 return mapper.writerWithDefaultPrettyPrinter().writeValueAsString(mapper.readTree(content.toString()));
             } catch (JsonProcessingException e) {
                 return content.toString();
             }
         }
+
         @Override // is not consistent with equals
         public int compareTo(Record that) {
             int result = ObjectUtils.compare(this.getPartition(), that.getPartition());
