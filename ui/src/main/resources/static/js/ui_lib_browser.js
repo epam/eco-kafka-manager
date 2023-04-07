@@ -71,12 +71,43 @@ function setBeginOffsetsToMin(event) {
 
 }
 function setEndOffsetsToMax(event) {
-    $('.partition-checkbox').each(function (idx, elem) {
+    let checkBoxList = $('.partition-checkbox');
+    let limit = parseInt($('#limit').val());
+    let partitionsCount = 0;
+    checkBoxList.each(function (idx, elem) {
         if ($(elem).is(':checked')) {
-            var partition = $(elem).data('partition');
-            $('#p_max_' + partition).val($('#p_max_range_' + partition).val());
+            partitionsCount++;
+        }
+    });
+    let counts = divideLimitOnPartitions(partitionsCount,limit);
+    let index = 0;
+    checkBoxList.each(function (idx, elem) {
+        if ($(elem).is(':checked')) {
+            let partition = $(elem).data('partition');
+            let maxRangeValue = parseInt($('#p_max_range_' + partition).val());
+            let minRangeValue = parseInt($('#p_min_range_' + partition).val());
+            let minOffset = limit - counts[index];
+            $('#p_max_' + partition).val(maxRangeValue);
+            $('#p_min_' + partition).val(minOffset < minRangeValue ? minRangeValue : minOffset);
+            index++;
         }
     });
     $('#next-offsets-link-in-grid').css("display", "none");
     $('#next-offsets-link').css("display", "none");
+}
+
+function divideLimitOnPartitions(partitionCount,limit) {
+    let result = [partitionCount];
+    let firstChunk = parseInt(limit/partitionCount);
+    for(let ii=0;ii<partitionCount;ii++) {
+        result[ii]=firstChunk;
+    }
+    let rest = limit - partitionCount*firstChunk;
+    let ii=0;
+    while(rest>0) {
+        let index = (ii++)%partitionCount;
+        result[index]+=1;
+        rest--;
+    }
+    return result;
 }

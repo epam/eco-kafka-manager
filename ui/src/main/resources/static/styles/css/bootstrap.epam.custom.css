@@ -340,7 +340,7 @@ thead, tbody, tfoot, tr, td, th {
     height: 100%;
     top: 0;
     left: 0;
-    z-index: 1100;
+    z-index: 1060;
 }
 
 .info-modal-header-danger {
