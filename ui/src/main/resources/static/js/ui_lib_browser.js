@@ -86,7 +86,7 @@ function setEndOffsetsToMax(event) {
             let partition = $(elem).data('partition');
             let maxRangeValue = parseInt($('#p_max_range_' + partition).val());
             let minRangeValue = parseInt($('#p_min_range_' + partition).val());
-            let minOffset = limit - counts[index];
+            let minOffset = maxRangeValue - counts[index] + 1;
             $('#p_max_' + partition).val(maxRangeValue);
             $('#p_min_' + partition).val(minOffset < minRangeValue ? minRangeValue : minOffset);
             index++;
