@@ -35,7 +35,7 @@ function storeOrApplySelectedColumns() {
     var key = $('#topicName').val() + '_' + $('#valueFormat').val();
     var columnCheckboxSelector = $('.column-checkbox');
     if (columnCheckboxSelector.length > 0) {
-        var columns = Array(); 
+        var columns = Array();
         columnCheckboxSelector.each(function(idx, elem) {
             var enabled = $(elem).is(':checked');
             var column = $(elem).data('column');
@@ -72,17 +72,42 @@ function setBeginOffsetsToMin(event) {
 }
 function setEndOffsetsToMax(event) {
     let checkBoxList = $('.partition-checkbox');
-    let partitionsCount = checkBoxList.length;
+    let limit = parseInt($('#limit').val());
+    let partitionsCount = 0;
+    checkBoxList.each(function (idx, elem) {
+        if ($(elem).is(':checked')) {
+            partitionsCount++;
+        }
+    });
+    let counts = divideLimitOnPartitions(partitionsCount,limit);
+    let index = 0;
     checkBoxList.each(function (idx, elem) {
         if ($(elem).is(':checked')) {
             let partition = $(elem).data('partition');
             let maxRangeValue = parseInt($('#p_max_range_' + partition).val());
             let minRangeValue = parseInt($('#p_min_range_' + partition).val());
-            let minOffset = parseInt(maxRangeValue - ((parseInt($('#limit').val())/partitionsCount)-2));
+            let minOffset = maxRangeValue - counts[index] + 1;
             $('#p_max_' + partition).val(maxRangeValue);
             $('#p_min_' + partition).val(minOffset < minRangeValue ? minRangeValue : minOffset);
+            index++;
         }
     });
     $('#next-offsets-link-in-grid').css("display", "none");
     $('#next-offsets-link').css("display", "none");
+}
+
+function divideLimitOnPartitions(partitionCount,limit) {
+    let result = [partitionCount];
+    let firstChunk = parseInt(limit/partitionCount);
+    for(let ii=0;ii<partitionCount;ii++) {
+        result[ii]=firstChunk;
+    }
+    let rest = limit - partitionCount*firstChunk;
+    let ii=0;
+    while(rest>0) {
+        let index = (ii++)%partitionCount;
+        result[index]+=1;
+        rest--;
+    }
+    return result;
 }
