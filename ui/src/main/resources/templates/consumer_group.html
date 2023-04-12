@@ -171,12 +171,12 @@
                                 <ul class="dropdown-menu">
                                     <li>
                                         <a  class="dropdown-item" th:href="@{/udmetrics/consumer_group_lag/{name}(name=${group.name})}">
-                                            <i class="fa fa-edit"></i> <span th:text="${groupLagUdm != null ? 'Edit' : 'Create'}"></span>
+                                            <i class="fa fa-edit info"></i> <span th:text="${groupLagUdm != null ? 'Edit' : 'Create'}"></span>
                                         </a>
                                     </li>
                                     <li th:if="${groupLagUdm != null}">
-                                        <a class="dropdown-item" href="#" th:attr="data-action=@{${groupLagUdm.url}}">
-                                            <i class="fa fa-trash"></i> Delete
+                                        <a class="dropdown-item delete-udm-link" href="#" th:attr="data-action=@{${groupLagUdm.url}}">
+                                            <i class="fa fa-trash text-danger"></i> Delete
                                         </a>
                                     </li>
                                 </ul>
