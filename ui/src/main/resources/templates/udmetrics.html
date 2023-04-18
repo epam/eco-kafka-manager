@@ -179,12 +179,12 @@
                                             <ul class="dropdown-menu">
                                                 <li>
                                                     <a class="dropdown-item" th:href="@{${udm.url}}">
-                                                        <i class="fa fa-edit"></i> Edit
+                                                        <i class="fa fa-edit info"></i> Edit
                                                     </a>
                                                 </li>
                                                 <li>
-                                                    <a class="dropdown-item" href="#" th:attr="data-action=@{${udm.url}}">
-                                                        <i class="fa fa-trash"></i> Delete
+                                                    <a class="dropdown-item delete-udm-link" href="#" th:attr="data-action=@{${udm.url}}">
+                                                        <i class="fa fa-trash text-danger"></i> Delete
                                                     </a>
                                                 </li>
                                             </ul>
