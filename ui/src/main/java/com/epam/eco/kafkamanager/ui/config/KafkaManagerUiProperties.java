@@ -34,7 +34,7 @@ public class KafkaManagerUiProperties {
     private Collection<ExternalToolTemplate> externalTools;
     private TopicBrowser topicBrowser;
     private Boolean showGridInTopicBrowser = Boolean.FALSE;
-    public ExternalToolTemplate getSchemaCatalogTool() {
+    public SchemaCatalogTemplate getSchemaCatalogTool() {
         return schemaCatalogTool;
     }
 
