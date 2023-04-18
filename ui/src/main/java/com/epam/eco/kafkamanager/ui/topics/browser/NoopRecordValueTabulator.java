@@ -43,7 +43,7 @@ public class NoopRecordValueTabulator implements RecordValueTabulator<Object> {
 
     @Override
     public RecordSchema getSchema(ConsumerRecord<?, ?> record) {
-        return new RecordSchema(
+        return new RecordSchema(0,
                 "",
                 "",
                 "",

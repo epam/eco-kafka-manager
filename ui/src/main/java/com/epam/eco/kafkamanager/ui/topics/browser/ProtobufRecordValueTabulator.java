@@ -37,8 +37,9 @@ import com.epam.eco.kafkamanager.ui.utils.SchemaSubjectUtils;
  */
 public class ProtobufRecordValueTabulator implements RecordValueTabulator<Object> {
 
-    public static final String NA = "N/A";
-    public static final String SEPARATOR = ".";
+    private static final String NA = "N/A";
+    private static final String SEPARATOR = ".";
+    private static final long NOPE_SCHEMA = 0L;
 
     private final Config topicConfig;
 
@@ -95,7 +96,7 @@ public class ProtobufRecordValueTabulator implements RecordValueTabulator<Object
         String schemaValue = SchemaSubjectUtils.getSchemaSubjectValue(record.topic(), schemaName, topicConfig);
         String schemaAsString = message.getDescriptorForType().getFile().toProto().toString();
 
-        return new RecordSchema(
+        return new RecordSchema(NOPE_SCHEMA,
                 schemaName,
                 schemaKey,
                 schemaValue,

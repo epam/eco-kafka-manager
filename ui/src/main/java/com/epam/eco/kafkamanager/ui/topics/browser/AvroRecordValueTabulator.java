@@ -30,6 +30,7 @@ import org.apache.commons.lang3.Validate;
 import org.apache.kafka.clients.admin.Config;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 
+import com.epam.eco.kafkamanager.KafkaCustomAvroDeserializer;
 import com.epam.eco.kafkamanager.TopicRecordFetchParams;
 import com.epam.eco.kafkamanager.ui.utils.SchemaSubjectUtils;
 
@@ -56,8 +57,7 @@ public class AvroRecordValueTabulator implements RecordValueTabulator<Object> {
     @Override
     public Map<String, Object> toTabularValue(ConsumerRecord<?, Object> record) {
         Validate.notNull(record, "Record is null");
-
-        return record.value() != null ? doConvert(null, record.value()) : null;
+        return AvroRecordValuesExtractor.getValuesAsMap(record);
     }
 
     @Override
@@ -68,7 +68,8 @@ public class AvroRecordValueTabulator implements RecordValueTabulator<Object> {
             return null;
         }
 
-        Schema schema = ((GenericContainer)record.value()).getSchema();
+        GenericRecord genericRecord = (GenericRecord)KafkaCustomAvroDeserializer.extractGenericRecord(record);
+        Schema schema = genericRecord.getSchema();
 
         Map<String, Object> attributes = new HashMap<>();
         attributes.put("fullName", schema.getFullName());
@@ -88,7 +89,8 @@ public class AvroRecordValueTabulator implements RecordValueTabulator<Object> {
             return null;
         }
 
-        Schema schema = ((GenericContainer)record.value()).getSchema();
+        GenericRecord genericRecord = (GenericRecord)KafkaCustomAvroDeserializer.extractGenericRecord(record);
+        Schema schema = genericRecord.getSchema();
 
         String schemaName = schema.getFullName();
         String schemaKey = SchemaSubjectUtils.getSchemaSubjectKey(record.topic(), schemaName, topicConfig);
@@ -96,61 +98,12 @@ public class AvroRecordValueTabulator implements RecordValueTabulator<Object> {
         String schemaAsString = schema.toString(true);
 
         return new RecordSchema(
+                KafkaCustomAvroDeserializer.extractSchemaId(record),
                 schemaName,
                 schemaKey,
                 schemaValue,
                 schemaAsString,
                 TopicRecordFetchParams.DataFormat.AVRO);
-    }
-
-    @SuppressWarnings("rawtypes")
-    private Map<String, Object> doConvert(String path, Object value) {
-        if (value instanceof GenericRecord) {
-            return doConvertRecord(path, (GenericRecord)value);
-        } else if (value instanceof Map) {
-            return doConvertMap(path, (Map)value);
-        } else if (value instanceof List) {
-            return doConvertList(path, (List)value);
-        } else {
-            return doConvertOther(path, value);
-        }
-    }
-
-    @SuppressWarnings("rawtypes")
-    private Map<String, Object> doConvertList(String path, List list) {
-        return doConvertOther(path, list);
-    }
-
-    @SuppressWarnings("rawtypes")
-    private Map<String, Object> doConvertMap(String path, Map map) {
-        return doConvertOther(path, map);
-    }
-
-    private Map<String, Object> doConvertRecord(String path, GenericRecord record) {
-        Map<String, Object> tabular = new LinkedHashMap<>();
-        for (Field field : record.getSchema().getFields()) {
-            String name = field.name();
-            Object value = record.get(name);
-            tabular.putAll(
-                    doConvert(
-                            append(path, name),
-                            value));
-        }
-        return tabular;
-    }
-
-    private Map<String, Object> doConvertOther(String path, Object value) {
-        return Collections.singletonMap(
-                orDefault(path, () -> value != null ? value.getClass().getSimpleName() : NA),
-                value);
-    }
-
-    private String orDefault(String value, Supplier<String> defaultValue) {
-        return value != null ? value : defaultValue.get();
-    }
-
-    private String append(String parent, String path) {
-        return parent != null ? parent + SEPARATOR + path : path;
     }
 
 }

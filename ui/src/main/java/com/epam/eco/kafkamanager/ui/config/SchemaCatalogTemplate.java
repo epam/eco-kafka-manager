@@ -19,8 +19,22 @@ package com.epam.eco.kafkamanager.ui.config;
  * @author Mikhail_Vershkov
  */
 public class SchemaCatalogTemplate extends ExternalToolTemplate {
+
+    private String urlTemplateById;
+
     @Override
     public String resolve(String schemaName) {
         return super.resolveWithSchema(schemaName);
+    }
+    public String resolveById(String schemaId) {
+        return getUrlTemplateById().replace("{schemaId}", schemaId);
+    }
+
+    public String getUrlTemplateById() {
+        return urlTemplateById;
+    }
+
+    public void setUrlTemplateById(String urlTemplateById) {
+        this.urlTemplateById = urlTemplateById;
     }
 }
