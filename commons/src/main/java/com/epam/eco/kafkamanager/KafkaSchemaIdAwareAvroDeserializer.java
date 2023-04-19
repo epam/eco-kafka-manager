@@ -22,37 +22,34 @@ import java.util.Map;
 import org.apache.avro.Schema;
 import org.apache.avro.generic.GenericRecord;
 import org.apache.commons.lang3.Validate;
-import org.apache.kafka.clients.consumer.ConsumerRecord;
 
 import io.confluent.kafka.schemaregistry.client.SchemaRegistryClient;
 import io.confluent.kafka.serializers.KafkaAvroDeserializer;
-import io.confluent.kafka.serializers.KafkaAvroDeserializerConfig;
 
 /**
  * @author Mikhail_Vershkov
  */
 
-public class KafkaCustomAvroDeserializer extends KafkaAvroDeserializer {
+public class KafkaSchemaIdAwareAvroDeserializer extends KafkaAvroDeserializer {
 
     private static final int START_SCHEMA_ID_POSITION = 1;
     private static final int END_SCHEMA_ID_POSITION = 5;
     private boolean isKey;
 
-    public KafkaCustomAvroDeserializer() {}
+    public KafkaSchemaIdAwareAvroDeserializer() {}
 
-    public KafkaCustomAvroDeserializer(SchemaRegistryClient schemaRegistryClient) {
-        schemaRegistry = schemaRegistryClient;
+    public KafkaSchemaIdAwareAvroDeserializer(SchemaRegistryClient schemaRegistryClient) {
+        super(schemaRegistryClient);
     }
 
-    public KafkaCustomAvroDeserializer(SchemaRegistryClient client, Map<String, ?> props) {
-        schemaRegistry = client;
-        configure(this.deserializerConfig(props));
+    public KafkaSchemaIdAwareAvroDeserializer(SchemaRegistryClient client, Map<String, ?> props) {
+        super(client,props);
     }
 
     @Override
     public void configure(Map<String, ?> configs, boolean isKey) {
+        super.configure(configs,isKey);
         this.isKey = isKey;
-        super.configure(new KafkaAvroDeserializerConfig(configs));
     }
 
     @Override
@@ -69,14 +66,15 @@ public class KafkaCustomAvroDeserializer extends KafkaAvroDeserializer {
 
     private int getSchemaId(byte[] bytes) {
         Validate.isTrue(bytes[0]==0x0,"Deserialization exception: not avro record!");
+        Validate.isTrue(bytes.length>END_SCHEMA_ID_POSITION,"Serialized message too short! (bytes<="+END_SCHEMA_ID_POSITION+")");
         return ByteBuffer.wrap(Arrays.copyOfRange(bytes, START_SCHEMA_ID_POSITION, END_SCHEMA_ID_POSITION)).getInt();
     }
 
-    private static class GenericRecordWrapper {
+    protected static class GenericRecordWrapper {
         private final GenericRecord genericRecord;
         private final long schemaId;
 
-        public GenericRecordWrapper(GenericRecord genericRecord, long schemaId) {
+        private GenericRecordWrapper(GenericRecord genericRecord, long schemaId) {
             this.genericRecord = genericRecord;
             this.schemaId = schemaId;
         }
@@ -89,16 +87,6 @@ public class KafkaCustomAvroDeserializer extends KafkaAvroDeserializer {
             return schemaId;
         }
 
-    }
-
-    public static Object extractGenericRecord(ConsumerRecord record) {
-        return record.value() instanceof GenericRecordWrapper ?
-                               ((GenericRecordWrapper) record.value()).getGenericRecord() :
-                               record.value();
-    }
-    public static long extractSchemaId(ConsumerRecord record) {
-        return record.value() instanceof GenericRecordWrapper ?
-               ((GenericRecordWrapper) record.value()).getSchemaId() : 0;
     }
 
 }

@@ -26,7 +26,7 @@ import org.apache.avro.generic.GenericRecord;
 import org.apache.commons.lang3.Validate;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 
-import com.epam.eco.kafkamanager.KafkaCustomAvroDeserializer;
+import com.epam.eco.kafkamanager.KafkaSchemaIdAwareUtils;
 
 import static java.util.Objects.nonNull;
 
@@ -41,7 +41,7 @@ public class AvroRecordValuesExtractor {
 
     public static Map<String, Object> getValuesAsMap(ConsumerRecord<?, Object> record) {
         Validate.notNull(record, "Record is null");
-        Object genericRecord = KafkaCustomAvroDeserializer.extractGenericRecord(record);
+        Object genericRecord = KafkaSchemaIdAwareUtils.extractGenericRecord(record);
         return nonNull(genericRecord) ? doConvert(null, genericRecord) : null;
     }
 
