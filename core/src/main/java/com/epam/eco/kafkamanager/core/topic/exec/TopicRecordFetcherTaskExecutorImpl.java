@@ -30,7 +30,7 @@ import com.epam.eco.commons.kafka.helpers.RecordBiDirectionalFetcher;
 import com.epam.eco.commons.kafka.helpers.RecordFetchResult;
 import com.epam.eco.commons.kafka.serde.HexStringDeserializer;
 import com.epam.eco.commons.kafka.serde.JsonStringDeserializer;
-import com.epam.eco.kafkamanager.KafkaCustomAvroDeserializer;
+import com.epam.eco.kafkamanager.KafkaSchemaIdAwareAvroDeserializer;
 import com.epam.eco.kafkamanager.KafkaManager;
 import com.epam.eco.kafkamanager.TopicRecordFetchParams;
 import com.epam.eco.kafkamanager.TopicRecordFetchParams.DataFormat;
@@ -114,7 +114,7 @@ public class TopicRecordFetcherTaskExecutorImpl<K, V> extends AbstractTaskExecut
             DataFormat dataFormat,
             boolean isKey) {
         if (DataFormat.AVRO == dataFormat) {
-            builder.deserializer(KafkaCustomAvroDeserializer.class, isKey);
+            builder.deserializer(KafkaSchemaIdAwareAvroDeserializer.class, isKey);
         } else if (DataFormat.STRING == dataFormat) {
             builder.deserializer(StringDeserializer.class, isKey);
         } else if (DataFormat.JSON_STRING == dataFormat) {

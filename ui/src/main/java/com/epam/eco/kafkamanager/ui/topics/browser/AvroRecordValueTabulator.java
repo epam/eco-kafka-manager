@@ -15,22 +15,16 @@
  *******************************************************************************/
 package com.epam.eco.kafkamanager.ui.topics.browser;
 
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.function.Supplier;
 
 import org.apache.avro.Schema;
-import org.apache.avro.Schema.Field;
-import org.apache.avro.generic.GenericContainer;
 import org.apache.avro.generic.GenericRecord;
 import org.apache.commons.lang3.Validate;
 import org.apache.kafka.clients.admin.Config;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 
-import com.epam.eco.kafkamanager.KafkaCustomAvroDeserializer;
+import com.epam.eco.kafkamanager.KafkaSchemaIdAwareUtils;
 import com.epam.eco.kafkamanager.TopicRecordFetchParams;
 import com.epam.eco.kafkamanager.ui.utils.SchemaSubjectUtils;
 
@@ -68,7 +62,7 @@ public class AvroRecordValueTabulator implements RecordValueTabulator<Object> {
             return null;
         }
 
-        GenericRecord genericRecord = (GenericRecord)KafkaCustomAvroDeserializer.extractGenericRecord(record);
+        GenericRecord genericRecord = (GenericRecord) KafkaSchemaIdAwareUtils.extractGenericRecord(record);
         Schema schema = genericRecord.getSchema();
 
         Map<String, Object> attributes = new HashMap<>();
@@ -89,7 +83,7 @@ public class AvroRecordValueTabulator implements RecordValueTabulator<Object> {
             return null;
         }
 
-        GenericRecord genericRecord = (GenericRecord)KafkaCustomAvroDeserializer.extractGenericRecord(record);
+        GenericRecord genericRecord = (GenericRecord) KafkaSchemaIdAwareUtils.extractGenericRecord(record);
         Schema schema = genericRecord.getSchema();
 
         String schemaName = schema.getFullName();
@@ -98,7 +92,7 @@ public class AvroRecordValueTabulator implements RecordValueTabulator<Object> {
         String schemaAsString = schema.toString(true);
 
         return new RecordSchema(
-                KafkaCustomAvroDeserializer.extractSchemaId(record),
+                KafkaSchemaIdAwareUtils.extractSchemaId(record),
                 schemaName,
                 schemaKey,
                 schemaValue,
