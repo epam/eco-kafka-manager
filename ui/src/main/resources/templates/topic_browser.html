@@ -34,9 +34,9 @@
 
     $(function () {
 
-        var sortingOrderTimestamp = [2, 'desc'];
-        var sortingOrderPartition = [0, 'desc'];
-        var sortingOrderOffset = [1, 'desc'];
+
+        var sortingOrderPartition = [0, 'asc'];
+        var sortingOrderOffset = [1, 'asc'];
 
         var columnClasses = showGrid ?
             [ { className: "vertical-line-class", targets: "_all" },
@@ -54,7 +54,6 @@
             },
             columnDefs: columnClasses,
             order: [
-                sortingOrderTimestamp,
                 sortingOrderPartition,
                 sortingOrderOffset
             ],
