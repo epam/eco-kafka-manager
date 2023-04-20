@@ -27,11 +27,10 @@ import com.epam.eco.commons.kafka.config.ConsumerConfigBuilder;
 import com.epam.eco.commons.kafka.helpers.BiDirectionalTopicRecordFetcher;
 import com.epam.eco.commons.kafka.helpers.CachedTopicRecordFetcher;
 import com.epam.eco.commons.kafka.helpers.RecordBiDirectionalFetcher;
-import com.epam.eco.commons.kafka.helpers.BiDirectionalTopicRecordFetcher.FetchDirection;
 import com.epam.eco.commons.kafka.helpers.RecordFetchResult;
 import com.epam.eco.commons.kafka.serde.HexStringDeserializer;
 import com.epam.eco.commons.kafka.serde.JsonStringDeserializer;
-import com.epam.eco.kafkamanager.FetchMode;
+import com.epam.eco.kafkamanager.KafkaSchemaIdAwareAvroDeserializer;
 import com.epam.eco.kafkamanager.KafkaManager;
 import com.epam.eco.kafkamanager.TopicRecordFetchParams;
 import com.epam.eco.kafkamanager.TopicRecordFetchParams.DataFormat;
@@ -40,7 +39,6 @@ import com.epam.eco.kafkamanager.core.autoconfigure.KafkaManagerProperties;
 import com.epam.eco.kafkamanager.exec.AbstractTaskExecutor;
 import com.epam.eco.kafkamanager.exec.TaskResult;
 
-import io.confluent.kafka.serializers.KafkaAvroDeserializer;
 import io.confluent.kafka.serializers.protobuf.KafkaProtobufDeserializer;
 
 /**
@@ -116,7 +114,7 @@ public class TopicRecordFetcherTaskExecutorImpl<K, V> extends AbstractTaskExecut
             DataFormat dataFormat,
             boolean isKey) {
         if (DataFormat.AVRO == dataFormat) {
-            builder.deserializer(KafkaAvroDeserializer.class, isKey);
+            builder.deserializer(KafkaSchemaIdAwareAvroDeserializer.class, isKey);
         } else if (DataFormat.STRING == dataFormat) {
             builder.deserializer(StringDeserializer.class, isKey);
         } else if (DataFormat.JSON_STRING == dataFormat) {

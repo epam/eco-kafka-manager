@@ -1,5 +1,5 @@
 /*******************************************************************************
- *  Copyright 2022 EPAM Systems
+ *  Copyright 2023 EPAM Systems
  *
  *  Licensed under the Apache License, Version 2.0 (the "License"); you may not
  *  use this file except in compliance with the License.  You may obtain a copy
@@ -13,28 +13,25 @@
  *  License for the specific language governing permissions and limitations under
  *  the License.
  *******************************************************************************/
-package com.epam.eco.kafkamanager.ui.config;
+package com.epam.eco.kafkamanager;
+
+import org.apache.kafka.clients.consumer.ConsumerRecord;
 
 /**
  * @author Mikhail_Vershkov
  */
-public class SchemaCatalogTemplate extends ExternalToolTemplate {
 
-    private String urlTemplateById;
+public class KafkaSchemaIdAwareUtils extends KafkaSchemaIdAwareAvroDeserializer {
 
-    @Override
-    public String resolve(String schemaName) {
-        return super.resolveWithSchema(schemaName);
-    }
-    public String resolveById(String schemaId) {
-        return getUrlTemplateById().replace("{schemaId}", schemaId);
+    public static Object extractGenericRecord(ConsumerRecord record) {
+        return record.value() instanceof GenericRecordWrapper ?
+               ((GenericRecordWrapper) record.value()).getGenericRecord() :
+               record.value();
     }
 
-    public String getUrlTemplateById() {
-        return urlTemplateById;
+    public static long extractSchemaId(ConsumerRecord record) {
+        return record.value() instanceof GenericRecordWrapper ?
+               ((GenericRecordWrapper) record.value()).getSchemaId() : 0;
     }
 
-    public void setUrlTemplateById(String urlTemplateById) {
-        this.urlTemplateById = urlTemplateById;
-    }
 }

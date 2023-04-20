@@ -23,6 +23,7 @@ import com.epam.eco.kafkamanager.TopicRecordFetchParams.DataFormat;
  */
 public class RecordSchema {
 
+    private final long schemaId;
     private final String schemaName;
     private final String schemaKey;
     private final String schemaValue;
@@ -31,16 +32,22 @@ public class RecordSchema {
     private final TopicRecordFetchParams.DataFormat schemaType;
 
     public RecordSchema(
+            long schemaId,
             String schemaName,
             String schemaKey,
             String schemaValue,
             String schemaAsString,
             DataFormat schemaType) {
+        this.schemaId = schemaId;
         this.schemaName = schemaName;
         this.schemaKey = schemaKey;
         this.schemaValue = schemaValue;
         this.schemaAsString = schemaAsString;
         this.schemaType = schemaType;
+    }
+
+    public long getSchemaId() {
+        return schemaId;
     }
 
     public String getSchemaName() {

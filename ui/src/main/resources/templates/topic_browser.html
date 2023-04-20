@@ -34,9 +34,9 @@
 
     $(function () {
 
-        var sortingOrderTimestamp = [2, 'desc'];
-        var sortingOrderPartition = [0, 'desc'];
-        var sortingOrderOffset = [1, 'desc'];
+
+        var sortingOrderPartition = [0, 'asc'];
+        var sortingOrderOffset = [1, 'asc'];
 
         var columnClasses = showGrid ?
             [ { className: "vertical-line-class", targets: "_all" },
@@ -54,7 +54,6 @@
             },
             columnDefs: columnClasses,
             order: [
-                sortingOrderTimestamp,
                 sortingOrderPartition,
                 sortingOrderOffset
             ],
@@ -378,74 +377,14 @@
 
 
 
-                                    <div class="card mb-3"
-                                         id="column-selector-panel"
-                                         th:if="${fetchedRecords != null AND !fetchedRecords.isEmpty()}">
-
-                                        <div class="card-header collapsed-header card-flex">
-                                            <div>Columns</div>
-                                            <a data-bs-toggle="collapse" href="#column-selector"
-                                               role="button"
-                                               class="to-right text-secondary collapse-button"
-                                               id="topic_browser.columns-collapse-button">
-                                                <i class="fa fa-caret-down"></i>
-                                            </a>
-                                        </div>
-                                        <div id="column-selector" class="collapse">
-                                            <div class="card-body">
-                                                <div class="mb-2">
-                                                    <a id="all-columns-link"
-                                                       href="#"
-                                                       class="btn btn-primary btn-sm small">
-                                                        All <i class="fa fa-check-circle-o"></i>
-                                                    </a>
-                                                    <a id="none-columns-link"
-                                                       href="#"
-                                                       class="btn btn-primary btn-sm small">
-                                                        None <i class="fa fa-times-circle-o"></i>
-                                                    </a>
-                                                </div>
-                                                <div class="row"
-                                                     th:with="groupSize=${fetchedRecords.determineColumnsGroupSize(4,30)}">
-                                                    <th:block
-                                                            th:each="groupIndex : ${#numbers.sequence(0, 3)}">
-                                                        <div class="col col-md-6">
-                                                            <th:block
-                                                                    th:each="columnGroup : ${fetchedRecords.getColumnsGroup(groupIndex,groupSize)}">
-                                                                <div
-                                                                        class="checkbox"
-                                                                        style="margin: 0px auto;"
-                                                                        th:each="column : ${columnGroup}">
-                                                                    <label
-                                                                            th:class="${!column.present ? 'text-muted' : ''}"
-                                                                            style="word-wrap:break-word;">
-                                                                        <input
-                                                                                class="column-checkbox"
-                                                                                type="checkbox"
-                                                                                th:name="${'ce_' + column.name}"
-                                                                                th:attr="data-column=${column.name}"
-                                                                                th:checked="${browseParams.isColumnEnabled(column.name)}"/>
-                                                                        <span th:text="${column.name}"></span>
-                                                                    </label>
-                                                                </div>
-                                                            </th:block>
-                                                        </div>
-                                                    </th:block>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-
                                 </div>
-
-
 
                                 <div class="col-md-8">
                                     <div id="offsets-parameters">
-                                        <div class="container-fluid">
-                                            <div class="row">
+                                        <div class="container-fluid" style="padding:0">
+                                            <div class="row" style="margin-right: 1em;">
 
-                                                <div style="margin-left: auto;" class="input-group col-md-3">
+                                                <div class="input-group offsets-timestamp-wrapper">
                                                     <input id="offsets-timestamp"
                                                            type="text"
                                                            name="offsetsTimestamp"
@@ -489,17 +428,17 @@
                                                             <span class="input-group-text col-md-2">
                                                                 MIN
                                                             </span>
-                                                            <span class="input-group-text form-control">
+                                                            <span class="input-group-text to-min-max-title form-control">
                                                                 <div>FIRST BATCH</div>
                                                                 <button id="to-min-button"
-                                                                        class="btn btn-success btn-sm btn-small to-right">
+                                                                        class="btn btn-success btn-sm btn-small to-min-max-button">
                                                                     to MIN
                                                                 </button>
                                                             </span>
-                                                            <span class="input-group-text form-control">
+                                                            <span class="input-group-text to-min-max-title form-control">
                                                                 <div>LAST BATCH</div>
                                                                 <button id="to-max-button"
-                                                                        class="btn btn-success btn-sm btn-small to-right">
+                                                                        class="btn btn-success btn-sm btn-small to-min-max-button">
                                                                     to MAX
                                                                 </button>
                                                             </span>
@@ -629,6 +568,59 @@
                                    th:value="${browseParams.limit}"/>
 
                         </div>
+
+                        <div th:if="${fetchedRecords!=null}" id="column-selector-dialog" class="modal fade" role="dialog">
+                            <div class="modal-dialog column-selector-dialog">
+                                <div class="modal-content column-selector-dialog-content">
+                                    <div class="modal-header">
+                                        <h4 class="modal-title">Columns selector</h4>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal">&times;</button>
+                                    </div>
+                                    <div class="modal-body" style="overflow: scroll">
+
+                                        <div class="column-selector-dialog-column">
+
+                                            <div class="checkbox column-selector-dialog-item"
+                                                 th:each="column : ${fetchedRecords.listColumns()}">
+                                                <label
+                                                        th:class="${!column.present ? 'text-muted' : ''}"
+                                                        style="word-wrap:break-word;">
+                                                    <input
+                                                            class="column-checkbox"
+                                                            type="checkbox"
+                                                            th:name="${'ce_' + column.name}"
+                                                            th:attr="data-column=${column.name}"
+                                                            th:checked="${browseParams.isColumnEnabled(column.name)}"/>
+                                                    <span th:text="${column.name}"></span>
+                                                </label>
+                                            </div>
+
+                                        </div>
+
+                                    </div>
+                                    <div class="modal-footer">
+                                        <h5>SELECT:</h5>
+                                        <a id="all-columns-link"
+                                           href="#"
+                                           class="btn btn-primary btn-sm small ms-2">
+                                            All <i class="fa fa-check-circle-o"></i>
+                                        </a>
+                                        <a id="none-columns-link"
+                                           href="#"
+                                           class="btn btn-primary btn-sm small ms-1">
+                                            None <i class="fa fa-times-circle-o"></i>
+                                        </a>
+                                        <button type="button"
+                                                class="btn btn-success ms-4"
+                                                data-bs-dismiss="modal">
+                                            Exit
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+
                     </form>
                 </div>
 
@@ -652,7 +644,16 @@
                             <i class="fa fa-chevron-right"></i>
                         </a>
                         <h7><span th:text="${fetchSummary}"></span></h7>
-                        <button id="full-screen-button" class="btn btn-secondary btn-sm to-right">Full screen</button>
+
+                        <button id="column-filter-button"
+                                class="btn btn-primary btn-sm to-right"
+                                type="button"
+                                data-bs-target="#column-selector-dialog"
+                                data-bs-toggle="modal" >
+                            <i class="fa fa-check-square-o"></i>Columns selector
+                        </button>
+
+                        <button id="full-screen-button" class="btn btn-secondary btn-sm">Full screen</button>
                     </div>
                     <div class="pre-scrollable"
                          style="padding-top: 0;">
@@ -741,7 +742,7 @@
                                             <div class="modal-content" style="max-height:90vh">
                                                 <div class="modal-header">
                                                     <h4 class="modal-title"
-                                                        th:text="${record.RegistrySchema.schemaType.name() + ' schema   (key=' + record.key + ')'}">
+                                                        th:text="${browseParams.getValueFormat() + ' SCHEMA (ID=' + record.RegistrySchema.schemaId + ') FOR MESSAGE WITH KEY=&quot;' + record.key + '&quot;'}">
                                                     </h4>
                                                     <button type="button" class="btn-close" data-bs-dismiss="modal">&times;</button>
                                                 </div>
@@ -749,7 +750,7 @@
                                                     <pre th:id="${'schema_content_'+recordId}" th:text="${record.RegistrySchema.schemaAsString}"></pre>
                                                 </div>
                                                 <div class="modal-footer">
-                                                    <a th:href="@{|${schemaCatalogUrlTemplate.resolve(record.RegistrySchema.schemaName)}|}"
+                                                    <a th:href="@{|${schemaCatalogUrlTemplate.resolveById(record.RegistrySchema.schemaId)}|}"
                                                        th:text="${schemaCatalogUrlTemplate.getName()}"
                                                        target="_blank"
                                                        class="btn btn-success">
