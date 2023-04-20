@@ -72,11 +72,8 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <java.version>17</java.version>
-        
-        <kafka.version>7.0.1-ccs</kafka.version>
-        <kafka-clients.version>7.0.1-ccs</kafka-clients.version>
-        <kafka_2.13.version>7.0.1-ccs</kafka_2.13.version>
-        <cp.version>7.0.1</cp.version>
+        <kafka.version>2.8.2</kafka.version>
+        <cp.version>7.2.1</cp.version>
         <eco-commons.version>1.0.0</eco-commons.version>
         <eco-commons-kafka.version>3.0.0</eco-commons-kafka.version>
         <ehcache.version>3.5.2</ehcache.version>
@@ -131,7 +128,7 @@
             <dependency>
                 <groupId>org.apache.kafka</groupId>
                 <artifactId>kafka_2.13</artifactId>
-                <version>${kafka_2.13.version}</version>
+                <version>${kafka.version}</version>
                 <exclusions>
                     <exclusion>
                         <groupId>org.slf4j</groupId>
@@ -146,7 +143,7 @@
             <dependency>
                 <groupId>org.apache.kafka</groupId>
                 <artifactId>kafka-clients</artifactId>
-                <version>${kafka-clients.version}</version>
+                <version>${kafka.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.epam.eco</groupId>

@@ -750,7 +750,8 @@
                                                     <pre th:id="${'schema_content_'+recordId}" th:text="${record.RegistrySchema.schemaAsString}"></pre>
                                                 </div>
                                                 <div class="modal-footer">
-                                                    <a th:href="@{|${schemaCatalogUrlTemplate.resolveById(record.RegistrySchema.schemaId)}|}"
+                                                    <a th:if="${schemaCatalogUrlTemplate.showByIdButton()}"
+                                                       th:href="@{|${schemaCatalogUrlTemplate.resolveById(record.RegistrySchema.schemaId)}|}"
                                                        th:text="${schemaCatalogUrlTemplate.getName()}"
                                                        target="_blank"
                                                        class="btn btn-success">
