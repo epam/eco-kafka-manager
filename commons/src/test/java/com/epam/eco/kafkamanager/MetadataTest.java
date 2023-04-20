@@ -15,8 +15,8 @@
  *******************************************************************************/
 package com.epam.eco.kafkamanager;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -41,13 +41,13 @@ public class MetadataTest {
         ObjectMapper mapper = TestObjectMapperSingleton.getObjectMapper();
 
         String json = mapper.writeValueAsString(origin);
-        Assert.assertNotNull(json);
+        Assertions.assertNotNull(json);
 
         Metadata deserialized = mapper.readValue(
                 json,
                 Metadata.class);
-        Assert.assertNotNull(deserialized);
-        Assert.assertEquals(origin, deserialized);
+        Assertions.assertNotNull(deserialized);
+        Assertions.assertEquals(origin, deserialized);
     }
 
 }

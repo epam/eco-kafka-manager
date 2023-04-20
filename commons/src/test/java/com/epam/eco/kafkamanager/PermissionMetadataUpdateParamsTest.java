@@ -20,8 +20,8 @@ import java.util.Map;
 
 import org.apache.kafka.common.resource.PatternType;
 import org.apache.kafka.common.resource.ResourceType;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -48,13 +48,13 @@ public class PermissionMetadataUpdateParamsTest {
         ObjectMapper mapper = TestObjectMapperSingleton.getObjectMapper();
 
         String json = mapper.writeValueAsString(origin);
-        Assert.assertNotNull(json);
+        Assertions.assertNotNull(json);
 
         PermissionMetadataUpdateParams deserialized = mapper.readValue(
                 json,
                 PermissionMetadataUpdateParams.class);
-        Assert.assertNotNull(deserialized);
-        Assert.assertEquals(origin, deserialized);
+        Assertions.assertNotNull(deserialized);
+        Assertions.assertEquals(origin, deserialized);
     }
 
     @Test
@@ -72,13 +72,13 @@ public class PermissionMetadataUpdateParamsTest {
         json.put("description", "description");
 
         PermissionMetadataUpdateParams params = PermissionMetadataUpdateParams.fromJson(json);
-        Assert.assertNotNull(params);
-        Assert.assertEquals(ResourceType.GROUP, params.getResourceType());
-        Assert.assertEquals("group1", params.getResourceName());
-        Assert.assertEquals(PatternType.LITERAL, params.getPatternType());
-        Assert.assertEquals("user:user1", params.getPrincipal());
-        Assert.assertEquals(attributes, params.getAttributes());
-        Assert.assertEquals("description", params.getDescription());
+        Assertions.assertNotNull(params);
+        Assertions.assertEquals(ResourceType.GROUP, params.getResourceType());
+        Assertions.assertEquals("group1", params.getResourceName());
+        Assertions.assertEquals(PatternType.LITERAL, params.getPatternType());
+        Assertions.assertEquals("user:user1", params.getPrincipal());
+        Assertions.assertEquals(attributes, params.getAttributes());
+        Assertions.assertEquals("description", params.getDescription());
     }
 
     @Test
@@ -94,17 +94,17 @@ public class PermissionMetadataUpdateParamsTest {
                 "}";
 
         PermissionMetadataUpdateParams params = PermissionMetadataUpdateParams.fromJson(json);
-        Assert.assertNotNull(params);
-        Assert.assertEquals(ResourceType.GROUP, params.getResourceType());
-        Assert.assertEquals("group1", params.getResourceName());
-        Assert.assertEquals(PatternType.LITERAL, params.getPatternType());
-        Assert.assertEquals("user:user1", params.getPrincipal());
+        Assertions.assertNotNull(params);
+        Assertions.assertEquals(ResourceType.GROUP, params.getResourceType());
+        Assertions.assertEquals("group1", params.getResourceName());
+        Assertions.assertEquals(PatternType.LITERAL, params.getPatternType());
+        Assertions.assertEquals("user:user1", params.getPrincipal());
         Map<String, Object> attributes = new HashMap<>();
         attributes.put("attr1", "value1");
         attributes.put("attr2", "value2");
         attributes.put("attr3", "value3");
-        Assert.assertEquals(attributes, params.getAttributes());
-        Assert.assertEquals("description", params.getDescription());
+        Assertions.assertEquals(attributes, params.getAttributes());
+        Assertions.assertEquals("description", params.getDescription());
     }
 
 }

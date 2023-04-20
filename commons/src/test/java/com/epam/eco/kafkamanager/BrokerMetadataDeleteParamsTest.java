@@ -18,8 +18,8 @@ package com.epam.eco.kafkamanager;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -39,13 +39,13 @@ public class BrokerMetadataDeleteParamsTest {
         ObjectMapper mapper = TestObjectMapperSingleton.getObjectMapper();
 
         String json = mapper.writeValueAsString(origin);
-        Assert.assertNotNull(json);
+        Assertions.assertNotNull(json);
 
         BrokerMetadataDeleteParams deserialized = mapper.readValue(
                 json,
                 BrokerMetadataDeleteParams.class);
-        Assert.assertNotNull(deserialized);
-        Assert.assertEquals(origin, deserialized);
+        Assertions.assertNotNull(deserialized);
+        Assertions.assertEquals(origin, deserialized);
     }
 
     @Test
@@ -54,8 +54,8 @@ public class BrokerMetadataDeleteParamsTest {
         json.put("brokerId", 42);
 
         BrokerMetadataDeleteParams params = BrokerMetadataDeleteParams.fromJson(json);
-        Assert.assertNotNull(params);
-        Assert.assertEquals(42, params.getBrokerId());
+        Assertions.assertNotNull(params);
+        Assertions.assertEquals(42, params.getBrokerId());
     }
 
     @Test
@@ -66,8 +66,8 @@ public class BrokerMetadataDeleteParamsTest {
                 "}";
 
         BrokerMetadataDeleteParams params = BrokerMetadataDeleteParams.fromJson(json);
-        Assert.assertNotNull(params);
-        Assert.assertEquals(42, params.getBrokerId());
+        Assertions.assertNotNull(params);
+        Assertions.assertEquals(42, params.getBrokerId());
     }
 
 }

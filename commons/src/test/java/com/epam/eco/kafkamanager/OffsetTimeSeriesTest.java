@@ -18,8 +18,8 @@ package com.epam.eco.kafkamanager;
 import java.time.LocalDateTime;
 
 import org.apache.kafka.common.TopicPartition;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -40,11 +40,11 @@ public class OffsetTimeSeriesTest {
         ObjectMapper mapper = TestObjectMapperSingleton.getObjectMapper();
 
         String json = mapper.writeValueAsString(origin);
-        Assert.assertNotNull(json);
+        Assertions.assertNotNull(json);
 
         OffsetTimeSeries deserialized = mapper.readValue(json, OffsetTimeSeries.class);
-        Assert.assertNotNull(deserialized);
-        Assert.assertEquals(origin, deserialized);
+        Assertions.assertNotNull(deserialized);
+        Assertions.assertEquals(origin, deserialized);
     }
 
     @Test
@@ -56,7 +56,7 @@ public class OffsetTimeSeriesTest {
         series.append(dateTime.minus(1, series.getGranularity()), 1l);
         series.append(dateTime, 100l);
 
-        Assert.assertEquals(Long.valueOf(99), series.deltaAtDate(dateTime));
+        Assertions.assertEquals(Long.valueOf(99), series.deltaAtDate(dateTime));
     }
 
     @Test
@@ -74,9 +74,9 @@ public class OffsetTimeSeriesTest {
         series.append(date2, 120l);
         series.append(date3, 200l);
 
-        Assert.assertNotNull(series.currentRatePerSec());
-        Assert.assertNotNull(series.currentRatePerMinute());
-        Assert.assertNotNull(series.currentRatePerHour());
+        Assertions.assertNotNull(series.currentRatePerSec());
+        Assertions.assertNotNull(series.currentRatePerMinute());
+        Assertions.assertNotNull(series.currentRatePerHour());
 
         series = new OffsetTimeSeries(new TopicPartition("topic", 0));
 
@@ -91,9 +91,9 @@ public class OffsetTimeSeriesTest {
         series.append(date2, 120l);
         series.append(date3, 200l);
 
-        Assert.assertNotNull(series.currentRatePerSec());
-        Assert.assertNotNull(series.currentRatePerMinute());
-        Assert.assertNotNull(series.currentRatePerHour());
+        Assertions.assertNotNull(series.currentRatePerSec());
+        Assertions.assertNotNull(series.currentRatePerMinute());
+        Assertions.assertNotNull(series.currentRatePerHour());
     }
 
 }

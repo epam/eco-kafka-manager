@@ -19,8 +19,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -55,8 +55,8 @@ public class SpringModuleTest {
         String json = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(page);
         Page<BrokerInfo> resultPage = objectMapper.readValue(json, new TypeReference<PageImpl<BrokerInfo>>() {});
 
-        Assert.assertEquals(brokerInfoList, resultPage.getContent());
-        Assert.assertEquals(pageable, resultPage.getPageable());
+        Assertions.assertEquals(brokerInfoList, resultPage.getContent());
+        Assertions.assertEquals(pageable, resultPage.getPageable());
     }
 
 }

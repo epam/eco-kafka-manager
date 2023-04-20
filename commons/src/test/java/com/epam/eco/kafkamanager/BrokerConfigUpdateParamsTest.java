@@ -18,8 +18,8 @@ package com.epam.eco.kafkamanager;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -42,13 +42,13 @@ public class BrokerConfigUpdateParamsTest {
         ObjectMapper mapper = TestObjectMapperSingleton.getObjectMapper();
 
         String json = mapper.writeValueAsString(origin);
-        Assert.assertNotNull(json);
+        Assertions.assertNotNull(json);
 
         BrokerConfigUpdateParams deserialized = mapper.readValue(
                 json,
                 BrokerConfigUpdateParams.class);
-        Assert.assertNotNull(deserialized);
-        Assert.assertEquals(origin, deserialized);
+        Assertions.assertNotNull(deserialized);
+        Assertions.assertEquals(origin, deserialized);
     }
 
     @Test
@@ -68,9 +68,9 @@ public class BrokerConfigUpdateParamsTest {
         json.put("description", "description");
 
         BrokerConfigUpdateParams params = BrokerConfigUpdateParams.fromJson(json);
-        Assert.assertNotNull(params);
-        Assert.assertEquals(42, params.getBrokerId());
-        Assert.assertEquals(config, params.getConfig());
+        Assertions.assertNotNull(params);
+        Assertions.assertEquals(42, params.getBrokerId());
+        Assertions.assertEquals(config, params.getConfig());
     }
 
     @Test
@@ -82,13 +82,13 @@ public class BrokerConfigUpdateParamsTest {
                 "}";
 
         BrokerConfigUpdateParams params = BrokerConfigUpdateParams.fromJson(json);
-        Assert.assertNotNull(params);
-        Assert.assertEquals(1, params.getBrokerId());
+        Assertions.assertNotNull(params);
+        Assertions.assertEquals(1, params.getBrokerId());
         Map<String, Object> config = new HashMap<>();
         config.put("config1", "value1");
         config.put("config2", "value2");
         config.put("config3", "value3");
-        Assert.assertEquals(config, params.getConfig());
+        Assertions.assertEquals(config, params.getConfig());
     }
 
 }

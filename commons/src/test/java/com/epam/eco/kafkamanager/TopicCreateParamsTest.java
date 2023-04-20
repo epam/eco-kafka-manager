@@ -18,8 +18,8 @@ package com.epam.eco.kafkamanager;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -48,13 +48,13 @@ public class TopicCreateParamsTest {
         ObjectMapper mapper = TestObjectMapperSingleton.getObjectMapper();
 
         String json = mapper.writeValueAsString(origin);
-        Assert.assertNotNull(json);
+        Assertions.assertNotNull(json);
 
         TopicCreateParams deserialized = mapper.readValue(
                 json,
                 TopicCreateParams.class);
-        Assert.assertNotNull(deserialized);
-        Assert.assertEquals(origin, deserialized);
+        Assertions.assertNotNull(deserialized);
+        Assertions.assertEquals(origin, deserialized);
     }
 
     @Test
@@ -76,13 +76,13 @@ public class TopicCreateParamsTest {
         json.put("description", "description");
 
         TopicCreateParams params = TopicCreateParams.fromJson(json);
-        Assert.assertNotNull(params);
-        Assert.assertEquals("topic1", params.getTopicName());
-        Assert.assertEquals(42, params.getPartitionCount());
-        Assert.assertEquals(10, params.getReplicationFactor());
-        Assert.assertEquals(config, params.getConfig());
-        Assert.assertEquals(attributes, params.getAttributes());
-        Assert.assertEquals("description", params.getDescription());
+        Assertions.assertNotNull(params);
+        Assertions.assertEquals("topic1", params.getTopicName());
+        Assertions.assertEquals(42, params.getPartitionCount());
+        Assertions.assertEquals(10, params.getReplicationFactor());
+        Assertions.assertEquals(config, params.getConfig());
+        Assertions.assertEquals(attributes, params.getAttributes());
+        Assertions.assertEquals("description", params.getDescription());
     }
 
     @Test
@@ -98,21 +98,21 @@ public class TopicCreateParamsTest {
                 "}";
 
         TopicCreateParams params = TopicCreateParams.fromJson(json);
-        Assert.assertNotNull(params);
-        Assert.assertEquals("topic1", params.getTopicName());
-        Assert.assertEquals(42, params.getPartitionCount());
-        Assert.assertEquals(10, params.getReplicationFactor());
+        Assertions.assertNotNull(params);
+        Assertions.assertEquals("topic1", params.getTopicName());
+        Assertions.assertEquals(42, params.getPartitionCount());
+        Assertions.assertEquals(10, params.getReplicationFactor());
         Map<String, Object> config = new HashMap<>();
         config.put("config1", "value1");
         config.put("config2", "value2");
         config.put("config3", "value3");
-        Assert.assertEquals(config, params.getConfig());
+        Assertions.assertEquals(config, params.getConfig());
         Map<String, Object> attributes = new HashMap<>();
         attributes.put("attr1", "value1");
         attributes.put("attr2", "value2");
         attributes.put("attr3", "value3");
-        Assert.assertEquals(attributes, params.getAttributes());
-        Assert.assertEquals("description", params.getDescription());
+        Assertions.assertEquals(attributes, params.getAttributes());
+        Assertions.assertEquals("description", params.getDescription());
     }
 
 }

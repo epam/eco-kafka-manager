@@ -16,8 +16,8 @@
 package com.epam.eco.kafkamanager;
 
 import org.apache.kafka.common.security.auth.SecurityProtocol;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -46,13 +46,13 @@ public class BrokerInfoTest {
         ObjectMapper mapper = TestObjectMapperSingleton.getObjectMapper();
 
         String json = mapper.writeValueAsString(origin);
-        Assert.assertNotNull(json);
+        Assertions.assertNotNull(json);
 
         BrokerInfo deserialized = mapper.readValue(
                 json,
                 BrokerInfo.class);
-        Assert.assertNotNull(deserialized);
-        Assert.assertEquals(origin, deserialized);
+        Assertions.assertNotNull(deserialized);
+        Assertions.assertEquals(origin, deserialized);
     }
 
 }

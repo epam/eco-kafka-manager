@@ -19,8 +19,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import com.epam.eco.commons.kafka.serde.JsonDeserializer;
 import com.epam.eco.commons.kafka.serde.JsonSerializer;
@@ -52,12 +52,12 @@ public class MetadataJsonSerdeTest {
 
         byte[] bytes = serializer.serialize(null, metadataOrig);
 
-        Assert.assertNotNull(bytes);
-        Assert.assertTrue(bytes.length > 0);
+        Assertions.assertNotNull(bytes);
+        Assertions.assertTrue(bytes.length > 0);
 
         Metadata metadata = deserializer.deserialize(null, bytes);
 
-        Assert.assertEquals(metadataOrig, metadata);
+        Assertions.assertEquals(metadataOrig, metadata);
     }
 
 }

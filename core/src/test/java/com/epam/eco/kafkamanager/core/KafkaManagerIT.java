@@ -17,14 +17,14 @@ package com.epam.eco.kafkamanager.core;
 
 import java.util.List;
 
-import org.junit.Assert;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import com.epam.eco.kafkamanager.BrokerInfo;
 import com.epam.eco.kafkamanager.ConsumerGroupInfo;
@@ -35,7 +35,7 @@ import com.epam.eco.kafkamanager.TopicInfo;
 /**
  * @author Andrei_Tytsik
  */
-@RunWith(SpringRunner.class)
+@ExtendWith(SpringExtension.class)
 @SpringBootTest(classes=Config.class)
 public class KafkaManagerIT {
 
@@ -45,99 +45,99 @@ public class KafkaManagerIT {
     @Test
     public void testAllBrokersAreResolved() throws Exception {
         List<BrokerInfo> brokers = kafkaManager.getAllBrokers();
-        Assert.assertNotNull(brokers);
+        Assertions.assertNotNull(brokers);
         for (BrokerInfo broker : brokers) {
-            Assert.assertNotNull(broker);
-            Assert.assertTrue(broker.getId() >= 0);
-            Assert.assertFalse(broker.getEndPoints().isEmpty());
+            Assertions.assertNotNull(broker);
+            Assertions.assertTrue(broker.getId() >= 0);
+            Assertions.assertFalse(broker.getEndPoints().isEmpty());
         }
     }
 
     @Test
     public void testBrokerPageIsResolved() throws Exception {
         Page<BrokerInfo> page = kafkaManager.getBrokerPage(PageRequest.of(0, 1));
-        Assert.assertNotNull(page);
+        Assertions.assertNotNull(page);
         for (BrokerInfo broker : page) {
-            Assert.assertNotNull(broker);
-            Assert.assertTrue(broker.getId() >= 0);
-            Assert.assertNotNull(broker.getEndPoints());
-            Assert.assertFalse(broker.getEndPoints().isEmpty());
+            Assertions.assertNotNull(broker);
+            Assertions.assertTrue(broker.getId() >= 0);
+            Assertions.assertNotNull(broker.getEndPoints());
+            Assertions.assertFalse(broker.getEndPoints().isEmpty());
         }
     }
 
     @Test
     public void testAllTopicsAreResolved() throws Exception {
         List<TopicInfo> topics = kafkaManager.getAllTopics();
-        Assert.assertNotNull(topics);
+        Assertions.assertNotNull(topics);
         for (TopicInfo topic : topics) {
-            Assert.assertNotNull(topic);
-            Assert.assertNotNull(topic.getName());
-            Assert.assertTrue(topic.getPartitionCount() >= 0);
-            Assert.assertTrue(topic.getReplicationFactor() >= 0);
+            Assertions.assertNotNull(topic);
+            Assertions.assertNotNull(topic.getName());
+            Assertions.assertTrue(topic.getPartitionCount() >= 0);
+            Assertions.assertTrue(topic.getReplicationFactor() >= 0);
         }
     }
 
     @Test
     public void testTopicPageIsResolved() throws Exception {
         Page<TopicInfo> page = kafkaManager.getTopicPage(PageRequest.of(0, 1));
-        Assert.assertNotNull(page);
+        Assertions.assertNotNull(page);
         for (TopicInfo topic : page) {
-            Assert.assertNotNull(topic);
-            Assert.assertNotNull(topic.getName());
-            Assert.assertTrue(topic.getPartitionCount() >= 0);
-            Assert.assertTrue(topic.getReplicationFactor() >= 0);
+            Assertions.assertNotNull(topic);
+            Assertions.assertNotNull(topic.getName());
+            Assertions.assertTrue(topic.getPartitionCount() >= 0);
+            Assertions.assertTrue(topic.getReplicationFactor() >= 0);
         }
     }
 
     @Test
     public void testAllConsumerGroupsAreResolved() throws Exception {
         List<ConsumerGroupInfo> groups = kafkaManager.getAllConsumerGroups();
-        Assert.assertNotNull(groups);
+        Assertions.assertNotNull(groups);
         for (ConsumerGroupInfo group : groups) {
-            Assert.assertNotNull(group);
-            Assert.assertNotNull(group.getName());
-            Assert.assertNotNull(group.getTopicNames());
+            Assertions.assertNotNull(group);
+            Assertions.assertNotNull(group.getName());
+            Assertions.assertNotNull(group.getTopicNames());
         }
     }
 
     @Test
     public void testConsumerGroupPageIsResolved() throws Exception {
         Page<ConsumerGroupInfo> page = kafkaManager.getConsumerGroupPage(PageRequest.of(0, 1));
-        Assert.assertNotNull(page);
+        Assertions.assertNotNull(page);
         for (ConsumerGroupInfo group : page) {
-            Assert.assertNotNull(group);
-            Assert.assertNotNull(group.getName());
-            Assert.assertNotNull(group.getTopicNames());
+            Assertions.assertNotNull(group);
+            Assertions.assertNotNull(group.getName());
+            Assertions.assertNotNull(group.getTopicNames());
         }
     }
 
     @Test
     public void testAllPermissionsAreResolved() throws Exception {
         List<PermissionInfo> permissions = kafkaManager.getAllPermissions();
-        Assert.assertNotNull(permissions);
+        Assertions.assertNotNull(permissions);
         for (PermissionInfo permission : permissions) {
-            Assert.assertNotNull(permission);
-            Assert.assertNotNull(permission.getResourceType());
-            Assert.assertNotNull(permission.getResourceName());
-            Assert.assertNotNull(permission.getKafkaPrincipal());
-            Assert.assertNotNull(permission.getPermissionType());
-            Assert.assertNotNull(permission.getOperation());
-            Assert.assertNotNull(permission.getHost());
+            Assertions.assertNotNull(permission);
+            Assertions.assertNotNull(permission.getResourceType());
+            Assertions.assertNotNull(permission.getResourceName());
+            Assertions.assertNotNull(permission.getKafkaPrincipal());
+            Assertions.assertNotNull(permission.getPermissionType());
+            Assertions.assertNotNull(permission.getOperation());
+            Assertions.assertNotNull(permission.getHost());
         }
     }
 
     @Test
     public void testPermissionPageIsResolved() throws Exception {
         Page<PermissionInfo> page = kafkaManager.getPermissionPage(PageRequest.of(0, 1));
-        Assert.assertNotNull(page);
+        Assertions.assertNotNull(page);
         for (PermissionInfo permission : page) {
-            Assert.assertNotNull(permission);
-            Assert.assertNotNull(permission.getResourceType());
-            Assert.assertNotNull(permission.getResourceName());
-            Assert.assertNotNull(permission.getKafkaPrincipal());
-            Assert.assertNotNull(permission.getPermissionType());
-            Assert.assertNotNull(permission.getOperation());
-            Assert.assertNotNull(permission.getHost());
+            Assertions.assertNotNull(permission);
+            Assertions.assertNotNull(permission.getResourceType());
+            Assertions.assertNotNull(permission.getResourceName());
+            Assertions.assertNotNull(permission.getKafkaPrincipal());
+            Assertions.assertNotNull(permission.getPermissionType());
+            Assertions.assertNotNull(permission.getOperation());
+            Assertions.assertNotNull(permission.getHost());
         }
     }
 

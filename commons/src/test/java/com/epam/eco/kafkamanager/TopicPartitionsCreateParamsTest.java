@@ -18,8 +18,8 @@ package com.epam.eco.kafkamanager;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -40,13 +40,13 @@ public class TopicPartitionsCreateParamsTest {
         ObjectMapper mapper = TestObjectMapperSingleton.getObjectMapper();
 
         String json = mapper.writeValueAsString(origin);
-        Assert.assertNotNull(json);
+        Assertions.assertNotNull(json);
 
         TopicPartitionsCreateParams deserialized = mapper.readValue(
                 json,
                 TopicPartitionsCreateParams.class);
-        Assert.assertNotNull(deserialized);
-        Assert.assertEquals(origin, deserialized);
+        Assertions.assertNotNull(deserialized);
+        Assertions.assertEquals(origin, deserialized);
     }
 
     @Test
@@ -56,9 +56,9 @@ public class TopicPartitionsCreateParamsTest {
         json.put("newPartitionCount", 42);
 
         TopicPartitionsCreateParams params = TopicPartitionsCreateParams.fromJson(json);
-        Assert.assertNotNull(params);
-        Assert.assertEquals("topic1", params.getTopicName());
-        Assert.assertEquals(42, params.getNewPartitionCount());
+        Assertions.assertNotNull(params);
+        Assertions.assertEquals("topic1", params.getTopicName());
+        Assertions.assertEquals(42, params.getNewPartitionCount());
     }
 
     @Test
@@ -70,9 +70,9 @@ public class TopicPartitionsCreateParamsTest {
                 "}";
 
         TopicPartitionsCreateParams params = TopicPartitionsCreateParams.fromJson(json);
-        Assert.assertNotNull(params);
-        Assert.assertEquals("topic1", params.getTopicName());
-        Assert.assertEquals(42, params.getNewPartitionCount());
+        Assertions.assertNotNull(params);
+        Assertions.assertEquals("topic1", params.getTopicName());
+        Assertions.assertEquals(42, params.getNewPartitionCount());
     }
 
 }

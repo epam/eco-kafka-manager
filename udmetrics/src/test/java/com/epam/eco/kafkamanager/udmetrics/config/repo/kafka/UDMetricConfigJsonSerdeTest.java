@@ -17,8 +17,8 @@ package com.epam.eco.kafkamanager.udmetrics.config.repo.kafka;
 
 import java.util.Collections;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import com.epam.eco.commons.kafka.serde.JsonDeserializer;
 import com.epam.eco.commons.kafka.serde.JsonSerializer;
@@ -47,12 +47,12 @@ public class UDMetricConfigJsonSerdeTest {
                 Collections.emptyMap());
 
         byte[] bytes = serializer.serialize(null, configOrig);
-        Assert.assertNotNull(bytes);
-        Assert.assertTrue(bytes.length > 0);
+        Assertions.assertNotNull(bytes);
+        Assertions.assertTrue(bytes.length > 0);
 
         UDMetricConfig config = deserializer.deserialize(null, bytes);
-        Assert.assertNotNull(config);
-        Assert.assertEquals(configOrig, config);
+        Assertions.assertNotNull(config);
+        Assertions.assertEquals(configOrig, config);
     }
 
 }

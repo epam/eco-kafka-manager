@@ -21,8 +21,8 @@ import java.util.Collections;
 import java.util.List;
 
 import org.apache.kafka.common.ConsumerGroupState;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Andrei_Tytsik
@@ -44,7 +44,7 @@ public class ConsumerGroupStateComparatorTest {
         Collections.shuffle(actual);
 
         Collections.sort(actual, ConsumerGroupStateComparator.INSTANCE);
-        Assert.assertEquals(expected, actual);
+        Assertions.assertEquals(expected, actual);
     }
 
 }

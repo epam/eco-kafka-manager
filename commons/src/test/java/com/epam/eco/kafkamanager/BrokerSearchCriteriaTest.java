@@ -18,8 +18,8 @@ package com.epam.eco.kafkamanager;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -41,13 +41,13 @@ public class BrokerSearchCriteriaTest {
         ObjectMapper mapper = TestObjectMapperSingleton.getObjectMapper();
 
         String json = mapper.writeValueAsString(origin);
-        Assert.assertNotNull(json);
+        Assertions.assertNotNull(json);
 
         BrokerSearchCriteria deserialized = mapper.readValue(
                 json,
                 BrokerSearchCriteria.class);
-        Assert.assertNotNull(deserialized);
-        Assert.assertEquals(origin, deserialized);
+        Assertions.assertNotNull(deserialized);
+        Assertions.assertEquals(origin, deserialized);
     }
 
     @Test
@@ -58,10 +58,10 @@ public class BrokerSearchCriteriaTest {
         json.put("description", "description");
 
         BrokerSearchCriteria criteria = BrokerSearchCriteria.fromJson(json);
-        Assert.assertNotNull(criteria);
-        Assert.assertEquals(Integer.valueOf(42), criteria.getBrokerId());
-        Assert.assertEquals("default", criteria.getRack());
-        Assert.assertEquals("description", criteria.getDescription());
+        Assertions.assertNotNull(criteria);
+        Assertions.assertEquals(Integer.valueOf(42), criteria.getBrokerId());
+        Assertions.assertEquals("default", criteria.getRack());
+        Assertions.assertEquals("description", criteria.getDescription());
     }
 
     @Test
@@ -74,10 +74,10 @@ public class BrokerSearchCriteriaTest {
                 "}";
 
         BrokerSearchCriteria criteria = BrokerSearchCriteria.fromJson(json);
-        Assert.assertNotNull(criteria);
-        Assert.assertEquals(Integer.valueOf(42), criteria.getBrokerId());
-        Assert.assertEquals("default", criteria.getRack());
-        Assert.assertEquals("description", criteria.getDescription());
+        Assertions.assertNotNull(criteria);
+        Assertions.assertEquals(Integer.valueOf(42), criteria.getBrokerId());
+        Assertions.assertEquals("default", criteria.getRack());
+        Assertions.assertEquals("description", criteria.getDescription());
     }
 
 }

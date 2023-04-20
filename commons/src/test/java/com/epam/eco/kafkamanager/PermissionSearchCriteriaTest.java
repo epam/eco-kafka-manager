@@ -21,8 +21,8 @@ import java.util.Map;
 import org.apache.kafka.common.acl.AclOperation;
 import org.apache.kafka.common.acl.AclPermissionType;
 import org.apache.kafka.common.resource.ResourceType;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -48,13 +48,13 @@ public class PermissionSearchCriteriaTest {
         ObjectMapper mapper = TestObjectMapperSingleton.getObjectMapper();
 
         String json = mapper.writeValueAsString(origin);
-        Assert.assertNotNull(json);
+        Assertions.assertNotNull(json);
 
         PermissionSearchCriteria deserialized = mapper.readValue(
                 json,
                 PermissionSearchCriteria.class);
-        Assert.assertNotNull(deserialized);
-        Assert.assertEquals(origin, deserialized);
+        Assertions.assertNotNull(deserialized);
+        Assertions.assertEquals(origin, deserialized);
     }
 
     @Test
@@ -69,14 +69,14 @@ public class PermissionSearchCriteriaTest {
         json.put("description", "description");
 
         PermissionSearchCriteria criteria = PermissionSearchCriteria.fromJson(json);
-        Assert.assertNotNull(criteria);
-        Assert.assertEquals("user1", criteria.getKafkaPrincipal());
-        Assert.assertEquals(ResourceType.GROUP, criteria.getResourceType());
-        Assert.assertEquals("group1", criteria.getResourceName());
-        Assert.assertEquals(AclPermissionType.ALLOW, criteria.getPermissionType());
-        Assert.assertEquals(AclOperation.READ, criteria.getOperation());
-        Assert.assertEquals("host", criteria.getHost());
-        Assert.assertEquals("description", criteria.getDescription());
+        Assertions.assertNotNull(criteria);
+        Assertions.assertEquals("user1", criteria.getKafkaPrincipal());
+        Assertions.assertEquals(ResourceType.GROUP, criteria.getResourceType());
+        Assertions.assertEquals("group1", criteria.getResourceName());
+        Assertions.assertEquals(AclPermissionType.ALLOW, criteria.getPermissionType());
+        Assertions.assertEquals(AclOperation.READ, criteria.getOperation());
+        Assertions.assertEquals("host", criteria.getHost());
+        Assertions.assertEquals("description", criteria.getDescription());
     }
 
     @Test
@@ -93,14 +93,14 @@ public class PermissionSearchCriteriaTest {
                 "}";
 
         PermissionSearchCriteria criteria = PermissionSearchCriteria.fromJson(json);
-        Assert.assertNotNull(criteria);
-        Assert.assertEquals("user1", criteria.getKafkaPrincipal());
-        Assert.assertEquals(ResourceType.GROUP, criteria.getResourceType());
-        Assert.assertEquals("group1", criteria.getResourceName());
-        Assert.assertEquals(AclPermissionType.ALLOW, criteria.getPermissionType());
-        Assert.assertEquals(AclOperation.READ, criteria.getOperation());
-        Assert.assertEquals("host", criteria.getHost());
-        Assert.assertEquals("description", criteria.getDescription());
+        Assertions.assertNotNull(criteria);
+        Assertions.assertEquals("user1", criteria.getKafkaPrincipal());
+        Assertions.assertEquals(ResourceType.GROUP, criteria.getResourceType());
+        Assertions.assertEquals("group1", criteria.getResourceName());
+        Assertions.assertEquals(AclPermissionType.ALLOW, criteria.getPermissionType());
+        Assertions.assertEquals(AclOperation.READ, criteria.getOperation());
+        Assertions.assertEquals("host", criteria.getHost());
+        Assertions.assertEquals("description", criteria.getDescription());
     }
 
 }

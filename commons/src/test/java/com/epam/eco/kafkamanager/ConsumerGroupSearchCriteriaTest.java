@@ -19,8 +19,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.kafka.common.ConsumerGroupState;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -44,13 +44,13 @@ public class ConsumerGroupSearchCriteriaTest {
         ObjectMapper mapper = TestObjectMapperSingleton.getObjectMapper();
 
         String json = mapper.writeValueAsString(origin);
-        Assert.assertNotNull(json);
+        Assertions.assertNotNull(json);
 
         ConsumerGroupSearchCriteria deserialized = mapper.readValue(
                 json,
                 ConsumerGroupSearchCriteria.class);
-        Assert.assertNotNull(deserialized);
-        Assert.assertEquals(origin, deserialized);
+        Assertions.assertNotNull(deserialized);
+        Assertions.assertEquals(origin, deserialized);
     }
 
     @Test
@@ -62,11 +62,11 @@ public class ConsumerGroupSearchCriteriaTest {
         json.put("description", "description");
 
         ConsumerGroupSearchCriteria criteria = ConsumerGroupSearchCriteria.fromJson(json);
-        Assert.assertNotNull(criteria);
-        Assert.assertEquals("group1", criteria.getGroupName());
-        Assert.assertEquals(ConsumerGroupState.EMPTY, criteria.getState());
-        Assert.assertEquals(StorageType.KAFKA, criteria.getStorageType());
-        Assert.assertEquals("description", criteria.getDescription());
+        Assertions.assertNotNull(criteria);
+        Assertions.assertEquals("group1", criteria.getGroupName());
+        Assertions.assertEquals(ConsumerGroupState.EMPTY, criteria.getState());
+        Assertions.assertEquals(StorageType.KAFKA, criteria.getStorageType());
+        Assertions.assertEquals("description", criteria.getDescription());
     }
 
     @Test
@@ -80,11 +80,11 @@ public class ConsumerGroupSearchCriteriaTest {
                 "}";
 
         ConsumerGroupSearchCriteria criteria = ConsumerGroupSearchCriteria.fromJson(json);
-        Assert.assertNotNull(criteria);
-        Assert.assertEquals("group1", criteria.getGroupName());
-        Assert.assertEquals(ConsumerGroupState.COMPLETING_REBALANCE, criteria.getState());
-        Assert.assertEquals(StorageType.KAFKA, criteria.getStorageType());
-        Assert.assertEquals("description", criteria.getDescription());
+        Assertions.assertNotNull(criteria);
+        Assertions.assertEquals("group1", criteria.getGroupName());
+        Assertions.assertEquals(ConsumerGroupState.COMPLETING_REBALANCE, criteria.getState());
+        Assertions.assertEquals(StorageType.KAFKA, criteria.getStorageType());
+        Assertions.assertEquals("description", criteria.getDescription());
     }
 
 }

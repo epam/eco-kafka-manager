@@ -18,8 +18,8 @@ package com.epam.eco.kafkamanager;
 import java.util.Collections;
 
 import org.apache.kafka.common.TopicPartition;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -45,13 +45,13 @@ public class ConsumerGroupMemberInfoTest {
         ObjectMapper mapper = TestObjectMapperSingleton.getObjectMapper();
 
         String json = mapper.writeValueAsString(origin);
-        Assert.assertNotNull(json);
+        Assertions.assertNotNull(json);
 
         ConsumerGroupMemberInfo deserialized = mapper.readValue(
                 json,
                 ConsumerGroupMemberInfo.class);
-        Assert.assertNotNull(deserialized);
-        Assert.assertEquals(origin, deserialized);
+        Assertions.assertNotNull(deserialized);
+        Assertions.assertEquals(origin, deserialized);
     }
 
 }

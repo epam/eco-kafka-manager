@@ -22,8 +22,8 @@ import org.apache.kafka.common.acl.AclOperation;
 import org.apache.kafka.common.acl.AclPermissionType;
 import org.apache.kafka.common.resource.PatternType;
 import org.apache.kafka.common.resource.ResourceType;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -49,13 +49,13 @@ public class PermissionCreateParamsTest {
         ObjectMapper mapper = TestObjectMapperSingleton.getObjectMapper();
 
         String json = mapper.writeValueAsString(origin);
-        Assert.assertNotNull(json);
+        Assertions.assertNotNull(json);
 
         PermissionCreateParams deserialized = mapper.readValue(
                 json,
                 PermissionCreateParams.class);
-        Assert.assertNotNull(deserialized);
-        Assert.assertEquals(origin, deserialized);
+        Assertions.assertNotNull(deserialized);
+        Assertions.assertEquals(origin, deserialized);
     }
 
     @Test
@@ -70,14 +70,14 @@ public class PermissionCreateParamsTest {
         json.put("host", "host");
 
         PermissionCreateParams params = PermissionCreateParams.fromJson(json);
-        Assert.assertNotNull(params);
-        Assert.assertEquals(ResourceType.GROUP, params.getResourceType());
-        Assert.assertEquals("group1", params.getResourceName());
-        Assert.assertEquals(PatternType.LITERAL, params.getPatternType());
-        Assert.assertEquals("user:user1", params.getPrincipal());
-        Assert.assertEquals(AclPermissionType.ALLOW, params.getPermissionType());
-        Assert.assertEquals(AclOperation.READ, params.getOperation());
-        Assert.assertEquals("host", params.getHost());
+        Assertions.assertNotNull(params);
+        Assertions.assertEquals(ResourceType.GROUP, params.getResourceType());
+        Assertions.assertEquals("group1", params.getResourceName());
+        Assertions.assertEquals(PatternType.LITERAL, params.getPatternType());
+        Assertions.assertEquals("user:user1", params.getPrincipal());
+        Assertions.assertEquals(AclPermissionType.ALLOW, params.getPermissionType());
+        Assertions.assertEquals(AclOperation.READ, params.getOperation());
+        Assertions.assertEquals("host", params.getHost());
     }
 
     @Test
@@ -94,14 +94,14 @@ public class PermissionCreateParamsTest {
                 "}";
 
         PermissionCreateParams params = PermissionCreateParams.fromJson(json);
-        Assert.assertNotNull(params);
-        Assert.assertEquals(ResourceType.GROUP, params.getResourceType());
-        Assert.assertEquals("group1", params.getResourceName());
-        Assert.assertEquals(PatternType.LITERAL, params.getPatternType());
-        Assert.assertEquals("user:user1", params.getPrincipal());
-        Assert.assertEquals(AclPermissionType.ALLOW, params.getPermissionType());
-        Assert.assertEquals(AclOperation.READ, params.getOperation());
-        Assert.assertEquals("host", params.getHost());
+        Assertions.assertNotNull(params);
+        Assertions.assertEquals(ResourceType.GROUP, params.getResourceType());
+        Assertions.assertEquals("group1", params.getResourceName());
+        Assertions.assertEquals(PatternType.LITERAL, params.getPatternType());
+        Assertions.assertEquals("user:user1", params.getPrincipal());
+        Assertions.assertEquals(AclPermissionType.ALLOW, params.getPermissionType());
+        Assertions.assertEquals(AclOperation.READ, params.getOperation());
+        Assertions.assertEquals("host", params.getHost());
     }
 
 }

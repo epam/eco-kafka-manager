@@ -22,8 +22,8 @@ import org.apache.kafka.common.acl.AclOperation;
 import org.apache.kafka.common.acl.AclPermissionType;
 import org.apache.kafka.common.resource.PatternType;
 import org.apache.kafka.common.resource.ResourceType;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -49,13 +49,13 @@ public class ResourcePermissionFilterTest {
         ObjectMapper mapper = TestObjectMapperSingleton.getObjectMapper();
 
         String json = mapper.writeValueAsString(origin);
-        Assert.assertNotNull(json);
+        Assertions.assertNotNull(json);
 
         ResourcePermissionFilter deserialized = mapper.readValue(
                 json,
                 ResourcePermissionFilter.class);
-        Assert.assertNotNull(deserialized);
-        Assert.assertEquals(origin, deserialized);
+        Assertions.assertNotNull(deserialized);
+        Assertions.assertEquals(origin, deserialized);
     }
 
     @Test
@@ -70,14 +70,14 @@ public class ResourcePermissionFilterTest {
         json.put("hostFilter", "host");
 
         ResourcePermissionFilter params = ResourcePermissionFilter.fromJson(json);
-        Assert.assertNotNull(params);
-        Assert.assertEquals(ResourceType.GROUP, params.getResourceType());
-        Assert.assertEquals("group1", params.getResourceName());
-        Assert.assertEquals(PatternType.LITERAL, params.getPatternType());
-        Assert.assertEquals("user:user1", params.getPrincipalFilter());
-        Assert.assertEquals(AclPermissionType.ALLOW, params.getPermissionTypeFilter());
-        Assert.assertEquals(AclOperation.READ, params.getOperationFilter());
-        Assert.assertEquals("host", params.getHostFilter());
+        Assertions.assertNotNull(params);
+        Assertions.assertEquals(ResourceType.GROUP, params.getResourceType());
+        Assertions.assertEquals("group1", params.getResourceName());
+        Assertions.assertEquals(PatternType.LITERAL, params.getPatternType());
+        Assertions.assertEquals("user:user1", params.getPrincipalFilter());
+        Assertions.assertEquals(AclPermissionType.ALLOW, params.getPermissionTypeFilter());
+        Assertions.assertEquals(AclOperation.READ, params.getOperationFilter());
+        Assertions.assertEquals("host", params.getHostFilter());
     }
 
     @Test
@@ -94,14 +94,14 @@ public class ResourcePermissionFilterTest {
                 "}";
 
         ResourcePermissionFilter params = ResourcePermissionFilter.fromJson(json);
-        Assert.assertNotNull(params);
-        Assert.assertEquals(ResourceType.GROUP, params.getResourceType());
-        Assert.assertEquals("group1", params.getResourceName());
-        Assert.assertEquals(PatternType.LITERAL, params.getPatternType());
-        Assert.assertEquals("user:user1", params.getPrincipalFilter());
-        Assert.assertEquals(AclPermissionType.ALLOW, params.getPermissionTypeFilter());
-        Assert.assertEquals(AclOperation.READ, params.getOperationFilter());
-        Assert.assertEquals("host", params.getHostFilter());
+        Assertions.assertNotNull(params);
+        Assertions.assertEquals(ResourceType.GROUP, params.getResourceType());
+        Assertions.assertEquals("group1", params.getResourceName());
+        Assertions.assertEquals(PatternType.LITERAL, params.getPatternType());
+        Assertions.assertEquals("user:user1", params.getPrincipalFilter());
+        Assertions.assertEquals(AclPermissionType.ALLOW, params.getPermissionTypeFilter());
+        Assertions.assertEquals(AclOperation.READ, params.getOperationFilter());
+        Assertions.assertEquals("host", params.getHostFilter());
     }
 
 }

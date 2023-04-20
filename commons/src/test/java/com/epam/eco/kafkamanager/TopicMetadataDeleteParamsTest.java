@@ -18,8 +18,8 @@ package com.epam.eco.kafkamanager;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -39,13 +39,13 @@ public class TopicMetadataDeleteParamsTest {
         ObjectMapper mapper = TestObjectMapperSingleton.getObjectMapper();
 
         String json = mapper.writeValueAsString(origin);
-        Assert.assertNotNull(json);
+        Assertions.assertNotNull(json);
 
         TopicMetadataDeleteParams deserialized = mapper.readValue(
                 json,
                 TopicMetadataDeleteParams.class);
-        Assert.assertNotNull(deserialized);
-        Assert.assertEquals(origin, deserialized);
+        Assertions.assertNotNull(deserialized);
+        Assertions.assertEquals(origin, deserialized);
     }
 
     @Test
@@ -54,8 +54,8 @@ public class TopicMetadataDeleteParamsTest {
         json.put("topicName", "topic1");
 
         TopicMetadataDeleteParams params = TopicMetadataDeleteParams.fromJson(json);
-        Assert.assertNotNull(params);
-        Assert.assertEquals("topic1", params.getTopicName());
+        Assertions.assertNotNull(params);
+        Assertions.assertEquals("topic1", params.getTopicName());
     }
 
     @Test
@@ -66,8 +66,8 @@ public class TopicMetadataDeleteParamsTest {
                 "}";
 
         TopicMetadataDeleteParams params = TopicMetadataDeleteParams.fromJson(json);
-        Assert.assertNotNull(params);
-        Assert.assertEquals("topic1", params.getTopicName());
+        Assertions.assertNotNull(params);
+        Assertions.assertEquals("topic1", params.getTopicName());
     }
 
 }

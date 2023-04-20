@@ -17,8 +17,8 @@ package com.epam.eco.kafkamanager.rest.request;
 
 import java.util.Collections;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -42,13 +42,13 @@ public class TopicRequestTest {
         ObjectMapper mapper = TestObjectMapperSingleton.getObjectMapper();
 
         String json = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(origin);
-        Assert.assertNotNull(json);
+        Assertions.assertNotNull(json);
 
         TopicRequest deserialized = mapper.readValue(
                 json,
                 TopicRequest.class);
-        Assert.assertNotNull(deserialized);
-        Assert.assertEquals(deserialized, origin);
+        Assertions.assertNotNull(deserialized);
+        Assertions.assertEquals(deserialized, origin);
     }
 
 }

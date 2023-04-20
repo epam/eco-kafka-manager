@@ -25,12 +25,14 @@ import java.util.Optional;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.common.header.internals.RecordHeaders;
 import org.apache.kafka.common.record.TimestampType;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import com.epam.eco.kafkamanager.ui.topics.browser.TabularRecords;
 import com.epam.eco.kafkamanager.ui.topics.browser.TabularRecords.Column;
 import com.epam.eco.kafkamanager.ui.topics.browser.TabularRecords.Record;
+
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
  * @author Andrei_Tytsik
@@ -53,98 +55,100 @@ public class TabularRecordsTest {
                 addRecord(createNullKeyNullValueTestRecord()).
                 build();
 
-        Assert.assertNotNull(records);
-        Assert.assertEquals(6, records.size());
+        Assertions.assertNotNull(records);
+        Assertions.assertEquals(6, records.size());
 
-        Assert.assertEquals("key1", records.getRecord(0).getKey());
-        Assert.assertTrue(records.getRecord(0).containsColumn("columnA"));
-        Assert.assertTrue(records.getRecord(0).containsColumn("columnB"));
+        Assertions.assertEquals("key1", records.getRecord(0).getKey());
+        Assertions.assertTrue(records.getRecord(0).containsColumn("columnA"));
+        Assertions.assertTrue(records.getRecord(0).containsColumn("columnB"));
 
-        Assert.assertEquals("key2", records.getRecord(1).getKey());
-        Assert.assertTrue(records.getRecord(1).containsColumn("columnC"));
-        Assert.assertTrue(records.getRecord(1).containsColumn("columnD"));
+        Assertions.assertEquals("key2", records.getRecord(1).getKey());
+        Assertions.assertTrue(records.getRecord(1).containsColumn("columnC"));
+        Assertions.assertTrue(records.getRecord(1).containsColumn("columnD"));
 
-        Assert.assertEquals("key3", records.getRecord(2).getKey());
-        Assert.assertTrue(records.getRecord(2).containsColumn("columnE"));
+        Assertions.assertEquals("key3", records.getRecord(2).getKey());
+        Assertions.assertTrue(records.getRecord(2).containsColumn("columnE"));
 
-        Assert.assertEquals(null, records.getRecord(3).getKey());
-        Assert.assertTrue(records.getRecord(3).isNullKey());
-        Assert.assertTrue(records.getRecord(3).containsColumn("columnF"));
+        Assertions.assertEquals(null, records.getRecord(3).getKey());
+        Assertions.assertTrue(records.getRecord(3).isNullKey());
+        Assertions.assertTrue(records.getRecord(3).containsColumn("columnF"));
 
-        Assert.assertEquals("key4", records.getRecord(4).getKey());
-        Assert.assertTrue(records.getRecord(4).isNullValue());
-        Assert.assertTrue(records.getRecord(4).getColumnNames().isEmpty());
+        Assertions.assertEquals("key4", records.getRecord(4).getKey());
+        Assertions.assertTrue(records.getRecord(4).isNullValue());
+        Assertions.assertTrue(records.getRecord(4).getColumnNames().isEmpty());
 
-        Assert.assertEquals(null, records.getRecord(5).getKey());
-        Assert.assertTrue(records.getRecord(5).isNullKey());
-        Assert.assertTrue(records.getRecord(5).isNullValue());
-        Assert.assertTrue(records.getRecord(4).getColumnNames().isEmpty());
+        Assertions.assertEquals(null, records.getRecord(5).getKey());
+        Assertions.assertTrue(records.getRecord(5).isNullKey());
+        Assertions.assertTrue(records.getRecord(5).isNullValue());
+        Assertions.assertTrue(records.getRecord(4).getColumnNames().isEmpty());
 
         List<Column> columns = records.listColumns();
-        Assert.assertNotNull(columns);
-        Assert.assertEquals(7, columns.size());
+        Assertions.assertNotNull(columns);
+        Assertions.assertEquals(7, columns.size());
 
-        Assert.assertEquals("columnA", columns.get(0).getName());
-        Assert.assertEquals(true, columns.get(0).isPresent());
-        Assert.assertEquals(true, columns.get(0).isSelected());
+        Assertions.assertEquals("columnA", columns.get(0).getName());
+        Assertions.assertEquals(true, columns.get(0).isPresent());
+        Assertions.assertEquals(true, columns.get(0).isSelected());
 
-        Assert.assertEquals("columnB", columns.get(1).getName());
-        Assert.assertEquals(true, columns.get(1).isPresent());
-        Assert.assertEquals(true, columns.get(1).isSelected());
+        Assertions.assertEquals("columnB", columns.get(1).getName());
+        Assertions.assertEquals(true, columns.get(1).isPresent());
+        Assertions.assertEquals(true, columns.get(1).isSelected());
 
-        Assert.assertEquals("columnC", columns.get(2).getName());
-        Assert.assertEquals(true, columns.get(2).isPresent());
-        Assert.assertEquals(true, columns.get(2).isSelected());
+        Assertions.assertEquals("columnC", columns.get(2).getName());
+        Assertions.assertEquals(true, columns.get(2).isPresent());
+        Assertions.assertEquals(true, columns.get(2).isSelected());
 
-        Assert.assertEquals("columnD", columns.get(3).getName());
-        Assert.assertEquals(true, columns.get(3).isPresent());
-        Assert.assertEquals(true, columns.get(3).isSelected());
+        Assertions.assertEquals("columnD", columns.get(3).getName());
+        Assertions.assertEquals(true, columns.get(3).isPresent());
+        Assertions.assertEquals(true, columns.get(3).isSelected());
 
-        Assert.assertEquals("columnE", columns.get(4).getName());
-        Assert.assertEquals(true, columns.get(4).isPresent());
-        Assert.assertEquals(true, columns.get(4).isSelected());
+        Assertions.assertEquals("columnE", columns.get(4).getName());
+        Assertions.assertEquals(true, columns.get(4).isPresent());
+        Assertions.assertEquals(true, columns.get(4).isSelected());
 
-        Assert.assertEquals("columnF", columns.get(5).getName());
-        Assert.assertEquals(true, columns.get(5).isPresent());
-        Assert.assertEquals(true, columns.get(5).isSelected());
+        Assertions.assertEquals("columnF", columns.get(5).getName());
+        Assertions.assertEquals(true, columns.get(5).isPresent());
+        Assertions.assertEquals(true, columns.get(5).isSelected());
 
-        Assert.assertEquals("columnX", columns.get(6).getName());
-        Assert.assertEquals(false, columns.get(6).isPresent());
-        Assert.assertEquals(true, columns.get(6).isSelected());
+        Assertions.assertEquals("columnX", columns.get(6).getName());
+        Assertions.assertEquals(false, columns.get(6).isPresent());
+        Assertions.assertEquals(true, columns.get(6).isSelected());
 
         List<Column> columnsPresent = records.listPresentColumns();
-        Assert.assertNotNull(columnsPresent);
-        Assert.assertEquals(6, columnsPresent.size());
-        Assert.assertEquals("columnA", columnsPresent.get(0).getName());
-        Assert.assertEquals("columnB", columnsPresent.get(1).getName());
-        Assert.assertEquals("columnC", columnsPresent.get(2).getName());
-        Assert.assertEquals("columnD", columnsPresent.get(3).getName());
-        Assert.assertEquals("columnE", columnsPresent.get(4).getName());
-        Assert.assertEquals("columnF", columnsPresent.get(5).getName());
+        Assertions.assertNotNull(columnsPresent);
+        Assertions.assertEquals(6, columnsPresent.size());
+        Assertions.assertEquals("columnA", columnsPresent.get(0).getName());
+        Assertions.assertEquals("columnB", columnsPresent.get(1).getName());
+        Assertions.assertEquals("columnC", columnsPresent.get(2).getName());
+        Assertions.assertEquals("columnD", columnsPresent.get(3).getName());
+        Assertions.assertEquals("columnE", columnsPresent.get(4).getName());
+        Assertions.assertEquals("columnF", columnsPresent.get(5).getName());
 
         List<Column> columnsSelected = records.listSelectedColumns();
-        Assert.assertNotNull(columnsSelected);
-        Assert.assertEquals(7, columnsSelected.size());
-        Assert.assertEquals("columnA", columnsSelected.get(0).getName());
-        Assert.assertEquals("columnB", columnsSelected.get(1).getName());
-        Assert.assertEquals("columnC", columnsSelected.get(2).getName());
-        Assert.assertEquals("columnD", columnsSelected.get(3).getName());
-        Assert.assertEquals("columnE", columnsSelected.get(4).getName());
-        Assert.assertEquals("columnF", columnsSelected.get(5).getName());
-        Assert.assertEquals("columnX", columnsSelected.get(6).getName());
+        Assertions.assertNotNull(columnsSelected);
+        Assertions.assertEquals(7, columnsSelected.size());
+        Assertions.assertEquals("columnA", columnsSelected.get(0).getName());
+        Assertions.assertEquals("columnB", columnsSelected.get(1).getName());
+        Assertions.assertEquals("columnC", columnsSelected.get(2).getName());
+        Assertions.assertEquals("columnD", columnsSelected.get(3).getName());
+        Assertions.assertEquals("columnE", columnsSelected.get(4).getName());
+        Assertions.assertEquals("columnF", columnsSelected.get(5).getName());
+        Assertions.assertEquals("columnX", columnsSelected.get(6).getName());
     }
 
-    @Test(expected=Exception.class)
+    @Test
     public void testFailsOnIllegalColumnNames() throws Exception {
-        TabularRecords.builder().
-                addSelectedColumnNames(Arrays.asList("column1", null, "column2")).
-                addRecord(createTestRecord("key", "column")).
-                build();
+        assertThrows(IllegalArgumentException.class,()->{
+            TabularRecords.builder().
+                    addSelectedColumnNames(Arrays.asList("column1", null, "column2")).
+                                  addRecord(createTestRecord("key", "column")).
+                                  build();
+        });
     }
 
-    @Test(expected=Exception.class)
+    @Test
     public void testFailsOnNullRecords() throws Exception {
-        new TabularRecords(null);
+        assertThrows(Exception.class,()-> new TabularRecords(null) );
     }
 
     @Test
@@ -157,34 +161,34 @@ public class TabularRecordsTest {
                 build();
 
         List<Column> group0 = records.getColumnsGroup(0, 3);
-        Assert.assertNotNull(group0);
-        Assert.assertEquals(3, group0.size());
-        Assert.assertEquals("columnA", group0.get(0).getName());
-        Assert.assertEquals("columnB", group0.get(1).getName());
-        Assert.assertEquals("columnC", group0.get(2).getName());
+        Assertions.assertNotNull(group0);
+        Assertions.assertEquals(3, group0.size());
+        Assertions.assertEquals("columnA", group0.get(0).getName());
+        Assertions.assertEquals("columnB", group0.get(1).getName());
+        Assertions.assertEquals("columnC", group0.get(2).getName());
 
         List<Column> group1 = records.getColumnsGroup(1, 3);
-        Assert.assertNotNull(group1);
-        Assert.assertEquals(3, group1.size());
-        Assert.assertEquals("columnD", group1.get(0).getName());
-        Assert.assertEquals("columnE", group1.get(1).getName());
-        Assert.assertEquals("columnF", group1.get(2).getName());
+        Assertions.assertNotNull(group1);
+        Assertions.assertEquals(3, group1.size());
+        Assertions.assertEquals("columnD", group1.get(0).getName());
+        Assertions.assertEquals("columnE", group1.get(1).getName());
+        Assertions.assertEquals("columnF", group1.get(2).getName());
 
         List<Column> group2 = records.getColumnsGroup(2, 3);
-        Assert.assertNotNull(group2);
-        Assert.assertEquals(3, group2.size());
-        Assert.assertEquals("columnG", group2.get(0).getName());
-        Assert.assertEquals("columnH", group2.get(1).getName());
-        Assert.assertEquals("columnI", group2.get(2).getName());
+        Assertions.assertNotNull(group2);
+        Assertions.assertEquals(3, group2.size());
+        Assertions.assertEquals("columnG", group2.get(0).getName());
+        Assertions.assertEquals("columnH", group2.get(1).getName());
+        Assertions.assertEquals("columnI", group2.get(2).getName());
 
         List<Column> group3 = records.getColumnsGroup(3, 3);
-        Assert.assertNotNull(group3);
-        Assert.assertEquals(1, group3.size());
-        Assert.assertEquals("columnJ", group3.get(0).getName());
+        Assertions.assertNotNull(group3);
+        Assertions.assertEquals(1, group3.size());
+        Assertions.assertEquals("columnJ", group3.get(0).getName());
 
         List<Column> group4 = records.getColumnsGroup(4, 3);
-        Assert.assertNotNull(group4);
-        Assert.assertEquals(0, group4.size());
+        Assertions.assertNotNull(group4);
+        Assertions.assertEquals(0, group4.size());
     }
 
     @Test
@@ -197,48 +201,48 @@ public class TabularRecordsTest {
                 build();
 
         int size = records.determineColumnsGroupSize(1, 1);
-        Assert.assertEquals(10, size);
+        Assertions.assertEquals(10, size);
 
         size = records.determineColumnsGroupSize(2, 1);
-        Assert.assertEquals(5, size);
+        Assertions.assertEquals(5, size);
 
         size = records.determineColumnsGroupSize(3, 1);
-        Assert.assertEquals(4, size);
+        Assertions.assertEquals(4, size);
 
         size = records.determineColumnsGroupSize(4, 1);
-        Assert.assertEquals(3, size);
+        Assertions.assertEquals(3, size);
 
         size = records.determineColumnsGroupSize(5, 1);
-        Assert.assertEquals(2, size);
+        Assertions.assertEquals(2, size);
 
         size = records.determineColumnsGroupSize(6, 1);
-        Assert.assertEquals(2, size);
+        Assertions.assertEquals(2, size);
 
         size = records.determineColumnsGroupSize(7, 1);
-        Assert.assertEquals(2, size);
+        Assertions.assertEquals(2, size);
 
         size = records.determineColumnsGroupSize(8, 1);
-        Assert.assertEquals(2, size);
+        Assertions.assertEquals(2, size);
 
         size = records.determineColumnsGroupSize(9, 1);
-        Assert.assertEquals(2, size);
+        Assertions.assertEquals(2, size);
 
         size = records.determineColumnsGroupSize(10, 1);
-        Assert.assertEquals(1, size);
+        Assertions.assertEquals(1, size);
 
         size = records.determineColumnsGroupSize(11, 1);
-        Assert.assertEquals(1, size);
+        Assertions.assertEquals(1, size);
 
         size = records.determineColumnsGroupSize(12, 1);
-        Assert.assertEquals(1, size);
+        Assertions.assertEquals(1, size);
     }
 
     @Test
     public void testAttributesHaveExpectedValues() throws Exception {
         Record record = new Record(createTestConsumerRecord(null), null, null, null, null);
 
-        Assert.assertNull(record.getAttributesJson());
-        Assert.assertNull(record.getAttributesPrettyJson());
+        Assertions.assertNull(record.getAttributesJson());
+        Assertions.assertNull(record.getAttributesPrettyJson());
 
         record = new Record(
                 createTestConsumerRecord(null),
@@ -246,9 +250,9 @@ public class TabularRecordsTest {
                 Collections.singletonMap("attr_key", "attr_value"),
                 new HashMap<>(), null);
 
-        Assert.assertNotNull(record.getAttributesJson());
-        Assert.assertEquals("{\"attr_key\":\"attr_value\"}", record.getAttributesJson());
-        Assert.assertNotNull(record.getAttributesPrettyJson());
+        Assertions.assertNotNull(record.getAttributesJson());
+        Assertions.assertEquals("{\"attr_key\":\"attr_value\"}", record.getAttributesJson());
+        Assertions.assertNotNull(record.getAttributesPrettyJson());
     }
 
     private Record createNullKeyNullValueTestRecord() {
@@ -281,6 +285,7 @@ public class TabularRecordsTest {
                 0,
                 System.currentTimeMillis(),
                 TimestampType.NO_TIMESTAMP_TYPE,
+                1L,
                 1,
                 1,
                 key,

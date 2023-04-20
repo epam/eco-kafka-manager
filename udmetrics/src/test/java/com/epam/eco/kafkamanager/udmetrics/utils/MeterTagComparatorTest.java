@@ -15,8 +15,8 @@
  *******************************************************************************/
 package com.epam.eco.kafkamanager.udmetrics.utils;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import io.micrometer.core.instrument.Tag;
 
@@ -28,12 +28,12 @@ public class MeterTagComparatorTest {
 
     @Test
     public void testCompared() throws Exception {
-        Assert.assertEquals(0, MeterTagComparator.INSTANCE.compare(null, null));
-        Assert.assertEquals(0, MeterTagComparator.INSTANCE.compare(Tag.of("a", "a"), Tag.of("a", "a")));
-        Assert.assertEquals(1, MeterTagComparator.INSTANCE.compare(Tag.of("a", "a"), null));
-        Assert.assertEquals(-1, MeterTagComparator.INSTANCE.compare(null, Tag.of("a", "a")));
-        Assert.assertEquals(1, MeterTagComparator.INSTANCE.compare(Tag.of("b", "b"), Tag.of("a", "a")));
-        Assert.assertEquals(-1, MeterTagComparator.INSTANCE.compare(Tag.of("a", "a"), Tag.of("b", "b")));
+        Assertions.assertEquals(0, MeterTagComparator.INSTANCE.compare(null, null));
+        Assertions.assertEquals(0, MeterTagComparator.INSTANCE.compare(Tag.of("a", "a"), Tag.of("a", "a")));
+        Assertions.assertEquals(1, MeterTagComparator.INSTANCE.compare(Tag.of("a", "a"), null));
+        Assertions.assertEquals(-1, MeterTagComparator.INSTANCE.compare(null, Tag.of("a", "a")));
+        Assertions.assertEquals(1, MeterTagComparator.INSTANCE.compare(Tag.of("b", "b"), Tag.of("a", "a")));
+        Assertions.assertEquals(-1, MeterTagComparator.INSTANCE.compare(Tag.of("a", "a"), Tag.of("b", "b")));
     }
 
 }

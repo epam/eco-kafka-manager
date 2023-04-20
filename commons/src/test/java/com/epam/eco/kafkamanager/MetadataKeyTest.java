@@ -17,8 +17,8 @@ package com.epam.eco.kafkamanager;
 
 import org.apache.kafka.common.resource.PatternType;
 import org.apache.kafka.common.resource.ResourceType;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -43,32 +43,32 @@ public class MetadataKeyTest {
         ObjectMapper mapper = TestObjectMapperSingleton.getObjectMapper();
 
         String json1 = mapper.writeValueAsString(origin1);
-        Assert.assertNotNull(json1);
+        Assertions.assertNotNull(json1);
 
         String json2 = mapper.writeValueAsString(origin2);
-        Assert.assertNotNull(json2);
+        Assertions.assertNotNull(json2);
 
         String json3 = mapper.writeValueAsString(origin3);
-        Assert.assertNotNull(json3);
+        Assertions.assertNotNull(json3);
 
         String json4 = mapper.writeValueAsString(origin4);
-        Assert.assertNotNull(json4);
+        Assertions.assertNotNull(json4);
 
         MetadataKey deserialized1 = mapper.readValue(json1, MetadataKey.class);
-        Assert.assertNotNull(deserialized1);
-        Assert.assertEquals(origin1, deserialized1);
+        Assertions.assertNotNull(deserialized1);
+        Assertions.assertEquals(origin1, deserialized1);
 
         MetadataKey deserialized2 = mapper.readValue(json2, MetadataKey.class);
-        Assert.assertNotNull(deserialized2);
-        Assert.assertEquals(origin2, deserialized2);
+        Assertions.assertNotNull(deserialized2);
+        Assertions.assertEquals(origin2, deserialized2);
 
         MetadataKey deserialized3 = mapper.readValue(json3, MetadataKey.class);
-        Assert.assertNotNull(deserialized3);
-        Assert.assertEquals(origin3, deserialized3);
+        Assertions.assertNotNull(deserialized3);
+        Assertions.assertEquals(origin3, deserialized3);
 
         MetadataKey deserialized4 = mapper.readValue(json4, MetadataKey.class);
-        Assert.assertNotNull(deserialized4);
-        Assert.assertEquals(origin4, deserialized4);
+        Assertions.assertNotNull(deserialized4);
+        Assertions.assertEquals(origin4, deserialized4);
     }
 
 }

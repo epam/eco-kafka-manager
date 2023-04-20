@@ -34,8 +34,8 @@ import javax.cache.processor.EntryProcessor;
 import javax.cache.processor.EntryProcessorException;
 import javax.cache.processor.EntryProcessorResult;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
 /**
@@ -47,21 +47,21 @@ public class AbstractAsyncStatefullTaskExecutorTest {
     public void testSimlpeAsyncTaskIsExecuted() throws Exception {
         try (SynchronizedParrotTaskExecutor executor = new SynchronizedParrotTaskExecutor("Doubloons")) {
             Future<TaskResult<String>> future = executor.submitDetailed("");
-            Assert.assertNotNull(future);
+            Assertions.assertNotNull(future);
 
             executor.awaitStarted();
 
-            Assert.assertTrue(executor.isRunning(""));
+            Assertions.assertTrue(executor.isRunning(""));
 
             executor.signalCanContinue();
 
             TaskResult<String> result = future.get();
-            Assert.assertNotNull(result);
-            Assert.assertNotNull(result.getStartedAt());
-            Assert.assertNotNull(result.getFinishedAt());
-            Assert.assertNotNull(result.getElapsedFormattedAsHMS());
-            Assert.assertNull(result.getError());
-            Assert.assertEquals("Doubloons", result.getValue());
+            Assertions.assertNotNull(result);
+            Assertions.assertNotNull(result.getStartedAt());
+            Assertions.assertNotNull(result.getFinishedAt());
+            Assertions.assertNotNull(result.getElapsedFormattedAsHMS());
+            Assertions.assertNull(result.getError());
+            Assertions.assertEquals("Doubloons", result.getValue());
         }
     }
 
@@ -70,21 +70,21 @@ public class AbstractAsyncStatefullTaskExecutorTest {
         try (SynchronizedParrotTaskExecutor executor = new SynchronizedParrotTaskExecutor("Jolly Roger")) {
             Future<TaskResult<String>> future =
                     Executors.newSingleThreadExecutor().submit(() -> executor.executeDetailed(""));
-            Assert.assertNotNull(future);
+            Assertions.assertNotNull(future);
 
             executor.awaitStarted();
 
-            Assert.assertTrue(executor.isRunning(""));
+            Assertions.assertTrue(executor.isRunning(""));
 
             executor.signalCanContinue();
 
             TaskResult<String> result = future.get();
-            Assert.assertNotNull(result);
-            Assert.assertNotNull(result.getStartedAt());
-            Assert.assertNotNull(result.getFinishedAt());
-            Assert.assertNotNull(result.getElapsedFormattedAsHMS());
-            Assert.assertNull(result.getError());
-            Assert.assertEquals("Jolly Roger", result.getValue());
+            Assertions.assertNotNull(result);
+            Assertions.assertNotNull(result.getStartedAt());
+            Assertions.assertNotNull(result.getFinishedAt());
+            Assertions.assertNotNull(result.getElapsedFormattedAsHMS());
+            Assertions.assertNull(result.getError());
+            Assertions.assertEquals("Jolly Roger", result.getValue());
         }
     }
 
@@ -92,20 +92,20 @@ public class AbstractAsyncStatefullTaskExecutorTest {
     public void testPendingFutureIsResolvedForAsyncRun() throws Exception {
         try (SynchronizedParrotTaskExecutor executor = new SynchronizedParrotTaskExecutor("Old Salt")) {
             Future<TaskResult<String>> future1 = executor.submitDetailed("");
-            Assert.assertNotNull(future1);
+            Assertions.assertNotNull(future1);
 
             Future<TaskResult<String>> future2 = executor.submitDetailed("");
-            Assert.assertNotNull(future2);
-            Assert.assertEquals(future1, future2);
+            Assertions.assertNotNull(future2);
+            Assertions.assertEquals(future1, future2);
 
             executor.awaitStarted();
 
-            Assert.assertTrue(executor.isRunning(""));
+            Assertions.assertTrue(executor.isRunning(""));
 
             executor.signalCanContinue();
 
-            Assert.assertEquals("Old Salt", future1.get().getValue());
-            Assert.assertEquals("Old Salt", future2.get().getValue());
+            Assertions.assertEquals("Old Salt", future1.get().getValue());
+            Assertions.assertEquals("Old Salt", future2.get().getValue());
         }
     }
 
@@ -117,20 +117,20 @@ public class AbstractAsyncStatefullTaskExecutorTest {
 
             executor.awaitStarted();
 
-            Assert.assertTrue(executor.isRunning(""));
+            Assertions.assertTrue(executor.isRunning(""));
 
             Future<TaskResult<String>> future1 = executor.submitDetailed("");
-            Assert.assertNotNull(future1);
+            Assertions.assertNotNull(future1);
 
             Future<TaskResult<String>> future2 = executor.submitDetailed("");
-            Assert.assertNotNull(future2);
-            Assert.assertEquals(future1, future2);
+            Assertions.assertNotNull(future2);
+            Assertions.assertEquals(future1, future2);
 
             executor.signalCanContinue();
 
-            Assert.assertEquals("Seadog", future.get().getValue());
-            Assert.assertEquals("Seadog", future1.get().getValue());
-            Assert.assertEquals("Seadog", future2.get().getValue());
+            Assertions.assertEquals("Seadog", future.get().getValue());
+            Assertions.assertEquals("Seadog", future1.get().getValue());
+            Assertions.assertEquals("Seadog", future2.get().getValue());
         }
     }
 
@@ -138,7 +138,7 @@ public class AbstractAsyncStatefullTaskExecutorTest {
     public void testLastFreshResultIsResolvedPriorToRunningNewTask() throws Exception {
         try (SynchronizedParrotTaskExecutor executor = new SynchronizedParrotTaskExecutor("Bottle of Rum")) {
             Future<TaskResult<String>> future = executor.submitDetailed("");
-            Assert.assertNotNull(future);
+            Assertions.assertNotNull(future);
 
             executor.awaitStarted();
 
@@ -149,7 +149,7 @@ public class AbstractAsyncStatefullTaskExecutorTest {
             TaskResult<String> result1 = future.get();
             TaskResult<String> result2 = executor.getResultIfActualOrRefresh("");
 
-            Assert.assertEquals(result1, result2);
+            Assertions.assertEquals(result1, result2);
         }
     }
 

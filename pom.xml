@@ -4,12 +4,12 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>2.1.8.RELEASE</version>
+        <version>2.4.13</version>
     </parent>
 
     <groupId>com.epam.eco.kafkamanager</groupId>
     <artifactId>kafka-manager-parent</artifactId>
-    <version>2.0.3-SNAPSHOT</version>
+    <version>3.0.0-SNAPSHOT</version>
     
     <name>Eco Kafka Manager</name>
     <packaging>pom</packaging>
@@ -71,23 +71,29 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <java.version>11</java.version>
+        <java.version>17</java.version>
         
         <kafka.version>7.0.1-ccs</kafka.version>
+        <kafka-clients.version>7.0.1-ccs</kafka-clients.version>
+        <kafka_2.13.version>7.0.1-ccs</kafka_2.13.version>
         <cp.version>7.0.1</cp.version>
-        <eco-commons.version>0.1.5</eco-commons.version>
-        <eco-commons-kafka.version>2.0.7</eco-commons-kafka.version>
+        <eco-commons.version>1.0.0</eco-commons.version>
+        <eco-commons-kafka.version>3.0.0</eco-commons-kafka.version>
         <ehcache.version>3.5.2</ehcache.version>
         <curator.version>5.2.0</curator.version>
         <commons-collections4.version>4.1</commons-collections4.version>
         <commons-csv.version>1.5</commons-csv.version>
         <commons-math3.version>3.6.1</commons-math3.version>
         <commons-io.version>2.7</commons-io.version>
-        <avro.version>1.10.1</avro.version>
+        <avro.version>1.11.0</avro.version>
         <slf4j.version>1.7.25</slf4j.version>
         <openapi.version>1.6.9</openapi.version>
-        <jackson.version>2.13.2</jackson.version>
+        <jackson.version>2.13.4</jackson.version>
         <jackson-databind.version>2.13.4.2</jackson-databind.version>
+        <byte-buddy.version>1.12.19</byte-buddy.version>
+        <objenesis.version>2.6</objenesis.version>
+        <spring-boot-starter-validation>2.7.6</spring-boot-starter-validation>
+
         <protobuf.version>3.21.7</protobuf.version>
 
         <maven-release-plugin.version>2.5.3</maven-release-plugin.version>
@@ -101,6 +107,9 @@
         <spotbugs-maven-plugin.version>4.6.0.0</spotbugs-maven-plugin.version>
         <findsecbugs-plugin.version>1.11.0</findsecbugs-plugin.version>
         <fb-contrib.version>7.4.3.sb</fb-contrib.version>
+
+        <junit5.version>5.7.2</junit5.version>
+        <mockito.version>4.11.0</mockito.version>
     </properties>
 
     <modules>
@@ -115,9 +124,14 @@
     <dependencyManagement>
         <dependencies>
             <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-starter-validation</artifactId>
+                <version>${spring-boot-starter-validation}</version>
+            </dependency>
+            <dependency>
                 <groupId>org.apache.kafka</groupId>
                 <artifactId>kafka_2.13</artifactId>
-                <version>${kafka.version}</version>
+                <version>${kafka_2.13.version}</version>
                 <exclusions>
                     <exclusion>
                         <groupId>org.slf4j</groupId>
@@ -132,7 +146,7 @@
             <dependency>
                 <groupId>org.apache.kafka</groupId>
                 <artifactId>kafka-clients</artifactId>
-                <version>${kafka.version}</version>
+                <version>${kafka-clients.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.epam.eco</groupId>
@@ -232,6 +246,16 @@
                 <version>${jackson.version}</version>
             </dependency>
             <dependency>
+                <groupId>com.fasterxml.jackson.core</groupId>
+                <artifactId>jackson-core</artifactId>
+                <version>${jackson.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.fasterxml.jackson.core</groupId>
+                <artifactId>jackson-annotations</artifactId>
+                <version>${jackson.version}</version>
+            </dependency>
+            <dependency>
                 <groupId>com.google.protobuf</groupId>
                 <artifactId>protobuf-java</artifactId>
                 <version>${protobuf.version}</version>
@@ -251,7 +275,38 @@
                 <artifactId>kafka-protobuf-types</artifactId>
                 <version>${cp.version}</version>
             </dependency>
+
+
+            <dependency>
+                <groupId>org.junit.jupiter</groupId>
+                <artifactId>junit-jupiter-engine</artifactId>
+                <version>${junit5.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.mockito</groupId>
+                <artifactId>mockito-core</artifactId>
+                <version>${mockito.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.mockito</groupId>
+                <artifactId>mockito-junit-jupiter</artifactId>
+                <scope>test</scope>
+                <version>${mockito.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>net.bytebuddy</groupId>
+                <artifactId>byte-buddy</artifactId>
+                <version>${byte-buddy.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.objenesis</groupId>
+                <artifactId>objenesis</artifactId>
+                <version>${objenesis.version}</version>
+            </dependency>
         </dependencies>
+
     </dependencyManagement>
 
     <build>
