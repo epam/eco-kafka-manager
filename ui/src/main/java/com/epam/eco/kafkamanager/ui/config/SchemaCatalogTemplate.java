@@ -32,8 +32,8 @@ public class SchemaCatalogTemplate extends ExternalToolTemplate {
         return getUrlTemplateById().replace("{schemaId}", schemaId);
     }
 
-    public boolean showByIdButton() {
-        return nonNull(urlTemplateById) && urlTemplateById.length()>0;
+    public boolean showSchemaCatalogButton() {
+        return nonNull(urlTemplateById) && !urlTemplateById.isEmpty();
     }
 
     public String getUrlTemplateById() {

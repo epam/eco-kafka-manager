@@ -32,6 +32,8 @@
 
     /*]]>*/
 
+    var dataTable;
+
     $(function () {
 
 
@@ -43,7 +45,7 @@
                 { className: "vertical-line-class-selected", targets: [ 1, 3 ] } ] :
             [ { className: "vertical-line-class-selected", targets: [ 1, 3 ] } ];
 
-        var dataTable = $('#recordTable').DataTable({
+        dataTable = $('#recordTable').DataTable({
             paging: false,
             info: false,
             scrollX: true,
@@ -249,7 +251,6 @@
         }
 
         hideWaitingSign();
-        setTimeout(dataTable.columns.adjust().draw(), 1000);
 
         table.on( 'preDraw', function () { showWaitingSign("Rendering table..."); })
             .on( 'draw', function () {
@@ -750,7 +751,7 @@
                                                     <pre th:id="${'schema_content_'+recordId}" th:text="${record.RegistrySchema.schemaAsString}"></pre>
                                                 </div>
                                                 <div class="modal-footer">
-                                                    <a th:if="${schemaCatalogUrlTemplate.showByIdButton()}"
+                                                    <a th:if="${schemaCatalogUrlTemplate.showSchemaCatalogButton()}"
                                                        th:href="@{|${schemaCatalogUrlTemplate.resolveById(record.RegistrySchema.schemaId)}|}"
                                                        th:text="${schemaCatalogUrlTemplate.getName()}"
                                                        target="_blank"
