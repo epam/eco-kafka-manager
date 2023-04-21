@@ -47,6 +47,7 @@
 
         dataTable = $('#recordTable').DataTable({
             paging: false,
+            processing: true,
             info: false,
             scrollX: true,
             scrollY: "40vh",
@@ -61,20 +62,13 @@
             ],
             fixedHeader: true,
             language: {
-                searchPlaceholder: "Enter this page search expression"
+                searchPlaceholder: "Enter this page search expression",
+                processing: "<span class='fa-stack fa-lg'>\n\
+                                     <i class='fa fa-spinner fa-spin fa-stack-2x fa-fw'></i>\n\
+                                 </span>&emsp;Processing ..."
+
             }
         });
-        dataTable
-            .on( 'preDraw', function () { showWaitingSign("Rendering table..."); })
-            .on( 'draw', function () {
-                $('.table').css({"width":"100%"});
-                setTimeout(dataTable.columns.adjust().draw(), 1000);
-                hideWaitingSign(); })
-            .on('init.dt', function () {
-            $("#recordTableContainer").addClass("d-flex");
-            dataTable.columns.adjust();
-        });
-
 
         $('#all-partition-checkbox').click(function (e) {
             $('.partition-checkbox').each(function (idx, elem) {
@@ -225,6 +219,7 @@
                 $('#full-screen-button').text("Exit full screen");
                 $('#previous-offsets-link-in-grid').css("display",  "block");
                 $('#next-offsets-link-in-grid').css("display", "block");
+                dataTable.columns.adjust();
                 $('#full-screen').val(true);
             } else {
                 $('#recordTableContainer').removeClass("full-screen");
@@ -232,6 +227,7 @@
                 $('#full-screen-button').text("Full screen");
                 $('#previous-offsets-link-in-grid').css("display",  "none");
                 $('#next-offsets-link-in-grid').css("display", "none");
+                dataTable.columns.adjust();
                 $('#full-screen').val(false);
             }
         }
