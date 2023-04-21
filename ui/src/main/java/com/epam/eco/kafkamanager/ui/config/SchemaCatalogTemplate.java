@@ -15,6 +15,8 @@
  *******************************************************************************/
 package com.epam.eco.kafkamanager.ui.config;
 
+import static java.util.Objects.nonNull;
+
 /**
  * @author Mikhail_Vershkov
  */
@@ -28,6 +30,10 @@ public class SchemaCatalogTemplate extends ExternalToolTemplate {
     }
     public String resolveById(String schemaId) {
         return getUrlTemplateById().replace("{schemaId}", schemaId);
+    }
+
+    public boolean showSchemaCatalogButton() {
+        return nonNull(urlTemplateById) && !urlTemplateById.isEmpty();
     }
 
     public String getUrlTemplateById() {
