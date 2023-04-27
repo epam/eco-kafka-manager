@@ -21,15 +21,15 @@
 
     <script type="text/javascript" th:inline="javascript">
         /*<![CDATA[*/
-        var pageCurrent = [[${(page != null)?(page.number + 1):(0)}]];
-        var totalPagesCurrent = [[${(page != null)?(page.totalPages):(0)}]];
+        let pageCurrent = [[${(page != null)?(page.number + 1):(0)}]];
+        let totalPagesCurrent = [[${(page != null)?(page.totalPages):(0)}]];
         /*]]>*/
 
-        var dataTable;
+        let dataTable;
 
         $(function() {
-            $('#search_form').submit(function(e) {
-                e.preventDefault();
+            $('#search_form').submit(function(event) {
+                event.preventDefault();
                 showWaitingSign("Fetch data...");
                 location.params(
                         {
@@ -62,19 +62,22 @@
                     location.params({page: pageClicked}, {}, {});
                 }
             });
-            var sortingOrderTopicName = [0, 'asc'];
+            const sortingOrderTopicName = [0, 'asc'];
             dataTable = $('#topics-table').DataTable({
                 paging: false,
                 info: false,
                 scrollY: "40vh",
                 scrollCollapse: true,
                 order: [sortingOrderTopicName],
+                initComplete: function(settings, json) {
+                    setTimeout( api => api.columns.adjust(), 1000, this.api());
+                },
                 language: {
                     searchPlaceholder: "Enter this page search expression"
                 }
             });
 
-            var toggleFullScreen = ( mode ) => {
+            let toggleFullScreen = ( mode ) => {
                 if(mode==='maximize') {
                     $('#recordTableContainer').addClass("full-screen");
                     $('.dataTables_scrollBody').css("min-height","80vh");
@@ -91,11 +94,6 @@
                     $('#fullScreen').val(false);
                 }
             }
-
-            $("#topics-table").on('init.dt', function () {
-                $("#recordTableContainer").addClass("d-flex");
-                dataTable.columns.adjust();
-            });
 
             $('#full-screen-button').click(function (e) {
                 if($('#recordTableContainer')[0].classList.contains("full-screen")) {

@@ -16,11 +16,11 @@
 
 $(document).ready(function() {
 
-    isLocalStorageSuportsChevron = function () {
+    let isLocalStorageSuportsChevron = function () {
         return (typeof(Storage) !== "undefined");
     }
 
-    getDestanationStateChevron = function (iconItem) {
+    let getDestanationStateChevron = function (iconItem) {
         if (iconItem.classList.contains('fa-chevron-right')) {
             return "opened-state";
         } else {
@@ -28,8 +28,8 @@ $(document).ready(function() {
         }
     };
 
-    changeCollapseButtonStateChevron = function (button, destinationState) {
-        let iconItem = button.children[0];
+    let changeCollapseButtonStateChevron = function (button, destinationState) {
+        const iconItem = button.children[0];
         if (destinationState === 'opened-state') {
             iconItem.classList.replace('fa-chevron-right', 'fa-chevron-down');
         } else {
@@ -42,17 +42,17 @@ $(document).ready(function() {
 
     document.querySelectorAll(".collapse-button-chevron").forEach(item => item.addEventListener('click',
         function (event) {
-            let button = event.currentTarget;
-            let destinationState = getDestanationStateChevron(button.children[0]);
+            const button = event.currentTarget;
+            const destinationState = getDestanationStateChevron(button.children[0]);
             changeCollapseButtonStateChevron(button, destinationState);
         }));
 
     document.querySelectorAll(".collapse-button-chevron").forEach(button => {
         if(isLocalStorageSuportsChevron()) {
-            var storedState = localStorage.getItem(button.id);
+            const storedState = localStorage.getItem(button.id);
             if (storedState !== null) {
                 changeCollapseButtonStateChevron(button, storedState);
-                let panel = document.querySelector(button.getAttribute("href"));
+                const panel = document.querySelector(button.getAttribute("href"));
                 if (storedState === 'opened-state') {
                     panel.classList.remove("show");
                     panel.classList.add("show");

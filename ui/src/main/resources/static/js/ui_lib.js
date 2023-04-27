@@ -15,9 +15,9 @@
  */
 
 location.params = function(params_set, params_append, params_subtract) {
-    var obj = {}, i, parts, len, key, value;
+    let obj = {}, i, parts, len, key, value;
 
-    var _params = location.search.substr(1).split('&');
+    const _params = location.search.substr(1).split('&');
 
     for (i = 0, len = _params.length; i < len; i++) {
         parts = _params[i].split('=');
@@ -56,7 +56,7 @@ location.params = function(params_set, params_append, params_subtract) {
     	key = encodeURIComponent(key);
         if (obj[key] != null && obj[key].indexOf(value) >= 0) {
     		obj[key].splice(obj[key].indexOf(value), 1);
-            if (obj[key].length == 0) {
+            if (obj[key].length === 0) {
             	delete obj[key];
             }
         }
@@ -80,30 +80,34 @@ function hidePopoverIfClickedOutside(e) {
     });
 }
 
-var infoModal;
-var dataModal;
+let infoModal;
+let dataModal;
 
 $(document).ready(function() {
-    infoModal = new bootstrap.Modal(document.getElementById("infoModal"));
-    dataModal = new bootstrap.Modal(document.getElementById("dataModal"));
+    if(document.getElementById("infoModal")!==null) {
+        infoModal = new bootstrap.Modal(document.getElementById("infoModal"));
+    }
+    if(document.getElementById("dataModal")!==null) {
+        dataModal = new bootstrap.Modal(document.getElementById("dataModal"));
+    }
 })
 
 function showInfo(type,infoHeader,infoText) {
 
-    var headerClass = "info-modal-header-info";
-    var textClass = "info-modal-text-info";
-    var buttonClass = "btn-success";
+    let headerClass = "info-modal-header-info";
+    let textClass = "info-modal-text-info";
+    let buttonClass = "btn-success";
 
     if(type==="error") {
         headerClass = "info-modal-header-danger";
         textClass = "info-modal-text-danger";
         buttonClass = "btn-danger";
     }
-    var header = document.getElementById('infoModalHeader');
+    const header = document.getElementById('infoModalHeader');
     header.textContent = infoHeader;
     header.classList.add(headerClass);
 
-    var text = document.getElementById('infoModalText');
+    const text = document.getElementById('infoModalText');
     text.textContent = infoText;
     text.classList.add(textClass)
 
@@ -114,10 +118,10 @@ function showInfo(type,infoHeader,infoText) {
 
 function showData(dialogHeader,dialogText) {
 
-    var headerClass = "data-modal-header";
-    var textClass = "data-modal-text";
+    const headerClass = "data-modal-header";
+    const textClass = "data-modal-text";
 
-    var header = document.getElementById('dataModalHeader');
+    const header = document.getElementById('dataModalHeader');
     header.textContent = dialogHeader;
     header.classList.add(headerClass);
 

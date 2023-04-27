@@ -21,8 +21,8 @@
 
     <script type="text/javascript" th:inline="javascript">
         /*<![CDATA[*/
-        var pageCurrent = [[${(page != null)?(page.number + 1):(0)}]];
-        var totalPagesCurrent = [[${(page != null)?(page.totalPages):(0)}]];
+        const pageCurrent = [[${(page != null)?(page.number + 1):(0)}]];
+        const totalPagesCurrent = [[${(page != null)?(page.totalPages):(0)}]];
         /*]]>*/
         $(function() {
             $('#search_form').submit(function(e) {

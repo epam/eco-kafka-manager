@@ -24,7 +24,7 @@
 <script type="text/javascript" th:inline="javascript">
 
     $(function() {
-        var dataTable = $('#consumerGroupTable').DataTable({
+        $('#consumerGroupTable').DataTable({
             paging: false,
             searching: true,
             language: {
@@ -33,21 +33,22 @@
         });
 
 
-        $('.delete-udm-link').click(function(e) {
-            e.preventDefault();
-            var action = $(this).data("action");
-            $('#delete-udm-form').prop('action', action);
-            $('#delete-udm-form').submit();
+        $('.delete-udm-link').click(function(event) {
+            event.preventDefault();
+            const action = $(this).data("action");
+            const deleteFormElement = $('#delete-udm-form');
+            deleteFormElement.prop('action', action);
+            deleteFormElement.submit();
         });
 
         $('[data-bs-toggle="popover"]').popover();
 
-        $(document).on('click', function (e) {
-            hidePopoverIfClickedOutside(e);
+        $(document).on('click', function (event) {
+            hidePopoverIfClickedOutside(event);
         });
 
-        $('#count_records').click(function(e) {
-            e.preventDefault();
+        $('#count_records').click(function(event) {
+            event.preventDefault();
 
             $('#count_records').addClass('disabled');
             fetch(/*[[@{/topics/{name}/count_records(name=${topic.name})}]]*/,{credentials: 'include'})
