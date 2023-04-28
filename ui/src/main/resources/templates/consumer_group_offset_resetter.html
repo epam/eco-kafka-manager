@@ -24,8 +24,8 @@
         $(function() {
             
             $('.partition-checkbox').change(function () {
-                var partitionElemId = $(this).data("partition-elem-id");
-                var enabled = $(this).is(":checked");
+                const partitionElemId = $(this).data("partition-elem-id");
+                const enabled = $(this).is(":checked");
                 $("#pe_" + partitionElemId).val(enabled ? "1" : "0");
                 $("#p_" + partitionElemId).prop("disabled", !enabled);
             });
@@ -49,8 +49,8 @@
             $('#smallest-partitions-link').click(function(e) {
                 e.preventDefault();
                 $('.partition-checkbox').each(function(idx, elem) {
-                    var partitionElemId = $(this).data("partition-elem-id");
-                    var offset = $(this).data("offset-smallest");
+                    const partitionElemId = $(this).data("partition-elem-id");
+                    const offset = $(this).data("offset-smallest");
                     $("#p_" + partitionElemId).val(offset);
                 });
             });
@@ -58,8 +58,8 @@
             $('#largest-partitions-link').click(function(e) {
                 e.preventDefault();
                 $('.partition-checkbox').each(function(idx, elem) {
-                    var partitionElemId = $(this).data("partition-elem-id");
-                    var offset = $(this).data("offset-largest");
+                    const partitionElemId = $(this).data("partition-elem-id");
+                    const offset = $(this).data("offset-largest");
                     $("#p_" + partitionElemId).val(offset);
                 });
             });

@@ -29,7 +29,7 @@ $(document).ready(function() {
     };
 
     changeCollapseButtonState = function (button, destinationState) {
-        let iconItem = button.children[0];
+        const iconItem = button.children[0];
         if (destinationState === 'opened-state') {
             iconItem.classList.replace('fa-caret-down', 'fa-caret-up');
         } else {
@@ -43,7 +43,7 @@ $(document).ready(function() {
     document.querySelectorAll(".collapsed-header").forEach(item =>
         item.addEventListener('click',
             function (event) {
-                let button = event.currentTarget.querySelector(".collapse-button");
+                const button = event.currentTarget.querySelector(".collapse-button");
                 if(button) {
                     button.click();
                 }
@@ -53,18 +53,18 @@ $(document).ready(function() {
     document.querySelectorAll(".collapse-button")
         .forEach(item => item.addEventListener('click',
             function (event) {
-                let button = event.currentTarget;
-                let destinationState = getDestanationState(button.children[0]);
+                const button = event.currentTarget;
+                const destinationState = getDestanationState(button.children[0]);
                 changeCollapseButtonState(button, destinationState);
             })
         );
 
     document.querySelectorAll(".collapse-button").forEach(button => {
         if(isLocalStorageSuports()) {
-            var storedState = localStorage.getItem(button.id);
+            const storedState = localStorage.getItem(button.id);
             if (storedState !== null) {
                 changeCollapseButtonState(button, storedState);
-                let panel = document.querySelector(button.getAttribute("href"));
+                const panel = document.querySelector(button.getAttribute("href"));
                 if (storedState === 'opened-state') {
                     panel.classList.remove("show");
                     panel.classList.add("show");
