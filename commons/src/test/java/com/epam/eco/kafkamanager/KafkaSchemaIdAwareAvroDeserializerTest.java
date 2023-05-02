@@ -2,8 +2,8 @@ package com.epam.eco.kafkamanager;
 
 import java.util.Arrays;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
 /**
@@ -19,21 +19,27 @@ public class KafkaSchemaIdAwareAvroDeserializerTest {
     private final KafkaSchemaIdAwareAvroDeserializer kafkaSchemaIdAwareAvroDeserializer =
             Mockito.spy(KafkaSchemaIdAwareAvroDeserializer.class);
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void illegalLengthTest() {
-        kafkaSchemaIdAwareAvroDeserializer.getSchemaId(BYTES_SHORT);
+        Assertions.assertThrows(IllegalArgumentException.class, () ->
+                kafkaSchemaIdAwareAvroDeserializer.getSchemaId(BYTES_SHORT)
+        );
+
+
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void extractSchemaIdWithNoAvroSchemaTest() {
         Arrays.fill(BYTES_NORMAL, BYTE_FILL);
-        kafkaSchemaIdAwareAvroDeserializer.getSchemaId(BYTES_NORMAL);
+        Assertions.assertThrows(IllegalArgumentException.class, () ->
+                kafkaSchemaIdAwareAvroDeserializer.getSchemaId(BYTES_NORMAL)
+        );
     }
     @Test
     public void extractSchemaIdWithTest() {
         Arrays.fill(BYTES_NORMAL, BYTE_FILL);
         Arrays.fill(BYTES_NORMAL,0,3, BYTE_ZERO);
         long schemaId = kafkaSchemaIdAwareAvroDeserializer.getSchemaId(BYTES_NORMAL);
-        Assert.assertEquals(schemaId,257L);
+        Assertions.assertEquals(schemaId, 257L);
     }
 }
