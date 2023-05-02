@@ -18,36 +18,36 @@ function showHideColumnSelectorDependingOnFormatSelected(fetchedValueFormat) {
     if (fetchedValueFormat == null) {
         return;
     }
-    if (fetchedValueFormat == $('#valueFormat').val()) {
+    if (fetchedValueFormat === $('#valueFormat').val()) {
         $('#column-selector-panel').show();
     } else {
         $('#column-selector-panel').hide();
     }
-};
+}
 
 function removeColumnSelectorIfFormatNotEqualToFecthedOne(fetchedValueFormat) {
-    if (fetchedValueFormat != null && fetchedValueFormat != $('#valueFormat').val()) {
+    if (fetchedValueFormat != null && fetchedValueFormat !== $('#valueFormat').val()) {
         $('#column-selector-panel').remove();
     }
-};
+}
 
 function storeOrApplySelectedColumns() {
-    var key = $('#topicName').val() + '_' + $('#valueFormat').val();
-    var columnCheckboxSelector = $('.column-checkbox');
+    const key = $('#topicName').val() + '_' + $('#valueFormat').val();
+    const columnCheckboxSelector = $('.column-checkbox');
     if (columnCheckboxSelector.length > 0) {
-        var columns = Array();
+        let columns = Array();
         columnCheckboxSelector.each(function(idx, elem) {
-            var enabled = $(elem).is(':checked');
-            var column = $(elem).data('column');
+            const enabled = $(elem).is(':checked');
+            const column = $(elem).data('column');
             if (enabled && column) {
                 columns.push(column);
             }
         });
         localStorage.setItem(key, JSON.stringify(columns));
     } else {
-        var columnsJson = localStorage.getItem(key);
+        const columnsJson = localStorage.getItem(key);
         if (columnsJson && columnsJson.length > 0) {
-            var columns = JSON.parse(columnsJson);
+            const columns = JSON.parse(columnsJson);
             $('#fetch-form').append($.map(columns, function (column) {
                 return $('<input/>', {
                     type: 'hidden',
@@ -59,10 +59,10 @@ function storeOrApplySelectedColumns() {
     }
 }
 
-function setBeginOffsetsToMin(event) {
+function setBeginOffsetsToMin() {
     $('.partition-checkbox').each(function (idx, elem) {
         if ($(elem).is(':checked')) {
-            var partition = $(elem).data('partition');
+            const partition = $(elem).data('partition');
             $('#p_min_' + partition).val($('#p_min_range_' + partition).val());
         }
     });
@@ -70,23 +70,23 @@ function setBeginOffsetsToMin(event) {
     $('#previous-offsets-link').css("display", "none");
 
 }
-function setEndOffsetsToMax(event) {
-    let checkBoxList = $('.partition-checkbox');
-    let limit = parseInt($('#limit').val());
+function setEndOffsetsToMax() {
+    const checkBoxList = $('.partition-checkbox');
+    const limit = parseInt($('#limit').val());
     let partitionsCount = 0;
     checkBoxList.each(function (idx, elem) {
         if ($(elem).is(':checked')) {
             partitionsCount++;
         }
     });
-    let counts = divideLimitOnPartitions(partitionsCount,limit);
+    const counts = divideLimitOnPartitions(partitionsCount,limit);
     let index = 0;
     checkBoxList.each(function (idx, elem) {
         if ($(elem).is(':checked')) {
-            let partition = $(elem).data('partition');
-            let maxRangeValue = parseInt($('#p_max_range_' + partition).val());
-            let minRangeValue = parseInt($('#p_min_range_' + partition).val());
-            let minOffset = maxRangeValue - counts[index] + 1;
+            const partition = $(elem).data('partition');
+            const maxRangeValue = parseInt($('#p_max_range_' + partition).val());
+            const minRangeValue = parseInt($('#p_min_range_' + partition).val());
+            const minOffset = maxRangeValue - counts[index] + 1;
             $('#p_max_' + partition).val(maxRangeValue);
             $('#p_min_' + partition).val(minOffset < minRangeValue ? minRangeValue : minOffset);
             index++;
@@ -97,8 +97,8 @@ function setEndOffsetsToMax(event) {
 }
 
 function divideLimitOnPartitions(partitionCount,limit) {
-    let result = [partitionCount];
-    let firstChunk = parseInt(limit/partitionCount);
+    const result = [partitionCount];
+    const firstChunk = parseInt(limit/partitionCount);
     for(let ii=0;ii<partitionCount;ii++) {
         result[ii]=firstChunk;
     }

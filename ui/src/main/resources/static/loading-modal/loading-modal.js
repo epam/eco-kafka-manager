@@ -14,7 +14,7 @@
  * the License.
  */
 
-var loadingModal;
+let loadingModal;
 
 $(document).ready(function() {
     if(document.getElementById("loadingModal")!==null) {
@@ -22,13 +22,13 @@ $(document).ready(function() {
     }
 })
 
-var showWaitingSign = (text) => {
+let showWaitingSign = (text) => {
     if(loadingModal) {
         document.getElementById("loadingModalText").innerHTML = text;
         loadingModal.show();
     }
 }
-var hideWaitingSign = () => {
+let hideWaitingSign = () => {
     if(loadingModal) {
         loadingModal.hide();
     }
