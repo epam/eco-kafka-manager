@@ -413,7 +413,7 @@
                                 <goal>jar</goal>
                             </goals>
                             <configuration>
-                                <source>11</source>
+                                <failOnError>false</failOnError>
                             </configuration>
                         </execution>
                     </executions>
