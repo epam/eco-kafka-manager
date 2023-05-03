@@ -15,8 +15,6 @@
  *******************************************************************************/
 package com.epam.eco.kafkamanager.ui.config;
 
-import javax.validation.Valid;
-
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -67,7 +65,7 @@ public class KafkaManagerUiConfiguration implements WebMvcConfigurer {
 
     @Bean(initMethod = "init")
     @ConditionalOnProperty(name="eco.kafkamanager.ui.topicBrowser.useCache", havingValue="true")
-    public TopicOffsetCacheCleanerRunner topicOffsetCacheCleanerRunner(@Valid KafkaManagerUiProperties properties) {
+    public TopicOffsetCacheCleanerRunner topicOffsetCacheCleanerRunner(KafkaManagerUiProperties properties) {
         return new TopicOffsetCacheCleanerRunner(properties.getTopicBrowser().getCacheCleanerIntervalMin());
     }
 
