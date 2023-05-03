@@ -18,8 +18,8 @@ package com.epam.eco.kafkamanager;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -40,13 +40,13 @@ public class ConsumerGroupDeleteTopicParamsTest {
         ObjectMapper mapper = TestObjectMapperSingleton.getObjectMapper();
 
         String json = mapper.writeValueAsString(origin);
-        Assert.assertNotNull(json);
+        Assertions.assertNotNull(json);
 
         ConsumerGroupDeleteTopicParams deserialized = mapper.readValue(
                 json,
                 ConsumerGroupDeleteTopicParams.class);
-        Assert.assertNotNull(deserialized);
-        Assert.assertEquals(origin, deserialized);
+        Assertions.assertNotNull(deserialized);
+        Assertions.assertEquals(origin, deserialized);
     }
 
     @Test
@@ -56,9 +56,9 @@ public class ConsumerGroupDeleteTopicParamsTest {
         json.put("topicName", "topic1");
 
         ConsumerGroupDeleteTopicParams params = ConsumerGroupDeleteTopicParams.fromJson(json);
-        Assert.assertNotNull(params);
-        Assert.assertEquals("group1", params.getGroupName());
-        Assert.assertEquals("topic1", params.getTopicName());
+        Assertions.assertNotNull(params);
+        Assertions.assertEquals("group1", params.getGroupName());
+        Assertions.assertEquals("topic1", params.getTopicName());
     }
 
     @Test
@@ -70,9 +70,9 @@ public class ConsumerGroupDeleteTopicParamsTest {
                 "}";
 
         ConsumerGroupDeleteTopicParams params = ConsumerGroupDeleteTopicParams.fromJson(json);
-        Assert.assertNotNull(params);
-        Assert.assertEquals("group1", params.getGroupName());
-        Assert.assertEquals("topic1", params.getTopicName());
+        Assertions.assertNotNull(params);
+        Assertions.assertEquals("group1", params.getGroupName());
+        Assertions.assertEquals("topic1", params.getTopicName());
     }
 
 }

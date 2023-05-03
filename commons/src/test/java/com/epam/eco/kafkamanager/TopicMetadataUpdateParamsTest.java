@@ -18,8 +18,8 @@ package com.epam.eco.kafkamanager;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -43,13 +43,13 @@ public class TopicMetadataUpdateParamsTest {
         ObjectMapper mapper = TestObjectMapperSingleton.getObjectMapper();
 
         String json = mapper.writeValueAsString(origin);
-        Assert.assertNotNull(json);
+        Assertions.assertNotNull(json);
 
         TopicMetadataUpdateParams deserialized = mapper.readValue(
                 json,
                 TopicMetadataUpdateParams.class);
-        Assert.assertNotNull(deserialized);
-        Assert.assertEquals(origin, deserialized);
+        Assertions.assertNotNull(deserialized);
+        Assertions.assertEquals(origin, deserialized);
     }
 
     @Test
@@ -64,10 +64,10 @@ public class TopicMetadataUpdateParamsTest {
         json.put("description", "description");
 
         TopicMetadataUpdateParams params = TopicMetadataUpdateParams.fromJson(json);
-        Assert.assertNotNull(params);
-        Assert.assertEquals("topic1", params.getTopicName());
-        Assert.assertEquals(attributes, params.getAttributes());
-        Assert.assertEquals("description", params.getDescription());
+        Assertions.assertNotNull(params);
+        Assertions.assertEquals("topic1", params.getTopicName());
+        Assertions.assertEquals(attributes, params.getAttributes());
+        Assertions.assertEquals("description", params.getDescription());
     }
 
     @Test
@@ -80,14 +80,14 @@ public class TopicMetadataUpdateParamsTest {
                 "}";
 
         TopicMetadataUpdateParams params = TopicMetadataUpdateParams.fromJson(json);
-        Assert.assertNotNull(params);
-        Assert.assertEquals("topic1", params.getTopicName());
+        Assertions.assertNotNull(params);
+        Assertions.assertEquals("topic1", params.getTopicName());
         Map<String, Object> attributes = new HashMap<>();
         attributes.put("attr1", "value1");
         attributes.put("attr2", "value2");
         attributes.put("attr3", "value3");
-        Assert.assertEquals(attributes, params.getAttributes());
-        Assert.assertEquals("description", params.getDescription());
+        Assertions.assertEquals(attributes, params.getAttributes());
+        Assertions.assertEquals("description", params.getDescription());
     }
 
 }

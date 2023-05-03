@@ -25,8 +25,8 @@ import org.apache.avro.generic.GenericRecord;
 import org.apache.kafka.clients.admin.Config;
 import org.apache.kafka.clients.admin.ConfigEntry;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import com.google.common.collect.ImmutableList;
 
@@ -49,7 +49,7 @@ public class AvroRecordValueTabulatorTest {
         AvroRecordValueTabulator tabulator = new AvroRecordValueTabulator(new Config(Collections.emptyList()));
 
         Map<String, Object> tabular = tabulator.toTabularValue(createConsumerRecord(null));
-        Assert.assertNull(tabular);
+        Assertions.assertNull(tabular);
     }
 
     @Test
@@ -59,10 +59,10 @@ public class AvroRecordValueTabulatorTest {
         Object[] values = new Object[] {"stringvalue", new Object(), 1L, 1, 1f, 1d, false};
         for (Object value : values) {
             Map<String, Object> tabular = tabulator.toTabularValue(createConsumerRecord(value));
-            Assert.assertNotNull(tabular);
-            Assert.assertEquals(1, tabular.size());
-            Assert.assertTrue(tabular.containsKey(value.getClass().getSimpleName()));
-            Assert.assertEquals(value, tabular.get(value.getClass().getSimpleName()));
+            Assertions.assertNotNull(tabular);
+            Assertions.assertEquals(1, tabular.size());
+            Assertions.assertTrue(tabular.containsKey(value.getClass().getSimpleName()));
+            Assertions.assertEquals(value, tabular.get(value.getClass().getSimpleName()));
         }
     }
 
@@ -84,15 +84,15 @@ public class AvroRecordValueTabulatorTest {
         record.put("e", subRecord);
 
         Map<String, Object> tabular = tabulator.toTabularValue(createConsumerRecord(record));
-        Assert.assertNotNull(tabular);
-        Assert.assertEquals(7, tabular.size());
-        Assert.assertEquals("a", tabular.get("a"));
-        Assert.assertEquals("b", tabular.get("b"));
-        Assert.assertEquals("c", tabular.get("c"));
-        Assert.assertEquals(Arrays.asList("1","2","3"), tabular.get("d"));
-        Assert.assertEquals("f", tabular.get("e.f"));
-        Assert.assertEquals("g", tabular.get("e.g"));
-        Assert.assertEquals("h", tabular.get("e.h"));
+        Assertions.assertNotNull(tabular);
+        Assertions.assertEquals(7, tabular.size());
+        Assertions.assertEquals("a", tabular.get("a"));
+        Assertions.assertEquals("b", tabular.get("b"));
+        Assertions.assertEquals("c", tabular.get("c"));
+        Assertions.assertEquals(Arrays.asList("1","2","3"), tabular.get("d"));
+        Assertions.assertEquals("f", tabular.get("e.f"));
+        Assertions.assertEquals("g", tabular.get("e.g"));
+        Assertions.assertEquals("h", tabular.get("e.h"));
     }
 
     @Test
@@ -103,8 +103,8 @@ public class AvroRecordValueTabulatorTest {
         AvroRecordValueTabulator tabulator = new AvroRecordValueTabulator(config);
         GenericRecord record = createEmptyTestRecord();
         RecordSchema schema = tabulator.getSchema(createConsumerRecord(record));
-        Assert.assertEquals(schema.getSchemaKey(), "topic-key");
-        Assert.assertEquals(schema.getSchemaValue(), "topic-value");
+        Assertions.assertEquals(schema.getSchemaKey(), "topic-key");
+        Assertions.assertEquals(schema.getSchemaValue(), "topic-value");
     }
 
     @Test
@@ -115,8 +115,8 @@ public class AvroRecordValueTabulatorTest {
         AvroRecordValueTabulator tabulator = new AvroRecordValueTabulator(config);
         GenericRecord record = createEmptyTestRecord();
         RecordSchema schema = tabulator.getSchema(createConsumerRecord(record));
-        Assert.assertEquals(schema.getSchemaKey(), "TestRecord");
-        Assert.assertEquals(schema.getSchemaValue(), "TestRecord");
+        Assertions.assertEquals(schema.getSchemaKey(), "TestRecord");
+        Assertions.assertEquals(schema.getSchemaValue(), "TestRecord");
     }
 
     @Test
@@ -127,8 +127,8 @@ public class AvroRecordValueTabulatorTest {
         AvroRecordValueTabulator tabulator = new AvroRecordValueTabulator(config);
         GenericRecord record = createEmptyTestRecord();
         RecordSchema schema = tabulator.getSchema(createConsumerRecord(record));
-        Assert.assertEquals(schema.getSchemaKey(), "topic-TestRecord");
-        Assert.assertEquals(schema.getSchemaValue(), "topic-TestRecord");
+        Assertions.assertEquals(schema.getSchemaKey(), "topic-TestRecord");
+        Assertions.assertEquals(schema.getSchemaValue(), "topic-TestRecord");
     }
 
 

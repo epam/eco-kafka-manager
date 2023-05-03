@@ -21,8 +21,8 @@ import java.util.Map;
 import org.apache.kafka.clients.admin.Config;
 import org.apache.kafka.clients.admin.ConfigEntry;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import com.google.common.collect.ImmutableList;
 import com.google.protobuf.Descriptors;
@@ -52,7 +52,7 @@ public class ProtobufRecordValueTabulatorTest {
     public void testNullIsTabulated() {
         ProtobufRecordValueTabulator tabulator = new ProtobufRecordValueTabulator(new Config(Collections.emptyList()));
         Map<String, Object> tabular = tabulator.toTabularValue(createConsumerRecord(null));
-        Assert.assertNull(tabular);
+        Assertions.assertNull(tabular);
     }
 
     @Test
@@ -62,12 +62,12 @@ public class ProtobufRecordValueTabulatorTest {
         DynamicMessage dynamicMessage = createDynamicMessage();
 
         Map<String, Object> tabular = tabulator.toTabularValue(createConsumerRecord(dynamicMessage));
-        Assert.assertNotNull(tabular);
-        Assert.assertEquals(4, tabular.size());
-        Assert.assertEquals(OPERATION_ID, tabular.get("operationId"));
-        Assert.assertEquals(DOC_ID, tabular.get("docId"));
-        Assert.assertEquals(METADATA_BT, tabular.get("metadataBt"));
-        Assert.assertEquals(METADATA_TT, tabular.get("metadataTt"));
+        Assertions.assertNotNull(tabular);
+        Assertions.assertEquals(4, tabular.size());
+        Assertions.assertEquals(OPERATION_ID, tabular.get("operationId"));
+        Assertions.assertEquals(DOC_ID, tabular.get("docId"));
+        Assertions.assertEquals(METADATA_BT, tabular.get("metadataBt"));
+        Assertions.assertEquals(METADATA_TT, tabular.get("metadataTt"));
     }
 
     @Test
@@ -78,8 +78,8 @@ public class ProtobufRecordValueTabulatorTest {
         ProtobufRecordValueTabulator tabulator = new ProtobufRecordValueTabulator(config);
         DynamicMessage dynamicMessage = createDynamicMessage();
         RecordSchema schema = tabulator.getSchema(createConsumerRecord(dynamicMessage));
-        Assert.assertEquals(schema.getSchemaKey(), "testTopic-key");
-        Assert.assertEquals(schema.getSchemaValue(), "testTopic-value");
+        Assertions.assertEquals(schema.getSchemaKey(), "testTopic-key");
+        Assertions.assertEquals(schema.getSchemaValue(), "testTopic-value");
     }
 
     @Test
@@ -90,8 +90,8 @@ public class ProtobufRecordValueTabulatorTest {
         ProtobufRecordValueTabulator tabulator = new ProtobufRecordValueTabulator(config);
         DynamicMessage dynamicMessage = createDynamicMessage();
         RecordSchema schema = tabulator.getSchema(createConsumerRecord(dynamicMessage));
-        Assert.assertEquals(schema.getSchemaKey(), "kafkaManager.test.ProtobufRecord");
-        Assert.assertEquals(schema.getSchemaValue(), "kafkaManager.test.ProtobufRecord");
+        Assertions.assertEquals(schema.getSchemaKey(), "kafkaManager.test.ProtobufRecord");
+        Assertions.assertEquals(schema.getSchemaValue(), "kafkaManager.test.ProtobufRecord");
     }
 
     @Test
@@ -102,8 +102,8 @@ public class ProtobufRecordValueTabulatorTest {
         ProtobufRecordValueTabulator tabulator = new ProtobufRecordValueTabulator(config);
         DynamicMessage dynamicMessage = createDynamicMessage();
         RecordSchema schema = tabulator.getSchema(createConsumerRecord(dynamicMessage));
-        Assert.assertEquals(schema.getSchemaKey(), "testTopic-kafkaManager.test.ProtobufRecord");
-        Assert.assertEquals(schema.getSchemaValue(), "testTopic-kafkaManager.test.ProtobufRecord");
+        Assertions.assertEquals(schema.getSchemaKey(), "testTopic-kafkaManager.test.ProtobufRecord");
+        Assertions.assertEquals(schema.getSchemaValue(), "testTopic-kafkaManager.test.ProtobufRecord");
     }
 
     private DynamicMessage createDynamicMessage() {

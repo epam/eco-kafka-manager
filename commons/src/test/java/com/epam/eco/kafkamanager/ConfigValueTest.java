@@ -15,8 +15,8 @@
  *******************************************************************************/
 package com.epam.eco.kafkamanager;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Assertions;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -34,24 +34,24 @@ public class ConfigValueTest {
         ConfigValue origin = new ConfigValue("name", "value");
 
         String json = mapper.writeValueAsString(origin);
-        Assert.assertNotNull(json);
+        Assertions.assertNotNull(json);
 
         ConfigValue deserialized = mapper.readValue(
                 json,
                 ConfigValue.class);
-        Assert.assertNotNull(deserialized);
-        Assert.assertEquals(origin, deserialized);
+        Assertions.assertNotNull(deserialized);
+        Assertions.assertEquals(origin, deserialized);
 
         origin = new ConfigValue("name", "value", true, false, true);
 
         json = mapper.writeValueAsString(origin);
-        Assert.assertNotNull(json);
+        Assertions.assertNotNull(json);
 
         deserialized = mapper.readValue(
                 json,
                 ConfigValue.class);
-        Assert.assertNotNull(deserialized);
-        Assert.assertEquals(origin, deserialized);
+        Assertions.assertNotNull(deserialized);
+        Assertions.assertEquals(origin, deserialized);
     }
 
 }

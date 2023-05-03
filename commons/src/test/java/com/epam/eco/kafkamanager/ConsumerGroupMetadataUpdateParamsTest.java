@@ -18,8 +18,8 @@ package com.epam.eco.kafkamanager;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -43,13 +43,13 @@ public class ConsumerGroupMetadataUpdateParamsTest {
         ObjectMapper mapper = TestObjectMapperSingleton.getObjectMapper();
 
         String json = mapper.writeValueAsString(origin);
-        Assert.assertNotNull(json);
+        Assertions.assertNotNull(json);
 
         ConsumerGroupMetadataUpdateParams deserialized = mapper.readValue(
                 json,
                 ConsumerGroupMetadataUpdateParams.class);
-        Assert.assertNotNull(deserialized);
-        Assert.assertEquals(origin, deserialized);
+        Assertions.assertNotNull(deserialized);
+        Assertions.assertEquals(origin, deserialized);
     }
 
     @Test
@@ -64,10 +64,10 @@ public class ConsumerGroupMetadataUpdateParamsTest {
         json.put("description", "description");
 
         ConsumerGroupMetadataUpdateParams params = ConsumerGroupMetadataUpdateParams.fromJson(json);
-        Assert.assertNotNull(params);
-        Assert.assertEquals("group1", params.getGroupName());
-        Assert.assertEquals(attributes, params.getAttributes());
-        Assert.assertEquals("description", params.getDescription());
+        Assertions.assertNotNull(params);
+        Assertions.assertEquals("group1", params.getGroupName());
+        Assertions.assertEquals(attributes, params.getAttributes());
+        Assertions.assertEquals("description", params.getDescription());
     }
 
     @Test
@@ -80,14 +80,14 @@ public class ConsumerGroupMetadataUpdateParamsTest {
                 "}";
 
         ConsumerGroupMetadataUpdateParams params = ConsumerGroupMetadataUpdateParams.fromJson(json);
-        Assert.assertNotNull(params);
-        Assert.assertEquals("group1", params.getGroupName());
+        Assertions.assertNotNull(params);
+        Assertions.assertEquals("group1", params.getGroupName());
         Map<String, Object> attributes = new HashMap<>();
         attributes.put("attr1", "value1");
         attributes.put("attr2", "value2");
         attributes.put("attr3", "value3");
-        Assert.assertEquals(attributes, params.getAttributes());
-        Assert.assertEquals("description", params.getDescription());
+        Assertions.assertEquals(attributes, params.getAttributes());
+        Assertions.assertEquals("description", params.getDescription());
     }
 
 }

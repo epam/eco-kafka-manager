@@ -18,8 +18,8 @@ package com.epam.eco.kafkamanager.ui.consumers;
 import java.util.List;
 
 import org.apache.kafka.common.TopicPartition;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Andrei_Tytsik
@@ -30,19 +30,19 @@ public class ResetGroupOffsetsParamsTest {
     public void testAccessorsGetDefaultsOnEmptyMap() throws Exception {
         ResetGroupOffsetsParams params = ResetGroupOffsetsParams.with(null);
 
-        Assert.assertNotNull(params);
-        Assert.assertEquals(null, params.getGroupName());
-        Assert.assertNotNull(params.getPartitionOffsets());
-        Assert.assertEquals(0, params.getPartitionOffset(new TopicPartition("topic", 0)));
-        Assert.assertEquals(0, params.getPartitionOffset(new TopicPartition("topic", 1)));
-        Assert.assertEquals(0, params.getPartitionOffset(new TopicPartition("topic", 2)));
-        Assert.assertEquals(true, params.isPartitionEnabled(new TopicPartition("topic", 0)));
-        Assert.assertEquals(true, params.isPartitionEnabled(new TopicPartition("topic", 1)));
-        Assert.assertEquals(true, params.isPartitionEnabled(new TopicPartition("topic", 2)));
+        Assertions.assertNotNull(params);
+        Assertions.assertEquals(null, params.getGroupName());
+        Assertions.assertNotNull(params.getPartitionOffsets());
+        Assertions.assertEquals(0, params.getPartitionOffset(new TopicPartition("topic", 0)));
+        Assertions.assertEquals(0, params.getPartitionOffset(new TopicPartition("topic", 1)));
+        Assertions.assertEquals(0, params.getPartitionOffset(new TopicPartition("topic", 2)));
+        Assertions.assertEquals(true, params.isPartitionEnabled(new TopicPartition("topic", 0)));
+        Assertions.assertEquals(true, params.isPartitionEnabled(new TopicPartition("topic", 1)));
+        Assertions.assertEquals(true, params.isPartitionEnabled(new TopicPartition("topic", 2)));
 
         List<TopicPartition> partitions = params.listPartitions();
-        Assert.assertNotNull(partitions);
-        Assert.assertTrue(partitions.isEmpty());
+        Assertions.assertNotNull(partitions);
+        Assertions.assertTrue(partitions.isEmpty());
     }
 
     @Test
@@ -50,41 +50,41 @@ public class ResetGroupOffsetsParamsTest {
         ResetGroupOffsetsParams params = ResetGroupOffsetsParams.with(null);
 
         params.setGroupName("group");
-        Assert.assertEquals("group", params.getGroupName());
+        Assertions.assertEquals("group", params.getGroupName());
 
         TopicPartition partition0 = new TopicPartition("topic", 0);
         params.setPartitionEnabled(partition0, true);
-        Assert.assertEquals(true, params.isPartitionEnabled(partition0));
+        Assertions.assertEquals(true, params.isPartitionEnabled(partition0));
 
         TopicPartition partition1 = new TopicPartition("topic", 1);
         params.setPartitionEnabled(partition1, false);
-        Assert.assertEquals(false, params.isPartitionEnabled(partition1));
+        Assertions.assertEquals(false, params.isPartitionEnabled(partition1));
 
         TopicPartition partition2 = new TopicPartition("topic", 2);
         params.addPartitionOffset(partition2, 999);
-        Assert.assertTrue(params.containsPartition(partition2));
-        Assert.assertFalse(params.containsPartition(new TopicPartition("topic", 4)));
-        Assert.assertEquals(999, params.getPartitionOffset(partition2));
+        Assertions.assertTrue(params.containsPartition(partition2));
+        Assertions.assertFalse(params.containsPartition(new TopicPartition("topic", 4)));
+        Assertions.assertEquals(999, params.getPartitionOffset(partition2));
 
         List<TopicPartition> partitions = params.listPartitions();
-        Assert.assertNotNull(partitions);
-        Assert.assertEquals(1, partitions.size());
+        Assertions.assertNotNull(partitions);
+        Assertions.assertEquals(1, partitions.size());
 
         TopicPartition partition4 = new TopicPartition("topic", 4);
         params.addPartitionOffset(partition4, 100);
-        Assert.assertTrue(params.containsPartition(partition4));
-        Assert.assertEquals(100, params.getPartitionOffset(partition4));
+        Assertions.assertTrue(params.containsPartition(partition4));
+        Assertions.assertEquals(100, params.getPartitionOffset(partition4));
 
         partitions = params.listPartitions();
-        Assert.assertNotNull(partitions);
-        Assert.assertEquals(2, partitions.size());
+        Assertions.assertNotNull(partitions);
+        Assertions.assertEquals(2, partitions.size());
 
         params.addPartitionOffsetOnCondition(partition4, 999, oldOffset -> oldOffset != 100);
-        Assert.assertNotEquals(999, params.getPartitionOffset(partition4));
+        Assertions.assertNotEquals(999, params.getPartitionOffset(partition4));
 
         TopicPartition partition5 = new TopicPartition("topic", 5);
         params.addPartitionOffsetOnCondition(partition5, 333, oldOffset -> oldOffset == 0);
-        Assert.assertEquals(333, params.getPartitionOffset(partition5));
+        Assertions.assertEquals(333, params.getPartitionOffset(partition5));
     }
 
 }

@@ -19,8 +19,8 @@ import org.apache.kafka.common.acl.AclOperation;
 import org.apache.kafka.common.acl.AclPermissionType;
 import org.apache.kafka.common.resource.PatternType;
 import org.apache.kafka.common.resource.ResourceType;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -45,13 +45,13 @@ public class PermissionRequestTest {
         ObjectMapper mapper = TestObjectMapperSingleton.getObjectMapper();
 
         String json = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(origin);
-        Assert.assertNotNull(json);
+        Assertions.assertNotNull(json);
 
         PermissionRequest deserialized = mapper.readValue(
                 json,
                 PermissionRequest.class);
-        Assert.assertNotNull(deserialized);
-        Assert.assertEquals(deserialized, origin);
+        Assertions.assertNotNull(deserialized);
+        Assertions.assertEquals(deserialized, origin);
     }
 
 }

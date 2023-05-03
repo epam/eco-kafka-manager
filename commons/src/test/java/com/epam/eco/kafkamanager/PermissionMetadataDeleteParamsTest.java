@@ -20,8 +20,8 @@ import java.util.Map;
 
 import org.apache.kafka.common.resource.PatternType;
 import org.apache.kafka.common.resource.ResourceType;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -44,13 +44,13 @@ public class PermissionMetadataDeleteParamsTest {
         ObjectMapper mapper = TestObjectMapperSingleton.getObjectMapper();
 
         String json = mapper.writeValueAsString(origin);
-        Assert.assertNotNull(json);
+        Assertions.assertNotNull(json);
 
         PermissionMetadataDeleteParams deserialized = mapper.readValue(
                 json,
                 PermissionMetadataDeleteParams.class);
-        Assert.assertNotNull(deserialized);
-        Assert.assertEquals(origin, deserialized);
+        Assertions.assertNotNull(deserialized);
+        Assertions.assertEquals(origin, deserialized);
     }
 
     @Test
@@ -62,11 +62,11 @@ public class PermissionMetadataDeleteParamsTest {
         json.put("principal", "user:user1");
 
         PermissionMetadataDeleteParams params = PermissionMetadataDeleteParams.fromJson(json);
-        Assert.assertNotNull(params);
-        Assert.assertEquals(ResourceType.GROUP, params.getResourceType());
-        Assert.assertEquals("group1", params.getResourceName());
-        Assert.assertEquals(PatternType.LITERAL, params.getPatternType());
-        Assert.assertEquals("user:user1", params.getPrincipal());
+        Assertions.assertNotNull(params);
+        Assertions.assertEquals(ResourceType.GROUP, params.getResourceType());
+        Assertions.assertEquals("group1", params.getResourceName());
+        Assertions.assertEquals(PatternType.LITERAL, params.getPatternType());
+        Assertions.assertEquals("user:user1", params.getPrincipal());
     }
 
     @Test
@@ -80,11 +80,11 @@ public class PermissionMetadataDeleteParamsTest {
                 "}";
 
         PermissionMetadataDeleteParams params = PermissionMetadataDeleteParams.fromJson(json);
-        Assert.assertNotNull(params);
-        Assert.assertEquals(ResourceType.GROUP, params.getResourceType());
-        Assert.assertEquals("group1", params.getResourceName());
-        Assert.assertEquals(PatternType.LITERAL, params.getPatternType());
-        Assert.assertEquals("user:user1", params.getPrincipal());
+        Assertions.assertNotNull(params);
+        Assertions.assertEquals(ResourceType.GROUP, params.getResourceType());
+        Assertions.assertEquals("group1", params.getResourceName());
+        Assertions.assertEquals(PatternType.LITERAL, params.getPatternType());
+        Assertions.assertEquals("user:user1", params.getPrincipal());
     }
 
 }

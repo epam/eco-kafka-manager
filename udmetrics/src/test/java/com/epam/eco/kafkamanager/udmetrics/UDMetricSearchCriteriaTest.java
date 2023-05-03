@@ -18,8 +18,8 @@ package com.epam.eco.kafkamanager.udmetrics;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -42,13 +42,13 @@ public class UDMetricSearchCriteriaTest {
         ObjectMapper mapper = TestObjectMapperSingleton.getObjectMapper();
 
         String json = mapper.writeValueAsString(origin);
-        Assert.assertNotNull(json);
+        Assertions.assertNotNull(json);
 
         UDMetricSearchCriteria deserialized = mapper.readValue(
                 json,
                 UDMetricSearchCriteria.class);
-        Assert.assertNotNull(deserialized);
-        Assert.assertEquals(origin, deserialized);
+        Assertions.assertNotNull(deserialized);
+        Assertions.assertEquals(origin, deserialized);
     }
 
     @Test
@@ -59,10 +59,10 @@ public class UDMetricSearchCriteriaTest {
         json.put("status", "OK");
 
         UDMetricSearchCriteria criteria = UDMetricSearchCriteria.fromJson(json);
-        Assert.assertNotNull(criteria);
-        Assert.assertEquals(UDMetricType.CONSUMER_GROUP_LAG, criteria.getType());
-        Assert.assertEquals("resource3", criteria.getResourceName());
-        Assert.assertEquals(Status.OK, criteria.getStatus());
+        Assertions.assertNotNull(criteria);
+        Assertions.assertEquals(UDMetricType.CONSUMER_GROUP_LAG, criteria.getType());
+        Assertions.assertEquals("resource3", criteria.getResourceName());
+        Assertions.assertEquals(Status.OK, criteria.getStatus());
     }
 
     @Test
@@ -75,10 +75,10 @@ public class UDMetricSearchCriteriaTest {
                 "}";
 
         UDMetricSearchCriteria criteria = UDMetricSearchCriteria.fromJson(json);
-        Assert.assertNotNull(criteria);
-        Assert.assertEquals(UDMetricType.CONSUMER_GROUP_LAG, criteria.getType());
-        Assert.assertEquals("resource3", criteria.getResourceName());
-        Assert.assertEquals(Status.FAILED, criteria.getStatus());
+        Assertions.assertNotNull(criteria);
+        Assertions.assertEquals(UDMetricType.CONSUMER_GROUP_LAG, criteria.getType());
+        Assertions.assertEquals("resource3", criteria.getResourceName());
+        Assertions.assertEquals(Status.FAILED, criteria.getStatus());
     }
 
 }

@@ -15,8 +15,8 @@
  *******************************************************************************/
 package com.epam.eco.kafkamanager.udmetrics.utils;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import io.micrometer.core.instrument.Tags;
 
@@ -29,31 +29,31 @@ public class MeterTagsComparatorTest {
     public void testCompared() throws Exception {
         Tags tags1 = null;
         Tags tags2 = null;
-        Assert.assertEquals(0, MeterTagsComparator.INSTANCE.compare(tags1, tags2));
+        Assertions.assertEquals(0, MeterTagsComparator.INSTANCE.compare(tags1, tags2));
 
         tags1 = Tags.of("a","a");
         tags2 = Tags.of("a","a");
-        Assert.assertEquals(0, MeterTagsComparator.INSTANCE.compare(tags1, tags2));
+        Assertions.assertEquals(0, MeterTagsComparator.INSTANCE.compare(tags1, tags2));
 
         tags1 = Tags.of("a","a");
         tags2 = null;
-        Assert.assertEquals(1, MeterTagsComparator.INSTANCE.compare(tags1, tags2));
+        Assertions.assertEquals(1, MeterTagsComparator.INSTANCE.compare(tags1, tags2));
 
         tags1 = null;
         tags2 = Tags.of("a","a");
-        Assert.assertEquals(-1, MeterTagsComparator.INSTANCE.compare(tags1, tags2));
+        Assertions.assertEquals(-1, MeterTagsComparator.INSTANCE.compare(tags1, tags2));
 
         tags1 = Tags.of("a","a");
         tags2 = Tags.of("b","b");
-        Assert.assertEquals(-1, MeterTagsComparator.INSTANCE.compare(tags1, tags2));
+        Assertions.assertEquals(-1, MeterTagsComparator.INSTANCE.compare(tags1, tags2));
 
         tags1 = Tags.of("b","b");
         tags2 = Tags.of("a","a");
-        Assert.assertEquals(1, MeterTagsComparator.INSTANCE.compare(tags1, tags2));
+        Assertions.assertEquals(1, MeterTagsComparator.INSTANCE.compare(tags1, tags2));
 
         tags1 = Tags.of("a","a");
         tags2 = Tags.of("a","a", "c","c");
-        Assert.assertEquals(-1, MeterTagsComparator.INSTANCE.compare(tags1, tags2));
+        Assertions.assertEquals(-1, MeterTagsComparator.INSTANCE.compare(tags1, tags2));
     }
 
 }

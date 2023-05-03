@@ -18,8 +18,8 @@ package com.epam.eco.kafkamanager.ui.browser;
 import java.util.Map;
 
 import org.apache.kafka.clients.consumer.ConsumerRecord;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import com.epam.eco.kafkamanager.ui.topics.browser.NoopRecordValueTabulator;
 
@@ -33,7 +33,7 @@ public class NoopRecordValueTabulatorTest {
         NoopRecordValueTabulator tabulator = new NoopRecordValueTabulator();
 
         Map<String, Object> tabularValue = tabulator.toTabularValue(createConsumerRecord(null));
-        Assert.assertNull(tabularValue);
+        Assertions.assertNull(tabularValue);
     }
 
     @Test
@@ -43,10 +43,10 @@ public class NoopRecordValueTabulatorTest {
         Object[] values = new Object[]{"stringvalue", new Object(), 1L, 1, 1f, 1d, false};
         for(Object value : values) {
             Map<String, Object> tabularValue = tabulator.toTabularValue(createConsumerRecord(value));
-            Assert.assertNotNull(tabularValue);
-            Assert.assertEquals(1, tabularValue.size());
-            Assert.assertTrue(tabularValue.containsKey(value.getClass().getSimpleName()));
-            Assert.assertEquals(value, tabularValue.get(value.getClass().getSimpleName()));
+            Assertions.assertNotNull(tabularValue);
+            Assertions.assertEquals(1, tabularValue.size());
+            Assertions.assertTrue(tabularValue.containsKey(value.getClass().getSimpleName()));
+            Assertions.assertEquals(value, tabularValue.get(value.getClass().getSimpleName()));
         }
     }
 

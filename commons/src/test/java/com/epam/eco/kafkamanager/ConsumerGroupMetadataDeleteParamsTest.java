@@ -18,8 +18,8 @@ package com.epam.eco.kafkamanager;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -39,13 +39,13 @@ public class ConsumerGroupMetadataDeleteParamsTest {
         ObjectMapper mapper = TestObjectMapperSingleton.getObjectMapper();
 
         String json = mapper.writeValueAsString(origin);
-        Assert.assertNotNull(json);
+        Assertions.assertNotNull(json);
 
         ConsumerGroupMetadataDeleteParams deserialized = mapper.readValue(
                 json,
                 ConsumerGroupMetadataDeleteParams.class);
-        Assert.assertNotNull(deserialized);
-        Assert.assertEquals(origin, deserialized);
+        Assertions.assertNotNull(deserialized);
+        Assertions.assertEquals(origin, deserialized);
     }
 
     @Test
@@ -54,8 +54,8 @@ public class ConsumerGroupMetadataDeleteParamsTest {
         json.put("groupName", "group1");
 
         ConsumerGroupMetadataDeleteParams params = ConsumerGroupMetadataDeleteParams.fromJson(json);
-        Assert.assertNotNull(params);
-        Assert.assertEquals("group1", params.getGroupName());
+        Assertions.assertNotNull(params);
+        Assertions.assertEquals("group1", params.getGroupName());
     }
 
     @Test
@@ -66,8 +66,8 @@ public class ConsumerGroupMetadataDeleteParamsTest {
                 "}";
 
         ConsumerGroupMetadataDeleteParams params = ConsumerGroupMetadataDeleteParams.fromJson(json);
-        Assert.assertNotNull(params);
-        Assert.assertEquals("group1", params.getGroupName());
+        Assertions.assertNotNull(params);
+        Assertions.assertEquals("group1", params.getGroupName());
     }
 
 }
