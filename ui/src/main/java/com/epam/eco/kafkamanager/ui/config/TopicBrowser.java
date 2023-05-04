@@ -23,7 +23,8 @@ public class TopicBrowser {
     private Boolean useCache = true;
     private Long cacheExpirationPeriodMin = 60L;
     private Long cacheCleanerIntervalMin = 60L;
-
+    private Boolean showGrid = Boolean.TRUE;
+    private Boolean enableAnimation = Boolean.TRUE;
     public Boolean getUseCache() {
         return useCache;
     }
@@ -46,5 +47,21 @@ public class TopicBrowser {
 
     public void setCacheCleanerIntervalMin(Long cacheCleanerIntervalMin) {
         this.cacheCleanerIntervalMin = cacheCleanerIntervalMin;
+    }
+
+    public Boolean getShowGrid() {
+        return showGrid;
+    }
+
+    public void setShowGrid(Boolean showGrid) {
+        this.showGrid = showGrid;
+    }
+
+    public Boolean getEnableAnimation() {
+        return enableAnimation;
+    }
+
+    public void setEnableAnimation(Boolean enableAnimation) {
+        this.enableAnimation = enableAnimation;
     }
 }

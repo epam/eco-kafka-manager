@@ -111,3 +111,9 @@ function divideLimitOnPartitions(partitionCount,limit) {
     }
     return result;
 }
+
+function blink(elem) {
+    elem.addClass("after-blinking");
+    elem.addClass("blinked");
+    elem.removeClass("inactive-partition");
+}

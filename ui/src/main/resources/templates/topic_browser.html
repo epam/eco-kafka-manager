@@ -29,16 +29,27 @@
     const fetchedValueFormat = [[${browseParams.getValueFormat() != null ? browseParams.getValueFormat().name() : null}]];
     const fullScreen = [[${browseParams.getFullScreen()}]];
     const showGrid = [[${showGrid}]]
+    const enableAnimation = [[${enableAnimation}]]
 
     /*]]>*/
 
     let dataTable;
+    let partitionCheckboxes;
 
-    $(function () {
-
+    $(document).ready( function() {
 
         const sortingOrderPartition = [0, 'asc'];
         const sortingOrderOffset = [1, 'asc'];
+
+        partitionCheckboxes = $('.partition-checkbox');
+
+        if(enableAnimation) {
+            partitionCheckboxes.each(function (idx, elem) {
+                const partition = $(elem).data('partition');
+                $('#p_min_' + partition).addClass("inactive-partition");
+                $('#p_max_' + partition).addClass("inactive-partition");
+            });
+        }
 
         const columnClasses = showGrid ?
             [ { className: "vertical-line-class", targets: "_all" },
@@ -74,14 +85,14 @@
         });
 
         $('#all-partition-checkbox').click(function (e) {
-            $('.partition-checkbox').each(function (idx, elem) {
+            partitionCheckboxes.each(function (idx, elem) {
                 const checked = $('#all-partition-checkbox').prop('checked');
                 $(elem).prop('checked', checked);
                 $(elem).trigger('change');
             });
         });
 
-        $('.partition-checkbox').change(function () {
+        partitionCheckboxes.change(function () {
             const partition = $(this).data('partition');
             const enabled = $(this).is(':checked');
             $('#pe_' + partition).val(enabled ? '1' : '0');
@@ -90,19 +101,26 @@
         });
 
 
-        $('.partition-checkbox').each(function (idx, elem) {
+        partitionCheckboxes.each(function (idx, elem) {
             if ($(elem).is(':checked')) {
                 const partition = $(elem).data('partition');
                 if(currentOffsets !== null) {
                     const currentOffset = currentOffsets[partition];
                     if (currentOffset !== undefined) {
-                        $('#p_min_' + partition).val(currentOffset.smallest);
-                        $('#p_min_p_inc_' + partition).html(getMinBoundsLabel(currentOffset));
-                        $('#p_min_inc_' + partition).val(currentOffset.smallestInclusive);
-
-                        $('#p_max_' + partition).val(currentOffset.largest);
-                        $('#p_max_p_inc_' + partition).html(getMaxBoundsLabel(currentOffset));
-                        $('#p_max_inc_' + partition).val(currentOffset.largestInclusive);
+                        const minOffsetElem = $('#p_min_' + partition);
+                        if(minOffsetElem.val()!==currentOffset.smallest) {
+                            minOffsetElem.val(currentOffset.smallest);
+                            if(enableAnimation) blink(minOffsetElem);
+                            $('#p_min_p_inc_' + partition).html(getMinBoundsLabel(currentOffset));
+                            $('#p_min_inc_' + partition).val(currentOffset.smallestInclusive);
+                        }
+                        const maxOffsetElem = $('#p_max_' + partition);
+                        if(maxOffsetElem.val()!==currentOffset.largest) {
+                            maxOffsetElem.val(currentOffset.largest);
+                            if(enableAnimation) blink(maxOffsetElem);
+                            $('#p_max_p_inc_' + partition).html(getMaxBoundsLabel(currentOffset));
+                            $('#p_max_inc_' + partition).val(currentOffset.largestInclusive);
+                        }
                     }
                 }
                 if(realRangeBounds !== null) {
@@ -207,7 +225,7 @@
 
         let checkIfAtLeastOnePartitionSelected = () => {
             let result = false;
-            $('.partition-checkbox').each((idx, elem) => {
+            partitionCheckboxes.each((idx, elem) => {
                 if(elem.checked) {
                     result = true;
                 }
@@ -279,7 +297,7 @@
 
     function validateRanges() {
         let result = true;
-        $('.partition-checkbox').each(function (idx, elem) {
+        partitionCheckboxes.each(function (idx, elem) {
             if ($(elem).is(':checked')) {
                 const partition = $(elem).data('partition');
                 const smallest = parseInt($('#p_min_' + partition).val());

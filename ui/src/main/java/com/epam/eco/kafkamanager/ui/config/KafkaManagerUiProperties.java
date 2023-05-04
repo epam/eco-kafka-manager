@@ -33,7 +33,7 @@ public class KafkaManagerUiProperties {
     private GrafanaUrlTemplate grafanaMetrics;
     private Collection<ExternalToolTemplate> externalTools;
     private TopicBrowser topicBrowser;
-    private Boolean showGridInTopicBrowser = Boolean.FALSE;
+
     public SchemaCatalogTemplate getSchemaCatalogTool() {
         return schemaCatalogTool;
     }
@@ -62,14 +62,6 @@ public class KafkaManagerUiProperties {
         this.topicBrowser = topicBrowser;
     }
 
-    public Boolean getShowGridInTopicBrowser() {
-        return showGridInTopicBrowser;
-    }
-
-    public void setShowGridInTopicBrowser(Boolean showGridInTopicBrowser) {
-        this.showGridInTopicBrowser = showGridInTopicBrowser;
-    }
-
     public GrafanaUrlTemplate getGrafanaMetrics() {
         return grafanaMetrics;
     }
@@ -85,4 +77,5 @@ public class KafkaManagerUiProperties {
     public void setExternalTools(Collection<ExternalToolTemplate> externalTools) {
         this.externalTools = externalTools;
     }
+
 }

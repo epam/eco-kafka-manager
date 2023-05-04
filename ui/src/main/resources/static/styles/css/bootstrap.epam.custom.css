@@ -35,6 +35,8 @@
     --epm-full-screen-z-index: 1060;
     --epm-over-full-screen-z-index: 1100;
     --epm-over-all-windows-z-index: 2000;
+
+    --epm-button-partition-blinking: #65a965;
 }
 
 .btn-sm {
@@ -476,4 +478,26 @@ div.schema-content-dialog-body {
 .to-min-max-button {
     max-width: 5em;
     min-width: 5em;
+}
+.inactive-partition {
+    color: rgb(127, 127, 127);
+}
+
+.blinked {
+    animation: blinker 0.3s linear 4;
+}
+@keyframes blinker {
+    0% {
+        color: rgba(0,0,0,0);
+        font-weight: bold;
+    }
+    50% {
+        color: var( --epm-button-partition-blinking );
+        font-weight: bold;
+    }
+}
+
+.after-blinking {
+    color: var( --epm-button-partition-blinking );
+    font-weight: bold;
 }

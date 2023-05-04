@@ -41,7 +41,10 @@ import com.epam.eco.kafkamanager.TopicRecordFetchParams;
 import com.epam.eco.kafkamanager.TopicRecordFetchParams.DataFormat;
 import com.epam.eco.kafkamanager.exec.TaskResult;
 import com.epam.eco.kafkamanager.ui.config.KafkaManagerUiProperties;
+import com.epam.eco.kafkamanager.ui.config.TopicBrowser;
 import com.epam.eco.kafkamanager.ui.topics.TopicController;
+
+import static java.util.Objects.nonNull;
 
 /**
  * @author Andrei_Tytsik
@@ -63,6 +66,7 @@ public class TopicBrowserController {
     public static final String ATTR_HAS_NEXT_OFFSETS = "hasNextOffsets";
     public static final String ATTR_HAS_PREVIOUS_OFFSETS = "hasPreviousOffsets";
     public static final String ATTR_SCHEMA_CATALOG_URL_TEMPLATE = "schemaCatalogUrlTemplate";
+    public static final String ATTR_ENABLE_ANIMATION = "enableAnimation";
     private static final long DEFAULT_FETCH_TIMEOUT = 30_000;
 
     @Autowired
@@ -117,9 +121,12 @@ public class TopicBrowserController {
 
         addTopicConfigParams(browseParams);
 
+        TopicBrowser topicBrowser = properties.getTopicBrowser();
+
         modelAttributes.accept(ATTR_BROWSE_PARAMS, browseParams);
         modelAttributes.accept(ATTR_OFFSET_RANGES, offsetRanges);
-        modelAttributes.accept(ATTR_SHOW_GRID, properties.getShowGridInTopicBrowser());
+        modelAttributes.accept(ATTR_SHOW_GRID, nonNull(topicBrowser) ? topicBrowser.getShowGrid() : Boolean.TRUE);
+        modelAttributes.accept(ATTR_ENABLE_ANIMATION, nonNull(topicBrowser) ? topicBrowser.getEnableAnimation() : Boolean.TRUE);
 
         modelAttributes.accept(ATTR_OFFSET_RANGES_SUMMARY, offsetRangesSummary);
 
