@@ -70,6 +70,7 @@ import com.epam.eco.kafkamanager.TopicRecordCounterTaskExecutor;
 import com.epam.eco.kafkamanager.TopicRecordFetcherTaskExecutor;
 import com.epam.eco.kafkamanager.TopicRepo;
 import com.epam.eco.kafkamanager.TopicSearchCriteria;
+import com.epam.eco.kafkamanager.TopicSearchCriteriaImpl;
 import com.epam.eco.kafkamanager.TransactionInfo;
 import com.epam.eco.kafkamanager.TransactionRepo;
 import com.epam.eco.kafkamanager.TransactionSearchCriteria;

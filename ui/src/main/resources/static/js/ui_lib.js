@@ -22,12 +22,12 @@ location.params = function(params_set, params_append, params_subtract) {
     for (i = 0, len = _params.length; i < len; i++) {
         parts = _params[i].split('=');
         if (! parts[0]) {
-        	continue;
+            continue;
         }
         if (parts[1]) {
-        	obj[parts[0]] = parts[1].split(',');
+            obj[parts[0]] = parts[1].split(',');
         } else {
-        	obj[parts[0]] = true;
+            obj[parts[0]] = true;
         }
     }
 
@@ -44,20 +44,20 @@ location.params = function(params_set, params_append, params_subtract) {
         value = encodeURIComponent(params_append[key]);
         key = encodeURIComponent(key);
         if (obj[key] != null) {
-        	if (obj[key].indexOf(value) < 0) {
-        		obj[key].push(value);
-        	}
+            if (obj[key].indexOf(value) < 0) {
+                obj[key].push(value);
+            }
         } else {
-        	obj[key] = [value];
+            obj[key] = [value];
         }
     }
     for (key in params_subtract) {
-    	value = encodeURIComponent(params_subtract[key]);
-    	key = encodeURIComponent(key);
+        value = encodeURIComponent(params_subtract[key]);
+        key = encodeURIComponent(key);
         if (obj[key] != null && obj[key].indexOf(value) >= 0) {
-    		obj[key].splice(obj[key].indexOf(value), 1);
+            obj[key].splice(obj[key].indexOf(value), 1);
             if (obj[key].length === 0) {
-            	delete obj[key];
+                delete obj[key];
             }
         }
     }
@@ -80,8 +80,29 @@ function hidePopoverIfClickedOutside(e) {
     });
 }
 
+let prettyJson = (object) => {
+    let result = JSON.stringify(object,null, 1);
+    result=result.replaceAll('\{','')
+        .replaceAll('\}','')
+        .replaceAll('\,','')
+        .replaceAll('\"','') ;
+    return result;
+}
+
+let prettyJson2 = (object) => {
+    let result = '';
+    const properties= Object.getOwnPropertyNames(object);
+    if(properties!==null && properties.length>0) {
+        for(let ii=0;ii<properties.length;ii++) {
+            result+=properties[ii]+': <b>'+object[properties[ii]]+'</b>' + (ii < properties.length - 1 ? '</br>' : '');
+        }
+    }
+    return result;
+}
+
 let infoModal;
 let dataModal;
+let confirmModal;
 
 $(document).ready(function() {
     if(document.getElementById("infoModal")!==null) {
@@ -90,30 +111,35 @@ $(document).ready(function() {
     if(document.getElementById("dataModal")!==null) {
         dataModal = new bootstrap.Modal(document.getElementById("dataModal"));
     }
+    if(document.getElementById("confirmModal")!==null) {
+        confirmModal = new bootstrap.Modal(document.getElementById("confirmModal"));
+    }
 })
 
 function showInfo(type,infoHeader,infoText) {
 
-    let headerClass = "info-modal-header-info";
-    let textClass = "info-modal-text-info";
-    let buttonClass = "btn-success";
+    if(infoModal) {
+        let headerClass = "info-modal-header-info";
+        let textClass = "info-modal-text-info";
+        let buttonClass = "btn-success";
 
-    if(type==="error") {
-        headerClass = "info-modal-header-danger";
-        textClass = "info-modal-text-danger";
-        buttonClass = "btn-danger";
+        if (type === "error") {
+            headerClass = "info-modal-header-danger";
+            textClass = "info-modal-text-danger";
+            buttonClass = "btn-danger";
+        }
+        const header = document.getElementById('infoModalHeader');
+        header.textContent = infoHeader;
+        header.classList.add(headerClass);
+
+        const text = document.getElementById('infoModalText');
+        text.textContent = infoText;
+        text.classList.add(textClass)
+
+        document.getElementById('infoModalCloseButton').classList.add(buttonClass);
+
+        infoModal.show();
     }
-    const header = document.getElementById('infoModalHeader');
-    header.textContent = infoHeader;
-    header.classList.add(headerClass);
-
-    const text = document.getElementById('infoModalText');
-    text.textContent = infoText;
-    text.classList.add(textClass)
-
-    document.getElementById('infoModalCloseButton').classList.add(buttonClass);
-
-    infoModal.show();
 }
 
 function showData(dialogHeader,dialogText) {
@@ -125,7 +151,7 @@ function showData(dialogHeader,dialogText) {
     header.textContent = dialogHeader;
     header.classList.add(headerClass);
 
-    var text = document.getElementById('dataModalText');
+    const text = document.getElementById('dataModalText');
     text.textContent = dialogText;
     text.classList.add(textClass)
 
@@ -134,4 +160,33 @@ function showData(dialogHeader,dialogText) {
     };
 
     dataModal.show();
+}
+
+function showConfirm(headerText, bodyText, successCallback) {
+
+    if(confirmModal) {
+
+        const header = document.getElementById('confirmModalHeader');
+        header.textContent = headerText;
+        header.classList.add("confirm-modal-header-info");
+
+        const text = document.getElementById('confirmModalText');
+        text.textContent = bodyText;
+        text.classList.add("confirm-modal-text-info")
+
+        const okButton = document.getElementById('confirmModalOkButton');
+        // clone node strips dom element from any earlier added listeners,
+        // this is the only way to enforce it to execute only one, current, listener
+        const okButtonClone = okButton.cloneNode(true);
+        okButton.parentNode.replaceChild(okButtonClone, okButton);
+        okButtonClone.classList.add("btn-primary");
+        okButtonClone.addEventListener('click', successCallback, true);
+
+        const cancelButton = document.getElementById('confirmModalCloseButton');
+        cancelButton.classList.add("btn-primary");
+
+        confirmModal.show();
+
+    }
+
 }

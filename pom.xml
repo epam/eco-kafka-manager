@@ -25,6 +25,12 @@
 
     <developers>
         <developer>
+            <name>Mikhail Vershkov</name>
+            <email>Mikhail_Vershkov@epam.com</email>
+            <organization>EPAM Systems</organization>
+            <organizationUrl>https://www.epam.com</organizationUrl>
+        </developer>
+        <developer>
             <name>Raman Babich</name>
             <email>Raman_Babich@epam.com</email>
             <organization>EPAM Systems</organization>
@@ -105,7 +111,9 @@
         <findsecbugs-plugin.version>1.11.0</findsecbugs-plugin.version>
         <fb-contrib.version>7.4.3.sb</fb-contrib.version>
 
-        <junit5.version>5.7.2</junit5.version>
+        <junit5.version>5.9.3</junit5.version>
+        <junit-platform-commons.version>1.9.3</junit-platform-commons.version>
+        <junit-jupiter-api.version>5.9.3</junit-jupiter-api.version>
         <mockito.version>4.11.0</mockito.version>
     </properties>
 
@@ -272,8 +280,6 @@
                 <artifactId>kafka-protobuf-types</artifactId>
                 <version>${cp.version}</version>
             </dependency>
-
-
             <dependency>
                 <groupId>org.junit.jupiter</groupId>
                 <artifactId>junit-jupiter-engine</artifactId>
@@ -292,6 +298,19 @@
                 <scope>test</scope>
                 <version>${mockito.version}</version>
             </dependency>
+            <dependency>
+                <groupId>org.junit.platform</groupId>
+                <artifactId>junit-platform-commons</artifactId>
+                <version>${junit-platform-commons.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.junit.jupiter</groupId>
+                <artifactId>junit-jupiter-api</artifactId>
+                <version>${junit-jupiter-api.version}</version>
+                <scope>test</scope>
+            </dependency>
+
             <dependency>
                 <groupId>net.bytebuddy</groupId>
                 <artifactId>byte-buddy</artifactId>

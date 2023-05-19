@@ -26,13 +26,14 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
@@ -49,16 +50,18 @@ import com.epam.eco.kafkamanager.KafkaManager;
 import com.epam.eco.kafkamanager.TopicConfigUpdateParams;
 import com.epam.eco.kafkamanager.TopicCreateParams;
 import com.epam.eco.kafkamanager.TopicInfo;
+import com.epam.eco.kafkamanager.TopicListSearchCriteriaImpl;
 import com.epam.eco.kafkamanager.TopicMetadataDeleteParams;
 import com.epam.eco.kafkamanager.TopicMetadataUpdateParams;
 import com.epam.eco.kafkamanager.TopicPartitionsCreateParams;
-import com.epam.eco.kafkamanager.TopicSearchCriteria;
 import com.epam.eco.kafkamanager.udmetrics.UDMetric;
 import com.epam.eco.kafkamanager.udmetrics.UDMetricManager;
 import com.epam.eco.kafkamanager.udmetrics.UDMetricType;
 import com.epam.eco.kafkamanager.ui.config.KafkaManagerUiProperties;
 import com.epam.eco.kafkamanager.ui.metrics.udm.UDMetricWrapper;
 import com.epam.eco.kafkamanager.ui.topics.export.TopicExporterType;
+import com.epam.eco.kafkamanager.ui.topics.model.TopicInfoToModelMapper;
+import com.epam.eco.kafkamanager.ui.topics.model.TopicTableModel;
 import com.epam.eco.kafkamanager.ui.utils.MetadataWrapper;
 import com.epam.eco.kafkamanager.utils.MapperUtils;
 
@@ -76,8 +79,6 @@ public class TopicController {
     public static final String TOPIC_CONFIG_UPDATE_VIEW = "topic_config_update";
     public static final String TOPIC_PARTITIONS_CREATE_VIEW = "topic_partitions_create";
     public static final String TOPIC_METADATA_VIEW = "topic_metadata";
-
-    public static final String ATTR_PAGE = "page";
     public static final String ATTR_TOPIC = "topic";
     public static final String ATTR_CONFIG_DEF = "configDef";
     public static final String ATTR_SEARCH_CRITERIA = "searchCriteria";
@@ -95,6 +96,7 @@ public class TopicController {
     public static final String ATTR_FULL_SCREEN = "fullScreen";
 
     public static final String MAPPING_TOPICS = "/topics";
+    public static final String MAPPING_TOPIC_LIST = "/topic_list";
     public static final String MAPPING_TOPIC = MAPPING_TOPICS + "/{name}";
     public static final String MAPPING_COUNT_RECORDS = MAPPING_TOPIC + "/count_records";
     public static final String MAPPING_PURGER = MAPPING_TOPIC + "/purger";
@@ -104,7 +106,6 @@ public class TopicController {
     public static final String MAPPING_METADATA = MAPPING_TOPIC + "/metadata";
     public static final String MAPPING_EXPORT = "/topics_export";
     public static final String MAPPING_CREATE = "/topic_create";
-    private static final int PAGE_SIZE = 30;
 
     @Autowired
     private KafkaAdminOperations kafkaAdminOperations;
@@ -139,22 +140,40 @@ public class TopicController {
             @RequestParam(required=false) Integer page,
             @RequestParam Map<String, Object> paramsMap,
             Model model) {
-        TopicSearchCriteria searchCriteria = TopicSearchCriteria.fromJsonWith(paramsMap, kafkaManager);
-        page = page != null && page > 0 ? page -1 : 0;
-
-        Page<TopicInfo> topicPage = kafkaManager.getTopicPage(
-                searchCriteria,
-                PageRequest.of(page, PAGE_SIZE));
+        TopicListSearchCriteriaImpl searchCriteria = TopicListSearchCriteriaImpl.fromJsonWith(paramsMap, kafkaManager);
 
         model.addAttribute(ATTR_SEARCH_CRITERIA, searchCriteria);
         model.addAttribute(ATTR_DATA_CATALOG_URL_TEMPLATE, properties.getDataCatalogTool());
         model.addAttribute(ATTR_GRAFANA_METRICS_URL_TEMPLATE, properties.getGrafanaMetrics());
         model.addAttribute(ATTR_EXTERNAL_TOOL_TEMPLATES, properties.getExternalTools());
-        model.addAttribute(ATTR_PAGE, wrap(topicPage));
+
         model.addAttribute(ATTR_TOTAL_COUNT, kafkaManager.getTopicCount());
         model.addAttribute(ATTR_FULL_SCREEN, paramsMap.get(ATTR_FULL_SCREEN));
 
         return TOPICS_VIEW;
+    }
+
+    @RequestMapping(value=MAPPING_TOPIC_LIST, method = RequestMethod.GET)
+    public @ResponseBody ResponseEntity<TopicTableModel> topicList(
+            @RequestParam Map<String, Object> paramsMap,
+            HttpServletRequest request) {
+        TopicListSearchCriteriaImpl criteria = TopicListSearchCriteriaImpl.fromJsonWith(paramsMap, kafkaManager);
+        //storedCriteria.put(request.getRequestedSessionId(), criteria);
+        List<TopicInfo> topics = kafkaManager.getTopics(criteria);
+        TopicInfoToModelMapper mapper =
+                new TopicInfoToModelMapper(properties.getDataCatalogTool(),
+                                           properties.getGrafanaMetrics(),
+                                           kafkaManager,
+                                           properties.getExternalTools());
+        TopicTableModel model = TopicTableModel.builder()
+                .draw(1)
+                .recordsTotal(topics.size())
+                .recordsFiltered(topics.size())
+                .data(topics.stream()
+                            .map(mapper)
+                            .collect(Collectors.toList()) )
+                .build();
+        return ResponseEntity.ok(model);
     }
 
     @RequestMapping(value = MAPPING_TOPIC, method = RequestMethod.GET)
@@ -189,9 +208,9 @@ public class TopicController {
             @RequestParam TopicExporterType exporterType,
             @RequestParam Map<String, Object> paramsMap,
             HttpServletResponse response) throws IOException {
-        TopicSearchCriteria searchCriteria = TopicSearchCriteria.fromJsonWith(paramsMap, kafkaManager);
 
-        List<TopicInfo> topicInfos = kafkaManager.getTopics(searchCriteria);
+        TopicListSearchCriteriaImpl criteria = TopicListSearchCriteriaImpl.fromJsonWith(paramsMap, kafkaManager);
+        List<TopicInfo> topicInfos = kafkaManager.getTopics(criteria);
 
         response.setContentType(exporterType.contentType());
         response.setHeader(

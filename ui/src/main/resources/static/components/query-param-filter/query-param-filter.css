@@ -1,0 +1,66 @@
+.query-param-filter-container {
+    display: flex;
+    justify-content: start;
+    gap: 10px;
+    padding: 10px;
+}
+
+.input-group .dropdown-toggle {
+    border-radius: 0;
+}
+
+#query-param-filter-column-select {
+    min-width: 12em;
+    max-width: 12em;
+}
+
+#query-param-filter-operation-select {
+    max-width: 9em;
+    min-width: 9em;
+}
+#query-param-filter-value {
+    min-width: 16em;
+    max-width: 16em;
+}
+#query-param-filter-clause-container {
+    margin-left: 1em;
+}
+
+div.filter-clause-item {
+    background-color: #538cb8;
+    border-radius: 50rem !important;
+    color: white;
+    margin: 2px;
+    display: inline-block;
+    padding: 0.35em 0.65em;
+    font-size: 1em;
+    font-weight: 700;
+    line-height: 1em;
+    text-align: center;
+    white-space: nowrap;
+    vertical-align: baseline;
+    pointer-events: none;
+}
+
+.filter-clause-item::after {
+    content: url('x-circle-fill.svg');
+    margin-left: 0.5em;
+    pointer-events: auto;
+    cursor: pointer;
+}
+
+.filter-clause-item>span {
+    vertical-align: text-top;
+}
+
+#query-param-filter-value-select {
+    min-width: 16em;
+    max-width: 16em;
+}
+
+.display-none {
+    display: none;
+}
+.display-block {
+    display: block;
+}

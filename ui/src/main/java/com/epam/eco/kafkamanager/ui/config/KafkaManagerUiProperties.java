@@ -42,7 +42,7 @@ public class KafkaManagerUiProperties {
         this.schemaCatalogTool = schemaCatalogTool;
     }
 
-    public ExternalToolTemplate getDataCatalogTool() {return dataCatalogTool;}
+    public DataCatalogUrlTemplate getDataCatalogTool() {return dataCatalogTool;}
 
     public void setDataCatalogTool(DataCatalogUrlTemplate dataCatalogTool) {this.dataCatalogTool = dataCatalogTool;}
 

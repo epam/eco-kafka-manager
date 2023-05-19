@@ -24,7 +24,6 @@ import org.junit.jupiter.api.Test;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import com.epam.eco.kafkamanager.TopicSearchCriteria.ReplicationState;
 import com.epam.eco.kafkamanager.utils.TestObjectMapperSingleton;
 
 /**
@@ -34,7 +33,7 @@ public class TopicSearchCriteriaTest {
 
     @Test
     public void testSerializedToJsonAndBack() throws Exception {
-        TopicSearchCriteria origin = TopicSearchCriteria.builder().
+        TopicSearchCriteriaImpl origin = TopicSearchCriteriaImpl.builder().
                 topicName("topicName").
                 minPartitionCount(1).
                 maxPartitionCount(10).
@@ -51,9 +50,9 @@ public class TopicSearchCriteriaTest {
         String json = mapper.writeValueAsString(origin);
         Assertions.assertNotNull(json);
 
-        TopicSearchCriteria deserialized = mapper.readValue(
+        TopicSearchCriteriaImpl deserialized = mapper.readValue(
                 json,
-                TopicSearchCriteria.class);
+                TopicSearchCriteriaImpl.class);
         Assertions.assertNotNull(deserialized);
         Assertions.assertEquals(origin, deserialized);
     }
@@ -71,7 +70,7 @@ public class TopicSearchCriteriaTest {
         json.put("configString", "key2:value2;key3:value3");
         json.put("description", "description");
 
-        TopicSearchCriteria criteria = TopicSearchCriteria.fromJson(json);
+        TopicSearchCriteriaImpl criteria = TopicSearchCriteriaImpl.fromJson(json);
         Assertions.assertNotNull(criteria);
         Assertions.assertEquals("topic1", criteria.getTopicName());
         Assertions.assertEquals(Integer.valueOf(1), criteria.getMinPartitionCount());
@@ -101,7 +100,7 @@ public class TopicSearchCriteriaTest {
                 ", \"description\": \"description\"" +
                 "}";
 
-        TopicSearchCriteria criteria = TopicSearchCriteria.fromJson(json);
+        TopicSearchCriteriaImpl criteria = TopicSearchCriteriaImpl.fromJson(json);
         Assertions.assertNotNull(criteria);
         Assertions.assertEquals("topic1", criteria.getTopicName());
         Assertions.assertEquals(Integer.valueOf(1), criteria.getMinPartitionCount());
@@ -118,31 +117,31 @@ public class TopicSearchCriteriaTest {
 
     @Test
     public void testConfigStringParsed() throws Exception {
-        Map<String, String> config = TopicSearchCriteria.parseConfigString(":");
+        Map<String, String> config = TopicSearchCriteriaImpl.parseConfigString(":");
         Assertions.assertNotNull(config);
         Assertions.assertEquals(1, config.size());
         Assertions.assertTrue(config.containsKey(null));
         Assertions.assertEquals(null, config.get(null));
 
-        config = TopicSearchCriteria.parseConfigString(" :");
+        config = TopicSearchCriteriaImpl.parseConfigString(" :");
         Assertions.assertNotNull(config);
         Assertions.assertEquals(1, config.size());
         Assertions.assertTrue(config.containsKey(null));
         Assertions.assertEquals(null, config.get(null));
 
-        config = TopicSearchCriteria.parseConfigString(" : ");
+        config = TopicSearchCriteriaImpl.parseConfigString(" : ");
         Assertions.assertNotNull(config);
         Assertions.assertEquals(1, config.size());
         Assertions.assertTrue(config.containsKey(null));
         Assertions.assertEquals(null, config.get(null));
 
-        config = TopicSearchCriteria.parseConfigString(" : ;   :  ");
+        config = TopicSearchCriteriaImpl.parseConfigString(" : ;   :  ");
         Assertions.assertNotNull(config);
         Assertions.assertEquals(1, config.size());
         Assertions.assertTrue(config.containsKey(null));
         Assertions.assertEquals(null, config.get(null));
 
-        config = TopicSearchCriteria.parseConfigString(" : ;  x :  ");
+        config = TopicSearchCriteriaImpl.parseConfigString(" : ;  x :  ");
         Assertions.assertNotNull(config);
         Assertions.assertEquals(2, config.size());
         Assertions.assertTrue(config.containsKey(null));
@@ -150,49 +149,49 @@ public class TopicSearchCriteriaTest {
         Assertions.assertTrue(config.containsKey("x"));
         Assertions.assertEquals(null, config.get("x"));
 
-        config = TopicSearchCriteria.parseConfigString("x:");
+        config = TopicSearchCriteriaImpl.parseConfigString("x:");
         Assertions.assertNotNull(config);
         Assertions.assertEquals(1, config.size());
         Assertions.assertTrue(config.containsKey("x"));
         Assertions.assertEquals(null, config.get("x"));
 
-        config = TopicSearchCriteria.parseConfigString(" x:");
+        config = TopicSearchCriteriaImpl.parseConfigString(" x:");
         Assertions.assertNotNull(config);
         Assertions.assertEquals(1, config.size());
         Assertions.assertTrue(config.containsKey("x"));
         Assertions.assertEquals(null, config.get("x"));
 
-        config = TopicSearchCriteria.parseConfigString(" x :");
+        config = TopicSearchCriteriaImpl.parseConfigString(" x :");
         Assertions.assertNotNull(config);
         Assertions.assertEquals(1, config.size());
         Assertions.assertTrue(config.containsKey("x"));
         Assertions.assertEquals(null, config.get("x"));
 
-        config = TopicSearchCriteria.parseConfigString(":y");
+        config = TopicSearchCriteriaImpl.parseConfigString(":y");
         Assertions.assertNotNull(config);
         Assertions.assertEquals(1, config.size());
         Assertions.assertTrue(config.containsKey(null));
         Assertions.assertEquals("y", config.get(null));
 
-        config = TopicSearchCriteria.parseConfigString(": y");
+        config = TopicSearchCriteriaImpl.parseConfigString(": y");
         Assertions.assertNotNull(config);
         Assertions.assertEquals(1, config.size());
         Assertions.assertTrue(config.containsKey(null));
         Assertions.assertEquals("y", config.get(null));
 
-        config = TopicSearchCriteria.parseConfigString(": y ");
+        config = TopicSearchCriteriaImpl.parseConfigString(": y ");
         Assertions.assertNotNull(config);
         Assertions.assertEquals(1, config.size());
         Assertions.assertTrue(config.containsKey(null));
         Assertions.assertEquals("y", config.get(null));
 
-        config = TopicSearchCriteria.parseConfigString(" x    :  y    ");
+        config = TopicSearchCriteriaImpl.parseConfigString(" x    :  y    ");
         Assertions.assertNotNull(config);
         Assertions.assertEquals(1, config.size());
         Assertions.assertTrue(config.containsKey("x"));
         Assertions.assertEquals("y", config.get("x"));
 
-        config = TopicSearchCriteria.parseConfigString(" x    :  y    ;     a:b;   c:   ");
+        config = TopicSearchCriteriaImpl.parseConfigString(" x    :  y    ;     a:b;   c:   ");
         Assertions.assertNotNull(config);
         Assertions.assertEquals(3, config.size());
         Assertions.assertTrue(config.containsKey("x"));

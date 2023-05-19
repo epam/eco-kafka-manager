@@ -15,85 +15,185 @@
  -->
 <!DOCTYPE HTML>
 <html xmlns:th="http://www.thymeleaf.org">
-<head th:replace="templates :: header(~{},~{},~{})">
+<head title="Topic list" th:replace="templates :: header(~{::/html/head/link},~{::/html/head/script},~{})">
+
+    <link rel="stylesheet" type="text/css" th:href="@{/components/query-param-filter/query-param-filter.css}" />
+    <script type="text/javascript" th:src="@{/components/query-param-filter/query-param-filter.js}"></script>
+
 </head>
 <body>
 
     <script type="text/javascript" th:inline="javascript">
         /*<![CDATA[*/
-        let pageCurrent = [[${(page != null)?(page.number + 1):(0)}]];
-        let totalPagesCurrent = [[${(page != null)?(page.totalPages):(0)}]];
+        const externalTools = [[${externalToolTemplates}]];
         /*]]>*/
-
         let dataTable;
 
-        $(function() {
-            $('#search_form').submit(function(event) {
-                event.preventDefault();
-                showWaitingSign("Fetch data...");
-                location.params(
-                        {
-                            topicName: $('#topicName').val(),
-                            minPartitionCount: $('#minPartitionCount').val(),
-                            maxPartitionCount: $('#maxPartitionCount').val(),
-                            minReplicationFactor: $('#minReplicationFactor').val(),
-                            maxReplicationFactor: $('#maxReplicationFactor').val(),
-                            minConsumerCount: $('#minConsumerCount').val(),
-                            maxConsumerCount: $('#maxConsumerCount').val(),
-                            replicationState: $('#replicationState').val(),
-                            configString: $('#configString').val(),
-                            description: $('#description').val(),
-                            page: 1
-                        }, 
-                        {}, 
-                        {});
-            });
-            $('#pagination').twbsPagination({
-                startPage: pageCurrent,
-                totalPages: totalPagesCurrent,
-                visiblePages: 11,
-                initiateStartPageClick: false,
-                first:'&lt;&lt;',
-                prev:'&lt;',
-                next:'&gt;',
-                last:'&gt;&gt;',
-                onPageClick: function (e, pageClicked) {
-                    e.preventDefault();
-                    location.params({page: pageClicked}, {}, {});
+        const stringPlaceholders = [
+            { operation: 'LIKE', text: 'Format:%any string%any string%'},
+            { operation: 'NOT_EMPTY', text: 'Format: leave it blank'},
+            { operation: 'OTHERS', text: 'Format: any string'}
+        ];
+        const numberPlaceholders = [{operation: 'OTHERS', text: 'Format: numeric'}];
+        const mapPlaceholders = [
+            { operation: 'EQUALS', text: 'Format: config: value,...'},
+            { operation: 'NOT_EMPTY', text: 'Format: leave it blank'},
+            { operation: 'LIKE', text: 'Format: %any string%any other string%'},
+            { operation: 'OTHERS', text: 'Format: any string'}
+        ];
+
+        function initColumns() {
+            setFilterColumnsArray( [
+                {id:'topicName', label: 'Topic name', type: 'string', placeholders: stringPlaceholders },
+                {id:'partitionCount', label: 'Partition count', type: 'number', placeholder: numberPlaceholders},
+                {id:'replicationFactor', label: 'Replication factor', type: 'number', placeholders: numberPlaceholders},
+                {id:'consumerCount', label: 'Consumer count', type: 'number', placeholders: numberPlaceholders},
+                {id:'replicationState', label: 'Replication state', type: 'enum', values: ['ANY_REPLICATED', 'FULLY_REPLICATED', 'UNDER_REPLICATED'], placeholders: []},
+                {id:'configString', label: 'Config string', type: 'map', placeholders: mapPlaceholders},
+                {id:'description', label: 'Description', type: 'string', placeholders: stringPlaceholders}
+            ]);
+        }
+
+        function copyActualUrl() {
+            copyText(location.origin + location.pathname + getClausesAsQueryParams(false), $('#copyUrlButton'));
+        }
+
+        $(document).ready(function() {
+
+            const generateQueryUrl = () => {
+                return '/kafka-manager/topic_list' + getClausesAsQueryParams(true);
+            }
+
+            const columnsDef = [
+                { data: 'name',
+                    render: function (data, type, row, meta) {
+                        return '<a style="word-break: break-all;" href="/kafka-manager/topics/'+data+'">'+data+'</a>'
+                    }
+                },
+                { data: 'partitions' },
+                { data: 'replicas' },
+                { data: 'config',
+                    render: (data, type) => {
+                        let configs = '';
+                        if (data !== null) {
+                            configs='<pre class="normal-pre">'+prettyJson2(data)+'</pre>';
+                        }
+                        return configs;
+                    }
+                },
+                { data: 'consumerGroups',
+                    render: (data, type) => {
+                        let consumerGroups = '';
+                        if (data !== null && data.length>0) {
+                            for(let ii=0;ii<data.length;ii++) {
+                                consumerGroups += '<a href="/kafka-manager/consumer_groups/'+data[ii]+'">'+data[ii]+'</a>' + ((ii<data.length-1) ? '</br>' : '');
+                            }
+                        }
+                        return consumerGroups;
+                    }
+                },
+                { data: 'description' },
+                { data: 'topicDataURL',
+                    render: (data, type) => {
+                        return '<div class="external-tools">' +
+                            '<a href="/kafka-manager/topics/'+data+'/browser">' +
+                            '<i class="fa fa-search info" aria-hidden="true"></i> ' +
+                            '</a>' +
+                            '</div>';
+                    }
+                },
+                { data: 'schemaCatalog' ,
+                    render: (data, type) => {
+                        return data === null ? '' :
+                            '<div class="external-tools">' +
+                            '<a href="'+data.url+'" target="_blank">' +
+                            '<i class="fa '+data.icon+' info" aria-hidden="true"></i> ' +
+                            '</a>' +
+                            '</div>';
+                    }
+                },
+                { data: 'grafanaMetrics' ,
+                    render: (data, type) => {
+                        return data === null ? '' :
+                            '<div class="external-tools">' +
+                            '<a href="'+data.url+'" target="_blank">' +
+                            '<i class="fa '+data.icon+' info" aria-hidden="true"></i>' +
+                            '</a>' +
+                            '</div>';
+                    }
+                },
+            ];
+
+            if(externalTools!==null && externalTools.length>0) {
+                for (let ii=0;ii<externalTools.length;ii++) {
+                    columnsDef.push(
+                        { data: 'externalTools' ,
+                            render: (data, type) => {
+                                return data === undefined || data === null ? '' :
+                                    '<div class="external-tools">' +
+                                        '<a href="'+data[ii].url+'" target="_blank">' +
+                                            '<i class="fa '+data[ii].icon+' info" aria-hidden="true"></i>' +
+                                        '</a>' +
+                                    '</div>';
+                            }
+                        }
+                    );
                 }
-            });
+            }
+
             const sortingOrderTopicName = [0, 'asc'];
             dataTable = $('#topics-table').DataTable({
-                paging: false,
-                info: false,
-                scrollY: "40vh",
-                scrollCollapse: true,
-                order: [sortingOrderTopicName],
+                processing: true,
+                serverSide: false,
+                ajax: {
+                    url: generateQueryUrl(),
+                    type: 'GET'
+                },
                 initComplete: function(settings, json) {
                     setTimeout( api => api.columns.adjust(), 1000, this.api());
                 },
+                columns: columnsDef,
+                paging: true,
+                pagingType: 'full_numbers',
+                info: true,
+                lengthMenu: [ 10, 20, 30 ],
+                pageLength: 20,
+                scrollY: "50vh",
+                scrollCollapse: true,
+                scrollX: false,
+                order: [sortingOrderTopicName],
+                search: {
+                    return: true,
+                },
                 language: {
-                    searchPlaceholder: "Enter this page search expression"
+                    searchPlaceholder: "Enter this page search expression",
+                    processing: "<span class='fa-stack fa-lg'>\n\
+                                     <i class='fa fa-spinner fa-spin fa-stack-2x fa-fw'></i>\n\
+                                 </span>&emsp;Processing ..."
                 }
             });
 
-            let toggleFullScreen = ( mode ) => {
+            const toggleFullScreen = ( mode ) => {
+                const fullScreenButton = $('#full-screen-button');
                 if(mode==='maximize') {
                     $('#recordTableContainer').addClass("full-screen");
                     $('.dataTables_scrollBody').css("min-height","80vh");
-                    $('#topics-table').css("min-height","80vh");
-                    $('#full-screen-button').text("Exit full screen");
-                    dataTable.columns.adjust();
+                    fullScreenButton.html("Exit full screen <i class='fa fa-window-restore'></i>");
                     $('#fullScreen').val(true);
                 } else {
                     $('#recordTableContainer').removeClass("full-screen");
-                    $('#topics-table').css("min-height","45vh");
                     $('.dataTables_scrollBody').css("min-height","45vh");
-                    $('#full-screen-button').text("Full screen");
-                    dataTable.columns.adjust();
+                    fullScreenButton.html("Full screen <i class='fa fa-window-maximize'></i>");
                     $('#fullScreen').val(false);
                 }
             }
+
+            $('#query-param-filter-apply-button').click(function (e) {
+                dataTable.ajax.url(generateQueryUrl()).load(
+                    function ( json ) {
+                       dataTable.columns.adjust();
+                    }, true);
+            });
 
             $('#full-screen-button').click(function (e) {
                 if($('#recordTableContainer')[0].classList.contains("full-screen")) {
@@ -101,35 +201,36 @@
                 } else {
                     toggleFullScreen('maximize');
                 }
+                dataTable.columns.adjust();
             });
 
-            hideWaitingSign();
+            $('.export-button').click(function (event) {
+                const exporterType = $(event.target).data('export-type');
+                window.open('/kafka-manager/topics_export' + getClausesAsQueryParams(true) + '&exporterType=' + exporterType,'_blank');
+            })
+
         });
+
+
     </script>
 
+    <div th:replace="templates :: info-modal"></div>
+    <div th:replace="templates :: confirm-modal"></div>
     <div th:replace="templates :: navbar"></div>
-
-    <div th:replace="templates :: loading-modal"></div>
-
+    
     <div class="main-content">
 
         <div class="container-fluid">
 
             <div class="row">
-                <div class="col-md-12">
-                    <h3>Topics (<span th:text="${totalCount}"></span>)</h3>
-                </div>
-            </div>
-        
-            <div class="row">
 
                 <div class="col-md-12">
-
+                
                     <div class="card mb-3">
+
                         <div class="card-body">
                         
-                            <a 
-                                th:href="@{/topic_create}" 
+                            <a  th:href="@{/topic_create}"
                                 class="btn btn-primary">
                                 Create <i class="fa fa-plus"></i>
                             </a>
@@ -146,112 +247,47 @@
                                 </button>
                                 <ul class="dropdown-menu" aria-labelledby="exportButton">
                                     <li>
-                                        <a class="dropdown-item"
-                                            th:href="@{/topics_export(exporterType=PLAIN, topicName=${searchCriteria.topicName}, minPartitionCount=${searchCriteria.minPartitionCount}, maxPartitionCount=${searchCriteria.maxPartitionCount}, minReplicationFactor=${searchCriteria.minReplicationFactor}, maxReplicationFactor=${searchCriteria.maxReplicationFactor}, minConsumerCount=${searchCriteria.minConsumerCount}, maxConsumerCount=${searchCriteria.maxConsumerCount}, replicationState=${searchCriteria.replicationState}, configString=${searchCriteria.configString}, description=${searchCriteria.description})}" target="_blank">
+                                        <a class="dropdown-item export-button"
+                                            data-export-type="PLAIN">
                                             Plain
                                         </a>
                                     </li>
                                     <li>
-                                        <a class="dropdown-item"
-                                            th:href="@{/topics_export(exporterType=JSON, topicName=${searchCriteria.topicName}, minPartitionCount=${searchCriteria.minPartitionCount}, maxPartitionCount=${searchCriteria.maxPartitionCount}, minReplicationFactor=${searchCriteria.minReplicationFactor}, maxReplicationFactor=${searchCriteria.maxReplicationFactor}, minConsumerCount=${searchCriteria.minConsumerCount}, maxConsumerCount=${searchCriteria.maxConsumerCount}, replicationState=${searchCriteria.replicationState}, configString=${searchCriteria.configString}, description=${searchCriteria.description})}" target="_blank">
-                                            Json
+                                        <a class="dropdown-item export-button"
+                                           data-export-type="JSON">
+                                           Json
                                         </a>
                                     </li>
                                 </ul>
                             </div>
 
+                            <a  onclick="copyActualUrl()"
+                                id="copyUrlButton"
+                                class="btn btn-primary btn-success ms-3">
+                                Copy URL <i class="fa fa-copy"></i>
+                            </a>
+
                         </div>
-                    </div>            
-                
-                    <form class="form-inline form-flex flex-wrap" id="search_form">
-                        <input
-                            type="text"
-                            class="form-control col-auto"
-                            id="topicName" 
-                            placeholder="Topic Name"
-                            th:value="${searchCriteria.topicName}"/>
-                        <input
-                            type="number"
-                            class="form-control col-auto"
-                            min="1"
-                            id="minPartitionCount" 
-                            placeholder="Min Partition Count"
-                            th:value="${searchCriteria.minPartitionCount}"/>
-                        <input 
-                            type="number"
-                            class="form-control col-auto"
-                            min="1"
-                            id="maxPartitionCount" 
-                            placeholder="Max Partition Count"
-                            th:value="${searchCriteria.maxPartitionCount}"/>
-                        <input 
-                            type="number"
-                            class="form-control col-auto"
-                            min="1"
-                            id="minReplicationFactor" 
-                            placeholder="Min Replication Factor"
-                            th:value="${searchCriteria.minReplicationFactor}"/>
-                        <input 
-                            type="number"
-                            class="form-control col-auto"
-                            min="1"
-                            id="maxReplicationFactor" 
-                            placeholder="Max Replication Factor"
-                            th:value="${searchCriteria.maxReplicationFactor}"/>
-                        <input 
-                            type="number"
-                            class="form-control col-auto"
-                            min="1"
-                            id="minConsumerCount" 
-                            placeholder="Min Consumer Count"
-                            th:value="${searchCriteria.minConsumerCount}"/>
-                        <input 
-                            type="number"
-                            class="form-control col-auto"
-                            min="1"
-                            id="maxConsumerCount" 
-                            placeholder="Max Consumer Count"
-                            th:value="${searchCriteria.maxConsumerCount}"/>
-                        <select title="Replication State" class="form-select col-auto" id="replicationState">
-                            <option 
-                                th:each="state : ${T(com.epam.eco.kafkamanager.TopicSearchCriteria$ReplicationState).values()}"
-                                th:value="${state}" 
-                                th:text="${state}"
-                                th:selected="${state == searchCriteria.replicationState}">
-                            </option>
-                        </select>
-                        <input
-                            type="text"
-                            class="form-control col-auto"
-                            id="configString" 
-                            placeholder="Config: Value;..."
-                            th:value="${searchCriteria.configString}"/>
-                        <input
-                            type="text"
-                            class="form-control col-auto"
-                            id="description" 
-                            placeholder="Description"
-                            th:value="${searchCriteria.description}"/>
-                        <button
-                            type="submit"
-                            class="btn btn-primary">
-                            Find
-                        </button>
-                        <input id="fullScreen" name="fullScreen" th:value="${fullScreen}" type="hidden" value="false" />
-                    </form>
-                
+
+                    </div>
+
+                    <div th:replace="templates :: query-param-filter"></div>
+
                 </div>
             
             </div>
             
             <div class="row">
-
+        
                 <div class="col-md-12">
 
-                    <div id="recordTableContainer" th:if="${page != null}" style="background: white;">
-                        <div class="d-flex">
-                            <h6>Topics</h6>
-                            <button id="full-screen-button" class="btn btn-secondary btn-sm to-right">Full screen</button>
+                    <div id="recordTableContainer" style="background: white;">
+                        <div class="d-flex" style="padding: 0 2em 0 2em">
+                            <h6>Topic list</h6>
+                            <button id="full-screen-button" class="btn btn-secondary btn-sm to-right">
+                                Full screen
+                                <i id="full-screen-icon" class="fa fa-window-maximize" aria-hidden="true"></i>
+                            </button>
                         </div>
                         <table id="topics-table" class="table table-bordered table-striped table-hover">
                             <thead>
@@ -271,65 +307,7 @@
                                     </td>
                                 </tr>
                             </thead>
-                            <tbody>
-                                <tr
-                                    th:each="topic : ${page.content}"
-                                    th:classappend="${topic.hasUnderReplicatedPartitions()} ? 'warning' : ''">
-                                    <td>
-                                        <a th:href="@{/topics/{name}(name=${topic.name})}">
-                                            <span th:text="${topic.name}"></span>
-                                        </a>
-                                    </td>
-                                    <td th:text="${topic.partitionCount}"></td>
-                                    <td th:text="${topic.replicationFactor}"></td>
-                                    <td
-                                        th:text="${topic.configOverridesAsString}"
-                                        style="white-space:pre-wrap;"></td>
-                                    <td>
-                                        <th:block th:each="group : ${topic.getConsumerGroupNamesAsCollapsedCol(5)}">
-                                            <a th:if="${!group.divider}" th:href="@{/consumer_groups/{name}(name=${group.value})}">
-                                                <span th:text="${group.value}" style="float:left;clear:left;"></span>
-                                            </a>
-                                            <span th:if="${group.divider}" th:text="..." style="float:left;clear:left;"></span>
-                                        </th:block>
-                                    </td>
-                                    <td
-                                        th:text="${topic.metadataDescription}"
-                                        style="word-wrap:break-word;max-width:150px">
-                                    </td>
-                                    <td style="text-align: center;width:50px;">
-                                        <a th:href="@{/topics/{name}/browser(name=${topic.name})}">
-                                            <i class="fa fa-search info" aria-hidden="true"></i>
-                                        </a>
-                                    </td>
-                                    <td th:if="${dataCatalogUrlTemplate!=null}" style="text-align: center;width:50px;">
-                                        <a th:href="@{|${dataCatalogUrlTemplate.resolve(topic.name)}|}" target="_blank">
-                                            <i th:class="${'fa '+dataCatalogUrlTemplate.getIcon()+' info'}" aria-hidden="true"></i>
-                                        </a>
-                                    </td>
-                                    <td th:if="${grafanaMetricsUrlTemplate!=null}" style="text-align: center;width:50px;">
-                                        <a th:href="@{|${grafanaMetricsUrlTemplate.resolve(topic.name)}|}" target="_blank">
-                                            <i th:class="${'fa '+grafanaMetricsUrlTemplate.getIcon()+' info'}" aria-hidden="true"></i>
-                                        </a>
-                                     </td>
-                                     <td th:each="tool: ${externalToolTemplates}"
-                                         th:if="${externalToolTemplates!=null && externalToolTemplates.size()>0}"
-                                         style="text-align: center;width:50px;">
-                                         <a th:href="@{|${tool.resolve(topic.name)}|}" target="_blank">
-                                            <i th:class="${'fa '+tool.getIcon()+' info'}" aria-hidden="true"></i>
-                                         </a>
-                                     </td>
-                                </tr>
-                            </tbody>
                         </table>
-
-                        <div
-                            th:if="${page.numberOfElements > 0}"
-                            th:text="${'Showing ' + (page.number * page.size + 1) + ' to ' + (page.number * page.size + page.numberOfElements) + ' of ' + page.totalElements}">
-                        </div>
-                        
-                        <ul id="pagination" class="pagination pagination-sm"></ul>
-        
                     </div>
         
                 </div>
