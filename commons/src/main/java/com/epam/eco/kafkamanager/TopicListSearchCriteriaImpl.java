@@ -22,7 +22,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-import java.util.function.BiFunction;
+import java.util.function.BiPredicate;
 import java.util.function.Function;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
@@ -72,9 +72,7 @@ public class TopicListSearchCriteriaImpl implements TopicSearchCriteria {
     @Override
     public boolean matches(TopicInfo obj) {
         Validate.notNull(obj, "Topic Info is null");
-        return clauses.stream().allMatch(clause -> (Boolean) clause.getClausesHandler().apply(clause.getClauses(),
-                                                                                              clause.getValueExtractor().apply(
-                                                                                                      obj)));
+        return clauses.stream().allMatch(clause -> clause.match(obj));
     }
 
     @Override
@@ -99,21 +97,8 @@ public class TopicListSearchCriteriaImpl implements TopicSearchCriteria {
         return "{ clauses: " + clauses + "}";
     }
 
-    public Builder toBuilder() {
-        return builder(this);
-    }
-
-    public static Builder builder() {
-        return builder(null);
-    }
-
-    public static Builder builder(TopicListSearchCriteriaImpl origin) {
-        return new Builder(origin);
-    }
-
     public static TopicListSearchCriteriaImpl fromJsonWith(Map<String, ?> map, KafkaManager kafkaManager) {
-        TopicListSearchCriteriaImpl topicListSearchCriteria = parseTopicCriteria(map, kafkaManager);
-        return topicListSearchCriteria.toBuilder().kafkaManager(kafkaManager).build();
+        return parseTopicCriteria(map, kafkaManager);
     }
 
     static Map<String, String> parseConfigString(String configString) {
@@ -218,36 +203,6 @@ public class TopicListSearchCriteriaImpl implements TopicSearchCriteria {
                 kafkaManager);
     }
 
-    public static class Builder {
-
-        private Set<ClausesWithHandler> clauses;
-
-        private KafkaManager kafkaManager;
-
-        private Builder(TopicListSearchCriteriaImpl origin) {
-            if(origin == null) {
-                return;
-            }
-            this.clauses = origin.clauses;
-            this.kafkaManager = origin.kafkaManager;
-        }
-
-        public Builder clauses(Set<ClausesWithHandler> clauses) {
-            this.clauses = clauses;
-            return this;
-        }
-
-        public Builder kafkaManager(KafkaManager kafkaManager) {
-            this.kafkaManager = kafkaManager;
-            return this;
-        }
-
-        public TopicListSearchCriteriaImpl build() {
-            return new TopicListSearchCriteriaImpl(clauses, kafkaManager);
-        }
-
-    }
-
     private static class SingleClause<T> {
         private final T filterValue;
         private final Operation operation;
@@ -292,20 +247,25 @@ public class TopicListSearchCriteriaImpl implements TopicSearchCriteria {
 
     private static class ClausesWithHandler<T, V> {
         private final Set<SingleClause<T>> clauses;
-        private final BiFunction<Set<SingleClause<T>>, V, Boolean> clausesHandler;
+        private final BiPredicate<Set<SingleClause<T>>, V> clausesHandler;
         private final Function<TopicInfo, V> valueExtractor;
 
-        private ClausesWithHandler(Set<SingleClause<T>> clauses, BiFunction<Set<SingleClause<T>>, V, Boolean> clausesHandler, Function<TopicInfo, V> valueExtractor) {
+        private ClausesWithHandler(Set<SingleClause<T>> clauses,
+                                   BiPredicate<Set<SingleClause<T>>, V> clausesHandler,
+                                   Function<TopicInfo, V> valueExtractor) {
             this.clauses = clauses;
             this.clausesHandler = clausesHandler;
             this.valueExtractor = valueExtractor;
         }
 
+        boolean match(TopicInfo obj) {
+            return getClausesHandler().test(getClauses(),getValueExtractor().apply(obj));
+        }
         public Set<SingleClause<T>> getClauses() {
             return clauses;
         }
 
-        public BiFunction<Set<SingleClause<T>>, V, Boolean> getClausesHandler() {
+        public BiPredicate<Set<SingleClause<T>>, V> getClausesHandler() {
             return clausesHandler;
         }
 
@@ -315,14 +275,14 @@ public class TopicListSearchCriteriaImpl implements TopicSearchCriteria {
 
     }
 
-    private static final BiFunction<Set<SingleClause<String>>, String, Boolean> stringClausesHandler = (Set<SingleClause<String>> stringClauses, String value) -> stringClauses.stream().allMatch(
+    private static final BiPredicate<Set<SingleClause<String>>, String> stringClausesHandler = (Set<SingleClause<String>> stringClauses, String value) -> stringClauses.stream().allMatch(
             clause -> compareStringValues(clause.getFilterValue(), value, clause.getOperation()));
 
 
-    private static final BiFunction<Set<SingleClause<Integer>>, Integer, Boolean> numericClausesHandler = (Set<SingleClause<Integer>> numericClauses, Integer value) -> numericClauses.stream().allMatch(
+    private static final BiPredicate<Set<SingleClause<Integer>>, Integer> numericClausesHandler = (Set<SingleClause<Integer>> numericClauses, Integer value) -> numericClauses.stream().allMatch(
             clause -> compareNumberValues(clause.getFilterValue(), value, clause.getOperation()));
 
-    private static final BiFunction<Set<SingleClause<ReplicationState>>, TopicInfo, Boolean> replicationStateClausesHandler = (Set<SingleClause<ReplicationState>> clauses, TopicInfo topicInfo) -> clauses.stream().allMatch(
+    private static final BiPredicate<Set<SingleClause<ReplicationState>>, TopicInfo> replicationStateClausesHandler = (Set<SingleClause<ReplicationState>> clauses, TopicInfo topicInfo) -> clauses.stream().allMatch(
             clause -> {
                 Boolean underReplicated = null;
                 if(ReplicationState.FULLY_REPLICATED == clause.getFilterValue()) {
@@ -333,7 +293,7 @@ public class TopicListSearchCriteriaImpl implements TopicSearchCriteria {
                 return (underReplicated == null || topicInfo.hasUnderReplicatedPartitions() == underReplicated);
             });
 
-    private static final BiFunction<Set<SingleClause<String>>, TopicInfo, Boolean> configMapClausesHandler =
+    private static final BiPredicate<Set<SingleClause<String>>, TopicInfo> configMapClausesHandler =
             (Set<SingleClause<String>> clauses, TopicInfo topicInfo) ->
                     clauses.stream().allMatch(clause -> configMapSingleClauseHandler(clause, topicInfo));
 
@@ -369,7 +329,7 @@ public class TopicListSearchCriteriaImpl implements TopicSearchCriteria {
             case CONTAINS:
                 return StringUtils.containsIgnoreCase(value, filterValue);
             case NOT_EMPTY:
-                return ! StringUtils.isBlank(value);
+                return !StringUtils.isBlank(value);
             case LIKE: {
                 try {
                     return like(value, filterValue);
