@@ -45,7 +45,6 @@ public class TopicListSearchCriteriaImplTest {
     private static final String DESCRIPTION = "topic description";
     private static final String DESCRIPTION_TEST = "topic test the string description";
     private static final KafkaManager kafkaManager = Mockito.mock(KafkaManager.class);
-    private TopicListSearchCriteriaImpl criteria;
 
     @BeforeAll
     public static void beforeAll() {
@@ -74,7 +73,7 @@ public class TopicListSearchCriteriaImplTest {
     @Test
     public void topicNameLikeTest() {
         Map<String, String> filterMap = Map.of("topicName_LIKE","%staff%roles%");
-        criteria = TopicListSearchCriteriaImpl.fromJsonWith(filterMap,kafkaManager);
+        TopicListSearchCriteriaImpl criteria = TopicListSearchCriteriaImpl.fromJsonWith(filterMap,kafkaManager);
         TopicInfo topicInfo = TopicSearchCriteriaUtils
                 .generateTopicInfo(STAFF_ROLES_TOPIC_NAME, 3, 3, Map.of(), DESCRIPTION);
         Assertions.assertTrue(criteria.matches(topicInfo));
@@ -85,7 +84,7 @@ public class TopicListSearchCriteriaImplTest {
     @Test
     public void topicNameEqualsTest() {
         Map<String, String> filterMap = Map.of("topicName_EQUALS", STAFF_TOPIC_NAME);
-        criteria = TopicListSearchCriteriaImpl.fromJsonWith(filterMap,kafkaManager);
+        TopicListSearchCriteriaImpl criteria = TopicListSearchCriteriaImpl.fromJsonWith(filterMap,kafkaManager);
         TopicInfo topicInfo = TopicSearchCriteriaUtils
                 .generateTopicInfo(STAFF_ROLES_TOPIC_NAME, 3, 3, Map.of(), DESCRIPTION);
         Assertions.assertFalse(criteria.matches(topicInfo));
@@ -96,7 +95,7 @@ public class TopicListSearchCriteriaImplTest {
     @Test
     public void topicNameContainsTest() {
         Map<String, String> filterMap = Map.of("topicName_CONTAINS", TOPIC_NAME_CONTAINS);
-        criteria = TopicListSearchCriteriaImpl.fromJsonWith(filterMap,kafkaManager);
+        TopicListSearchCriteriaImpl criteria = TopicListSearchCriteriaImpl.fromJsonWith(filterMap,kafkaManager);
         TopicInfo topicInfo = TopicSearchCriteriaUtils
                 .generateTopicInfo(STAFF_ROLES_TOPIC_NAME, 3, 3, Map.of(), DESCRIPTION);
         Assertions.assertTrue(criteria.matches(topicInfo));
@@ -107,7 +106,7 @@ public class TopicListSearchCriteriaImplTest {
     @Test
     public void partitionCountGreaterTest() {
         Map<String, String> filterMap = Map.of("partitionCount_GREATER", "2");
-        criteria = TopicListSearchCriteriaImpl.fromJsonWith(filterMap, kafkaManager);
+        TopicListSearchCriteriaImpl criteria = TopicListSearchCriteriaImpl.fromJsonWith(filterMap, kafkaManager);
         TopicInfo topicInfo = TopicSearchCriteriaUtils.generateTopicInfo(STAFF_ROLES_TOPIC_NAME, 3, 3, Map.of(), DESCRIPTION);
         Assertions.assertTrue(criteria.matches(topicInfo));
         filterMap = Map.of("partitionCount_GREATER", "3");
@@ -118,7 +117,7 @@ public class TopicListSearchCriteriaImplTest {
     public void partitionCountLessTest() {
 
         Map<String, String> filterMap = Map.of("partitionCount_LESS", "2");
-        criteria = TopicListSearchCriteriaImpl.fromJsonWith(filterMap,kafkaManager);
+        TopicListSearchCriteriaImpl criteria = TopicListSearchCriteriaImpl.fromJsonWith(filterMap,kafkaManager);
         TopicInfo topicInfo = TopicSearchCriteriaUtils.generateTopicInfo(STAFF_ROLES_TOPIC_NAME, 3, 3, Map.of(), DESCRIPTION);
         Assertions.assertFalse(criteria.matches(topicInfo));
         filterMap = Map.of("partitionCount_LESS", "4");
@@ -131,7 +130,7 @@ public class TopicListSearchCriteriaImplTest {
     @Test
     public void partitionCountBetweenTest() {
         Map<String, String> filterMap = Map.of("partitionCount_GREATER", "2", "partitionCount_LESS", "4");
-        criteria = TopicListSearchCriteriaImpl.fromJsonWith(filterMap,kafkaManager);
+        TopicListSearchCriteriaImpl criteria = TopicListSearchCriteriaImpl.fromJsonWith(filterMap,kafkaManager);
         TopicInfo topicInfo = TopicSearchCriteriaUtils.generateTopicInfo(STAFF_ROLES_TOPIC_NAME, 3, 3, Map.of(), DESCRIPTION);
         Assertions.assertTrue(criteria.matches(topicInfo));
 
@@ -153,7 +152,7 @@ public class TopicListSearchCriteriaImplTest {
     @Test
     public void replicationFactorGreaterTest() {
         Map<String, String> filterMap = Map.of("replicationFactor_GREATER", "2");
-        criteria = TopicListSearchCriteriaImpl.fromJsonWith(filterMap, kafkaManager);
+        TopicListSearchCriteriaImpl criteria = TopicListSearchCriteriaImpl.fromJsonWith(filterMap, kafkaManager);
         TopicInfo topicInfo = TopicSearchCriteriaUtils.generateTopicInfo(STAFF_ROLES_TOPIC_NAME, 3, 3, Map.of(), DESCRIPTION);
         Assertions.assertTrue(criteria.matches(topicInfo));
         filterMap = Map.of("replicationFactor_GREATER", "9");
@@ -164,7 +163,7 @@ public class TopicListSearchCriteriaImplTest {
     public void replicationFactorLessTest() {
 
         Map<String, String> filterMap = Map.of("replicationFactor_LESS", "2");
-        criteria = TopicListSearchCriteriaImpl.fromJsonWith(filterMap,kafkaManager);
+        TopicListSearchCriteriaImpl criteria = TopicListSearchCriteriaImpl.fromJsonWith(filterMap,kafkaManager);
         TopicInfo topicInfo = TopicSearchCriteriaUtils.generateTopicInfo(STAFF_ROLES_TOPIC_NAME, 3, 3, Map.of(), DESCRIPTION);
         Assertions.assertFalse(criteria.matches(topicInfo));
         filterMap = Map.of("replicationFactor_LESS", "4");
@@ -177,7 +176,7 @@ public class TopicListSearchCriteriaImplTest {
     @Test
     public void replicationFactorBetweenTest() {
         Map<String, String> filterMap = Map.of("replicationFactor_GREATER", "2", "replicationFactor_LESS", "4");
-        criteria = TopicListSearchCriteriaImpl.fromJsonWith(filterMap,kafkaManager);
+        TopicListSearchCriteriaImpl criteria = TopicListSearchCriteriaImpl.fromJsonWith(filterMap,kafkaManager);
         TopicInfo topicInfo = TopicSearchCriteriaUtils.generateTopicInfo(STAFF_ROLES_TOPIC_NAME, 3, 3, Map.of(), DESCRIPTION);
         Assertions.assertTrue(criteria.matches(topicInfo));
 
@@ -198,7 +197,7 @@ public class TopicListSearchCriteriaImplTest {
     @Test
     public void consumerCountGreaterTest() {
         Map<String, String> filterMap = Map.of("consumerCount_GREATER", "2");
-        criteria = TopicListSearchCriteriaImpl.fromJsonWith(filterMap, kafkaManager);
+        TopicListSearchCriteriaImpl criteria = TopicListSearchCriteriaImpl.fromJsonWith(filterMap, kafkaManager);
         TopicInfo topicInfo = TopicSearchCriteriaUtils.generateTopicInfo(CONSUMER_GROUPS_TEST_TOPIC, 3, 3,  Map.of(), DESCRIPTION);
         Assertions.assertTrue(criteria.matches(topicInfo));
         filterMap = Map.of("consumerCount_GREATER", "4");
@@ -209,7 +208,7 @@ public class TopicListSearchCriteriaImplTest {
     public void consumerCountLessTest() {
 
         Map<String, String> filterMap = Map.of("consumerCount_LESS", "2");
-        criteria = TopicListSearchCriteriaImpl.fromJsonWith(filterMap,kafkaManager);
+        TopicListSearchCriteriaImpl criteria = TopicListSearchCriteriaImpl.fromJsonWith(filterMap,kafkaManager);
         TopicInfo topicInfo = TopicSearchCriteriaUtils.generateTopicInfo(CONSUMER_GROUPS_TEST_TOPIC, 3, 3, Map.of(), DESCRIPTION);
         Assertions.assertFalse(criteria.matches(topicInfo));
         filterMap = Map.of("consumerCount_LESS", "4");
@@ -222,7 +221,7 @@ public class TopicListSearchCriteriaImplTest {
     @Test
     public void consumerCountBetweenTest() {
         Map<String, String> filterMap = Map.of("consumerCount_GREATER", "2", "consumerCount_LESS", "4");
-        criteria = TopicListSearchCriteriaImpl.fromJsonWith(filterMap,kafkaManager);
+        TopicListSearchCriteriaImpl criteria = TopicListSearchCriteriaImpl.fromJsonWith(filterMap,kafkaManager);
         TopicInfo topicInfo = TopicSearchCriteriaUtils.generateTopicInfo(CONSUMER_GROUPS_TEST_TOPIC, 3, 3, Map.of(), DESCRIPTION);
         Assertions.assertTrue(criteria.matches(topicInfo));
 
@@ -243,7 +242,7 @@ public class TopicListSearchCriteriaImplTest {
     @Test
     public void replicationStateHasReplicatedTest() {
         Map<String, String> filterMap = Map.of("replicationState_EQUALS", "ANY_REPLICATED");
-        criteria = TopicListSearchCriteriaImpl.fromJsonWith(filterMap, kafkaManager);
+        TopicListSearchCriteriaImpl criteria = TopicListSearchCriteriaImpl.fromJsonWith(filterMap, kafkaManager);
         TopicInfo topicInfo = TopicSearchCriteriaUtils.generateTopicInfo(CONSUMER_GROUPS_TEST_TOPIC, 2, 2, Map.of(), DESCRIPTION);
         Assertions.assertTrue(criteria.matches(topicInfo));
         filterMap = Map.of("replicationState_EQUALS", "FULLY_REPLICATED");
@@ -257,7 +256,7 @@ public class TopicListSearchCriteriaImplTest {
     @Test
     public void replicationStateHasNotReplicatedTest() {
         Map<String, String> filterMap = Map.of("replicationState_EQUALS", "ANY_REPLICATED");
-        criteria = TopicListSearchCriteriaImpl.fromJsonWith(filterMap, kafkaManager);
+        TopicListSearchCriteriaImpl criteria = TopicListSearchCriteriaImpl.fromJsonWith(filterMap, kafkaManager);
         TopicInfo topicInfo = TopicSearchCriteriaUtils.generateTopicInfo(CONSUMER_GROUPS_TEST_TOPIC, 2, 0, Map.of(), DESCRIPTION, false);
         Assertions.assertTrue(criteria.matches(topicInfo));
         filterMap = Map.of("replicationState_EQUALS", "FULLY_REPLICATED");
@@ -271,7 +270,7 @@ public class TopicListSearchCriteriaImplTest {
     @Test
     public void configAsMapEqualsTest() {
         Map<String, String> filterMap = Map.of("configString_EQUALS", "cleanup.policy: compact");
-        criteria = TopicListSearchCriteriaImpl.fromJsonWith(filterMap,kafkaManager);
+        TopicListSearchCriteriaImpl criteria = TopicListSearchCriteriaImpl.fromJsonWith(filterMap,kafkaManager);
         TopicInfo topicInfo = TopicSearchCriteriaUtils.generateTopicInfo(CONSUMER_GROUPS_TEST_TOPIC, 3, 3, CONFIG_MAP_COMPACT, DESCRIPTION);
         Assertions.assertTrue(criteria.matches(topicInfo));
         filterMap = Map.of("configString_EQUALS", "cleanup.policy: delete");
@@ -290,7 +289,7 @@ public class TopicListSearchCriteriaImplTest {
     @Test
     public void configAsStringTest() {
         Map<String, String> filterMap = Map.of("configString_EQUALS", "compact");
-        criteria = TopicListSearchCriteriaImpl.fromJsonWith(filterMap,kafkaManager);
+        TopicListSearchCriteriaImpl criteria = TopicListSearchCriteriaImpl.fromJsonWith(filterMap,kafkaManager);
         TopicInfo topicInfo = TopicSearchCriteriaUtils.generateTopicInfo(CONSUMER_GROUPS_TEST_TOPIC, 3, 3, CONFIG_MAP_COMPACT, DESCRIPTION);
         Assertions.assertTrue(criteria.matches(topicInfo));
         filterMap = Map.of("configString_EQUALS", "cleanup.policy");
@@ -316,7 +315,7 @@ public class TopicListSearchCriteriaImplTest {
     @Test
     public void descriptionLikeTest() {
         Map<String, String> filterMap = Map.of("description_LIKE","%test%string%");
-        criteria = TopicListSearchCriteriaImpl.fromJsonWith(filterMap,kafkaManager);
+        TopicListSearchCriteriaImpl criteria = TopicListSearchCriteriaImpl.fromJsonWith(filterMap,kafkaManager);
         TopicInfo topicInfo = TopicSearchCriteriaUtils.generateTopicInfo(STAFF_ROLES_TOPIC_NAME, 3, 3, Map.of(), DESCRIPTION_TEST);
         Assertions.assertTrue(criteria.matches(topicInfo));
         topicInfo = TopicSearchCriteriaUtils.generateTopicInfo(STAFF_TOPIC_NAME, 3, 3, Map.of(), DESCRIPTION);
@@ -326,7 +325,7 @@ public class TopicListSearchCriteriaImplTest {
     @Test
     public void descriptionEqualsTest() {
         Map<String, String> filterMap = Map.of("description_EQUALS", DESCRIPTION_TEST);
-        criteria = TopicListSearchCriteriaImpl.fromJsonWith(filterMap,kafkaManager);
+        TopicListSearchCriteriaImpl criteria = TopicListSearchCriteriaImpl.fromJsonWith(filterMap,kafkaManager);
         TopicInfo topicInfo = TopicSearchCriteriaUtils.generateTopicInfo(STAFF_ROLES_TOPIC_NAME, 3, 3, Map.of(), DESCRIPTION);
         Assertions.assertFalse(criteria.matches(topicInfo));
         topicInfo = TopicSearchCriteriaUtils.generateTopicInfo(STAFF_TOPIC_NAME, 3, 3, Map.of(), DESCRIPTION_TEST);
@@ -336,7 +335,7 @@ public class TopicListSearchCriteriaImplTest {
     @Test
     public void descriptionContainsTest() {
         Map<String, String> filterMap = Map.of("description_CONTAINS", "test the string", "description_LIKE", "%test%string%");
-        criteria = TopicListSearchCriteriaImpl.fromJsonWith(filterMap,kafkaManager);
+        TopicListSearchCriteriaImpl criteria = TopicListSearchCriteriaImpl.fromJsonWith(filterMap,kafkaManager);
         TopicInfo topicInfo = TopicSearchCriteriaUtils.generateTopicInfo(STAFF_ROLES_TOPIC_NAME, 3, 3, Map.of(), DESCRIPTION_TEST);
         Assertions.assertTrue(criteria.matches(topicInfo));
         topicInfo = TopicSearchCriteriaUtils.generateTopicInfo(STAFF_TOPIC_NAME, 3, 3, Map.of(), DESCRIPTION);
@@ -346,7 +345,7 @@ public class TopicListSearchCriteriaImplTest {
     @Test
     public void descriptionNotEmptyTest() {
         Map<String, String> filterMap = Map.of("description_NOT_EMPTY", "");
-        criteria = TopicListSearchCriteriaImpl.fromJsonWith(filterMap,kafkaManager);
+        TopicListSearchCriteriaImpl criteria = TopicListSearchCriteriaImpl.fromJsonWith(filterMap,kafkaManager);
         TopicInfo topicInfo = TopicSearchCriteriaUtils.generateTopicInfo(STAFF_ROLES_TOPIC_NAME, 3, 3, Map.of(), DESCRIPTION_TEST);
         Assertions.assertTrue(criteria.matches(topicInfo));
         topicInfo = TopicSearchCriteriaUtils.generateTopicInfo(STAFF_TOPIC_NAME, 3, 3, Map.of(), "");

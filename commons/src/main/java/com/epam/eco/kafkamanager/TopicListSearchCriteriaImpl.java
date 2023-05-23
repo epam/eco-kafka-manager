@@ -39,17 +39,17 @@ import static java.util.Objects.isNull;
  */
 public class TopicListSearchCriteriaImpl implements TopicSearchCriteria {
 
-    private final static String OPERATION_SEPARATOR = "_";
-    private final static String TOPIC_NAME_ATTR = "topicName";
-    private final static String PARTITION_COUNT_ATTR = "partitionCount";
-    private final static String REPLICATION_COUNT_ATTR = "replicationFactor";
-    private final static String CONSUMER_COUNT_ATTR = "consumerCount";
-    private final static String REPLICATION_STATE_ATTR = "replicationState";
-    private final static String CONFIG_STRING_ATTR = "configString";
-    private final static String DESCRIPTION_ATTR = "description";
+    private static final String OPERATION_SEPARATOR = "_";
+    private static final String TOPIC_NAME_ATTR = "topicName";
+    private static final String PARTITION_COUNT_ATTR = "partitionCount";
+    private static final String REPLICATION_COUNT_ATTR = "replicationFactor";
+    private static final String CONSUMER_COUNT_ATTR = "consumerCount";
+    private static final String REPLICATION_STATE_ATTR = "replicationState";
+    private static final String CONFIG_STRING_ATTR = "configString";
+    private static final String DESCRIPTION_ATTR = "description";
 
-    private final static String REGEX_CONFIG_STRING_PATTERN = "((.)+:(.)+(;|))+";
-    private final static String[] ARRAY_ATTRS = {TOPIC_NAME_ATTR, PARTITION_COUNT_ATTR, REPLICATION_COUNT_ATTR, CONSUMER_COUNT_ATTR, REPLICATION_STATE_ATTR, CONFIG_STRING_ATTR, DESCRIPTION_ATTR};
+    private static final String REGEX_CONFIG_STRING_PATTERN = "((.)+:(.)+(;|))+";
+    private static final String[] ARRAY_ATTRS = {TOPIC_NAME_ATTR, PARTITION_COUNT_ATTR, REPLICATION_COUNT_ATTR, CONSUMER_COUNT_ATTR, REPLICATION_STATE_ATTR, CONFIG_STRING_ATTR, DESCRIPTION_ATTR};
 
 
     public enum Operation {
@@ -148,40 +148,17 @@ public class TopicListSearchCriteriaImpl implements TopicSearchCriteria {
                 Operation filterOperation = Operation.valueOf(rawOperation);
 
                 switch (filterColumn) {
-
-                    case TOPIC_NAME_ATTR: {
-                        topicClauses.add(new SingleClause<>((String) map.get(key), filterOperation));
-                        break;
-                    }
-                    case PARTITION_COUNT_ATTR: {
-                        partitionCountClauses.add(
-                                new SingleClause<>(Integer.valueOf((String) map.get(key)), filterOperation));
-                        break;
-                    }
-                    case REPLICATION_COUNT_ATTR: {
-                        replicationFactorClauses.add(
-                                new SingleClause<>(Integer.valueOf((String) map.get(key)), filterOperation));
-                        break;
-                    }
-                    case CONSUMER_COUNT_ATTR: {
-                        consumerCountClauses.add(
-                                new SingleClause<>(Integer.valueOf((String) map.get(key)), filterOperation));
-                        break;
-                    }
-                    case REPLICATION_STATE_ATTR: {
-                        replicationStateClause = ReplicationState.valueOf((String) map.get(key));
-                        break;
-                    }
-                    case CONFIG_STRING_ATTR: {
-                        configStringClauses.add(new SingleClause<>((String) map.get(key), filterOperation));
-                        break;
-                    }
-                    case DESCRIPTION_ATTR: {
-                        descriptionClauses.add(new SingleClause<>((String) map.get(key), filterOperation));
-                        break;
-                    }
-                    default: {
-                        break;
+                    case TOPIC_NAME_ATTR -> topicClauses.add(new SingleClause<>((String) map.get(key), filterOperation));
+                    case PARTITION_COUNT_ATTR -> partitionCountClauses.add(
+                            new SingleClause<>(Integer.valueOf((String) map.get(key)), filterOperation));
+                    case REPLICATION_COUNT_ATTR -> replicationFactorClauses.add(
+                            new SingleClause<>(Integer.valueOf((String) map.get(key)), filterOperation));
+                    case CONSUMER_COUNT_ATTR -> consumerCountClauses.add(
+                            new SingleClause<>(Integer.valueOf((String) map.get(key)), filterOperation));
+                    case REPLICATION_STATE_ATTR -> replicationStateClause = ReplicationState.valueOf((String) map.get(key));
+                    case CONFIG_STRING_ATTR -> configStringClauses.add(new SingleClause<>((String) map.get(key), filterOperation));
+                    case DESCRIPTION_ATTR -> descriptionClauses.add(new SingleClause<>((String) map.get(key), filterOperation));
+                    default -> {
                     }
                 }
             }
