@@ -151,15 +151,37 @@ function showData(dialogHeader,dialogText) {
     header.textContent = dialogHeader;
     header.classList.add(headerClass);
 
-    const text = document.getElementById('dataModalText');
-    text.textContent = dialogText;
-    text.classList.add(textClass)
+    const textContentElement = document.getElementById('dataModalTextContent');
+    textContentElement.innerHTML='';
+
+    if(isHTML(dialogText)) {
+        const newDivElement = document.createElement("div");
+        newDivElement.innerHTML = stripLinkQuotes(dialogText);
+        textContentElement.append(newDivElement);
+    } else {
+        const newPreElement = document.createElement("pre");
+        newPreElement.textContent = dialogText;
+        textContentElement.append(newPreElement);
+        newPreElement.classList.add(textClass);
+    }
 
     document.getElementById('dataModalCopyButton').onclick = (event) => {
         copyText(dialogText, event.target)
     };
 
     dataModal.show();
+}
+
+function stripLinkQuotes(text) {
+   return text.replaceAll("&quot;","'");
+}
+
+const isHTML = (text) => {
+    try {
+        const fragment = new DOMParser().parseFromString(text,"text/html");
+        return fragment.body.children.length>0
+    } catch(error) { ; }
+    return false;
 }
 
 function showConfirm(headerText, bodyText, successCallback) {
