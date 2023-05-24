@@ -35,13 +35,14 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.epam.eco.kafkamanager.ConsumerGroupInfo;
 import com.epam.eco.kafkamanager.KafkaManager;
+import com.epam.eco.kafkamanager.ReplicationState;
 import com.epam.eco.kafkamanager.TopicConfigUpdateParams;
 import com.epam.eco.kafkamanager.TopicCreateParams;
 import com.epam.eco.kafkamanager.TopicInfo;
 import com.epam.eco.kafkamanager.TopicMetadataDeleteParams;
 import com.epam.eco.kafkamanager.TopicMetadataUpdateParams;
 import com.epam.eco.kafkamanager.TopicPartitionsCreateParams;
-import com.epam.eco.kafkamanager.TopicSearchCriteria;
+import com.epam.eco.kafkamanager.TopicSearchCriteriaImpl;
 import com.epam.eco.kafkamanager.TransactionInfo;
 import com.epam.eco.kafkamanager.core.utils.PageUtils;
 import com.epam.eco.kafkamanager.rest.request.MetadataRequest;
@@ -68,26 +69,26 @@ public class TopicController {
             @RequestParam(value = "maxReplicationFactor", required = false) Integer maxReplicationFactor,
             @RequestParam(value = "minConsumerCount", required = false) Integer minConsumerCount,
             @RequestParam(value = "maxConsumerCount", required = false) Integer maxConsumerCount,
-            @RequestParam(value = "replicationState", required = false) TopicSearchCriteria.ReplicationState replicationState,
+            @RequestParam(value = "replicationState", required = false) ReplicationState replicationState,
             @RequestParam(value = "configString", required = false) String configString,
             @RequestParam(value = "configMap", required = false) Map<String, String> configMap,
             @RequestParam(value = "description", required = false) String description,
             @RequestParam(value = "page", required = false) Integer page,
             @RequestParam(value = "pageSize", required = false) Integer pageSize) {
         Pageable pageable = PageUtils.buildPageableWithDefaultsIfNull(page, pageSize);
-        TopicSearchCriteria criteria = TopicSearchCriteria.builder()
-                .topicName(topicName)
-                .minPartitionCount(minPartitionCount)
-                .maxPartitionCount(maxPartitionCount)
-                .minReplicationFactor(minReplicationFactor)
-                .maxReplicationFactor(maxReplicationFactor)
-                .minConsumerCount(minConsumerCount)
-                .maxConsumerCount(maxConsumerCount)
-                .replicationState(replicationState)
-                .configString(configString)
-                .configMap(configMap)
-                .description(description)
-                .build();
+        TopicSearchCriteriaImpl criteria = TopicSearchCriteriaImpl.builder()
+                                                                  .topicName(topicName)
+                                                                  .minPartitionCount(minPartitionCount)
+                                                                  .maxPartitionCount(maxPartitionCount)
+                                                                  .minReplicationFactor(minReplicationFactor)
+                                                                  .maxReplicationFactor(maxReplicationFactor)
+                                                                  .minConsumerCount(minConsumerCount)
+                                                                  .maxConsumerCount(maxConsumerCount)
+                                                                  .replicationState(replicationState)
+                                                                  .configString(configString)
+                                                                  .configMap(configMap)
+                                                                  .description(description)
+                                                                  .build();
         return kafkaManager.getTopicPage(criteria, pageable);
     }
 

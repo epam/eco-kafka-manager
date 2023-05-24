@@ -45,7 +45,6 @@ public class UDMetricsController extends UDMAbstractController {
     public static final String HAS_ERRORS = "hasErrors";
 
     public static final String MAPPING = "/udmetrics";
-    public static final String UPDATE_URL = "updateUrl";
 
     @RequestMapping(value=MAPPING, method=RequestMethod.GET)
     public String metrics(

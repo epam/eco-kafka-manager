@@ -69,6 +69,7 @@ import com.epam.eco.kafkamanager.TopicPurgerTaskExecutor;
 import com.epam.eco.kafkamanager.TopicRecordCounterTaskExecutor;
 import com.epam.eco.kafkamanager.TopicRecordFetcherTaskExecutor;
 import com.epam.eco.kafkamanager.TopicSearchCriteria;
+import com.epam.eco.kafkamanager.TopicSearchCriteriaImpl;
 import com.epam.eco.kafkamanager.TransactionInfo;
 import com.epam.eco.kafkamanager.TransactionSearchCriteria;
 import com.epam.eco.kafkamanager.rest.request.BrokerConfigRequest;
@@ -278,13 +279,16 @@ public class RestKafkaManager implements KafkaManager {
 
     @Override
     public Page<TopicInfo> getTopicPage(Pageable pageable) {
-        return getTopicPage(TopicSearchCriteria.builder().build(), pageable);
+        return getTopicPage(TopicSearchCriteriaImpl.builder().build(), pageable);
     }
 
     @Override
-    public Page<TopicInfo> getTopicPage(TopicSearchCriteria criteria, Pageable pageable) {
-        Validate.notNull(criteria, "Criteria can't be null");
+    public Page<TopicInfo> getTopicPage(TopicSearchCriteria searchCriteria, Pageable pageable) {
+
+        Validate.notNull(searchCriteria, "Criteria can't be null");
         Validate.notNull(pageable, "Pageable can't be null");
+
+        TopicSearchCriteriaImpl criteria = (TopicSearchCriteriaImpl)searchCriteria;
 
         HashMap<String, Object> params = new HashMap<>();
         params.put("page", pageable.getPageNumber());

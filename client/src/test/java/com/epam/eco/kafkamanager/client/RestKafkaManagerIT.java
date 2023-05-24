@@ -61,7 +61,7 @@ import com.epam.eco.kafkamanager.TopicMetadataDeleteParams;
 import com.epam.eco.kafkamanager.TopicMetadataUpdateParams;
 import com.epam.eco.kafkamanager.TopicPartitionsCreateParams;
 import com.epam.eco.kafkamanager.TopicRecordFetchParams;
-import com.epam.eco.kafkamanager.TopicSearchCriteria;
+import com.epam.eco.kafkamanager.TopicSearchCriteriaImpl;
 import com.epam.eco.kafkamanager.TransactionInfo;
 import com.epam.eco.kafkamanager.TransactionSearchCriteria;
 import com.epam.eco.kafkamanager.exec.TaskResult;
@@ -174,7 +174,7 @@ public class RestKafkaManagerIT {
         assertTrue("Topic doesn't exist", kafkaManager.topicExists(topicName));
 
         Page<TopicInfo> topicPage = kafkaManager.getTopicPage(
-                TopicSearchCriteria.builder().build(),
+                TopicSearchCriteriaImpl.builder().build(),
                 PageRequest.of(0, 10));
         Assertions.assertNotNull(topicPage);
         assertTrue("There is no topics", topicPage.getContent().size() > 0);

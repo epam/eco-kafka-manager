@@ -85,43 +85,36 @@
 
             <div class="col-md-12">
 
-                <div class="card mb-3">
+                <div class="card mb-3" style="border: 0">
+                    <a class="text-primary" th:href="@{/topics}">
+                        <i class="fa fa-chevron-left text-primary"></i> Back To Topics
+                    </a>
                     <div class="card-body card-flex">
 
-                        <a
-                                th:href="@{/topics}"
-                                class="btn btn-primary">
-                            <i class="fa fa-arrow-left"></i> Back To Topics
-                        </a>
-                        <a
-                                th:href="@{/topics/{name}/config(name=${topic.name})}"
-                                class="btn btn-primary">
+                        <a th:href="@{/topics/{name}/config(name=${topic.name})}"
+                           class="btn btn-primary">
                             Update Config <i class="fa fa-pencil"></i>
                         </a>
-                        <a
-                                th:href="@{/topics/{name}/partitions(name=${topic.name})}"
-                                class="btn btn-primary">
+                        <a th:href="@{/topics/{name}/partitions(name=${topic.name})}"
+                           class="btn btn-primary">
                             Add Partitions <i class="fa fa-plus"></i>
                         </a>
-                        <a
-                                th:href="@{/topics/{name}/browser(name=${topic.name})}"
-                                class="btn btn-primary">
-                            Browse Data <i class="fa fa-search"></i>
-                        </a>
-                        <a
-                                th:href="@{/topics/{name}/metadata(name=${topic.name})}"
-                                class="btn btn-primary">
+                        <a th:href="@{/topics/{name}/metadata(name=${topic.name})}"
+                           class="btn btn-primary">
                             Edit Metadata <i class="fa fa-tags"></i>
                         </a>
-                        <a
-                                th:href="@{/permissions/(resourceType=${T(org.apache.kafka.common.resource.ResourceType).TOPIC}, resourceName=${topic.name})}"
-                                class="btn btn-primary">
+                        <a th:href="@{/permissions/(resourceType=${T(org.apache.kafka.common.resource.ResourceType).TOPIC}, resourceName=${topic.name})}"
+                           class="btn btn-primary">
                             View Permissions <i class="fa fa-list"></i>
                         </a>
-                        <a
-                                th:href="@{/permissions/create(resourceType=${T(org.apache.kafka.common.resource.ResourceType).TOPIC}, resourceName=${topic.name})}"
-                                class="btn btn-primary">
+                        <a th:href="@{/permissions/create(resourceType=${T(org.apache.kafka.common.resource.ResourceType).TOPIC}, resourceName=${topic.name})}"
+                           class="btn btn-primary">
                             Create Permission <i class="fa fa-plus"></i>
+                        </a>
+
+                        <a th:href="@{/topics/{name}/browser(name=${topic.name})}"
+                           class="btn btn-success ms-3">
+                            Browse Data <i class="fa fa-search"></i>
                         </a>
 
                         <button

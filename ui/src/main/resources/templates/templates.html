@@ -200,13 +200,62 @@
                         <div id="dataModalHeader"></div>
                     </div>
                     <div class="modal-body">
-                        <div style="text-align:left;font-size:1.2em;padding-left:1em">
-                            <pre id="dataModalText"></pre>
-                        </div>
+                        <div id="dataModalTextContent" style="text-align:left;font-size:1.2em;padding-left:1em"></div>
                     </div>
                     <div class="modal-footer">
                         <button id="dataModalCopyButton" class="btn btn-success" >Copy</button>
                         <button id="dataModalCloseButton" class="btn btn-primary" data-bs-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div th:fragment="confirm-modal">
+        <div id="confirmModal" class="modal over-all-windows" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <div id="confirmModalHeader"></div>
+                    </div>
+                    <div class="modal-body">
+                        <div class="mt-3 mb-3" style="text-align:center; font-size: 1.2em;">
+                            <div id="confirmModalText"></div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button id="confirmModalOkButton" class="btn" data-bs-dismiss="modal">Ok</button>
+                        <button id="confirmModalCloseButton" class="btn" data-bs-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div th:fragment="query-param-filter">
+        <div class="query-param-filter-container">
+            <div class="card" style="width: 100vw;">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-auto d-flex" style="flex-wrap: wrap">
+                            <div class="col-auto">
+                                <div class="input-group" style="flex-wrap: nowrap;">
+                                    <span class="input-group-text" id="basic-addon1">Filter:</span>
+                                    <select class="form-select w-10" id="query-param-filter-column-select" aria-label="Default select example">
+                                    </select>
+                                    <select class="form-select" id="query-param-filter-operation-select" aria-label="Default select example"></select>
+                                    <input type="text" class="form-control" id="query-param-filter-value" aria-label="Text input with dropdown button">
+                                    <select class="form-select display-none" id="query-param-filter-value-select" aria-label="choose value"></select>
+                                    <button class="btn btn-success" type="button" id="add-query-param-filter-button">Add</button>
+                                </div>
+                            </div>
+                            <div id="query-param-filter-clause-container" class="filter-clause-container col-auto"></div>
+                        </div>
+                        <div class="col-auto d-flex" style="max-height: 2.6em;flex:1;justify-content: flex-end;">
+                            <button id="query-param-filter-apply-button" class="btn btn-primary">
+                                Find <i class="fa fa-search"></i>
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>

@@ -288,11 +288,11 @@ table.dataTable thead>tr>td.sorting_desc_disabled:after {
 }
 div.dataTables_wrapper div.dataTables_filter label {
     width: 100%;
-    margin: 10px;
+    margin: 10px 0 10px 0;
 }
 
 div.dataTables_wrapper div.dataTables_filter input {
-    width: 80%;
+    width: 100%;
     margin: -6px 10px;
 }
 table.dataTable thead>tr>th.sorting,
@@ -377,6 +377,19 @@ thead, tbody, tfoot, tr, td, th {
 }
 
 
+.confirm-modal-text-info {
+    display: flex;
+    text-align: justify;
+    align-items: center;
+}
+.confirm-modal-text-info::before {
+    font-family: FontAwesome;
+    content: "\f059";
+    padding: 10px;
+    font-size: 3em;
+    color: var(--epm-button-success-background);
+}
+
 .data-modal-header {
     font-size: 1.5em;
     color: var(--epm-button-primary-background);
@@ -390,6 +403,7 @@ thead, tbody, tfoot, tr, td, th {
     min-height: 60vh;
     max-height: 70vh;
 }
+
 .over-all-windows {
     z-index: var(--epm-over-all-windows-z-index)
 }
@@ -417,11 +431,43 @@ a.external-tool-button>div {
     flex-direction: row;
     gap: 1em;
 }
+.external-tools {
+    display: flex;
+    justify-content: center;
+}
+select[name='topics-table_length'] {
+    width: 5em !important;
+}
+pre.normal-pre {
+    margin-bottom: 0;
+}
+
+label {
+    gap: 5px !important;
+}
+div.dataTables_wrapper div.dataTables_length select {
+    margin-top: -5px;
+}
+div.dataTables_processing {
+    width: 250px !important;
+    min-height: 4em;
+    padding-top: 10px !important;
+}
+div.dataTables_wrapper div.dataTables_length label {
+    margin: 10px 0 0 0;
+}
+
+.filter-number-value {
+    max-width: 12em;
+}
+.filter-string-value {
+    min-width: 30em;
+}
 
 div.schema-content-dialog {
-    min-width:50em;
-    max-width:50em;
-    max-height:50em
+    min-width:20vw;
+    max-width:50vw;
+    max-height:90vh;
 }
 div.schema-content-dialog-body {
     overflow-y: scroll;
