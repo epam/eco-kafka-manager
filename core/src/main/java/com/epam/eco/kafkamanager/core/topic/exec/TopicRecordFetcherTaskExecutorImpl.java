@@ -56,14 +56,14 @@ public class TopicRecordFetcherTaskExecutorImpl<K, V> extends AbstractTaskExecut
         return TaskResult.of(() -> executeInternal(resourceKey, input));
     }
 
-    public RecordFetchResult<K, V> executeInternal(String topicName, TopicRecordFetchParams params) {
+    public RecordFetchResult<K,V> executeInternal(String topicName, TopicRecordFetchParams<K,V> params) {
         Validate.notNull(params, "Params object is null");
 
         kafkaManager.getTopic(topicName); // sanity check just for case topic doesn't exist
 
         RecordBiDirectionalFetcher<K, V> recordFetcher = params.getUseCache() ?
-                CachedTopicRecordFetcher.with(buildConsumerConfig(params)) :
-                BiDirectionalTopicRecordFetcher.with(buildConsumerConfig(params));
+                                                         CachedTopicRecordFetcher.with(buildConsumerConfig(params)) :
+                                                         BiDirectionalTopicRecordFetcher.with(buildConsumerConfig(params));
 
         return params.getFetchMode().isItTimeFetch() ?
                fetchByTime(topicName, params, recordFetcher) :
@@ -71,38 +71,38 @@ public class TopicRecordFetcherTaskExecutorImpl<K, V> extends AbstractTaskExecut
     }
 
     private RecordFetchResult<K, V> fetchByTime(String topicName,
-                                                TopicRecordFetchParams params,
+                                                TopicRecordFetchParams<K,V> params,
                                                 RecordBiDirectionalFetcher<K, V> recordFetcher) {
         return recordFetcher.fetchByTimestamps(
                 params.getOffsets().entrySet().stream()
                       .filter(e -> e.getValue().getSize() > 0)
                       .collect(Collectors.toMap(
-                                       e -> new TopicPartition(topicName, e.getKey()),
-                                       e -> params.getTimestamp())),
+                              e -> new TopicPartition(topicName, e.getKey()),
+                              e -> params.getTimestamp())),
                 params.getLimit(),
-                record -> true,
+                params.getPredicate(),
                 params.getTimeoutInMs(),
                 params.getFetchMode().getFetchDirection());
     }
 
     private RecordFetchResult<K, V> fetchByPosition(String topicName,
-                                                    TopicRecordFetchParams params,
+                                                    TopicRecordFetchParams<K,V> params,
                                                     RecordBiDirectionalFetcher<K, V> recordFetcher) {
         return recordFetcher.fetchByOffsets(
                 params.getOffsets().entrySet().stream()
                       .filter(e -> e.getValue().getSize() > 0)
                       .collect(Collectors.toMap(
-                                         e -> new TopicPartition(topicName, e.getKey()),
-                                         e -> params.getFetchMode()
-                                                    .getBaseOffset(e.getValue().getSmallest(),
-                                                                   e.getValue().getLargest()))),
+                              e -> new TopicPartition(topicName, e.getKey()),
+                              e -> params.getFetchMode()
+                                         .getBaseOffset(e.getValue().getSmallest(),
+                                                        e.getValue().getLargest()))),
                 params.getLimit(),
-                record -> true,
+                params.getPredicate(),
                 params.getTimeoutInMs(),
                 params.getFetchMode().getFetchDirection());
     }
 
-    private Map<String, Object> buildConsumerConfig(TopicRecordFetchParams params) {
+    private Map<String, Object> buildConsumerConfig(TopicRecordFetchParams<K,V> params) {
         return properties.buildCommonConsumerConfig(builder -> {
             initDeserializerConfig(builder, params.getKeyDataFormat(), true);
             initDeserializerConfig(builder, params.getValueDataFormat(), false);

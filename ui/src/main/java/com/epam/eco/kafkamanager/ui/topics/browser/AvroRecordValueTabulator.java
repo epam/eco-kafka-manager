@@ -33,9 +33,6 @@ import com.epam.eco.kafkamanager.ui.utils.SchemaSubjectUtils;
  */
 public class AvroRecordValueTabulator implements RecordValueTabulator<Object> {
 
-    public static final String NA = "N/A";
-    public static final String SEPARATOR = ".";
-
     private final Config topicConfig;
 
     public AvroRecordValueTabulator(Config topicConfig) {

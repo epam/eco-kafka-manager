@@ -54,13 +54,17 @@ public class TabularRecords implements Iterable<Record> {
 
     private final List<Record> records;
     private final Map<String, Column> columns;
+
+    private final String topicName;
+
     private final boolean hasSelectedColumns;
 
-    public TabularRecords(List<Record> records) {
-        this(records, null);
+    public TabularRecords(List<Record> records, String topicName) {
+        this(records, null, topicName);
     }
 
-    public TabularRecords(List<Record> records, Collection<String> selectedColumnNames) {
+    public TabularRecords(List<Record> records, Collection<String> selectedColumnNames, String topicName) {
+        this.topicName = topicName;
         Validate.notNull(records, "Collection of records is null");
         Validate.noNullElements(records, "Collection of records contains null elements");
         if (selectedColumnNames != null) {
@@ -92,15 +96,15 @@ public class TabularRecords implements Iterable<Record> {
                         new Column(
                                 columnName,
                                 true,
-                                selectedColumnNames == null || selectedColumnNames.contains(columnName))));
+                                selectedColumnNames == null || selectedColumnNames.contains(columnName),
+                                topicName)));
 
         if (selectedColumnNames != null) {
-            selectedColumnNames.forEach(
-                    columnName -> {
-                        if (!columns.containsKey(columnName)) {
-                            columns.put(columnName, new Column(columnName, false, true));
-                        }
-                    });
+            selectedColumnNames.stream()
+                   .forEach( columnName ->
+                        columns.putIfAbsent(columnName,
+                            new Column(columnName, false, true, topicName))
+                    );
         }
 
         return columns;
@@ -118,6 +122,16 @@ public class TabularRecords implements Iterable<Record> {
         return new ArrayList<>(columns.values());
     }
 
+    public List<Column> listTopicColumns() {
+        return columns.values().stream()
+                      .filter(column->topicName.equals(column.getTopicName()))
+                      .collect(Collectors.toList());
+    }
+
+    public List<String> listColumnsAsString() {
+        return columns.values().stream().map(Column::getName).collect(Collectors.toList());
+    }
+
     public List<Column> listSelectedColumns() {
         if (!hasSelectedColumns) {
             return listColumns();
@@ -133,28 +147,6 @@ public class TabularRecords implements Iterable<Record> {
                 collect(Collectors.toList());
     }
 
-    public List<Column> getColumnsGroup(int groupIndex, int columnsPerGroup) {
-        int from = groupIndex * columnsPerGroup;
-        if (from >= columns.size()) {
-            return Collections.emptyList();
-        }
-
-        int to = from + columnsPerGroup;
-        to = to <= columns.size() ? to : columns.size();
-
-        List<Column> columnsAll = listColumns();
-        List<Column> columnsGroup = new ArrayList<>(to - from);
-        for (int i = from; i < to; i++) {
-            columnsGroup.add(columnsAll.get(i));
-        }
-        return columnsGroup;
-    }
-
-    public int determineColumnsGroupSize(int numberOfGroups, int minGroupSize) {
-        int size = (int) Math.ceil((double) columns.size() / numberOfGroups);
-        return size < minGroupSize ? minGroupSize : size;
-    }
-
     public boolean isEmpty() {
         return records.isEmpty();
     }
@@ -168,8 +160,8 @@ public class TabularRecords implements Iterable<Record> {
         return records.iterator();
     }
 
-    public static Builder builder() {
-        return new Builder();
+    public static Builder builder(String topicName) {
+        return new Builder(topicName);
     }
 
     public static class Record implements Comparable<Record> {
@@ -454,13 +446,20 @@ public class TabularRecords implements Iterable<Record> {
         private final String name;
         private final boolean present;
         private final boolean selected;
+        private final String topicName;
 
-        private Column(String name, boolean present, boolean selected) {
+        private Column(String name,
+                       boolean present,
+                       boolean selected,
+                       String topicName) {
+
             Validate.notNull(name, "Name is null");
+            Validate.notNull(topicName, "Topic name is null");
 
             this.name = name;
             this.present = present;
             this.selected = selected;
+            this.topicName = topicName;
         }
 
         public String getName() {
@@ -475,12 +474,20 @@ public class TabularRecords implements Iterable<Record> {
             return selected;
         }
 
+        public String getTopicName() {
+            return topicName;
+        }
     }
 
     public static class Builder {
 
+        private final String topicName;
         private final Set<String> selectedColumnNames = new HashSet<>();
         private final List<Record> records = new ArrayList<>();
+
+        public Builder(String topicName) {
+            this.topicName = topicName;
+        }
 
         public Builder addSelectedColumnName(String columnName) {
             this.selectedColumnNames.add(columnName);
@@ -503,7 +510,7 @@ public class TabularRecords implements Iterable<Record> {
         }
 
         public TabularRecords build() {
-            return new TabularRecords(records, selectedColumnNames);
+            return new TabularRecords(records, selectedColumnNames, topicName);
         }
 
     }

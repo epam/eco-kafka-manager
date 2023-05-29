@@ -134,7 +134,8 @@ public class RestKafkaManagerIT {
                 FetchMode.FETCH_FORWARD,
                 0,
                 false,
-                60L);
+                60L,
+                record->true);
         RecordFetchResult<String, String> recordFetchResult =
                 kafkaManager.<String, String>getTopicRecordFetcherTaskExecutor()
                 .execute(topicName, recordFetchParams);

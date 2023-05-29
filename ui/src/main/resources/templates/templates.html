@@ -262,6 +262,26 @@
         </div>
     </div>
 
+    <div th:fragment="browse-filter">
+        <div>
+            <div><b>Filter</b></div>
+            <div class="row">
+                <div class="input-group mb-3">
+                    <select class="form-select w-10" id="filter-column-select" aria-label="Default select example">
+                    </select>
+                    <select class="form-select" id="filter-operation-select" aria-label="Default select example">
+                    </select>
+                    <input type="text" class="form-control" id="filter-value" aria-label="Text input with dropdown button">
+                    <button class="btn btn-success" type="button" id="add-filter-button">Add</button>
+                </div>
+            </div>
+            <div class="row">
+                <div id="filter-clause-container" class="filter-clause-container">
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div th:fragment="footer" class="footer-content">
         <div class="build-info">
             <span th:text="${buildInfo.buildVersion}"></span>

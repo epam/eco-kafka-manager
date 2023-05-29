@@ -19,17 +19,17 @@ import java.util.Collections;
 import java.util.Map;
 
 import org.apache.commons.lang3.Validate;
-
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import com.epam.eco.commons.kafka.OffsetRange;
+import com.epam.eco.commons.kafka.helpers.FilterClausePredicate;
 
 import static java.util.Objects.isNull;
 
 /**
  * @author Andrei_Tytsik
  */
-public class TopicRecordFetchParams {
+public class TopicRecordFetchParams<K,V> {
 
     public static final long MIN_LIMIT = 1;
     public static final long MAX_LIMIT = 100;
@@ -42,8 +42,8 @@ public class TopicRecordFetchParams {
     private final FetchMode fetchMode;
     private final long timestamp;
     private final boolean useCache;
-
-    private final long cacheExpirationTimeMin;
+    private final Long cacheExpirationTimeMin;
+    private final FilterClausePredicate<K,V> predicate;
 
     public TopicRecordFetchParams(
             @JsonProperty("keyDataFormat") DataFormat keyDataFormat,
@@ -54,14 +54,15 @@ public class TopicRecordFetchParams {
             @JsonProperty("fetchMode") FetchMode fetchMode,
             @JsonProperty("timestamp") long timestamp,
             @JsonProperty("useCache") boolean useCache,
-            @JsonProperty("cacheExpirationTimeMin") long cacheExpirationTimeMin
-    ) {
+            @JsonProperty("cacheExpirationTimeMin") long cacheExpirationTimeMin,
+            @JsonProperty("predicat") FilterClausePredicate<K,V> predicate
+                                 ) {
         Validate.notNull(keyDataFormat, "Key data format can't be null");
         Validate.notNull(valueDataFormat, "Value data format can't be null");
         Validate.notNull(offsets, "Offsets can't be null");
         Validate.notEmpty(offsets, "Offsets can't be empty");
         Validate.isTrue(limit >= MIN_LIMIT && limit <= MAX_LIMIT,
-                String.format("Limit is invalid, should be within range [%d..%d]", MIN_LIMIT, MAX_LIMIT));
+                        String.format("Limit is invalid, should be within range [%d..%d]", MIN_LIMIT, MAX_LIMIT));
         Validate.notNull(timestamp,"Timestamp is null!");
 
         this.keyDataFormat = keyDataFormat;
@@ -73,6 +74,7 @@ public class TopicRecordFetchParams {
         this.timestamp = timestamp;
         this.useCache = useCache;
         this.cacheExpirationTimeMin = cacheExpirationTimeMin;
+        this.predicate = predicate;
     }
 
     public DataFormat getKeyDataFormat() {
@@ -102,6 +104,10 @@ public class TopicRecordFetchParams {
 
     public Long getCacheExpirationTimeMin() {
         return cacheExpirationTimeMin;
+    }
+
+    public FilterClausePredicate<K,V> getPredicate() {
+        return predicate;
     }
 
     public enum DataFormat {

@@ -81,7 +81,7 @@
         <kafka.version>7.0.1-ccs</kafka.version>
         <cp.version>7.2.1</cp.version>
         <eco-commons.version>1.0.0</eco-commons.version>
-        <eco-commons-kafka.version>3.0.1</eco-commons-kafka.version>
+        <eco-commons-kafka.version>3.0.2</eco-commons-kafka.version>
         <ehcache.version>3.5.2</ehcache.version>
         <curator.version>5.2.0</curator.version>
         <commons-collections4.version>4.1</commons-collections4.version>

@@ -1,0 +1,132 @@
+/*******************************************************************************
+ *  Copyright 2023 EPAM Systems
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ *  use this file except in compliance with the License.  You may obtain a copy
+ *  of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ *  WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ *  License for the specific language governing permissions and limitations under
+ *  the License.
+ *******************************************************************************/
+package com.epam.eco.kafkamanager.ui.topics.browser;
+
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+import org.apache.kafka.clients.consumer.ConsumerRecord;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import com.epam.eco.commons.kafka.helpers.FilterClausePredicate;
+import com.epam.eco.kafkamanager.FilterClause;
+import com.epam.eco.kafkamanager.ui.topics.browser.handlers.FilterOperationJsonHandler;
+import com.epam.eco.kafkamanager.ui.topics.browser.handlers.FilterOperationMapHandler;
+import com.epam.eco.kafkamanager.ui.topics.browser.handlers.FilterOperationStringHandler;
+
+import static com.epam.eco.kafkamanager.ui.topics.browser.FilterClauseUtils.KEY_ATTRIBUTE;
+import static com.epam.eco.kafkamanager.ui.topics.browser.FilterClauseUtils.KEY_VALUE_SEPARATOR;
+import static java.util.Objects.isNull;
+import static java.util.Objects.nonNull;
+
+/**
+ * @author Mikhail_Vershkov
+ */
+
+public class FilterClauseJsonPredicate<K,V> implements FilterClausePredicate<K,V> {
+
+    private final static Logger LOGGER = LoggerFactory.getLogger(FilterClauseJsonPredicate.class);
+
+    private final boolean areClausesEmpty;
+    private final List<FilterClause> keyClauses;
+    private final List<FilterClause> otherClauses;
+
+    public FilterClauseJsonPredicate(Map<String, List<FilterClause>> clauses) {
+        areClausesEmpty = clauses.isEmpty();
+        keyClauses = clauses.getOrDefault(KEY_ATTRIBUTE, Collections.emptyList());
+        this.otherClauses = clauses.entrySet().stream()
+                                   .filter(clause->!KEY_ATTRIBUTE.equals(clause.getKey()))
+                                   .flatMap(clause -> clause.getValue().stream())
+                                   .collect(Collectors.toList());
+    }
+
+    @Override
+    public boolean test(ConsumerRecord<K, V> record) {
+
+        if(areClausesEmpty) {
+            return true;
+        } else {
+
+            boolean result = true;
+
+            if(!keyClauses.isEmpty()) {
+                for(FilterClause clause : keyClauses) {
+                    if(nonNull(clause.getValue())) {
+                        result = result && executeOperation(clause, record.key().toString());
+                    } else {
+                        return false;
+                    }
+                }
+                if(isNull(record.value())) {
+                    return result;
+                }
+            }
+            if(!result) return false;
+
+            if(!otherClauses.isEmpty()) {
+
+                if(isNull(record.value())) {
+                    return false;
+                }
+
+                String json = record.value().toString();
+
+                for(FilterClause filterClause : otherClauses) {
+                    if(nonNull(json)) {
+                        result = result && executeOperation(filterClause, json);
+                    } else {
+                        result = false;
+                    }
+                    if(!result) {
+                        break;
+                    }
+                }
+
+            }
+            return result;
+
+        }
+    }
+
+    public static boolean executeOperation(FilterClause filterClause, Object value) {
+        if(isNull(value)) {
+            return false;
+        }
+        if(filterClause.getValue().contains(KEY_VALUE_SEPARATOR)) {
+            if(value instanceof Map) {
+                Map<Object,Object> map = (Map<Object,Object>)value;
+                return new FilterOperationMapHandler(filterClause).compare(map);
+            } else {
+                try {
+                    new ObjectMapper().readTree(value.toString());
+                    return new FilterOperationJsonHandler(filterClause).compare(value.toString());
+                } catch (JsonProcessingException e) {
+                    return false;
+                }
+            }
+        } else {
+            return new FilterOperationStringHandler(filterClause).compare(value.toString());
+        }
+
+    }
+
+}
