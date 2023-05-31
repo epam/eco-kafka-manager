@@ -23,9 +23,9 @@ import org.apache.kafka.clients.consumer.ConsumerRecord;
 
 public class KafkaSchemaIdAwareUtils extends KafkaSchemaIdAwareAvroDeserializer {
 
-    public static Object extractGenericRecord(ConsumerRecord record) {
+    public static Object extractGenericRecordOrValue(ConsumerRecord record) {
         return record.value() instanceof GenericRecordWrapper ?
-               ((GenericRecordWrapper) record.value()).getGenericRecord() :
+               ((GenericRecordWrapper) record.value()).getValue() :
                record.value();
     }
 

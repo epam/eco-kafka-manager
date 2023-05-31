@@ -33,9 +33,6 @@ import com.epam.eco.kafkamanager.ui.utils.SchemaSubjectUtils;
  */
 public class AvroRecordValueTabulator implements RecordValueTabulator<Object> {
 
-    public static final String NA = "N/A";
-    public static final String SEPARATOR = ".";
-
     private final Config topicConfig;
 
     public AvroRecordValueTabulator(Config topicConfig) {
@@ -50,7 +47,6 @@ public class AvroRecordValueTabulator implements RecordValueTabulator<Object> {
 
     @Override
     public Map<String, Object> toTabularValue(ConsumerRecord<?, Object> record) {
-        Validate.notNull(record, "Record is null");
         return AvroRecordValuesExtractor.getValuesAsMap(record);
     }
 
@@ -62,16 +58,21 @@ public class AvroRecordValueTabulator implements RecordValueTabulator<Object> {
             return null;
         }
 
-        GenericRecord genericRecord = (GenericRecord) KafkaSchemaIdAwareUtils.extractGenericRecord(record);
-        Schema schema = genericRecord.getSchema();
-
         Map<String, Object> attributes = new HashMap<>();
-        attributes.put("fullName", schema.getFullName());
-        attributes.put("type", schema.getType());
-        if (schema.getDoc() != null) {
-            attributes.put("doc", schema.getDoc());
+
+        Object object = KafkaSchemaIdAwareUtils.extractGenericRecordOrValue(record);
+
+        if(object instanceof GenericRecord genericRecord) {
+
+            Schema schema = genericRecord.getSchema();
+
+            attributes.put("fullName", schema.getFullName());
+            attributes.put("type", schema.getType());
+            if(schema.getDoc() != null) {
+                attributes.put("doc", schema.getDoc());
+            }
+            attributes.putAll(schema.getObjectProps());
         }
-        attributes.putAll(schema.getObjectProps());
         return attributes;
     }
 
@@ -83,21 +84,24 @@ public class AvroRecordValueTabulator implements RecordValueTabulator<Object> {
             return null;
         }
 
-        GenericRecord genericRecord = (GenericRecord) KafkaSchemaIdAwareUtils.extractGenericRecord(record);
-        Schema schema = genericRecord.getSchema();
+        Object object = KafkaSchemaIdAwareUtils.extractGenericRecordOrValue(record);
 
-        String schemaName = schema.getFullName();
-        String schemaKey = SchemaSubjectUtils.getSchemaSubjectKey(record.topic(), schemaName, topicConfig);
-        String schemaValue = SchemaSubjectUtils.getSchemaSubjectValue(record.topic(), schemaName, topicConfig);
-        String schemaAsString = schema.toString(true);
+        if(object instanceof GenericRecord genericRecord) {
 
-        return new RecordSchema(
-                KafkaSchemaIdAwareUtils.extractSchemaId(record),
-                schemaName,
-                schemaKey,
-                schemaValue,
-                schemaAsString,
-                TopicRecordFetchParams.DataFormat.AVRO);
+            Schema schema = genericRecord.getSchema();
+
+            String schemaName = schema.getFullName();
+            String schemaKey = SchemaSubjectUtils.getSchemaSubjectKey(record.topic(), schemaName, topicConfig);
+            String schemaValue = SchemaSubjectUtils.getSchemaSubjectValue(record.topic(), schemaName, topicConfig);
+            String schemaAsString = schema.toString(true);
+
+            return new RecordSchema(KafkaSchemaIdAwareUtils.extractSchemaId(record), schemaName, schemaKey, schemaValue,
+                                    schemaAsString, TopicRecordFetchParams.DataFormat.AVRO);
+        } else {
+            return new RecordSchema(0, "", "", "",
+                                    "", TopicRecordFetchParams.DataFormat.AVRO);
+        }
+
     }
 
 }

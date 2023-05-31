@@ -24,8 +24,6 @@ public class KafkaSchemaIdAwareAvroDeserializerTest {
         Assertions.assertThrows(IllegalArgumentException.class, () ->
                 kafkaSchemaIdAwareAvroDeserializer.getSchemaId(BYTES_SHORT)
         );
-
-
     }
 
     @Test
