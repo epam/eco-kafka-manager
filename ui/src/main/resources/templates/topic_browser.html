@@ -19,6 +19,7 @@
 
     <link rel="stylesheet" type="text/css" th:href="@{/components/browse-filter/browse-filter.css}" />
 
+    <script type="text/javascript" th:src="@{/components/browse-filter/browse-filter-faq.js}"></script>
     <script type="text/javascript" th:src="@{/components/browse-filter/browse-filter.js}"></script>
     <script type="text/javascript" th:src="@{/js/ui_lib_browser.js}"></script>
 </head>
@@ -101,6 +102,11 @@
                              </span>&emsp;Processing ..."
 
             }
+        });
+
+
+        $('#filter-faq-button').click(() => {
+            showFaq("Browser filter FAQ", browserFilerFaq);
         });
 
         const allPartitionCheckbox = $('#all-partition-checkbox');
@@ -352,6 +358,7 @@
 <div th:replace="templates :: loading-modal"></div>
 <div th:replace="templates :: info-modal"></div>
 <div th:replace="templates :: data-modal"></div>
+<div th:replace="templates :: faq-modal"></div>
 <div th:replace="templates :: confirm-modal"></div>
 
 <div class="main-content">

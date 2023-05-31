@@ -211,6 +211,24 @@
         </div>
     </div>
 
+    <div th:fragment="faq-modal">
+        <div id="faqModal" class="modal over-all-windows" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered" style="max-width:60vw">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <div id="faqModalHeader"></div>
+                    </div>
+                    <div class="modal-body">
+                        <div id="faqModalTextContent" style="text-align:left;font-size:1.2em;padding-left:1em"></div>
+                    </div>
+                    <div class="modal-footer">
+                        <button id="faqModalCloseButton" class="btn btn-primary" data-bs-dismiss="modal">Ok</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div th:fragment="confirm-modal">
         <div id="confirmModal" class="modal over-all-windows" tabindex="-1" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered">
@@ -264,7 +282,7 @@
 
     <div th:fragment="browse-filter">
         <div>
-            <div><b>Filter</b></div>
+            <div><b>Filter</b>&nbsp;<i id="filter-faq-button" class="fa fa-question-circle text-primary"></i></div>
             <div class="row">
                 <div class="input-group mb-3">
                     <select class="form-select w-10" id="filter-column-select" aria-label="Default select example">
