@@ -547,3 +547,13 @@ div.schema-content-dialog-body {
     color: var( --epm-button-partition-blinking );
     font-weight: bold;
 }
+
+.faq-button {
+    display: inline;
+}
+.faq-button::before {
+    font-family: FontAwesome;
+    content: "\f059";
+    color: var(--epm-button-primary-background);
+    cursor: pointer;
+}
