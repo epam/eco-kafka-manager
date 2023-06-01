@@ -15,6 +15,14 @@
  *******************************************************************************/
 package com.epam.eco.kafkamanager.ui.topics.browser.handlers;
 
+import java.util.Map;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import com.epam.eco.kafkamanager.FilterClause;
+
+import static com.epam.eco.kafkamanager.ui.topics.browser.FilterClauseUtils.KEY_VALUE_SEPARATOR;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 
@@ -33,7 +41,7 @@ public class FilterOperationUtils {
         }
         return testString.matches(regexp.replaceAll(LIKE_SQL_STYLE, LIKE_JAVA_STYLE));
     }
-    public static boolean notEmpty(String filter, String testString) {
+    public static boolean notEmpty(String testString) {
         return nonNull(testString) && !testString.isEmpty();
     }
 
@@ -42,6 +50,28 @@ public class FilterOperationUtils {
                 .replace("\n", "")
                 .replace("\r", "")
                 .trim();
+
+    }
+
+    public static boolean executeAvroJsonOperation(FilterClause filterClause, Object value) {
+        if(isNull(value)) {
+            return false;
+        }
+        if(filterClause.getValue().contains(KEY_VALUE_SEPARATOR)) {
+            if(value instanceof Map) {
+                Map<Object,Object> map = (Map<Object,Object>)value;
+                return new FilterOperationMapHandler(filterClause).compare(map);
+            } else {
+                try {
+                    new ObjectMapper().readTree(value.toString());
+                    return new FilterOperationJsonHandler(filterClause).compare(value.toString());
+                } catch (JsonProcessingException e) {
+                    return false;
+                }
+            }
+        } else {
+            return new FilterOperationStringHandler(filterClause).compare(value.toString());
+        }
 
     }
 }

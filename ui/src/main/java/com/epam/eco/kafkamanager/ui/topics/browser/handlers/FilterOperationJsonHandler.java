@@ -96,7 +96,7 @@ public class FilterOperationJsonHandler extends FilterOperationHandler<String> {
             return compareValue(node,
                                 getFieldName(getClause().getValue()),
                                 getFieldValue(getClause().getValue()),
-                                FilterOperationUtils::notEmpty);
+                                (filterClause,testValue)->FilterOperationUtils.notEmpty(testValue));
         } catch (JsonProcessingException e) {
             return FilterOperationUtils.like(getClause().getValue(), value);
         }

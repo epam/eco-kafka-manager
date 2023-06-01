@@ -124,14 +124,13 @@ public class FilterOperationMapHandler extends FilterOperationHandler<Map<Object
 
         if(propertyName.isEmpty()) {
             return value.values().stream().anyMatch(
-                    fieldValue -> FilterOperationUtils.notEmpty(getClause().getValue(), fieldValue.toString()));
+                    fieldValue -> FilterOperationUtils.notEmpty(fieldValue.toString()));
         }
 
         if(areValuesUtf8(value)) {
-            return FilterOperationUtils.notEmpty(getFilterPropertyValue(getClause()),
-                                             value.getOrDefault(new Utf8(propertyName), new Utf8(DEFAULT_VALUE)).toString());
+            return FilterOperationUtils.notEmpty(value.getOrDefault(new Utf8(propertyName), new Utf8(DEFAULT_VALUE)).toString());
         } else {
-            return FilterOperationUtils.notEmpty(getFilterPropertyValue(getClause()),value.getOrDefault(propertyName, DEFAULT_VALUE).toString());
+            return FilterOperationUtils.notEmpty(value.getOrDefault(propertyName, DEFAULT_VALUE).toString());
         }
     }
 

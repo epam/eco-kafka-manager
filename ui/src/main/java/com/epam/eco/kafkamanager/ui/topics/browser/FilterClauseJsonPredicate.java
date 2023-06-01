@@ -21,20 +21,12 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.apache.kafka.clients.consumer.ConsumerRecord;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 import com.epam.eco.commons.kafka.helpers.FilterClausePredicate;
 import com.epam.eco.kafkamanager.FilterClause;
-import com.epam.eco.kafkamanager.ui.topics.browser.handlers.FilterOperationJsonHandler;
-import com.epam.eco.kafkamanager.ui.topics.browser.handlers.FilterOperationMapHandler;
-import com.epam.eco.kafkamanager.ui.topics.browser.handlers.FilterOperationStringHandler;
 
 import static com.epam.eco.kafkamanager.ui.topics.browser.FilterClauseUtils.KEY_ATTRIBUTE;
-import static com.epam.eco.kafkamanager.ui.topics.browser.FilterClauseUtils.KEY_VALUE_SEPARATOR;
+import static com.epam.eco.kafkamanager.ui.topics.browser.handlers.FilterOperationUtils.executeAvroJsonOperation;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 
@@ -43,8 +35,6 @@ import static java.util.Objects.nonNull;
  */
 
 public class FilterClauseJsonPredicate<K,V> implements FilterClausePredicate<K,V> {
-
-    private final static Logger LOGGER = LoggerFactory.getLogger(FilterClauseJsonPredicate.class);
 
     private final boolean areClausesEmpty;
     private final List<FilterClause> keyClauses;
@@ -71,7 +61,7 @@ public class FilterClauseJsonPredicate<K,V> implements FilterClausePredicate<K,V
             if(!keyClauses.isEmpty()) {
                 for(FilterClause clause : keyClauses) {
                     if(nonNull(clause.getValue())) {
-                        result = result && executeOperation(clause, record.key().toString());
+                        result = result && executeAvroJsonOperation(clause, record.key().toString());
                     } else {
                         return false;
                     }
@@ -92,7 +82,7 @@ public class FilterClauseJsonPredicate<K,V> implements FilterClausePredicate<K,V
 
                 for(FilterClause filterClause : otherClauses) {
                     if(nonNull(json)) {
-                        result = result && executeOperation(filterClause, json);
+                        result = result && executeAvroJsonOperation(filterClause, json);
                     } else {
                         result = false;
                     }
@@ -105,28 +95,6 @@ public class FilterClauseJsonPredicate<K,V> implements FilterClausePredicate<K,V
             return result;
 
         }
-    }
-
-    public static boolean executeOperation(FilterClause filterClause, Object value) {
-        if(isNull(value)) {
-            return false;
-        }
-        if(filterClause.getValue().contains(KEY_VALUE_SEPARATOR)) {
-            if(value instanceof Map) {
-                Map<Object,Object> map = (Map<Object,Object>)value;
-                return new FilterOperationMapHandler(filterClause).compare(map);
-            } else {
-                try {
-                    new ObjectMapper().readTree(value.toString());
-                    return new FilterOperationJsonHandler(filterClause).compare(value.toString());
-                } catch (JsonProcessingException e) {
-                    return false;
-                }
-            }
-        } else {
-            return new FilterOperationStringHandler(filterClause).compare(value.toString());
-        }
-
     }
 
 }

@@ -91,7 +91,7 @@ public class FilterClauseStringPredicate<K,V> implements FilterClausePredicate<K
         }
     }
 
-    public boolean executeOperation(FilterClause filterClause, Object value) {
+    private boolean executeOperation(FilterClause filterClause, Object value) {
         if(isNull(value)) {
             return false;
         }

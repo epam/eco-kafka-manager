@@ -55,7 +55,7 @@ public class TopicRecordFetchParams<K,V> {
             @JsonProperty("timestamp") long timestamp,
             @JsonProperty("useCache") boolean useCache,
             @JsonProperty("cacheExpirationTimeMin") long cacheExpirationTimeMin,
-            @JsonProperty("predicat") FilterClausePredicate<K,V> predicate
+            @JsonProperty("predicate") FilterClausePredicate<K,V> predicate
                                  ) {
         Validate.notNull(keyDataFormat, "Key data format can't be null");
         Validate.notNull(valueDataFormat, "Value data format can't be null");
@@ -63,7 +63,6 @@ public class TopicRecordFetchParams<K,V> {
         Validate.notEmpty(offsets, "Offsets can't be empty");
         Validate.isTrue(limit >= MIN_LIMIT && limit <= MAX_LIMIT,
                         String.format("Limit is invalid, should be within range [%d..%d]", MIN_LIMIT, MAX_LIMIT));
-        Validate.notNull(timestamp,"Timestamp is null!");
 
         this.keyDataFormat = keyDataFormat;
         this.valueDataFormat = valueDataFormat;

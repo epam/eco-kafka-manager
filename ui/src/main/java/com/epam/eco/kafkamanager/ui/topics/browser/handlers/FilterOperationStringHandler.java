@@ -46,6 +46,6 @@ public class FilterOperationStringHandler extends FilterOperationHandler<String>
 
     @Override
     boolean notEmpty(String value) {
-        return FilterOperationUtils.notEmpty(getClause().getValue(), value);
+        return FilterOperationUtils.notEmpty(value);
     }
 }
