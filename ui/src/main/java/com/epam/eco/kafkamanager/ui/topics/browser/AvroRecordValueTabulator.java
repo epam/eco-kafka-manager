@@ -98,8 +98,7 @@ public class AvroRecordValueTabulator implements RecordValueTabulator<Object> {
             return new RecordSchema(KafkaSchemaIdAwareUtils.extractSchemaId(record), schemaName, schemaKey, schemaValue,
                                     schemaAsString, TopicRecordFetchParams.DataFormat.AVRO);
         } else {
-            return new RecordSchema(0, "", "", "",
-                                    "", TopicRecordFetchParams.DataFormat.AVRO);
+            return RecordSchema.DUMMY_AVRO_RECORD_SCHEMA;
         }
 
     }

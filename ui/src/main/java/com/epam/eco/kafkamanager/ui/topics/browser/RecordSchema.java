@@ -31,6 +31,13 @@ public class RecordSchema {
 
     private final TopicRecordFetchParams.DataFormat schemaType;
 
+    public static final RecordSchema DUMMY_AVRO_RECORD_SCHEMA = new RecordSchema(0,
+                                                                            "",
+                                                                            "",
+                                                                            "",
+                                                                            "",
+                                                                            DataFormat.AVRO);
+
     public RecordSchema(
             long schemaId,
             String schemaName,
