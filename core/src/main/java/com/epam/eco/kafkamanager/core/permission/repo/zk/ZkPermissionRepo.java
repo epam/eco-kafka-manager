@@ -66,7 +66,7 @@ import com.epam.eco.kafkamanager.repo.CachedRepo;
  */
 public class ZkPermissionRepo extends AbstractValueRepo<PermissionInfo, PermissionSearchCriteria> implements PermissionRepo, CachedRepo<ResourcePattern>, ZkAclCache.CacheListener, MetadataUpdateListener, AsyncStartingBean {
 
-    private final static Logger LOGGER = LoggerFactory.getLogger(ZkPermissionRepo.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ZkPermissionRepo.class);
 
     @Autowired
     private KafkaAdminOperations adminOperations;

@@ -26,8 +26,7 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 
 import com.epam.eco.kafkamanager.FilterClause;
 
-import static com.epam.eco.kafkamanager.ui.topics.browser.FilterClauseUtils.KEY_VALUE_SEPARATOR;
-import static com.epam.eco.kafkamanager.ui.topics.browser.FilterClauseUtils.PROPERTIES_SEPARATOR;
+import static java.util.Objects.isNull;
 
 /**
  * @author Mikhail_Vershkov
@@ -41,6 +40,9 @@ public class FilterOperationJsonHandler extends FilterOperationHandler<String> {
     }
     @Override
     boolean equalValues(String value) {
+        if(isNull(value)) {
+            return false;
+        }
         try {
             JsonNode node = mapper.readTree(value);
             return compareValue(node,
@@ -53,6 +55,9 @@ public class FilterOperationJsonHandler extends FilterOperationHandler<String> {
     }
     @Override
     boolean contains(String value) {
+        if(isNull(value)) {
+            return false;
+        }
         try {
             JsonNode node = mapper.readTree(value);
             return compareValue(node,
@@ -65,6 +70,9 @@ public class FilterOperationJsonHandler extends FilterOperationHandler<String> {
     }
     @Override
     boolean startWith(String value) {
+        if(isNull(value)) {
+            return false;
+        }
         try {
             JsonNode node = mapper.readTree(value);
             return compareValue(node,
@@ -78,6 +86,9 @@ public class FilterOperationJsonHandler extends FilterOperationHandler<String> {
 
     @Override
     boolean like(String value) {
+        if(isNull(value)) {
+            return false;
+        }
         try {
             JsonNode node = mapper.readTree(value);
             return compareValue(node,
@@ -91,6 +102,9 @@ public class FilterOperationJsonHandler extends FilterOperationHandler<String> {
 
     @Override
     boolean notEmpty(String value) {
+        if(isNull(value)) {
+            return false;
+        }
         try {
             JsonNode node = mapper.readTree(value);
             return compareValue(node,

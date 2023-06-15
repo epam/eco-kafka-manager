@@ -100,7 +100,7 @@ public class TabularRecords implements Iterable<Record> {
                                 topicName)));
 
         if (selectedColumnNames != null) {
-            selectedColumnNames.stream()
+            selectedColumnNames
                    .forEach( columnName ->
                         columns.putIfAbsent(columnName,
                             new Column(columnName, false, true, topicName))

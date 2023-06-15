@@ -60,7 +60,7 @@ import com.epam.eco.kafkamanager.repo.CachedRepo;
  */
 public class KafkaConsumerGroupRepo extends AbstractKeyValueRepo<String, ConsumerGroupInfo, ConsumerGroupSearchCriteria> implements ConsumerGroupRepo, CachedRepo<String>, KafkaConsumerGroupCache.CacheListener, MetadataUpdateListener, AsyncStartingBean {
 
-    private final static Logger LOGGER = LoggerFactory.getLogger(KafkaConsumerGroupRepo.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(KafkaConsumerGroupRepo.class);
 
     @Autowired
     private KafkaAdminOperations adminOperations;

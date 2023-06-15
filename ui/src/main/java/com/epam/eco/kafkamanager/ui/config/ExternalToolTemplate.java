@@ -23,7 +23,7 @@ import static java.util.Objects.nonNull;
  */
 public class ExternalToolTemplate extends UrlTemplate {
 
-    private final static String DEFAULT_ICON = "fa-external-link";
+    private static final String DEFAULT_ICON = "fa-external-link";
 
     public boolean show() {
         return (nonNull(super.getUrlTemplate()) && nonNull(super.getName()));

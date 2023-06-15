@@ -48,7 +48,7 @@ import com.epam.eco.kafkamanager.repo.AbstractKeyValueRepo;
  */
 public class KafkaMetadataRepo extends AbstractKeyValueRepo<MetadataKey, Metadata, MetadataSearchCriteria> implements MetadataRepo, CacheListener<MetadataKey, Metadata>, AsyncStartingBean {
 
-    private final static Logger LOGGER = LoggerFactory.getLogger(KafkaMetadataRepo.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(KafkaMetadataRepo.class);
 
     private static final String TOPIC = "__eco_entity_metadata";
 

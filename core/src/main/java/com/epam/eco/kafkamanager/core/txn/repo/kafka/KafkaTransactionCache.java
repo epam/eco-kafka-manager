@@ -45,7 +45,7 @@ import kafka.coordinator.transaction.TransactionMetadata;
  */
 class KafkaTransactionCache implements CacheListener<String, TransactionProjection> {
 
-    private final static Logger LOGGER = LoggerFactory.getLogger(KafkaTransactionCache.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(KafkaTransactionCache.class);
 
     private final ProjectingKafkaCache<String, TransactionMetadata, TransactionProjection> transactionCache;
 

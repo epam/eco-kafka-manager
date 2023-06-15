@@ -46,7 +46,7 @@ import com.epam.eco.kafkamanager.udmetrics.UDMetricConfigSearchCriteria;
  */
 public class KafkaUDMetricConfigRepo extends AbstractKeyValueRepo<String, UDMetricConfig, UDMetricConfigSearchCriteria> implements UDMetricConfigRepo, CacheListener<String, UDMetricConfig>, AsyncStartingBean {
 
-    private final static Logger LOGGER = LoggerFactory.getLogger(KafkaUDMetricConfigRepo.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(KafkaUDMetricConfigRepo.class);
 
     private static final String TOPIC = "__eco_udm_configs";
 

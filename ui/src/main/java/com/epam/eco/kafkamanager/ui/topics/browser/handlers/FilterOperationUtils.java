@@ -22,7 +22,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import com.epam.eco.kafkamanager.FilterClause;
 
-import static com.epam.eco.kafkamanager.ui.topics.browser.FilterClauseUtils.KEY_VALUE_SEPARATOR;
+import static com.epam.eco.kafkamanager.ui.topics.browser.handlers.FilterOperationHandler.KEY_VALUE_SEPARATOR;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 
@@ -55,7 +55,7 @@ public class FilterOperationUtils {
 
     public static boolean executeAvroJsonOperation(FilterClause filterClause, Object value) {
         if(isNull(value)) {
-            return false;
+            return new FilterOperationTombstoneHandler(filterClause).compare(value);
         }
         if(filterClause.getValue().contains(KEY_VALUE_SEPARATOR)) {
             if(value instanceof Map) {

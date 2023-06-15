@@ -29,8 +29,6 @@ import com.epam.eco.kafkamanager.ui.config.KafkaManagerUiConfiguration;
  * @author Andrei_Tytsik
  */
 @SpringBootApplication
-@ComponentScan
-@EnableAutoConfiguration
 @Import(KafkaManagerUiConfiguration.class)
 public class KafkaManagerUiApplication {
 

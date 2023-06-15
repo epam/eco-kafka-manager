@@ -27,11 +27,13 @@ import com.epam.eco.kafkamanager.FilterOperation;
 
 public enum FilterOperationEnum {
 
-    EQUALS(new FilterOperation("equals", "equals", "Any string")),
-    CONTAINS(new FilterOperation("contains", "contains", "Any string")),
-    STARTS_WITH(new FilterOperation("startsWith", "starts with", "Any string")),
-    LIKE(new FilterOperation("like", "like", "%string%string%")),
-    NOT_EMPTY(new FilterOperation("notEmpty", "not empty", "Leave it blank"));
+    EQUALS(new FilterOperation("equals", "equals", "Any string", true)),
+    CONTAINS(new FilterOperation("contains", "contains", "Any string", true)),
+    STARTS_WITH(new FilterOperation("startsWith", "starts with", "Any string", true)),
+    LIKE(new FilterOperation("like", "like", "%string%string%", true)),
+    NOT_EMPTY(new FilterOperation("notEmpty", "not empty", "Leave it blank", false)),
+    EXCLUDE(new FilterOperation("exclude", "exclude", "Leave it blank", false)),
+    ONLY(new FilterOperation("only", "only", "Leave it blank", false));
 
     private final FilterOperation operation;
 

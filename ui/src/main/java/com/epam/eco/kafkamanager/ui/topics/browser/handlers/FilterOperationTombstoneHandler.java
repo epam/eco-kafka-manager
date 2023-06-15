@@ -17,37 +17,47 @@ package com.epam.eco.kafkamanager.ui.topics.browser.handlers;
 
 import com.epam.eco.kafkamanager.FilterClause;
 
-import static java.util.Objects.nonNull;
+import static java.util.Objects.isNull;
 
 /**
  * @author Mikhail_Vershkov
  */
 
-public class FilterOperationStringHandler extends FilterOperationHandler<String> {
+public class FilterOperationTombstoneHandler extends FilterOperationHandler<Object> {
 
-    public FilterOperationStringHandler(FilterClause clause) {
+    public FilterOperationTombstoneHandler(FilterClause clause) {
         super(clause);
     }
     @Override
-    boolean equalValues(String value) {
-        return nonNull(value) && FilterOperationUtils.strip(value).equals(getClause().getValue());
+    boolean equalValues(Object value) {
+        return false;
     }
     @Override
-    boolean contains(String value) {
-        return nonNull(value) && FilterOperationUtils.strip(value).contains(getClause().getValue());
+    boolean contains(Object value) {
+        return false;
     }
     @Override
-    boolean startWith(String value) {
-        return nonNull(value) && FilterOperationUtils.strip(value).startsWith(getClause().getValue());
-    }
-
-    @Override
-    boolean like(String value) {
-        return nonNull(value) && FilterOperationUtils.like(getClause().getValue(), value);
+    boolean startWith(Object value) {
+        return false;
     }
 
     @Override
-    boolean notEmpty(String value) {
-        return nonNull(value) && FilterOperationUtils.notEmpty(value);
+    boolean like(Object value) {
+        return false;
+    }
+
+    @Override
+    boolean notEmpty(Object value) {
+        return false;
+    }
+
+    @Override
+    public boolean exclude(Object value) {
+        return !isNull(value);
+    }
+
+    @Override
+    public boolean only(Object value) {
+        return isNull(value);
     }
 }

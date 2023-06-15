@@ -1,36 +1,22 @@
-/*******************************************************************************
- *  Copyright 2023 EPAM Systems
- *
- *  Licensed under the Apache License, Version 2.0 (the "License"); you may not
- *  use this file except in compliance with the License.  You may obtain a copy
- *  of the License at
- *
- *    http://www.apache.org/licenses/LICENSE-2.0
- *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
- *  WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
- *  License for the specific language governing permissions and limitations under
- *  the License.
- *******************************************************************************/
-
 class FilterOperation {
 
     id;
     label;
+    placeholder;
+    required;
 
-     static from(json){
-         return Object.assign(new FilterOperation(), json);
+    static from(json){
+        return Object.assign(new FilterOperation(), json);
     }
 
     equals(testOperation) {
-       if(testOperation===undefined) {
-           return false;
-       }
-       return this.id === testOperation.id;    
+        if(testOperation===undefined) {
+            return false;
+        }
+        return this.id === testOperation.id;
     }
 }
-        
+
 class FilterClause {
 
     column;
@@ -38,9 +24,9 @@ class FilterClause {
     value;
 
     constructor(column, operation, value) {
-       this.column = column;
-       this.operation = operation;
-       this.value = value;               
+        this.column = column;
+        this.operation = operation;
+        this.value = value;
     }
 
     equals(testClause) {
@@ -50,39 +36,27 @@ class FilterClause {
         return this.column === testClause.column &&  this.operation.equals(testClause.operation);
     }
     getFilterClauseText() {
-       return this.column + ' ' + this.operation.label +' "' + this.value + '"';
+        return this.column + ' ' + this.operation.label +
+            (this.operation.required ? ' "' + this.value + '"' : '');
     }
 }
 
 let filterOperationArray = [];
-//           FilterOperation.from({id:'equals', label:'equals'}),
-//           FilterOperation.from({id:'contains', label: 'contains'}),
-//           FilterOperation.from({id:'startWith', label: 'startWith'})
-// ];
 
 let getOperationById = (operationId) => {
     for(let ii=0;ii<filterOperationArray.length;ii++) {
-       if(filterOperationArray[ii].id === operationId) {
-           return filterOperationArray[ii];
-       }
+        if(filterOperationArray[ii].id === operationId) {
+            return filterOperationArray[ii];
+        }
     }
     return undefined;
 }
 
-let filterClauseArray=[
-    // new FilterClause('operation_id', getOperationById('equals'), '123846756538000009'),
-    // new FilterClause('key', getOperationById('equals'), '67800009998000009'),
-    // new FilterClause('department_id', getOperationById('like'), 'EPM_ECO')
-];
+let filterClauseArray=[];
 
-let filterColumnArray = [
-        // 'key',
-        // 'department_id',
-        // 'document_id',
-        // 'operation_id',
-        // 'buiseness_time',
-        // 'transaction_time'
-];
+let excludesArray = [];
+
+let filterColumnArray = [];
 
 let isBrowserFilterSet = () => {
     return filterClauseArray!==null && filterClauseArray.length>0;
@@ -91,9 +65,33 @@ let setFilterOperationArray = (operations) => {
     filterOperationArray = operations
         .map(operation=>FilterOperation.from(operation));
 }
-let setFilterColumnsArray = (columns) => {
-    filterColumnArray = columns;
+let setExcludes = (excludes) => {
+    excludesArray = excludes;
 }
+
+let setFilterColumnsArray = (topic, columns) => {
+
+    let storedColumns = JSON.parse(localStorage.getItem(topic));
+
+    if(!storedColumns || storedColumns.length===0) {
+        localStorage.setItem(topic, JSON.stringify(columns));
+        storedColumns = columns;
+    }
+
+    let addNewColumns = false;
+    for(let ii=0;ii<columns.length;ii++) {
+        if(!storedColumns.includes(columns[ii])) {
+            storedColumns.push(columns[ii]);
+            addNewColumns = true;
+        }
+    }
+    if(addNewColumns) {
+        localStorage.setItem(topic, JSON.stringify(storedColumns));
+    }
+
+    filterColumnArray = storedColumns;
+}
+
 let setFilterClauseArray = (clauses) => {
     filterClauseArray = clauses
         .map(clause=>new FilterClause(clause.column,
@@ -105,38 +103,56 @@ let loadFilterColumnArray = () => {
 
     for(let ii=0;ii<filterColumnArray.length;ii++) {
 
-         const filterSelectItem = document.createElement('option');
-         filterSelectItem.setAttribute('value', filterColumnArray[ii]);
-         filterSelectItem.textContent = filterColumnArray[ii];
+        const filterSelectItem = document.createElement('option');
+        filterSelectItem.setAttribute('value', filterColumnArray[ii]);
+        filterSelectItem.textContent = filterColumnArray[ii];
 
-         document.getElementById('filter-column-select').appendChild(filterSelectItem);
+        document.getElementById('filter-column-select').appendChild(filterSelectItem);
 
-     }
+    }
 }
 
-let loadFilterOperationArray = () => {
+let getOperationIdsByColumn = (columnId) => {
+    let operations = excludesArray.filter( e => e.columnName === columnId).flatMap(e => e.operations);
+    if(operations && operations.length===0) {
+        operations = excludesArray.filter(e => e.columnName === 'default').flatMap(e => e.operations);
+    }
+    return operations;
+}
 
-    for(let ii=0;ii<filterOperationArray.length;ii++) {
+let getOperationsByColumn = ( columnId ) => {
+    let operations = getOperationIdsByColumn(columnId);
+    return filterOperationArray.filter(operation => operations.includes(operation.id));
+}
+
+let loadFilterOperationArray = (columnId) => {
+
+    document.getElementById('filter-operation-select').innerHTML='';
+
+    const filteredOperations = getOperationsByColumn(columnId);
+
+    for(let ii=0;ii<filteredOperations.length;ii++) {
 
         const filterSelectItem = document.createElement('option');
-        filterSelectItem.setAttribute('value',filterOperationArray[ii].id);
-        filterSelectItem.textContent = filterOperationArray[ii].label;
+        filterSelectItem.setAttribute('value',filteredOperations[ii].id);
+        filterSelectItem.textContent = filteredOperations[ii].label;
 
         document.getElementById('filter-operation-select').appendChild(filterSelectItem);
 
     }
-}   
+    setValuePlaceholder(filteredOperations[0].id);
+}
 
 
 let getFilterClauseByText = (filterClauseText) => {
     for(let ii=0;ii<filterClauseArray.length;ii++) {
-       if(filterClauseArray[ii].getFilterClauseText() === filterClauseText) {
-           return filterClauseArray[ii];
-       }
+        if(filterClauseArray[ii].getFilterClauseText() === filterClauseText) {
+            return filterClauseArray[ii];
+        }
     }
 }
 
-let drawfilterClause = (filterClause) => {
+let drawFilterClause = (filterClause) => {
 
     const filterClauseSpan = document.createElement('span');
     filterClauseSpan.textContent=filterClause.getFilterClauseText();
@@ -152,13 +168,13 @@ let drawfilterClause = (filterClause) => {
 }
 
 let loadFilterClauses = () => {
-   const containerElement = document.getElementById('filter-clause-container');
-   while(containerElement.firstChild && !containerElement.firstChild.remove());
-   for(let ii=0;ii<filterClauseArray.length;ii++) {
-       if(validateSingleFilterClause(filterClauseArray[ii])) {
-          addRemoveListener(drawfilterClause(filterClauseArray[ii]));
-       }
-   }
+    const containerElement = document.getElementById('filter-clause-container');
+    while(containerElement.firstChild && !containerElement.firstChild.remove());
+    for(let ii=0;ii<filterClauseArray.length;ii++) {
+        if(validateSingleFilterClause(filterClauseArray[ii])) {
+            addRemoveListener(drawFilterClause(filterClauseArray[ii]));
+        }
+    }
 }
 
 const isColumnExists = (columnName) => {
@@ -166,9 +182,9 @@ const isColumnExists = (columnName) => {
         return true;
     }
     for(let ii=0;ii<filterColumnArray.length;ii++) {
-       if(filterColumnArray[ii]===columnName) {
-           return true;
-       }
+        if(filterColumnArray[ii]===columnName) {
+            return true;
+        }
     }
     showInfo('error','Error while validating columns','Column "' + columnName + '" doesnt exists in topic.');
     return false;
@@ -176,31 +192,31 @@ const isColumnExists = (columnName) => {
 
 const isOperationExists = (operation) => {
     for(let ii=0;ii<filterOperationArray.length;ii++) {
-       if(filterOperationArray[ii].equals(operation)) {
-           return true;
-       }
+        if(filterOperationArray[ii].equals(operation)) {
+            return true;
+        }
     }
     showInfo('error','Error while validate operations','Operation "' + operation.id + '" doesnt exists.');
     return false;
 }
 
 const validateSingleFilterClause = ( singleFilterClause ) => {
-    return isColumnExists(singleFilterClause.column) && 
-              isOperationExists(singleFilterClause.operation);
+    return isColumnExists(singleFilterClause.column) &&
+        isOperationExists(singleFilterClause.operation);
 
-}   
+}
 
 const validateFilterClause = () => {
     for(let ii=0;ii<filterClauseArray.length;ii++) {
-       if(!validateSingleFilterClause(filterClauseArray[ii])) {
-           return false;
-       }
+        if(!validateSingleFilterClause(filterClauseArray[ii])) {
+            return false;
+        }
     }
     return true;
 }
 
 let thisClausePredicate = (clause,filterClause) => {
-   return !clause.equals(filterClause);  
+    return !clause.equals(filterClause);
 }
 
 let removeFilterClause = (filterClauseText) => {
@@ -218,23 +234,35 @@ let confirmRemoveClause = (filterClauseText) => {
 let addRemoveListener = (elem) => {
     elem.addEventListener('click', function() {
         removeFilterClause(elem.textContent);
-    });            
+    });
 }
 
 function setValuePlaceholder(operationId) {
-    const placeholderText = getOperationById(operationId).placeholder;
-    $("#filter-value").attr('placeholder', placeholderText);
+    const operation = getOperationById(operationId);
+    const filterValueElement = document.getElementById("filter-value");
+    if(operation.required) {
+        filterValueElement.removeAttribute('disabled');
+    } else {
+        filterValueElement.setAttribute('disabled', 'disabled');
+    }
+
+    filterValueElement.setAttribute('placeholder', operation.placeholder);
 }
+
 
 $(document).ready( function () {
 
     loadFilterColumnArray();
-    loadFilterOperationArray();
+    loadFilterOperationArray(filterColumnArray[0]);
     loadFilterClauses();
     setValuePlaceholder(filterOperationArray[0].id);
 
     document.getElementById("filter-operation-select").addEventListener('change', (event) => {
         setValuePlaceholder(event.target.value)
+    });
+
+    document.getElementById("filter-column-select").addEventListener('change', (event) => {
+        loadFilterOperationArray(event.target.value)
     });
 
     document.getElementById("add-filter-button").addEventListener('click', () => {
@@ -251,10 +279,15 @@ $(document).ready( function () {
         });
 
         if (filterColumnName === undefined ||
-            filterOperationId === undefined ||
-            ($('#filter-value').val() === '' && filterOperationId!=='notEmpty' )) {
+            filterOperationId === undefined ) {
             return;
         }
+
+        if ($('#filter-value').val() === '' && filterOperationArray.filter(op=>op.required).map(op=>op.id).includes(filterOperationId) ) {
+            showInfo('error', 'Filter clause validation', 'Operation "' + filterOperationId + '" requires value.');
+            return;
+        }
+
         for (let ii = 0; ii < filterClauseArray.length; ii++) {
             if (filterClauseArray[ii].column === filterColumnName &&
                 filterClauseArray[ii].operation.id === filterOperationId) {
@@ -267,7 +300,7 @@ $(document).ready( function () {
 
         filterClauseArray.push(newFilterClause);
 
-        const filterClauseItem = drawfilterClause(newFilterClause);
+        const filterClauseItem = drawFilterClause(newFilterClause);
         addRemoveListener(filterClauseItem);
 
     });

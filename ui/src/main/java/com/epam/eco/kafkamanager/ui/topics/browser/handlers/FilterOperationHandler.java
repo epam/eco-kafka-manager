@@ -15,13 +15,14 @@
  *******************************************************************************/
 package com.epam.eco.kafkamanager.ui.topics.browser.handlers;
 
-import org.apache.commons.lang3.Validate;
-
 import com.epam.eco.kafkamanager.FilterClause;
 
+import static java.util.Objects.isNull;
 
 public abstract class FilterOperationHandler<T> {
 
+    public static final String KEY_VALUE_SEPARATOR = ":";
+    public static final String PROPERTIES_SEPARATOR = ".";
     private final FilterClause clause;
 
     public FilterOperationHandler(FilterClause clause) {
@@ -33,21 +34,16 @@ public abstract class FilterOperationHandler<T> {
     }
 
     public boolean compare(T value) {
-        Validate.notNull(value,"Value is null!");
         FilterOperationEnum filterOperationEnum = FilterOperationEnum.getOperationEnum(clause.getOperation());
-        switch (filterOperationEnum) {
-            case EQUALS:
-                return equalValues(value);
-            case CONTAINS:
-                return contains(value);
-            case STARTS_WITH:
-                return startWith(value);
-            case LIKE:
-                return like(value);
-            case NOT_EMPTY:
-                return notEmpty(value);
-        }
-        return false;
+        return switch (filterOperationEnum) {
+            case EQUALS -> equalValues(value);
+            case CONTAINS -> contains(value);
+            case STARTS_WITH -> startWith(value);
+            case LIKE -> like(value);
+            case NOT_EMPTY -> notEmpty(value);
+            case EXCLUDE -> exclude(value);
+            case ONLY -> only(value);
+        };
     }
 
     abstract boolean equalValues(T value);
@@ -55,5 +51,11 @@ public abstract class FilterOperationHandler<T> {
     abstract boolean startWith(T value);
     abstract boolean like(T value);
     abstract boolean notEmpty(T value);
+    protected boolean exclude(T value) {
+        return !isNull(value);
+    }
+    protected boolean only(T value) {
+        return isNull(value);
+    }
 
 }

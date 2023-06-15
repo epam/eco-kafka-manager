@@ -47,6 +47,8 @@ import com.epam.eco.kafkamanager.ui.config.TopicBrowser;
 import com.epam.eco.kafkamanager.ui.topics.TopicController;
 import com.epam.eco.kafkamanager.ui.topics.browser.handlers.FilterOperationEnum;
 
+import static com.epam.eco.kafkamanager.ui.topics.browser.FilterClauseAbstractPredicate.KEY_ATTRIBUTE;
+import static com.epam.eco.kafkamanager.ui.topics.browser.FilterClauseAbstractPredicate.TOMBSTONE_ATTRIBUTE;
 import static java.util.Objects.nonNull;
 
 /**
@@ -73,7 +75,6 @@ public class TopicBrowserController {
     public static final String ATTR_SCHEMA_CATALOG_URL_TEMPLATE = "schemaCatalogUrlTemplate";
     public static final String ATTR_FILTER_CLAUSE = "filter-clause";
     public static final String ATTR_FILTER_OPERATIONS = "filterOperations";
-    private static final String KEY_ATTRIBUTE = "key";
     private static final long DEFAULT_FETCH_TIMEOUT = 30_000;
 
     @Autowired
@@ -157,6 +158,7 @@ public class TopicBrowserController {
 
         List<String> columns = new ArrayList<>();
         columns.add(KEY_ATTRIBUTE);
+        columns.add(TOMBSTONE_ATTRIBUTE);
         columns.addAll(tabularRecords.listColumnsAsString());
 
         modelAttributes.accept(ATTR_FILTER_CLAUSE, browseParams.getFilterClauses());

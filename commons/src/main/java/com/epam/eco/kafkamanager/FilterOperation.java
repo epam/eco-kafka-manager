@@ -25,13 +25,13 @@ public class FilterOperation {
     private String id;
     private String label;
     private String placeholder;
+    private boolean required;
 
-    public FilterOperation() {}
-
-    public FilterOperation(String id, String label, String placeholder) {
+    public FilterOperation(String id, String label, String placeholder, boolean required) {
         this.id = id;
         this.label = label;
         this.placeholder = placeholder;
+        this.required = required;
     }
 
     @JsonGetter("id")
@@ -59,6 +59,15 @@ public class FilterOperation {
 
     public void setPlaceholder(String placeholder) {
         this.placeholder = placeholder;
+    }
+
+    @JsonGetter("required")
+    public boolean isRequired() {
+        return required;
+    }
+
+    public void setRequired(boolean required) {
+        this.required = required;
     }
 
     public boolean equals(FilterOperation filterOperation) {

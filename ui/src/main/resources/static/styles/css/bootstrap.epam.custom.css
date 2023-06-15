@@ -37,6 +37,9 @@
     --epm-over-all-windows-z-index: 2000;
 
     --epm-button-partition-blinking: #65a965;
+
+    --epm-faq-font-color: #3c3c3c;
+    --epm-faq-hilight-font-color: #6284b6;
 }
 
 .btn-sm {
@@ -556,4 +559,10 @@ div.schema-content-dialog-body {
     content: "\f059";
     color: var(--epm-button-primary-background);
     cursor: pointer;
+}
+.faq {
+    color: var(--epm-faq-font-color);
+}
+.faq b {
+    color: var(--epm-faq-hilight-font-color);
 }

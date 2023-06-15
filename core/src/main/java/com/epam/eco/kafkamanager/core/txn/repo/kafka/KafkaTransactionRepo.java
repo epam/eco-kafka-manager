@@ -51,7 +51,7 @@ import kafka.coordinator.transaction.TransactionMetadata;
  */
 public class KafkaTransactionRepo extends AbstractKeyValueRepo<String, TransactionInfo, TransactionSearchCriteria> implements TransactionRepo, CachedRepo<String>, KafkaTransactionCache.CacheListener, AsyncStartingBean {
 
-    private final static Logger LOGGER = LoggerFactory.getLogger(KafkaTransactionRepo.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(KafkaTransactionRepo.class);
 
     @Autowired
     private KafkaManagerProperties properties;

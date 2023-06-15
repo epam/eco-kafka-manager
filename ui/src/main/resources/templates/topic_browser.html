@@ -40,11 +40,20 @@
     const filterOperations = [[${filterOperations}]]
 
     const enableAnimation = [[${enableAnimation}]]
+    const topicName = [[${browseParams.topicName}]]
 
     /*]]>*/
 
+    const excludes = [
+        {columnName: 'default', operations: ['equals','contains','startWith','like','notEmpty']},
+        {columnName: 'tombstones', operations: ['include','exclude','only']},
+    ];
+
     if(filterColumns!==null) {
-        setFilterColumnsArray(filterColumns);
+        setFilterColumnsArray(topicName, filterColumns);
+    }
+    if(excludes && excludes!=null) {
+        setExcludes(excludes);
     }
     if(filterClauses!==null) {
         setFilterClauseArray(filterClauses);

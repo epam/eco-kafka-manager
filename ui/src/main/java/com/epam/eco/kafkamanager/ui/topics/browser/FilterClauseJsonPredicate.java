@@ -15,17 +15,14 @@
  *******************************************************************************/
 package com.epam.eco.kafkamanager.ui.topics.browser;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 
-import com.epam.eco.commons.kafka.helpers.FilterClausePredicate;
 import com.epam.eco.kafkamanager.FilterClause;
+import com.epam.eco.kafkamanager.ui.topics.browser.handlers.FilterOperationUtils;
 
-import static com.epam.eco.kafkamanager.ui.topics.browser.FilterClauseUtils.KEY_ATTRIBUTE;
 import static com.epam.eco.kafkamanager.ui.topics.browser.handlers.FilterOperationUtils.executeAvroJsonOperation;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
@@ -34,67 +31,42 @@ import static java.util.Objects.nonNull;
  * @author Mikhail_Vershkov
  */
 
-public class FilterClauseJsonPredicate<K,V> implements FilterClausePredicate<K,V> {
-
-    private final boolean areClausesEmpty;
-    private final List<FilterClause> keyClauses;
-    private final List<FilterClause> otherClauses;
+public class FilterClauseJsonPredicate<K,V> extends FilterClauseAbstractPredicate<K,V> {
 
     public FilterClauseJsonPredicate(Map<String, List<FilterClause>> clauses) {
-        areClausesEmpty = clauses.isEmpty();
-        keyClauses = clauses.getOrDefault(KEY_ATTRIBUTE, Collections.emptyList());
-        this.otherClauses = clauses.entrySet().stream()
-                                   .filter(clause->!KEY_ATTRIBUTE.equals(clause.getKey()))
-                                   .flatMap(clause -> clause.getValue().stream())
-                                   .collect(Collectors.toList());
+        super(clauses);
     }
 
     @Override
-    public boolean test(ConsumerRecord<K, V> record) {
+    protected boolean processValueClauses(ConsumerRecord<K, V> record) {
 
-        if(areClausesEmpty) {
-            return true;
-        } else {
+        boolean result = true;
 
-            boolean result = true;
+        if(!otherClauses.isEmpty()) {
 
-            if(!keyClauses.isEmpty()) {
-                for(FilterClause clause : keyClauses) {
-                    if(nonNull(clause.getValue())) {
-                        result = result && executeAvroJsonOperation(clause, record.key().toString());
-                    } else {
-                        return false;
-                    }
+            if(isNull(record.value())) {
+                return false;
+            }
+
+            String json = record.value().toString();
+
+            for(FilterClause filterClause : otherClauses) {
+                if(nonNull(json)) {
+                    result = result && executeAvroJsonOperation(filterClause, json);
+                } else {
+                    result = false;
                 }
-                if(isNull(record.value())) {
-                    return result;
+                if(!result) {
+                    break;
                 }
             }
-            if(!result) return false;
-
-            if(!otherClauses.isEmpty()) {
-
-                if(isNull(record.value())) {
-                    return false;
-                }
-
-                String json = record.value().toString();
-
-                for(FilterClause filterClause : otherClauses) {
-                    if(nonNull(json)) {
-                        result = result && executeAvroJsonOperation(filterClause, json);
-                    } else {
-                        result = false;
-                    }
-                    if(!result) {
-                        break;
-                    }
-                }
-
-            }
-            return result;
 
         }
+        return result;
     }
 
+    @Override
+    boolean executeOperation(FilterClause clause, Object value) {
+        return FilterOperationUtils.executeAvroJsonOperation(clause, value);
+    }
 }

@@ -21,14 +21,14 @@ import org.apache.avro.util.Utf8;
 
 import com.epam.eco.kafkamanager.FilterClause;
 
-import static com.epam.eco.kafkamanager.ui.topics.browser.FilterClauseUtils.KEY_VALUE_SEPARATOR;
+import static java.util.Objects.isNull;
 
 /**
  * @author Mikhail_Vershkov
  */
 
 public class FilterOperationMapHandler extends FilterOperationHandler<Map<Object,Object>> {
-    private final static String DEFAULT_VALUE = "";
+    private static final String DEFAULT_VALUE = "";
     private final String propertyName;
 
     public FilterOperationMapHandler(FilterClause clause) {
@@ -37,7 +37,7 @@ public class FilterOperationMapHandler extends FilterOperationHandler<Map<Object
     }
     @Override
     boolean equalValues(Map<Object,Object> value) {
-        if(value.isEmpty()) {
+        if(isNull(value) || value.isEmpty()) {
             return false;
         }
         if(areValuesUtf8(value)) {
@@ -57,7 +57,7 @@ public class FilterOperationMapHandler extends FilterOperationHandler<Map<Object
     @Override
     boolean contains(Map<Object,Object> value) {
 
-        if(value.isEmpty()) {
+        if(isNull(value) || value.isEmpty()) {
             return false;
         }
 
@@ -78,7 +78,7 @@ public class FilterOperationMapHandler extends FilterOperationHandler<Map<Object
     @Override
     boolean startWith(Map<Object,Object> value) {
 
-        if(value.isEmpty()) {
+        if(isNull(value) || value.isEmpty()) {
             return false;
         }
 
@@ -99,7 +99,7 @@ public class FilterOperationMapHandler extends FilterOperationHandler<Map<Object
 
     @Override
     boolean like(Map<Object, Object> value) {
-        if(value.isEmpty()) {
+        if(isNull(value) || value.isEmpty()) {
             return false;
         }
 
@@ -118,7 +118,7 @@ public class FilterOperationMapHandler extends FilterOperationHandler<Map<Object
 
     @Override
     boolean notEmpty(Map<Object, Object> value) {
-        if(value.isEmpty()) {
+        if(isNull(value) || value.isEmpty()) {
             return false;
         }
 

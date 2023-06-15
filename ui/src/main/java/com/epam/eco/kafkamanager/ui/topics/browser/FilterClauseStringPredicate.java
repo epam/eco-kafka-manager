@@ -15,18 +15,13 @@
  *******************************************************************************/
 package com.epam.eco.kafkamanager.ui.topics.browser;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import org.apache.kafka.clients.consumer.ConsumerRecord;
-
-import com.epam.eco.commons.kafka.helpers.FilterClausePredicate;
 import com.epam.eco.kafkamanager.FilterClause;
 import com.epam.eco.kafkamanager.ui.topics.browser.handlers.FilterOperationStringHandler;
 
-import static com.epam.eco.kafkamanager.ui.topics.browser.FilterClauseUtils.KEY_ATTRIBUTE;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 
@@ -34,68 +29,34 @@ import static java.util.Objects.nonNull;
  * @author Mikhail_Vershkov
  */
 
-public class FilterClauseStringPredicate<K,V> implements FilterClausePredicate<K,V> {
+public class FilterClauseStringPredicate<K,V> extends FilterClauseAbstractPredicate<K,V> {
 
-    private final boolean areClausesEmpty;
-    private final List<FilterClause> keyClauses;
-    private final List<FilterClause> otherClauses;
     public FilterClauseStringPredicate(Map<String, List<FilterClause>> clauses) {
-        areClausesEmpty = clauses.isEmpty();
-        keyClauses = clauses.getOrDefault(KEY_ATTRIBUTE, Collections.emptyList());
-        this.otherClauses = clauses.entrySet().stream()
-                                   .filter(clause->!KEY_ATTRIBUTE.equals(clause.getKey()))
-                                   .flatMap(clause -> clause.getValue().stream())
-                                   .collect(Collectors.toList());
+        super(clauses);
     }
 
     @Override
-    public boolean test(ConsumerRecord<K,V> record) {
-        if(areClausesEmpty) {
-            return true;
-        } else {
-
-            boolean result = true;
-
-            if(!keyClauses.isEmpty()) {
-                for(FilterClause clause : keyClauses) {
-                    if(nonNull(clause.getValue())) {
-                        result = result && executeOperation(clause, record.key().toString());
-                    } else {
-                        return false;
-                    }
+    protected boolean processValueClauses(ConsumerRecord<K,V> record) {
+        boolean result = true;
+        if(!otherClauses.isEmpty()) {
+            String value = (String)record.value();
+            for(FilterClause filterClause : otherClauses) {
+                if(nonNull(value)) {
+                    result = result && executeOperation(filterClause, value);
+                } else {
+                    result = false;
                 }
-                if(isNull(record.value())) {
-                    return result;
+                if(!result) {
+                    break;
                 }
             }
-            if(!result) return false;
-
-
-            if(!otherClauses.isEmpty()) {
-
-                String value = (String)record.value();
-
-                for(FilterClause filterClause : otherClauses) {
-                    if(nonNull(value)) {
-                        result = result && executeOperation(filterClause, value);
-                    } else {
-                        result = false;
-                    }
-                    if(!result) {
-                        break;
-                    }
-                }
-            }
-            return result;
-
         }
+        return result;
     }
 
-    private boolean executeOperation(FilterClause filterClause, Object value) {
-        if(isNull(value)) {
-            return false;
-        }
-        return new FilterOperationStringHandler(filterClause).compare(value.toString());
+    @Override
+    protected boolean executeOperation(FilterClause filterClause, Object value) {
+        return new FilterOperationStringHandler(filterClause).compare((String)value);
     }
 
 }
