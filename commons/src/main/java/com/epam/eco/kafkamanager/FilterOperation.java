@@ -27,6 +27,8 @@ public class FilterOperation {
     private String placeholder;
     private boolean required;
 
+    public FilterOperation() {}
+
     public FilterOperation(String id, String label, String placeholder, boolean required) {
         this.id = id;
         this.label = label;
