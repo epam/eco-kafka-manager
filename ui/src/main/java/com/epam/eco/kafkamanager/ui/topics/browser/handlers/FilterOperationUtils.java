@@ -17,6 +17,8 @@ package com.epam.eco.kafkamanager.ui.topics.browser.handlers;
 
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -30,7 +32,7 @@ import static java.util.Objects.nonNull;
  * @author Mikhail_Vershkov
  */
 
-public class FilterOperationUtils {
+public final class FilterOperationUtils {
 
     private static final String LIKE_SQL_STYLE = "%";
     private static final String LIKE_JAVA_STYLE = "(.)+";
@@ -39,10 +41,10 @@ public class FilterOperationUtils {
         if(isNull(testString) || testString.isEmpty()) {
             return false;
         }
-        return testString.matches(regexp.replaceAll(LIKE_SQL_STYLE, LIKE_JAVA_STYLE));
+        return testString.matches(regexp.replace(LIKE_SQL_STYLE, LIKE_JAVA_STYLE));
     }
     public static boolean notEmpty(String testString) {
-        return nonNull(testString) && !testString.isEmpty();
+        return !StringUtils.isEmpty(testString);
     }
 
     public static String strip(String value) {

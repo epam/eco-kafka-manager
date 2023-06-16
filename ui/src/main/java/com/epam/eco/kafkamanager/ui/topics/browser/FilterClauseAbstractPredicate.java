@@ -38,7 +38,7 @@ public abstract class FilterClauseAbstractPredicate<K, V> implements FilterClaus
     public static final String KEY_ATTRIBUTE = "key";
     public static final String TOMBSTONE_ATTRIBUTE = "tombstones";
 
-    public static final String[] RESERVED_ATTRIBUTES = {KEY_ATTRIBUTE,TOMBSTONE_ATTRIBUTE};
+    private static final String[] RESERVED_ATTRIBUTES = {KEY_ATTRIBUTE,TOMBSTONE_ATTRIBUTE};
     protected final boolean areClausesEmpty;
     protected final List<FilterClause> keyClauses;
     protected final List<FilterClause> tombstoneClauses;
@@ -58,47 +58,42 @@ public abstract class FilterClauseAbstractPredicate<K, V> implements FilterClaus
     public boolean test(ConsumerRecord<K, V> record) {
         if(areClausesEmpty) {
             return true;
-        } else {
-
-            if(!keyClauses.isEmpty()) {
-                if(!processKeyClauses(record)) return false;
-            }
-
-            if(!tombstoneClauses.isEmpty()) {
-                if(!processTombstoneClauses(record)) return false;
-            }
-
-            if(otherClauses.isEmpty() && isNull(record.value())) return true;
-
-            if(!otherClauses.isEmpty()) {
-                return processValueClauses(record);
-            }
-
-            return true;
         }
+
+        if(!keyClauses.isEmpty() && !processKeyClauses(record)) {
+            return false;
+        }
+
+        if(!tombstoneClauses.isEmpty() && !processTombstoneClauses(record)) {
+            return false;
+        }
+
+        if(otherClauses.isEmpty() && isNull(record.value())) return true;
+
+        if(!otherClauses.isEmpty()) {
+            return processValueClauses(record);
+        }
+
+        return true;
+
     }
 
     private boolean processTombstoneClauses(ConsumerRecord<K, V> record) {
-        boolean result = true;
-        for(FilterClause clause : tombstoneClauses) {
-            result = result && executeOperation(clause, record.value());
-        }
-        return result;
-    }
-
-    private boolean processKeyClauses(ConsumerRecord<K, V> record) {
-
-        boolean result = true;
-
-        for(FilterClause clause : keyClauses) {
-            if(nonNull(clause.getValue())) {
-                result = result && executeOperation(clause, record.key().toString());
-            } else {
+        for (FilterClause clause : tombstoneClauses) {
+            if (!executeOperation(clause, record.value())) {
                 return false;
             }
         }
+        return true;
+    }
 
-        return result;
+    private boolean processKeyClauses(ConsumerRecord<K, V> record) {
+        for (FilterClause clause : keyClauses) {
+            if (clause.getValue() == null || !executeOperation(clause, record.key().toString())) {
+                return false;
+            }
+        }
+        return true;
     }
 
     abstract boolean processValueClauses(ConsumerRecord<K,V> record);
