@@ -73,7 +73,7 @@ public class KafkaSchemaIdAwareAvroDeserializer extends KafkaAvroDeserializer {
 
     protected int getSchemaId(byte[] bytes) {
         Validate.isTrue(bytes[0]==0x0,"Deserialization exception: not avro record!");
-        Validate.isTrue(bytes.length>5,"Serialized message too short! (bytes length<="+END_SCHEMA_ID_POSITION+")");
+        Validate.isTrue(bytes.length>END_SCHEMA_ID_POSITION,"Serialized message too short! (bytes length<="+END_SCHEMA_ID_POSITION+")");
         return ByteBuffer.wrap(Arrays.copyOfRange(bytes, START_SCHEMA_ID_POSITION, END_SCHEMA_ID_POSITION)).getInt();
     }
 
