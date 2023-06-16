@@ -43,44 +43,51 @@ public class KafkaSchemaIdAwareAvroDeserializer extends KafkaAvroDeserializer {
     }
 
     public KafkaSchemaIdAwareAvroDeserializer(SchemaRegistryClient client, Map<String, ?> props) {
-        super(client,props);
+        super(client, props);
     }
 
     @Override
     public void configure(Map<String, ?> configs, boolean isKey) {
-        super.configure(configs,isKey);
+        super.configure(configs, isKey);
         this.isKey = isKey;
     }
 
     @Override
     public Object deserialize(String topic, byte[] bytes) {
-        return new GenericRecordWrapper((GenericRecord) deserialize(topic, isKey, bytes, null),
-                                            getSchemaId(bytes));
+        return getDeserializedResult(topic, bytes);
     }
 
     @Override
     public Object deserialize(String topic, byte[] bytes, Schema readerSchema) {
-        return new GenericRecordWrapper((GenericRecord) deserialize(topic, isKey, bytes, readerSchema),
-                                            getSchemaId(bytes));
+        return getDeserializedResult(topic,bytes);
+    }
+
+    private Object getDeserializedResult(String topic, byte[] bytes) {
+        Object obj = deserialize(topic, isKey, bytes, null);
+        if(obj instanceof GenericRecord) {
+            return new GenericRecordWrapper(obj, getSchemaId(bytes));
+        } else {
+            return obj;
+        }
     }
 
     protected int getSchemaId(byte[] bytes) {
         Validate.isTrue(bytes[0]==0x0,"Deserialization exception: not avro record!");
-        Validate.isTrue(bytes.length>END_SCHEMA_ID_POSITION,"Serialized message too short! (bytes<="+END_SCHEMA_ID_POSITION+")");
+        Validate.isTrue(bytes.length>END_SCHEMA_ID_POSITION,"Serialized message too short! (bytes length<="+END_SCHEMA_ID_POSITION+")");
         return ByteBuffer.wrap(Arrays.copyOfRange(bytes, START_SCHEMA_ID_POSITION, END_SCHEMA_ID_POSITION)).getInt();
     }
 
     protected static class GenericRecordWrapper {
-        private final GenericRecord genericRecord;
+        private final Object value;
         private final long schemaId;
 
-        private GenericRecordWrapper(GenericRecord genericRecord, long schemaId) {
-            this.genericRecord = genericRecord;
+        private GenericRecordWrapper(Object value, long schemaId) {
+            this.value = value;
             this.schemaId = schemaId;
         }
 
-        public GenericRecord getGenericRecord() {
-            return genericRecord;
+        public Object getValue() {
+            return value;
         }
 
         public long getSchemaId() {
@@ -90,4 +97,3 @@ public class KafkaSchemaIdAwareAvroDeserializer extends KafkaAvroDeserializer {
     }
 
 }
-

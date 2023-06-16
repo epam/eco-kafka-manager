@@ -67,7 +67,7 @@
             const columnsDef = [
                 { data: 'name',
                     render: function (data, type, row, meta) {
-                        return '<a style="word-break: break-all;" href="/kafka-manager/topics/'+data+'">'+data+'</a>'
+                        return '<a href="/kafka-manager/topics/'+data+'">'+data+'</a>'
                     }
                 },
                 { data: 'partitions' },

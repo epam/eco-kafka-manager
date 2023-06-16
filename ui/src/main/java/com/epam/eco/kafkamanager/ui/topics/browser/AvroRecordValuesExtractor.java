@@ -41,7 +41,7 @@ public class AvroRecordValuesExtractor {
 
     public static Map<String, Object> getValuesAsMap(ConsumerRecord<?, Object> record) {
         Validate.notNull(record, "Record is null");
-        Object genericRecord = KafkaSchemaIdAwareUtils.extractGenericRecord(record);
+        Object genericRecord = KafkaSchemaIdAwareUtils.extractGenericRecordOrValue(record);
         return nonNull(genericRecord) ? doConvert(null, genericRecord) : null;
     }
 
