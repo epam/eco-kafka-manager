@@ -47,6 +47,7 @@ import com.epam.eco.kafkamanager.ui.config.TopicBrowser;
 import com.epam.eco.kafkamanager.ui.topics.TopicController;
 import com.epam.eco.kafkamanager.ui.topics.browser.handlers.FilterOperationEnum;
 
+import static com.epam.eco.kafkamanager.ui.topics.browser.FilterClauseAbstractPredicate.HEADERS_ATTRIBUTE;
 import static com.epam.eco.kafkamanager.ui.topics.browser.FilterClauseAbstractPredicate.KEY_ATTRIBUTE;
 import static com.epam.eco.kafkamanager.ui.topics.browser.FilterClauseAbstractPredicate.TOMBSTONE_ATTRIBUTE;
 import static java.util.Objects.nonNull;
@@ -158,6 +159,7 @@ public class TopicBrowserController {
 
         List<String> columns = new ArrayList<>();
         columns.add(KEY_ATTRIBUTE);
+        columns.add(HEADERS_ATTRIBUTE);
         columns.add(TOMBSTONE_ATTRIBUTE);
         columns.addAll(tabularRecords.listColumnsAsString());
 
@@ -190,15 +192,15 @@ public class TopicBrowserController {
         );
     }
 
-    private <K,V> FilterClausePredicate<K,V> resolveFilterPredicate(TopicBrowseParams browseParams) {
+    private FilterClausePredicate resolveFilterPredicate(TopicBrowseParams browseParams) {
         if(browseParams.isAvroValueFormat()) {
-            return new FilterClauseAvroPredicate<>(browseParams.getFilterClausesAsMap());
+            return new FilterClauseAvroPredicate(browseParams.getFilterClausesAsMap());
         } else if(browseParams.isStringValueFormat()) {
-            return new FilterClauseStringPredicate<>(browseParams.getFilterClausesAsMap());
+            return new FilterClauseStringPredicate(browseParams.getFilterClausesAsMap());
         } else if(browseParams.isJsonValueFormat()) {
-            return new FilterClauseJsonPredicate<>(browseParams.getFilterClausesAsMap());
+            return new FilterClauseJsonPredicate(browseParams.getFilterClausesAsMap());
         } else {
-            return new FilterClauseNoopPredicate<>();
+            return new FilterClauseNoopPredicate();
         }
     }
 

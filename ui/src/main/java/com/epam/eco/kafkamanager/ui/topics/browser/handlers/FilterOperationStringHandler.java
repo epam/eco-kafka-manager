@@ -30,15 +30,15 @@ public class FilterOperationStringHandler extends FilterOperationHandler<String>
     }
     @Override
     boolean equalValues(String value) {
-        return nonNull(value) && FilterOperationUtils.strip(value).equals(getClause().getValue());
+        return nonNull(value) && value.trim().equals(getClause().getValue());
     }
     @Override
     boolean contains(String value) {
-        return nonNull(value) && FilterOperationUtils.strip(value).contains(getClause().getValue());
+        return nonNull(value) && value.trim().contains(getClause().getValue());
     }
     @Override
     boolean startWith(String value) {
-        return nonNull(value) && FilterOperationUtils.strip(value).startsWith(getClause().getValue());
+        return nonNull(value) && value.trim().startsWith(getClause().getValue());
     }
 
     @Override

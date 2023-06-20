@@ -21,6 +21,7 @@ import java.util.Map;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import com.epam.eco.kafkamanager.FilterClause;
 import com.epam.eco.kafkamanager.ui.topics.browser.handlers.FilterOperationStringHandler;
+import com.epam.eco.kafkamanager.ui.topics.browser.handlers.FilterOperationUtils;
 
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
@@ -29,29 +30,31 @@ import static java.util.Objects.nonNull;
  * @author Mikhail_Vershkov
  */
 
-public class FilterClauseStringPredicate<K,V> extends FilterClauseAbstractPredicate<K,V> {
+public class FilterClauseStringPredicate extends FilterClauseAbstractPredicate<String,Object> {
 
     public FilterClauseStringPredicate(Map<String, List<FilterClause>> clauses) {
         super(clauses);
     }
 
     @Override
-    protected boolean processValueClauses(ConsumerRecord<K,V> record) {
-        boolean result = true;
-        if(!otherClauses.isEmpty()) {
-            String value = (String)record.value();
-            for(FilterClause filterClause : otherClauses) {
-                if(nonNull(value)) {
-                    result = result && executeOperation(filterClause, value);
-                } else {
-                    result = false;
-                }
-                if(!result) {
-                    break;
-                }
+    protected boolean processValueClauses(ConsumerRecord<String,Object> record) {
+
+        if (otherClauses.isEmpty()) {
+            return true;
+        }
+
+        if(isNull(record.value())) {
+            return false;
+        }
+
+        String value = FilterOperationUtils.stringifyValue(record);
+
+        for (FilterClause filterClause : otherClauses) {
+            if (!executeOperation(filterClause, value)) {
+                return false;
             }
         }
-        return result;
+        return true;
     }
 
     @Override

@@ -24,13 +24,12 @@ import com.epam.eco.kafkamanager.FilterClause;
 import com.epam.eco.kafkamanager.ui.topics.browser.handlers.FilterOperationUtils;
 
 import static com.epam.eco.kafkamanager.ui.topics.browser.handlers.FilterOperationUtils.executeAvroJsonOperation;
-import static java.util.Objects.nonNull;
 
 /**
  * @author Mikhail_Vershkov
  */
 
-public class FilterClauseAvroPredicate<K, V> extends FilterClauseAbstractPredicate<K, V> {
+public class FilterClauseAvroPredicate extends FilterClauseAbstractPredicate<String, Object> {
 
 
     public FilterClauseAvroPredicate(Map<String, List<FilterClause>> clauses) {
@@ -38,27 +37,22 @@ public class FilterClauseAvroPredicate<K, V> extends FilterClauseAbstractPredica
     }
 
     @Override
-    protected boolean processValueClauses(ConsumerRecord<K,V> record) {
-
-        boolean result = true;
-
-        if(!otherClauses.isEmpty()) {
-
-            Map<String, Object> mapOfValues = AvroRecordValuesExtractor.getValuesAsMap((ConsumerRecord<?, Object>) record);
-
-            for(FilterClause filterClause : otherClauses) {
-                if(nonNull(mapOfValues) && nonNull(mapOfValues.get(filterClause.getColumn()))) {
-                    Object value = mapOfValues.get(filterClause.getColumn());
-                    result = result && executeAvroJsonOperation(filterClause, value);
-                } else {
-                    result = false;
+    protected boolean processValueClauses(ConsumerRecord<String,Object> record) {
+        if (otherClauses.isEmpty()) {
+            return true;
+        }
+        Map<String, Object> mapOfValues = AvroRecordValuesExtractor.getValuesAsMap(record);
+        for (FilterClause filterClause : otherClauses) {
+            if (mapOfValues != null && mapOfValues.containsKey(filterClause.getColumn())) {
+                Object value = mapOfValues.get(filterClause.getColumn());
+                if (!executeAvroJsonOperation(filterClause, value)) {
+                    return false;
                 }
-                if(!result) {
-                    break;
-                }
+            } else {
+                return false;
             }
         }
-        return result;
+        return true;
     }
 
     @Override

@@ -15,13 +15,20 @@
  *******************************************************************************/
 package com.epam.eco.kafkamanager.ui.browser;
 
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.apache.avro.Schema;
 import org.apache.avro.SchemaBuilder;
 import org.apache.avro.generic.GenericData;
 import org.apache.avro.generic.GenericRecord;
+import org.apache.kafka.clients.consumer.ConsumerRecord;
+import org.apache.kafka.common.header.Headers;
+import org.apache.kafka.common.header.internals.RecordHeader;
+import org.apache.kafka.common.header.internals.RecordHeaders;
+import org.apache.kafka.common.record.TimestampType;
 import org.jetbrains.annotations.NotNull;
 
 import com.epam.eco.kafkamanager.FilterClause;
@@ -29,6 +36,8 @@ import com.epam.eco.kafkamanager.ui.topics.browser.FilterClauseAvroPredicate;
 import com.epam.eco.kafkamanager.ui.topics.browser.FilterClauseJsonPredicate;
 import com.epam.eco.kafkamanager.ui.topics.browser.FilterClauseStringPredicate;
 import com.epam.eco.kafkamanager.ui.topics.browser.handlers.FilterOperationEnum;
+
+import static java.time.LocalTime.now;
 
 /**
  * @author Mikhail_Vershkov
@@ -39,6 +48,12 @@ public class FilterPredicateUtils {
     public static final String NAME_SPACE = "testNameSpace";
     public static final String TOPIC_NAME = "testTopic";
     public static final String KEY_VALUE = "testKey";
+    public static final String HEADER_KEY = "testHeaderKey";
+    public static final String HEADER_VALUE = "testHeaderValue";
+    public static final String HEADER_WRONG_VALUE = "testHeaderWrongValue";
+    public static final String HEADER_SIMPLE_FILTER_CLAUSE = HEADER_KEY+":"+HEADER_VALUE;
+    public static final String HEADER_EMPTY_FILTER_CLAUSE = HEADER_KEY+":";
+
     public static final String KEY_VALUE_WRONG = "testKeyWrong";
     public static final String FIELD_NAME = "testField";
     public static final String FIELD_TOMBSTONES = "tombstones";
@@ -61,14 +76,14 @@ public class FilterPredicateUtils {
                                                           .endRecord();
 
     @NotNull
-    public static FilterClauseStringPredicate<String, Object> getFilterClauseStringPredicate(String clauseFieldName,
+    public static FilterClauseStringPredicate getFilterClauseStringPredicate(String clauseFieldName,
                                                                                        FilterOperationEnum operationEnum,
                                                                                        String clauseValue) {
         Map<String, List<FilterClause>> clauses = Map.of(clauseFieldName,
                                                          List.of(new FilterClause(clauseFieldName,
                                                                                   operationEnum.getOperation(),
                                                                                   clauseValue)));
-        return new FilterClauseStringPredicate<>(clauses);
+        return new FilterClauseStringPredicate(clauses);
     }
 
     public static String generateString(String fieldValue) {
@@ -76,14 +91,14 @@ public class FilterPredicateUtils {
     }
 
     @NotNull
-    public static FilterClauseAvroPredicate<String, Object> getFilterClauseAvroPredicate(String clauseFieldName,
+    public static FilterClauseAvroPredicate getFilterClauseAvroPredicate(String clauseFieldName,
                                                                                    FilterOperationEnum operationEnum,
                                                                                    String clauseValue) {
         Map<String, List<FilterClause>> clauses = Map.of(clauseFieldName,
                                                          List.of(new FilterClause(clauseFieldName,
                                                                                   operationEnum.getOperation(),
                                                                                   clauseValue)));
-        return new FilterClauseAvroPredicate<>(clauses);
+        return new FilterClauseAvroPredicate(clauses);
     }
 
     @NotNull
@@ -94,19 +109,32 @@ public class FilterPredicateUtils {
     }
 
     @NotNull
-    public static FilterClauseJsonPredicate<String, Object> getFilterClauseJsonPredicate(String clauseFieldName,
+    public static FilterClauseJsonPredicate getFilterClauseJsonPredicate(String clauseFieldName,
                                                                                    FilterOperationEnum operationEnum,
                                                                                    String clauseValue) {
         Map<String, List<FilterClause>> clauses = Map.of(clauseFieldName,
                                                          List.of(new FilterClause(clauseFieldName,
                                                                                   operationEnum.getOperation(),
                                                                                   clauseValue)));
-        return new FilterClauseJsonPredicate<>(clauses);
+        return new FilterClauseJsonPredicate(clauses);
     }
 
     public static String generateJson(String fieldValue) {
         return String.format("{\"%s\": \"%s\"}",FIELD_NAME, fieldValue);
     }
 
+    private static Headers generateHeader(Map<String,Object> map) {
+        RecordHeader[] headerList = map.entrySet().stream()
+                .map(entry -> new RecordHeader(entry.getKey(),entry.getValue().toString().getBytes(StandardCharsets.UTF_8)))
+                .toArray(RecordHeader[]::new);
+        return new RecordHeaders(headerList);
+    }
+
+    public static ConsumerRecord<String,Object> generateConsumerRecordWithHeader(Map<String,Object> map) {
+        return new ConsumerRecord<>(TOPIC_NAME, 0, 0L, now().toNanoOfDay(),
+                             TimestampType.CREATE_TIME, 20, 128,
+                             KEY_VALUE, KEY_VALUE, generateHeader(map),
+                             Optional.of(1));
+    }
 
 }

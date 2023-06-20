@@ -15,6 +15,8 @@
  *******************************************************************************/
 package com.epam.eco.kafkamanager.ui.browser;
 
+import java.util.Map;
+
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -27,14 +29,21 @@ import static com.epam.eco.kafkamanager.ui.browser.FilterPredicateUtils.FIELD_TO
 import static com.epam.eco.kafkamanager.ui.browser.FilterPredicateUtils.FIELD_VALUE_CORRECT;
 import static com.epam.eco.kafkamanager.ui.browser.FilterPredicateUtils.FIELD_VALUE_EMPTY;
 import static com.epam.eco.kafkamanager.ui.browser.FilterPredicateUtils.FIELD_VALUE_INCORRECT;
+import static com.epam.eco.kafkamanager.ui.browser.FilterPredicateUtils.HEADER_EMPTY_FILTER_CLAUSE;
+import static com.epam.eco.kafkamanager.ui.browser.FilterPredicateUtils.HEADER_KEY;
+import static com.epam.eco.kafkamanager.ui.browser.FilterPredicateUtils.HEADER_SIMPLE_FILTER_CLAUSE;
+import static com.epam.eco.kafkamanager.ui.browser.FilterPredicateUtils.HEADER_VALUE;
+import static com.epam.eco.kafkamanager.ui.browser.FilterPredicateUtils.HEADER_WRONG_VALUE;
 import static com.epam.eco.kafkamanager.ui.browser.FilterPredicateUtils.KEY_VALUE;
 import static com.epam.eco.kafkamanager.ui.browser.FilterPredicateUtils.KEY_VALUE_WRONG;
 import static com.epam.eco.kafkamanager.ui.browser.FilterPredicateUtils.NULL_VALUE;
 import static com.epam.eco.kafkamanager.ui.browser.FilterPredicateUtils.PREFIX;
 import static com.epam.eco.kafkamanager.ui.browser.FilterPredicateUtils.SUFFIX;
 import static com.epam.eco.kafkamanager.ui.browser.FilterPredicateUtils.TOPIC_NAME;
+import static com.epam.eco.kafkamanager.ui.browser.FilterPredicateUtils.generateConsumerRecordWithHeader;
 import static com.epam.eco.kafkamanager.ui.browser.FilterPredicateUtils.generateJson;
 import static com.epam.eco.kafkamanager.ui.browser.FilterPredicateUtils.getFilterClauseJsonPredicate;
+import static com.epam.eco.kafkamanager.ui.topics.browser.FilterClauseAbstractPredicate.HEADERS_ATTRIBUTE;
 import static com.epam.eco.kafkamanager.ui.topics.browser.FilterClauseAbstractPredicate.KEY_ATTRIBUTE;
 
 /**
@@ -43,6 +52,7 @@ import static com.epam.eco.kafkamanager.ui.topics.browser.FilterClauseAbstractPr
 
 public class FilterClauseJsonPredicateTest {
 
+    private static final String TEST_CLAUSE_SIMPLE_STRING = "testField:testValue";
     private static final String TEST_JSON = "{\"testField\": \"testValue\", \"innerField\" : { \"innerField2\":\"innerValue2\"}}";
     private static final String TEST_JSON_INCORRECT = "{\"testField\": \"tstValueInvalid\", \"innerField\" : { \"innerField2\":\"innerValueInvalid2\"}}";
 
@@ -50,7 +60,7 @@ public class FilterClauseJsonPredicateTest {
     @Test
     public void testOrdinaryKeyEquals() {
 
-        FilterClauseJsonPredicate<String,Object> filterClausePredicate =
+        FilterClauseJsonPredicate filterClausePredicate =
                 getFilterClauseJsonPredicate(KEY_ATTRIBUTE, FilterOperationEnum.EQUALS, KEY_VALUE);
         Assertions.assertTrue(filterClausePredicate
                                   .test(new ConsumerRecord<>(TOPIC_NAME, 0, 0L, KEY_VALUE, KEY_VALUE)));
@@ -61,7 +71,7 @@ public class FilterClauseJsonPredicateTest {
     @Test
     public void testOrdinaryKeyContains() {
 
-        FilterClauseJsonPredicate<String,Object> filterClausePredicate =
+        FilterClauseJsonPredicate filterClausePredicate =
                 getFilterClauseJsonPredicate(KEY_ATTRIBUTE, FilterOperationEnum.CONTAINS,"TestKey");
         Assertions.assertTrue(filterClausePredicate
                                   .test(new ConsumerRecord<>(TOPIC_NAME, 0, 0L, "areTestKeyContains", KEY_VALUE)));
@@ -72,7 +82,7 @@ public class FilterClauseJsonPredicateTest {
     @Test
     public void testOrdinaryKeyStartsWith() {
 
-        FilterClauseJsonPredicate<String,Object> filterClausePredicate =
+        FilterClauseJsonPredicate filterClausePredicate =
                 getFilterClauseJsonPredicate(KEY_ATTRIBUTE, FilterOperationEnum.STARTS_WITH,KEY_VALUE);
         Assertions.assertTrue(filterClausePredicate
                                   .test(new ConsumerRecord<>(TOPIC_NAME, 0, 0L, "testKeyStartsWith", FIELD_VALUE_CORRECT)));
@@ -82,10 +92,62 @@ public class FilterClauseJsonPredicateTest {
     }
 
 
+
+    @Test
+    public void testOrdinaryHeaderEquals() {
+
+        FilterClauseJsonPredicate filterClausePredicate =
+                getFilterClauseJsonPredicate(HEADERS_ATTRIBUTE, FilterOperationEnum.EQUALS, HEADER_SIMPLE_FILTER_CLAUSE);
+        Assertions.assertTrue(filterClausePredicate
+                                      .test(generateConsumerRecordWithHeader(Map.of(HEADER_KEY, HEADER_VALUE))));
+        Assertions.assertFalse(filterClausePredicate
+                                       .test(generateConsumerRecordWithHeader(Map.of(HEADER_KEY, HEADER_WRONG_VALUE))));
+
+        filterClausePredicate =
+                getFilterClauseJsonPredicate(HEADERS_ATTRIBUTE, FilterOperationEnum.EQUALS, TEST_CLAUSE_SIMPLE_STRING);
+        Assertions.assertTrue(filterClausePredicate
+                                      .test(generateConsumerRecordWithHeader(Map.of("testField","testValue"))));
+
+    }
+
+    @Test
+    public void testOrdinaryHeaderContains() {
+
+        FilterClauseJsonPredicate filterClausePredicate =
+                getFilterClauseJsonPredicate(HEADERS_ATTRIBUTE, FilterOperationEnum.CONTAINS, HEADER_SIMPLE_FILTER_CLAUSE);
+        Assertions.assertTrue(filterClausePredicate
+                                      .test(generateConsumerRecordWithHeader(Map.of(HEADER_KEY, PREFIX+HEADER_VALUE+SUFFIX))));
+        Assertions.assertFalse(filterClausePredicate
+                                       .test(generateConsumerRecordWithHeader(Map.of(HEADER_KEY, PREFIX+HEADER_WRONG_VALUE+SUFFIX))));
+    }
+    @Test
+    public void testOrdinaryHeaderStartsWith() {
+
+        FilterClauseJsonPredicate filterClausePredicate =
+                getFilterClauseJsonPredicate(HEADERS_ATTRIBUTE, FilterOperationEnum.STARTS_WITH, HEADER_SIMPLE_FILTER_CLAUSE);
+        Assertions.assertTrue(filterClausePredicate
+                                      .test(generateConsumerRecordWithHeader(Map.of(HEADER_KEY, HEADER_VALUE+SUFFIX))));
+        Assertions.assertFalse(filterClausePredicate
+                                       .test(generateConsumerRecordWithHeader(Map.of(HEADER_KEY, PREFIX+HEADER_WRONG_VALUE))));
+    }
+
+    @Test
+    public void testOrdinaryHeaderNotEmpty() {
+
+        FilterClauseJsonPredicate filterClausePredicate =
+                getFilterClauseJsonPredicate(HEADERS_ATTRIBUTE, FilterOperationEnum.NOT_EMPTY, HEADER_EMPTY_FILTER_CLAUSE);
+        Assertions.assertTrue(filterClausePredicate
+                                      .test(generateConsumerRecordWithHeader(Map.of(HEADER_KEY, HEADER_VALUE+SUFFIX))));
+        Assertions.assertFalse(filterClausePredicate
+                                       .test(generateConsumerRecordWithHeader(Map.of(HEADER_KEY, FIELD_VALUE_EMPTY))));
+
+    }
+
+
     @Test
     public void testJsonOrdinaryFieldEquals() {
 
-        FilterClauseJsonPredicate<String,Object> filterClausePredicate =
+        FilterClauseJsonPredicate filterClausePredicate =
                 getFilterClauseJsonPredicate(FIELD_NAME, FilterOperationEnum.EQUALS,FIELD_NAME+":"+FIELD_VALUE_CORRECT);
         Assertions.assertTrue(filterClausePredicate.test(
                 new ConsumerRecord<>(TOPIC_NAME, 0, 0L, KEY_VALUE, TEST_JSON)));
@@ -111,7 +173,7 @@ public class FilterClauseJsonPredicateTest {
     @Test
     public void testJsonOrdinaryFieldContains() {
 
-        FilterClauseJsonPredicate<String,Object> filterClausePredicate =
+        FilterClauseJsonPredicate filterClausePredicate =
                 getFilterClauseJsonPredicate(FIELD_NAME, FilterOperationEnum.CONTAINS,FIELD_NAME+":test");
 
         Assertions.assertTrue(filterClausePredicate.test(
@@ -126,7 +188,7 @@ public class FilterClauseJsonPredicateTest {
     @Test
     public void testJsonOrdinaryFieldStarts() {
 
-        FilterClauseJsonPredicate<String,Object> filterClausePredicate =
+        FilterClauseJsonPredicate filterClausePredicate =
                 getFilterClauseJsonPredicate(FIELD_NAME, FilterOperationEnum.STARTS_WITH, FIELD_NAME+":"+FIELD_VALUE_CORRECT);
 
         Assertions.assertTrue(filterClausePredicate.test(
@@ -142,7 +204,7 @@ public class FilterClauseJsonPredicateTest {
     @Test
     public void testJsonFieldEquals() {
 
-        FilterClauseJsonPredicate<String,Object> filterClausePredicate =
+        FilterClauseJsonPredicate filterClausePredicate =
                 getFilterClauseJsonPredicate(FIELD_NAME, FilterOperationEnum.EQUALS,"testField:testValue");
 
         String json = TEST_JSON;
@@ -178,7 +240,7 @@ public class FilterClauseJsonPredicateTest {
     @Test
     public void testJsonJsonFieldContains() {
 
-        FilterClauseJsonPredicate<String,Object> filterClausePredicate =
+        FilterClauseJsonPredicate filterClausePredicate =
                 getFilterClauseJsonPredicate(FIELD_NAME, FilterOperationEnum.CONTAINS,"testField:test");
 
         Assertions.assertTrue(filterClausePredicate.test(
@@ -212,7 +274,7 @@ public class FilterClauseJsonPredicateTest {
     @Test
     public void testJsonJsonFieldStartsWith() {
 
-        FilterClauseJsonPredicate<String,Object> filterClausePredicate =
+        FilterClauseJsonPredicate filterClausePredicate =
                 getFilterClauseJsonPredicate(FIELD_NAME, FilterOperationEnum.STARTS_WITH,"testField:test");
         Assertions.assertTrue(filterClausePredicate.test(
                 new ConsumerRecord<>(TOPIC_NAME, 0, 0L, KEY_VALUE, TEST_JSON)));
@@ -245,7 +307,7 @@ public class FilterClauseJsonPredicateTest {
     @Test
     public void testJsonTombstonesExclude() {
 
-        FilterClauseJsonPredicate<String,Object> filterClausePredicate =
+        FilterClauseJsonPredicate filterClausePredicate =
                 getFilterClauseJsonPredicate(FIELD_TOMBSTONES, FilterOperationEnum.EXCLUDE, FIELD_VALUE_EMPTY);
 
         Assertions.assertTrue(filterClausePredicate.test(
@@ -259,7 +321,7 @@ public class FilterClauseJsonPredicateTest {
     @Test
     public void testJsonTombstonesOnly() {
 
-        FilterClauseJsonPredicate<String,Object> filterClausePredicate =
+        FilterClauseJsonPredicate filterClausePredicate =
                 getFilterClauseJsonPredicate(FIELD_TOMBSTONES, FilterOperationEnum.ONLY, FIELD_VALUE_EMPTY);
 
         Assertions.assertFalse(filterClausePredicate.test(

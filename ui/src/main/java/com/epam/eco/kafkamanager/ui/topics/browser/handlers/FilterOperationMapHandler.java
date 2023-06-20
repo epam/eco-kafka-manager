@@ -42,7 +42,7 @@ public class FilterOperationMapHandler extends FilterOperationHandler<Map<Object
         }
         if(areValuesUtf8(value)) {
             if(propertyName.length()>0) {
-                return FilterOperationUtils.strip(value.getOrDefault(new Utf8(propertyName), new Utf8(DEFAULT_VALUE)).toString())
+                return value.getOrDefault(new Utf8(propertyName), new Utf8(DEFAULT_VALUE)).toString().trim()
                             .equals(getFilterPropertyValue(getClause()));
             }
             return value.containsValue(new Utf8(getClause().getValue()));

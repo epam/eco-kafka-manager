@@ -22,12 +22,14 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.apache.kafka.clients.consumer.ConsumerRecord;
+import org.apache.kafka.common.header.Header;
+import org.apache.kafka.common.header.Headers;
 
 import com.epam.eco.commons.kafka.helpers.FilterClausePredicate;
 import com.epam.eco.kafkamanager.FilterClause;
 
+import static com.epam.eco.kafkamanager.ui.topics.browser.handlers.FilterOperationUtils.executeHeaderOperation;
 import static java.util.Objects.isNull;
-import static java.util.Objects.nonNull;
 
 /**
  * @author Mikhail_Vershkov
@@ -37,16 +39,19 @@ public abstract class FilterClauseAbstractPredicate<K, V> implements FilterClaus
 
     public static final String KEY_ATTRIBUTE = "key";
     public static final String TOMBSTONE_ATTRIBUTE = "tombstones";
+    public static final String HEADERS_ATTRIBUTE = "headers";
 
-    private static final String[] RESERVED_ATTRIBUTES = {KEY_ATTRIBUTE,TOMBSTONE_ATTRIBUTE};
+    private static final String[] RESERVED_ATTRIBUTES = {KEY_ATTRIBUTE,TOMBSTONE_ATTRIBUTE,HEADERS_ATTRIBUTE};
     protected final boolean areClausesEmpty;
     protected final List<FilterClause> keyClauses;
+    protected final List<FilterClause> headerClauses;
     protected final List<FilterClause> tombstoneClauses;
     protected final List<FilterClause> otherClauses;
 
     public FilterClauseAbstractPredicate(Map<String, List<FilterClause>> clauses) {
         areClausesEmpty = clauses.isEmpty();
         keyClauses = clauses.getOrDefault(KEY_ATTRIBUTE, Collections.emptyList());
+        headerClauses = clauses.getOrDefault(HEADERS_ATTRIBUTE, Collections.emptyList());
         tombstoneClauses = clauses.getOrDefault(TOMBSTONE_ATTRIBUTE, Collections.emptyList());
         otherClauses = clauses.entrySet().stream()
                                   .filter(clause->!Arrays.asList(RESERVED_ATTRIBUTES).contains(clause.getKey()))
@@ -64,6 +69,10 @@ public abstract class FilterClauseAbstractPredicate<K, V> implements FilterClaus
             return false;
         }
 
+        if(!headerClauses.isEmpty() && !processHeaderClauses(record)) {
+            return false;
+        }
+
         if(!tombstoneClauses.isEmpty() && !processTombstoneClauses(record)) {
             return false;
         }
@@ -76,6 +85,22 @@ public abstract class FilterClauseAbstractPredicate<K, V> implements FilterClaus
 
         return true;
 
+    }
+
+    private boolean processHeaderClauses(ConsumerRecord<K, V> record) {
+        List<Header> headers = Arrays.asList(record.headers().toArray());
+        if(headers.isEmpty()) {
+            return false;
+        }
+        Map<Object,Object> headersMap = headers.stream()
+                                               .collect(Collectors.toMap(Header::key,
+                                                                         header -> new String(header.value())));
+        for (FilterClause clause : headerClauses) {
+            if (!executeHeaderOperation(clause, headersMap)) {
+                return false;
+            }
+        }
+        return true;
     }
 
     private boolean processTombstoneClauses(ConsumerRecord<K, V> record) {

@@ -15,6 +15,8 @@
  *******************************************************************************/
 package com.epam.eco.kafkamanager.ui.browser;
 
+import java.util.Map;
+
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -27,14 +29,21 @@ import static com.epam.eco.kafkamanager.ui.browser.FilterPredicateUtils.FIELD_TO
 import static com.epam.eco.kafkamanager.ui.browser.FilterPredicateUtils.FIELD_VALUE_CORRECT;
 import static com.epam.eco.kafkamanager.ui.browser.FilterPredicateUtils.FIELD_VALUE_EMPTY;
 import static com.epam.eco.kafkamanager.ui.browser.FilterPredicateUtils.FIELD_VALUE_INCORRECT;
+import static com.epam.eco.kafkamanager.ui.browser.FilterPredicateUtils.HEADER_EMPTY_FILTER_CLAUSE;
+import static com.epam.eco.kafkamanager.ui.browser.FilterPredicateUtils.HEADER_KEY;
+import static com.epam.eco.kafkamanager.ui.browser.FilterPredicateUtils.HEADER_SIMPLE_FILTER_CLAUSE;
+import static com.epam.eco.kafkamanager.ui.browser.FilterPredicateUtils.HEADER_VALUE;
+import static com.epam.eco.kafkamanager.ui.browser.FilterPredicateUtils.HEADER_WRONG_VALUE;
 import static com.epam.eco.kafkamanager.ui.browser.FilterPredicateUtils.KEY_VALUE;
 import static com.epam.eco.kafkamanager.ui.browser.FilterPredicateUtils.KEY_VALUE_WRONG;
 import static com.epam.eco.kafkamanager.ui.browser.FilterPredicateUtils.NULL_VALUE;
 import static com.epam.eco.kafkamanager.ui.browser.FilterPredicateUtils.PREFIX;
 import static com.epam.eco.kafkamanager.ui.browser.FilterPredicateUtils.SUFFIX;
 import static com.epam.eco.kafkamanager.ui.browser.FilterPredicateUtils.TOPIC_NAME;
+import static com.epam.eco.kafkamanager.ui.browser.FilterPredicateUtils.generateConsumerRecordWithHeader;
 import static com.epam.eco.kafkamanager.ui.browser.FilterPredicateUtils.generateString;
 import static com.epam.eco.kafkamanager.ui.browser.FilterPredicateUtils.getFilterClauseStringPredicate;
+import static com.epam.eco.kafkamanager.ui.topics.browser.FilterClauseAbstractPredicate.HEADERS_ATTRIBUTE;
 import static com.epam.eco.kafkamanager.ui.topics.browser.FilterClauseAbstractPredicate.KEY_ATTRIBUTE;
 
 /**
@@ -50,7 +59,7 @@ public class FilterClauseStringPredicateTest {
     @Test
     public void testOrdinaryKeyEquals() {
 
-        FilterClauseStringPredicate<String,Object> filterClausePredicate =
+        FilterClauseStringPredicate filterClausePredicate =
                 getFilterClauseStringPredicate(KEY_ATTRIBUTE, FilterOperationEnum.EQUALS, KEY_VALUE);
         Assertions.assertTrue(filterClausePredicate
                                   .test(new ConsumerRecord<>(TOPIC_NAME, 0, 0L, KEY_VALUE, KEY_VALUE)));
@@ -61,7 +70,7 @@ public class FilterClauseStringPredicateTest {
     @Test
     public void testOrdinaryKeyContains() {
 
-        FilterClauseStringPredicate<String,Object> filterClausePredicate =
+        FilterClauseStringPredicate filterClausePredicate =
                 getFilterClauseStringPredicate(KEY_ATTRIBUTE, FilterOperationEnum.CONTAINS,"TestKey");
         Assertions.assertTrue(filterClausePredicate
                                   .test(new ConsumerRecord<>(TOPIC_NAME, 0, 0L, "areTestKeyContains", KEY_VALUE)));
@@ -71,7 +80,7 @@ public class FilterClauseStringPredicateTest {
     @Test
     public void testOrdinaryKeyStartsWith() {
 
-        FilterClauseStringPredicate<String,Object> filterClausePredicate =
+        FilterClauseStringPredicate filterClausePredicate =
                 getFilterClauseStringPredicate(KEY_ATTRIBUTE, FilterOperationEnum.STARTS_WITH,KEY_VALUE);
         Assertions.assertTrue(filterClausePredicate
                                   .test(new ConsumerRecord<>(TOPIC_NAME, 0, 0L, "testKeyStartsWith", FIELD_VALUE_CORRECT)));
@@ -80,10 +89,57 @@ public class FilterClauseStringPredicateTest {
     }
 
 
-    @Test
-    public void testStringOrdinaryFieldEquals() {
 
-        FilterClauseStringPredicate<String,Object> filterClausePredicate =
+    @Test
+    public void testOrdinaryHeaderEquals() {
+
+        FilterClauseStringPredicate filterClausePredicate =
+                getFilterClauseStringPredicate(HEADERS_ATTRIBUTE, FilterOperationEnum.EQUALS, HEADER_SIMPLE_FILTER_CLAUSE);
+        Assertions.assertTrue(filterClausePredicate
+                     .test(generateConsumerRecordWithHeader(Map.of(HEADER_KEY, HEADER_VALUE))));
+        Assertions.assertFalse(filterClausePredicate
+                     .test(generateConsumerRecordWithHeader(Map.of(HEADER_KEY, HEADER_WRONG_VALUE))));
+    }
+
+    @Test
+    public void testOrdinaryHeaderContains() {
+
+        FilterClauseStringPredicate filterClausePredicate =
+                getFilterClauseStringPredicate(HEADERS_ATTRIBUTE, FilterOperationEnum.CONTAINS, HEADER_SIMPLE_FILTER_CLAUSE);
+        Assertions.assertTrue(filterClausePredicate
+                                      .test(generateConsumerRecordWithHeader(Map.of(HEADER_KEY, PREFIX+HEADER_VALUE+SUFFIX))));
+        Assertions.assertFalse(filterClausePredicate
+                                       .test(generateConsumerRecordWithHeader(Map.of(HEADER_KEY, PREFIX+HEADER_WRONG_VALUE+SUFFIX))));
+    }
+    @Test
+    public void testOrdinaryHeaderStartsWith() {
+
+        FilterClauseStringPredicate filterClausePredicate =
+                getFilterClauseStringPredicate(HEADERS_ATTRIBUTE, FilterOperationEnum.STARTS_WITH, HEADER_SIMPLE_FILTER_CLAUSE);
+        Assertions.assertTrue(filterClausePredicate
+                                      .test(generateConsumerRecordWithHeader(Map.of(HEADER_KEY, HEADER_VALUE+SUFFIX))));
+        Assertions.assertFalse(filterClausePredicate
+                                       .test(generateConsumerRecordWithHeader(Map.of(HEADER_KEY, PREFIX+HEADER_WRONG_VALUE))));
+    }
+
+    @Test
+    public void testOrdinaryHeaderNotEmpty() {
+
+        FilterClauseStringPredicate filterClausePredicate =
+                getFilterClauseStringPredicate(HEADERS_ATTRIBUTE, FilterOperationEnum.NOT_EMPTY, HEADER_EMPTY_FILTER_CLAUSE);
+        Assertions.assertTrue(filterClausePredicate
+                                      .test(generateConsumerRecordWithHeader(Map.of(HEADER_KEY, HEADER_VALUE+SUFFIX))));
+        Assertions.assertFalse(filterClausePredicate
+                                       .test(generateConsumerRecordWithHeader(Map.of(HEADER_KEY, FIELD_VALUE_EMPTY))));
+
+    }
+
+
+
+    @Test
+    public void testHeaderOrdinaryFieldEquals() {
+
+        FilterClauseStringPredicate filterClausePredicate =
                 getFilterClauseStringPredicate(FIELD_NAME, FilterOperationEnum.EQUALS, FIELD_NAME+"="+FIELD_VALUE_CORRECT);
 
         Assertions.assertTrue(filterClausePredicate.test(
@@ -106,7 +162,7 @@ public class FilterClauseStringPredicateTest {
     @Test
     public void testStringOrdinaryFieldContains() {
 
-        FilterClauseStringPredicate<String,Object> filterClausePredicate =
+        FilterClauseStringPredicate filterClausePredicate =
                 getFilterClauseStringPredicate(FIELD_NAME, FilterOperationEnum.CONTAINS,FIELD_NAME+"=test");
 
         Assertions.assertTrue(filterClausePredicate.test(
@@ -123,7 +179,7 @@ public class FilterClauseStringPredicateTest {
     @Test
     public void testStringOrdinaryFieldStarts() {
 
-        FilterClauseStringPredicate<String,Object> filterClausePredicate =
+        FilterClauseStringPredicate filterClausePredicate =
                 getFilterClauseStringPredicate(FIELD_NAME, FilterOperationEnum.STARTS_WITH, FIELD_NAME+"="+FIELD_VALUE_CORRECT);
 
         Assertions.assertTrue(filterClausePredicate.test(
@@ -140,7 +196,7 @@ public class FilterClauseStringPredicateTest {
     @Test
     public void testStringTombstonesExclude() {
 
-        FilterClauseStringPredicate<String,Object> filterClausePredicate =
+        FilterClauseStringPredicate filterClausePredicate =
                 getFilterClauseStringPredicate(FIELD_TOMBSTONES, FilterOperationEnum.EXCLUDE, FIELD_VALUE_EMPTY);
 
         Assertions.assertTrue(filterClausePredicate.test(
@@ -154,7 +210,7 @@ public class FilterClauseStringPredicateTest {
     @Test
     public void testStringTombstonesOnly() {
 
-        FilterClauseStringPredicate<String,Object> filterClausePredicate =
+        FilterClauseStringPredicate filterClausePredicate =
                 getFilterClauseStringPredicate(FIELD_TOMBSTONES, FilterOperationEnum.ONLY, FIELD_VALUE_EMPTY);
 
         Assertions.assertFalse(filterClausePredicate.test(

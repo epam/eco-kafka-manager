@@ -25,7 +25,7 @@ public abstract class FilterOperationHandler<T> {
     public static final String PROPERTIES_SEPARATOR = ".";
     private final FilterClause clause;
 
-    public FilterOperationHandler(FilterClause clause) {
+    protected FilterOperationHandler(FilterClause clause) {
         this.clause = clause;
     }
 

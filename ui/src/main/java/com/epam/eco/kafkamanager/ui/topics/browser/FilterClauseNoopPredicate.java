@@ -23,9 +23,9 @@ import com.epam.eco.commons.kafka.helpers.FilterClausePredicate;
  * @author Mikhail_Vershkov
  */
 
-public class FilterClauseNoopPredicate<K,V> implements FilterClausePredicate<K,V> {
+public class FilterClauseNoopPredicate implements FilterClausePredicate<Object,Object> {
     @Override
-    public boolean test(ConsumerRecord<K,V> record) {
+    public boolean test(ConsumerRecord record) {
         return true;
     }
 

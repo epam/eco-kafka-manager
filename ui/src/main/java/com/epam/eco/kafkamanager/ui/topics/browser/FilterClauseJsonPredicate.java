@@ -31,38 +31,27 @@ import static java.util.Objects.nonNull;
  * @author Mikhail_Vershkov
  */
 
-public class FilterClauseJsonPredicate<K,V> extends FilterClauseAbstractPredicate<K,V> {
+public class FilterClauseJsonPredicate extends FilterClauseAbstractPredicate<String,Object> {
 
     public FilterClauseJsonPredicate(Map<String, List<FilterClause>> clauses) {
         super(clauses);
     }
 
     @Override
-    protected boolean processValueClauses(ConsumerRecord<K, V> record) {
-
-        boolean result = true;
-
-        if(!otherClauses.isEmpty()) {
-
-            if(isNull(record.value())) {
+    protected boolean processValueClauses(ConsumerRecord<String, Object> record) {
+        if (otherClauses.isEmpty()) {
+            return true;
+        }
+        if (isNull(record.value())) {
+            return false;
+        }
+        String json = FilterOperationUtils.stringifyValue(record);
+        for (FilterClause filterClause : otherClauses) {
+            if (!executeAvroJsonOperation(filterClause, json)) {
                 return false;
             }
-
-            String json = record.value().toString();
-
-            for(FilterClause filterClause : otherClauses) {
-                if(nonNull(json)) {
-                    result = result && executeAvroJsonOperation(filterClause, json);
-                } else {
-                    result = false;
-                }
-                if(!result) {
-                    break;
-                }
-            }
-
         }
-        return result;
+        return true;
     }
 
     @Override
