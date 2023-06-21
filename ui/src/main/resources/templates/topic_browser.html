@@ -15,7 +15,11 @@
  -->
 <!DOCTYPE HTML>
 <html xmlns:th="http://www.thymeleaf.org">
-<head th:replace="templates :: header(~{},~{::/html/head/script},~{})">
+<head th:replace="templates :: header(~{::/html/head/link},~{::/html/head/script},~{})">
+
+    <link rel="stylesheet" type="text/css" th:href="@{/components/browse-filter/browse-filter.css}" />
+
+    <script type="text/javascript" th:src="@{/components/browse-filter/browse-filter.js}"></script>
     <script type="text/javascript" th:src="@{/js/ui_lib_browser.js}"></script>
 </head>
 <body>
@@ -29,17 +33,37 @@
     const fetchedValueFormat = [[${browseParams.getValueFormat() != null ? browseParams.getValueFormat().name() : null}]];
     const fullScreen = [[${browseParams.getFullScreen()}]];
     const showGrid = [[${showGrid}]]
+
+    const filterColumns = [[${columnsList}]]
+    const filterClauses = [[${browseParams.getFilterClauses()}]]
+    const filterOperations = [[${filterOperations}]]
+
     const enableAnimation = [[${enableAnimation}]]
+    const topicName = [[${browseParams.topicName}]]
 
     /*]]>*/
 
-    let dataTable;
+    const excludes = [
+        {columnName: 'default', operations: ['equals','contains','startWith','like','notEmpty']},
+        {columnName: 'tombstones', operations: ['include','exclude','only']},
+    ];
+
+    if(filterColumns!==null) {
+        setFilterColumnsArray(topicName, filterColumns);
+    }
+    if(excludes && excludes!=null) {
+        setExcludes(excludes);
+    }
+    if(filterClauses!==null) {
+        setFilterClauseArray(filterClauses);
+    }
+    if(filterOperations!==null) {
+        setFilterOperationArray(filterOperations);
+    }
+
     let partitionCheckboxes;
 
-    $(document).ready( function() {
-
-        const sortingOrderPartition = [0, 'asc'];
-        const sortingOrderOffset = [1, 'asc'];
+    $(document).ready(function () {
 
         partitionCheckboxes = $('.partition-checkbox');
 
@@ -51,12 +75,16 @@
             });
         }
 
+        const sortingOrderPartition = [0, 'asc'];
+        const sortingOrderOffset = [1, 'asc'];
+
         const columnClasses = showGrid ?
             [ { className: "vertical-line-class", targets: "_all" },
-                { className: "vertical-line-class-selected", targets: [ 1, 3 ] } ] :
-            [ { className: "vertical-line-class-selected", targets: [ 1, 3 ] } ];
+                { className: "vertical-line-class-selected", targets: [ 1, 3, 4 ] } ] :
+            [ { className: "vertical-line-class-selected", targets: [ 1, 3, 4 ] } ];
 
-        dataTable = $('#recordTable').DataTable({
+        const dataTableItem = $('#recordTable');
+        const dataTable = dataTableItem.DataTable({
             paging: false,
             processing: true,
             info: false,
@@ -64,7 +92,7 @@
             scrollY: "40vh",
             scrollCollapse: true,
             fixedColumns: {
-                left: 4
+                left: 5
             },
             initComplete: function(settings, json) {
                 setTimeout( api => api.columns.adjust(), 1000, this.api());
@@ -78,15 +106,21 @@
             language: {
                 searchPlaceholder: "Enter this page search expression",
                 processing: "<span class='fa-stack fa-lg'>\n\
-                                     <i class='fa fa-spinner fa-spin fa-stack-2x fa-fw'></i>\n\
-                                 </span>&emsp;Processing ..."
+                                 <i class='fa fa-spinner fa-spin fa-stack-2x fa-fw'></i>\n\
+                             </span>&emsp;Processing ..."
 
             }
         });
 
-        $('#all-partition-checkbox').click(function (e) {
+
+        $('#filter-faq-button').click(() => {
+            showFaq("Browser filter FAQ", "/kafka-manager/faq/browse-filter-faq.html");
+        });
+
+        const allPartitionCheckbox = $('#all-partition-checkbox');
+        allPartitionCheckbox.click(function () {
             partitionCheckboxes.each(function (idx, elem) {
-                const checked = $('#all-partition-checkbox').prop('checked');
+                const checked = allPartitionCheckbox.prop('checked');
                 $(elem).prop('checked', checked);
                 $(elem).trigger('change');
             });
@@ -136,29 +170,31 @@
             }
         })
 
-        $('.previous-offsets-link').click(function () {
+        $('.previous-offsets-link').click(function (e) {
+            e.preventDefault();
             submitFetchForm("FETCH_BACKWARD", "Fetching data backward...");
         });
 
-        $('.next-offsets-link').click(function (event) {
-            event.preventDefault();
+        $('.next-offsets-link').click(function (e) {
+            e.preventDefault();
             submitFetchForm("FETCH_FORWARD", "Fetching data forward...");
         });
 
-        $("#fetchButton").click(function () {
+        $("#fetchButton").click(function (e) {
+            e.preventDefault();
             submitFetchForm("FETCH_RANGE", "Fetching data by range...");
         })
 
-        $('#all-columns-link').click(function (event) {
-            event.preventDefault();
+        $('#all-columns-link').click(function (e) {
+            e.preventDefault();
             $('.column-checkbox').each(function (idx, elem) {
                 $(elem).prop('checked', true);
                 $(elem).trigger('change');
             });
         });
 
-        $('#none-columns-link').click(function (event) {
-            event.preventDefault();
+        $('#none-columns-link').click(function (e) {
+            e.preventDefault();
             $('.column-checkbox').each(function (idx, elem) {
                 $(elem).prop('checked', false);
                 $(elem).trigger('change');
@@ -171,8 +207,8 @@
 
         });
 
-        $('#search-offsets-for-time-link').click(function (event) {
-            event.preventDefault();
+        $('#search-offsets-for-time-link').click(function (e) {
+            e.preventDefault();
             const stringValue = $('#offsets-timestamp').val();
             const date = moment(stringValue, 'DD/MM/YYYY HH:mm:ss', true);
             if (date && date.isValid()) {
@@ -184,8 +220,8 @@
             }
         });
 
-        $('#search-offsets-for-time-link-fwd').click(function (event) {
-            event.preventDefault();
+        $('#search-offsets-for-time-link-fwd').click(function (e) {
+            e.preventDefault();
             const stringValue = $('#offsets-timestamp').val();
             const date = moment(stringValue, 'DD/MM/YYYY HH:mm:ss', true);
             if (date && date.isValid()) {
@@ -197,12 +233,12 @@
             }
         });
 
-        $('#keyFormat').change(function (event) {
-            $('#keyFormatLabel').html('Key format: <div class="text-danger d-inline"><b>' + event.currentTarget.value + '</b></div>');
+        $('#keyFormat').change(function (e) {
+            $('#keyFormatLabel').html('Key format: <div class="text-danger d-inline"><b>' + e.currentTarget.value + '</b></div>');
         });
 
-        $('#valueFormat').change(function (event) {
-            $('#valueFormatLabel').html('Value format: <div class="text-danger d-inline"><b>' + event.currentTarget.value + '</b></div>');
+        $('#valueFormat').change(function (e) {
+            $('#valueFormatLabel').html('Value format: <div class="text-danger d-inline"><b>' + e.currentTarget.value + '</b></div>');
             showHideColumnSelectorDependingOnFormatSelected(fetchedValueFormat);
         });
 
@@ -214,6 +250,7 @@
                 removeColumnSelectorIfFormatNotEqualToFecthedOne(fetchedValueFormat);
                 storeOrApplySelectedColumns();
                 $('#fetch-mode').val(fetchMode);
+                $('#filter-clause').val(JSON.stringify(filterClauseArray));
                 showWaitingSign(waitingText);
                 $('#fetch-form').submit();
             } else {
@@ -278,7 +315,16 @@
             toggleFullScreen('maximize');
         }
 
-        hideWaitingSign();
+        const customParameters = $('#customParameters');
+        if(isBrowserFilterSet()) {
+            customParameters.text('Yes')
+            customParameters.removeClass('text-primary');
+            customParameters.addClass('text-danger');
+        } else {
+            customParameters.text('No');
+            customParameters.removeClass('text-danger');
+            customParameters.addClass('text-primary');
+        }
 
     });
 
@@ -312,21 +358,16 @@
         return result;
     }
 
-    $(document).on('click', function (event) {
-        hidePopoverIfClickedOutside(event);
-    });
-
 
 
 </script>
 
 <div th:replace="templates :: navbar"></div>
-
 <div th:replace="templates :: loading-modal"></div>
-
 <div th:replace="templates :: info-modal"></div>
-
 <div th:replace="templates :: data-modal"></div>
+<div th:replace="templates :: faq-modal"></div>
+<div th:replace="templates :: confirm-modal"></div>
 
 <div class="main-content">
 
@@ -352,8 +393,9 @@
 
                         <input id="fetch-mode" name="fetch-mode" type="hidden" value="FETCH_RANGE" />
                         <input id="full-screen" name="full-screen" th:value="${browseParams.getFullScreen()}" type="hidden" value="false" />
-                        <input id="topicName" name="topicName" th:value="${browseParams.topicName}" type="hidden" />
                         <input id="timestamp" name="timestamp" type="hidden" value="0"/>
+                        <input id="filter-clause" name="filter-clause" type="hidden" value="" />
+                        <input id="topicName" name="topicName" th:value="${browseParams.topicName}" type="hidden" />
                         <div class="card-header card-flex">
                             <div class="col">
                                 <a data-bs-toggle="collapse" href="#fetch-params"
@@ -374,7 +416,7 @@
                             <div class="col" th:utext="${'Value format: <div class=''text-primary d-inline''><b>' + browseParams.getValueFormat() + '</b></div>'}"
                                  id="valueFormatLabel">
                             </div>
-                            <div class="col">Custom parameters: <div class='text-primary d-inline'><b>no</b></div></div>
+                            <div class="col">Custom parameters: <div class='text-primary d-inline'><b><div id="customParameters" class="d-inline"></div></b></div></div>
                         </div>
                         <div class="card-body" id="fetch-params">
 
@@ -390,7 +432,7 @@
                                         </option>
                                     </select>
                                     <label for="valueFormat">Value Format</label>
-                                    <select class="form-select mb-3" name="valueFormat" id="valueFormat">
+                                    <select class="form-select mb-4" name="valueFormat" id="valueFormat">
                                         <option
                                                 th:each="format : ${T(com.epam.eco.kafkamanager.TopicRecordFetchParams$DataFormat).values()}"
                                                 th:value="${format}"
@@ -399,7 +441,12 @@
                                         </option>
                                     </select>
 
-
+                                    <div id="browse-filter-block">
+                                        <div
+                                                th:if="${browseParams.isAvroOrProtobufValueFormat()}"
+                                                th:replace="templates :: browse-filter">
+                                        </div>
+                                    </div>
 
                                 </div>
 
@@ -452,14 +499,14 @@
                                                             <span class="input-group-text col-md-2">
                                                                 MIN
                                                             </span>
-                                                            <span class="input-group-text to-min-max-title form-control">
+                                                            <span class="input-group-text form-control to-min-max-title">
                                                                 <div>FIRST BATCH</div>
                                                                 <button id="to-min-button"
                                                                         class="btn btn-success btn-sm btn-small to-min-max-button">
                                                                     to MIN
                                                                 </button>
                                                             </span>
-                                                            <span class="input-group-text to-min-max-title form-control">
+                                                            <span class="input-group-text form-control to-min-max-title">
                                                                 <div>LAST BATCH</div>
                                                                 <button id="to-max-button"
                                                                         class="btn btn-success btn-sm btn-small to-min-max-button">
@@ -546,6 +593,8 @@
                                     </div>
                                 </div>
 
+
+
                             </div>
 
                         </div>
@@ -605,7 +654,7 @@
                                         <div class="column-selector-dialog-column">
 
                                             <div class="checkbox column-selector-dialog-item"
-                                                 th:each="column : ${fetchedRecords.listColumns()}">
+                                                 th:each="column : ${fetchedRecords.listTopicColumns()}">
                                                 <label
                                                         th:class="${!column.present ? 'text-muted' : ''}"
                                                         style="word-wrap:break-word;">
@@ -644,7 +693,6 @@
                             </div>
                         </div>
 
-
                     </form>
                 </div>
 
@@ -668,7 +716,6 @@
                             <i class="fa fa-chevron-right"></i>
                         </a>
                         <h7><span th:text="${fetchSummary}"></span></h7>
-
                         <button id="column-filter-button"
                                 class="btn btn-primary btn-sm to-right"
                                 type="button"
@@ -692,6 +739,7 @@
                                 <th>Offset</th>
                                 <th>Timestamp (UTC)</th>
                                 <th>Key</th>
+                                <th>Key/Value size</th>
                                 <th>Headers</th>
                                 <th th:if="${browseParams.isAvroOrProtobufValueFormat()}">Attributes
                                 </th>
@@ -720,11 +768,16 @@
                                         th:text="${record.key}"
                                         style="word-wrap: break-word;min-width:50px;max-width:300px;">
                                 </td>
+                                <td th:text="${record.keyValueSizeFormatted}"></td>
                                 <td style="text-align: center;vertical-align: middle;">
                                     <a style="vertical-align: middle"
                                        th:if="${record.hasHeaders()}"
                                        href="javascript:void(0)"
-                                       th:attr="data-bs-container='body',data-bs-toggle='popover',data-bs-content=${record.headersPrettyJson},title='Headers',data-bs-html=true"
+                                       th:attr="data-bs-container='body',
+                                                data-bs-toggle='popover',
+                                                data-bs-content=${record.headersPrettyJson},
+                                                title='Headers',
+                                                data-bs-html=true"
                                        data-bs-toggle="popover"
                                        data-html="true">
                                         <i class="fa fa-eye info"></i>
@@ -739,9 +792,9 @@
                                        data-bs-toggle="popover"
                                        data-bs-backdrop=""
                                        th:attr="data-bs-container='body',
-                                                    data-bs-content=${record.attributesPrettyJson},
-                                                    title='Attributes',
-                                                    data-bs-html=true">
+                                                data-bs-content=${record.attributesPrettyJson},
+                                                title='Attributes',
+                                                data-bs-html=true">
                                         <i class="fa fa-list info"></i>
                                     </a>
                                 </td>
@@ -750,11 +803,11 @@
                                     style="text-align:center;vertical-align:middle;">
 
                                     <a th:if="${record.hasAttributes()}"
-                                        class="btn btn-sm info"
-                                        type="button"
-                                        th:attr="data-bs-target=${'#schema-modal-dialog-'+recordId},data-bs-html=true"
-                                        data-bs-toggle='modal'
-                                        data-bs-backdrop>
+                                       class="btn btn-sm info"
+                                       type="button"
+                                       th:attr="data-bs-target=${'#schema-modal-dialog-'+recordId},data-bs-html=true"
+                                       data-bs-toggle='modal'
+                                       data-bs-backdrop>
                                         <i class="fa fa-file-code-o info"></i>
                                     </a>
 
@@ -766,7 +819,7 @@
                                             <div class="modal-content" style="max-height:90vh">
                                                 <div class="modal-header">
                                                     <h4 class="modal-title"
-                                                        th:text="${browseParams.getValueFormat() + ' SCHEMA (ID=' + record.RegistrySchema.schemaId + ') FOR MESSAGE WITH KEY=&quot;' + record.key + '&quot;'}">
+                                                        th:text="${browseParams.getValueFormat() + ' SCHEMA (ID=' + record.RegistrySchema.schemaId + ') FOR MESSAGE WITH KEY=&quot;' + record.key + '&quot;' }">
                                                     </h4>
                                                     <button type="button" class="btn-close" data-bs-dismiss="modal">&times;</button>
                                                 </div>
@@ -798,7 +851,9 @@
 
                                 </td>
 
-                                <td th:if="${record.nullValue and browseParams.isAvroOrProtobufValueFormat()}" class="bg-danger"><span></span></td>
+                                <td th:if="${record.nullValue and browseParams.isAvroOrProtobufValueFormat()}" class="bg-danger">
+                                    <span></span>
+                                </td>
 
                                 <td
                                         th:each="column : ${fetchedRecords.listSelectedColumns()}"
@@ -807,8 +862,7 @@
 
                                     <span th:if="${record.nullValue}"></span>
                                     <span th:if="${!record.nullValue}"
-                                          th:utext="${record.getShort(column)}"
-                                          th:title="${record.get(column)}">
+                                          th:utext="${record.getShort(column)}">
                                     </span>
                                     <a class="btn btn-sm info"
                                        type="button"
@@ -825,6 +879,7 @@
                         </table>
 
                     </div>
+
                 </div>
 
             </div>

@@ -41,7 +41,7 @@ public class TabularRecordsTest {
 
     @Test
     public void testHasExpectedValuesAndIsIterable() throws Exception {
-        TabularRecords records = TabularRecords.builder().
+        TabularRecords records = TabularRecords.builder("topicName").
                 addSelectedColumnName("columnA").
                 addSelectedColumnName("columnB").
                 addSelectedColumnNames(Arrays.asList("columnC", "columnD", "columnE")).
@@ -133,13 +133,12 @@ public class TabularRecordsTest {
         Assertions.assertEquals("columnD", columnsSelected.get(3).getName());
         Assertions.assertEquals("columnE", columnsSelected.get(4).getName());
         Assertions.assertEquals("columnF", columnsSelected.get(5).getName());
-        Assertions.assertEquals("columnX", columnsSelected.get(6).getName());
     }
 
     @Test
     public void testFailsOnIllegalColumnNames() throws Exception {
         assertThrows(IllegalArgumentException.class,()->{
-            TabularRecords.builder().
+            TabularRecords.builder("topicName").
                     addSelectedColumnNames(Arrays.asList("column1", null, "column2")).
                                   addRecord(createTestRecord("key", "column")).
                                   build();
@@ -148,93 +147,7 @@ public class TabularRecordsTest {
 
     @Test
     public void testFailsOnNullRecords() throws Exception {
-        assertThrows(Exception.class,()-> new TabularRecords(null) );
-    }
-
-    @Test
-    public void testColumnsNamesAreGroupped() throws Exception {
-        TabularRecords records = TabularRecords.builder().
-                addSelectedColumnNames(Arrays.asList(
-                        "columnA", "columnB", "columnC", "columnD",
-                        "columnE", "columnF", "columnG", "columnH",
-                        "columnI", "columnJ")).
-                build();
-
-        List<Column> group0 = records.getColumnsGroup(0, 3);
-        Assertions.assertNotNull(group0);
-        Assertions.assertEquals(3, group0.size());
-        Assertions.assertEquals("columnA", group0.get(0).getName());
-        Assertions.assertEquals("columnB", group0.get(1).getName());
-        Assertions.assertEquals("columnC", group0.get(2).getName());
-
-        List<Column> group1 = records.getColumnsGroup(1, 3);
-        Assertions.assertNotNull(group1);
-        Assertions.assertEquals(3, group1.size());
-        Assertions.assertEquals("columnD", group1.get(0).getName());
-        Assertions.assertEquals("columnE", group1.get(1).getName());
-        Assertions.assertEquals("columnF", group1.get(2).getName());
-
-        List<Column> group2 = records.getColumnsGroup(2, 3);
-        Assertions.assertNotNull(group2);
-        Assertions.assertEquals(3, group2.size());
-        Assertions.assertEquals("columnG", group2.get(0).getName());
-        Assertions.assertEquals("columnH", group2.get(1).getName());
-        Assertions.assertEquals("columnI", group2.get(2).getName());
-
-        List<Column> group3 = records.getColumnsGroup(3, 3);
-        Assertions.assertNotNull(group3);
-        Assertions.assertEquals(1, group3.size());
-        Assertions.assertEquals("columnJ", group3.get(0).getName());
-
-        List<Column> group4 = records.getColumnsGroup(4, 3);
-        Assertions.assertNotNull(group4);
-        Assertions.assertEquals(0, group4.size());
-    }
-
-    @Test
-    public void testColumnsNamesGroupSizeIsDetermined() throws Exception {
-        TabularRecords records = TabularRecords.builder().
-                addSelectedColumnNames(Arrays.asList(
-                        "columnA", "columnB", "columnC", "columnD",
-                        "columnE", "columnF", "columnG", "columnH",
-                        "columnI", "columnJ")).
-                build();
-
-        int size = records.determineColumnsGroupSize(1, 1);
-        Assertions.assertEquals(10, size);
-
-        size = records.determineColumnsGroupSize(2, 1);
-        Assertions.assertEquals(5, size);
-
-        size = records.determineColumnsGroupSize(3, 1);
-        Assertions.assertEquals(4, size);
-
-        size = records.determineColumnsGroupSize(4, 1);
-        Assertions.assertEquals(3, size);
-
-        size = records.determineColumnsGroupSize(5, 1);
-        Assertions.assertEquals(2, size);
-
-        size = records.determineColumnsGroupSize(6, 1);
-        Assertions.assertEquals(2, size);
-
-        size = records.determineColumnsGroupSize(7, 1);
-        Assertions.assertEquals(2, size);
-
-        size = records.determineColumnsGroupSize(8, 1);
-        Assertions.assertEquals(2, size);
-
-        size = records.determineColumnsGroupSize(9, 1);
-        Assertions.assertEquals(2, size);
-
-        size = records.determineColumnsGroupSize(10, 1);
-        Assertions.assertEquals(1, size);
-
-        size = records.determineColumnsGroupSize(11, 1);
-        Assertions.assertEquals(1, size);
-
-        size = records.determineColumnsGroupSize(12, 1);
-        Assertions.assertEquals(1, size);
+        assertThrows(Exception.class,()-> new TabularRecords(null,"topicName") );
     }
 
     @Test
@@ -285,7 +198,6 @@ public class TabularRecordsTest {
                 0,
                 System.currentTimeMillis(),
                 TimestampType.NO_TIMESTAMP_TYPE,
-                1L,
                 1,
                 1,
                 key,

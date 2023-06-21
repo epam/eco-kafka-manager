@@ -57,7 +57,7 @@ import kafka.cluster.EndPoint;
  */
 public class ZkBrokerRepo extends AbstractKeyValueRepo<Integer, BrokerInfo, BrokerSearchCriteria> implements BrokerRepo, CachedRepo<Integer>, ZkBrokerCache.CacheListener, ZkBrokerConfigCache.CacheListener, MetadataUpdateListener, AsyncStartingBean {
 
-    private final static Logger LOGGER = LoggerFactory.getLogger(ZkBrokerRepo.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ZkBrokerRepo.class);
 
     @Autowired
     private KafkaAdminOperations adminOperations;

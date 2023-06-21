@@ -102,6 +102,7 @@ let prettyJson2 = (object) => {
 
 let infoModal;
 let dataModal;
+let faqModal;
 let confirmModal;
 
 $(document).ready(function() {
@@ -110,6 +111,9 @@ $(document).ready(function() {
     }
     if(document.getElementById("dataModal")!==null) {
         dataModal = new bootstrap.Modal(document.getElementById("dataModal"));
+    }
+    if(document.getElementById("faqModal")!==null) {
+        faqModal = new bootstrap.Modal(document.getElementById("faqModal"));
     }
     if(document.getElementById("confirmModal")!==null) {
         confirmModal = new bootstrap.Modal(document.getElementById("confirmModal"));
@@ -182,6 +186,23 @@ const isHTML = (text) => {
         return fragment.body.children.length>0
     } catch(error) { ; }
     return false;
+}
+
+function showFaq(dialogHeader, htmlPage) {
+
+    const headerClass = "data-modal-header";
+
+    const header = document.getElementById('faqModalHeader');
+    header.textContent = dialogHeader;
+    header.classList.add(headerClass);
+
+    const textContentElement = document.getElementById('faqModalTextContent');
+    textContentElement.innerHTML= '';
+    const newDivElement = document.createElement("div");
+    $(newDivElement).load(htmlPage);
+    textContentElement.append(newDivElement);
+
+    faqModal.show();
 }
 
 function showConfirm(headerText, bodyText, successCallback) {

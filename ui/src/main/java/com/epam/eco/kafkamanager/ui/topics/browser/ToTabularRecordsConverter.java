@@ -39,7 +39,7 @@ public class ToTabularRecordsConverter {
 
         RecordValueTabulator<?> valueTabulator = determineValueTabulator(browseParams);
 
-        TabularRecords.Builder builder = TabularRecords.builder();
+        TabularRecords.Builder builder = TabularRecords.builder(browseParams.getTopicName());
         for (ConsumerRecord<?, ?> record : fetchResult) {
             Record tabularRecord = toTabularRecord(record, valueTabulator);
             builder.addRecord(tabularRecord);
@@ -83,8 +83,8 @@ public class ToTabularRecordsConverter {
             return new ProtobufRecordValueTabulator(browseParams.getKafkaTopicConfig());
         } else if (
                 DataFormat.STRING == dataFormat ||
-                DataFormat.JSON_STRING == dataFormat ||
-                DataFormat.HEX_STRING == dataFormat) {
+                        DataFormat.JSON_STRING == dataFormat ||
+                        DataFormat.HEX_STRING == dataFormat) {
             return new NoopRecordValueTabulator();
         } else {
             throw new RuntimeException(

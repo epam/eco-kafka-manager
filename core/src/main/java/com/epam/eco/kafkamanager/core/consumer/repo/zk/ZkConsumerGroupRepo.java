@@ -55,7 +55,7 @@ import com.epam.eco.kafkamanager.repo.CachedRepo;
  */
 public class ZkConsumerGroupRepo extends AbstractKeyValueRepo<String, ConsumerGroupInfo, ConsumerGroupSearchCriteria> implements ConsumerGroupRepo, CachedRepo<String>, ZkConsumerGroupCache.CacheListener, MetadataUpdateListener, AsyncStartingBean {
 
-    private final static Logger LOGGER = LoggerFactory.getLogger(ZkConsumerGroupRepo.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ZkConsumerGroupRepo.class);
 
     @Autowired
     private MetadataRepo metadataRepo;

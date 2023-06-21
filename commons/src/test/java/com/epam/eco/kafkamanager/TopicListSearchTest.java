@@ -42,7 +42,7 @@ import static org.mockito.ArgumentMatchers.anyString;
 
 public class TopicListSearchTest {
 
-    private final static Map<String,TopicInfoGenerator.RecordConfig> TOPIC_LIST_CONFIG =
+    private static final Map<String,TopicInfoGenerator.RecordConfig> TOPIC_LIST_CONFIG =
            Stream.of(
                    new TopicInfoGenerator.RecordConfig("testTopic", 3, 3, CONFIG_MAP_COMPACT, "description like test a string", true),
                    new TopicInfoGenerator.RecordConfig("testTopicLike", 2, 0, CONFIG_MAP_DELETE, "", false),

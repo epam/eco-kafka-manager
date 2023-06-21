@@ -27,8 +27,13 @@ import java.util.stream.Collectors;
 import org.apache.commons.collections4.ListUtils;
 import org.apache.kafka.clients.admin.Config;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import com.epam.eco.commons.kafka.OffsetRange;
 import com.epam.eco.kafkamanager.FetchMode;
+import com.epam.eco.kafkamanager.FilterClause;
 import com.epam.eco.kafkamanager.TopicRecordFetchParams;
 import com.epam.eco.kafkamanager.TopicRecordFetchParams.DataFormat;
 
@@ -59,10 +64,13 @@ public class TopicBrowseParams extends HashMap<String, Object> {
 
     public static final String FETCH_MODE = "fetch-mode";
     public static final String FULL_SCREEN = "full-screen";
+    public static final String FILTER_CLAUSE = "filter-clause";
     public static final String TIMESTAMP = "timestamp";
 
     private static final Pattern PARTITION_MIN_OFFSET_PATTERN = Pattern.compile("^p_min_(0|[1-9]\\d*)$");
     private static final Pattern COLUMN_ENABLED_PATTERN = Pattern.compile("^ce_(.+)$");
+
+    private static final Long DEFAULT_TIMEOUT = 10000L;
 
     public TopicBrowseParams(Map<String, Object> requestParams) {
         if (requestParams != null) {
@@ -73,9 +81,10 @@ public class TopicBrowseParams extends HashMap<String, Object> {
     public FetchMode getFetchMode() {
         return getAsFetchMode(FETCH_MODE);
     }
+
     public Boolean getFullScreen() {
         Boolean fullScreen = getAsBoolean(FULL_SCREEN);
-        return !isNull(fullScreen) && fullScreen;
+        return ! isNull(fullScreen) && fullScreen;
     }
 
     Long getTimestamp() {
@@ -83,6 +92,16 @@ public class TopicBrowseParams extends HashMap<String, Object> {
     }
     public boolean isAvroOrProtobufValueFormat() {
         return getAsDataFormat(VALUE_FORMAT) == DataFormat.AVRO || getAsDataFormat(VALUE_FORMAT) == DataFormat.PROTOCOL_BUFFERS;
+    }
+
+    public boolean isAvroValueFormat() {
+        return getAsDataFormat(VALUE_FORMAT) == DataFormat.AVRO;
+    }
+    public boolean isStringValueFormat() {
+        return getAsDataFormat(VALUE_FORMAT) == DataFormat.STRING;
+    }
+    public boolean isJsonValueFormat() {
+        return getAsDataFormat(VALUE_FORMAT) == DataFormat.JSON_STRING;
     }
 
     public Config getKafkaTopicConfig() {
@@ -168,15 +187,15 @@ public class TopicBrowseParams extends HashMap<String, Object> {
     public List<String> listColumns() {
         return keySet().stream().
                 filter(key -> COLUMN_ENABLED_PATTERN.matcher(key).matches()).
-                map(this::extractColumnFromEnabledKey).
-                filter(this::isColumnEnabled).
-                sorted().
-                collect(Collectors.toList());
+                               map(this::extractColumnFromEnabledKey).
+                               filter(this::isColumnEnabled).
+                               sorted().
+                               collect(Collectors.toList());
     }
 
     public long getTimeout() {
         Long limit = getAsLong(TIMEOUT);
-        return limit != null ? limit : -1;
+        return limit != null ? limit : DEFAULT_TIMEOUT;
     }
 
     public void setTimeout(long timeout) {
@@ -216,7 +235,7 @@ public class TopicBrowseParams extends HashMap<String, Object> {
         Long offsetMax = getAsLong(formatPartitionMaxOffsetKey(partition));
         Boolean maxOffsetInclusive = getAsBoolean(formatPartitionMaxInclusiveOffsetKey(partition));
         return OffsetRange.with(nonNull(offsetMin) ? offsetMin : 0L, nonNull(minOffsetInclusive) ? minOffsetInclusive : false,
-                nonNull(offsetMax) ? offsetMax : 0L, nonNull(maxOffsetInclusive) ? maxOffsetInclusive : false);
+                                nonNull(offsetMax) ? offsetMax : 0L, nonNull(maxOffsetInclusive) ? maxOffsetInclusive : false);
     }
 
     public void addPartitionOffset(int partition, OffsetRange offset) {
@@ -246,9 +265,9 @@ public class TopicBrowseParams extends HashMap<String, Object> {
     public List<Integer> listPartitions() {
         return keySet().stream().
                 filter(key -> PARTITION_MIN_OFFSET_PATTERN.matcher(key).matches()).
-                map(this::extractPartitionFromOffsetKey).
-                sorted().
-                collect(Collectors.toList());
+                               map(this::extractPartitionFromOffsetKey).
+                               sorted().
+                               collect(Collectors.toList());
     }
 
     public List<List<Integer>> listPartitionBatches(int batchSize) {
@@ -258,7 +277,7 @@ public class TopicBrowseParams extends HashMap<String, Object> {
     public Map<Integer, OffsetRange> getPartitionOffsets() {
         return listPartitions().stream().
                 filter(this::isPartitionEnabled).
-                collect(Collectors.toMap(
+                                       collect(Collectors.toMap(
                 Function.identity(),
                 this::getPartitionOffset));
     }
@@ -328,8 +347,8 @@ public class TopicBrowseParams extends HashMap<String, Object> {
         } else if (value instanceof String) {
             if (
                     "1".equals(value) ||
-                    "true".equalsIgnoreCase((String)value) ||
-                    "on".equalsIgnoreCase((String)value)) {
+                            "true".equalsIgnoreCase((String)value) ||
+                            "on".equalsIgnoreCase((String)value)) {
                 return Boolean.TRUE;
             } else {
                 return Boolean.FALSE;
@@ -340,6 +359,29 @@ public class TopicBrowseParams extends HashMap<String, Object> {
                             "Can't convert %s to %s",
                             value.getClass().getName(), Boolean.class.getName()));
         }
+    }
+
+    public List<FilterClause> getFilterClauses() {
+        List<FilterClause> filterClauses=null;
+        String filterString = (String)get(FILTER_CLAUSE);
+        if(nonNull(filterString) && filterString.length()>0) {
+            try {
+                filterClauses = new ObjectMapper().readValue(filterString, new TypeReference<>() {});
+            } catch (JsonProcessingException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        return filterClauses;
+
+    }
+
+    public Map<String,List<FilterClause>> getFilterClausesAsMap() {
+        List<FilterClause> filterClauses = getFilterClauses();
+        return isNull(filterClauses) ?
+               new HashMap<>() :
+               filterClauses.stream()
+                            .collect(Collectors.groupingBy(FilterClause::getColumn));
+
     }
 
     private String formatColumnEnabledKey(String column) {

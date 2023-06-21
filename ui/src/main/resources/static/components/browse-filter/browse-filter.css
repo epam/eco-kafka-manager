@@ -1,0 +1,39 @@
+.input-group .dropdown-toggle {
+    border-radius: 0;
+}
+
+#filter-operation-select {
+    max-width: 10em;
+}
+
+div.filter-clause-item {
+    background-color: #538cb8;
+    border-radius: 50rem !important;
+    color: white;
+    margin: 2px;
+    display: inline-block;
+    padding: 0.35em 0.65em;
+    font-size: 1em;
+    font-weight: 700;
+    line-height: 1;
+    text-align: center;
+    white-space: nowrap;
+    vertical-align: baseline;
+    pointer-events: none;
+}
+
+.filter-clause-item::after {
+    content: url('x-circle-fill.svg');
+    margin-left: 0.5em;
+    pointer-events: auto;
+    cursor: pointer;
+}
+
+.filter-clause-item>span {
+    vertical-align: text-top;
+}
+
+.add-filter-button {
+    background-color: #29c729;
+    color: white;
+}

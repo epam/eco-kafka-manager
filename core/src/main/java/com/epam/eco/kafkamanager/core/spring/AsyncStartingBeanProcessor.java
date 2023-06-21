@@ -40,9 +40,9 @@ import org.springframework.context.event.EventListener;
  */
 public class AsyncStartingBeanProcessor {
 
-    private final static Logger LOGGER = LoggerFactory.getLogger(AsyncStartingBeanProcessor.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(AsyncStartingBeanProcessor.class);
 
-    private final static int BEAN_START_TIMEOUT_MINS = 10;
+    private static final int BEAN_START_TIMEOUT_MINS = 10;
 
     @Autowired(required=false)
     private List<AsyncStartingBean> beans;

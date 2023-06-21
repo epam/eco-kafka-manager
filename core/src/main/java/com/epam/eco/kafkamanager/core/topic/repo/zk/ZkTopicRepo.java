@@ -60,7 +60,7 @@ import com.epam.eco.kafkamanager.repo.CachedRepo;
  */
 public class ZkTopicRepo extends AbstractKeyValueRepo<String, TopicInfo, TopicSearchCriteria> implements TopicRepo, CachedRepo<String>, ZkTopicCache.CacheListener, ZkTopicConfigCache.CacheListener, MetadataUpdateListener, AsyncStartingBean {
 
-    private final static Logger LOGGER = LoggerFactory.getLogger(ZkTopicRepo.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ZkTopicRepo.class);
 
     @Autowired
     private KafkaAdminOperations adminOperations;

@@ -51,7 +51,7 @@ import kafka.coordinator.group.OffsetKey;
  */
 class KafkaConsumerGroupCache implements com.epam.eco.commons.kafka.cache.CacheListener<BaseKey, Object> {
 
-    private final static Logger LOGGER = LoggerFactory.getLogger(KafkaConsumerGroupCache.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(KafkaConsumerGroupCache.class);
 
     private final KafkaAdminOperations adminOperations;
 

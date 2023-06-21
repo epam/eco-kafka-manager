@@ -1,5 +1,5 @@
 /*******************************************************************************
- *  Copyright 2022 EPAM Systems
+ *  Copyright 2023 EPAM Systems
  *
  *  Licensed under the Apache License, Version 2.0 (the "License"); you may not
  *  use this file except in compliance with the License.  You may obtain a copy
@@ -13,27 +13,20 @@
  *  License for the specific language governing permissions and limitations under
  *  the License.
  *******************************************************************************/
-package com.epam.eco.kafkamanager.ui;
+package com.epam.eco.kafkamanager.ui.topics.browser;
 
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Import;
+import org.apache.kafka.clients.consumer.ConsumerRecord;
 
-import com.epam.eco.kafkamanager.ui.config.KafkaManagerUiConfiguration;
-
-
+import com.epam.eco.commons.kafka.helpers.FilterClausePredicate;
 
 /**
- * @author Andrei_Tytsik
+ * @author Mikhail_Vershkov
  */
-@SpringBootApplication
-@Import(KafkaManagerUiConfiguration.class)
-public class KafkaManagerUiApplication {
 
-    public static void main(String[] args) {
-        SpringApplication.run(KafkaManagerUiApplication.class, args);
+public class FilterClauseNoopPredicate implements FilterClausePredicate<Object,Object> {
+    @Override
+    public boolean test(ConsumerRecord record) {
+        return true;
     }
 
 }

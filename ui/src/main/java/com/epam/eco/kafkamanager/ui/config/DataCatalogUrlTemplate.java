@@ -20,7 +20,7 @@ package com.epam.eco.kafkamanager.ui.config;
  */
 public class DataCatalogUrlTemplate extends ExternalToolTemplate {
 
-    private final static String DEFAULT_ICON = "fa-share";
+    private static final String DEFAULT_ICON = "fa-share";
 
     public String getIcon() {
         return DEFAULT_ICON;

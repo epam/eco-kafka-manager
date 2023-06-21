@@ -20,7 +20,7 @@ package com.epam.eco.kafkamanager.ui.config;
  */
 public class GrafanaUrlTemplate extends ExternalToolTemplate {
 
-    private final static String DEFAULT_ICON = "fa-area-chart";
+    private static final String DEFAULT_ICON = "fa-area-chart";
     private String env;
 
     public String getEnv() {
