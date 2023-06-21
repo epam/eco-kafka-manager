@@ -188,7 +188,7 @@ const isHTML = (text) => {
     return false;
 }
 
-function showFaq(dialogHeader, htmlText) {
+function showFaq(dialogHeader, htmlPage) {
 
     const headerClass = "data-modal-header";
 
@@ -199,7 +199,7 @@ function showFaq(dialogHeader, htmlText) {
     const textContentElement = document.getElementById('faqModalTextContent');
     textContentElement.innerHTML= '';
     const newDivElement = document.createElement("div");
-    newDivElement.innerHTML=htmlText;
+    $(newDivElement).load(htmlPage);
     textContentElement.append(newDivElement);
 
     faqModal.show();
