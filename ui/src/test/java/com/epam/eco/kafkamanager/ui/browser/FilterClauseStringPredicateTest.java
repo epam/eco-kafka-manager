@@ -43,8 +43,8 @@ import static com.epam.eco.kafkamanager.ui.browser.FilterPredicateUtils.TOPIC_NA
 import static com.epam.eco.kafkamanager.ui.browser.FilterPredicateUtils.generateConsumerRecordWithHeader;
 import static com.epam.eco.kafkamanager.ui.browser.FilterPredicateUtils.generateString;
 import static com.epam.eco.kafkamanager.ui.browser.FilterPredicateUtils.getFilterClauseStringPredicate;
-import static com.epam.eco.kafkamanager.ui.topics.browser.FilterClauseAbstractPredicate.HEADERS_ATTRIBUTE;
 import static com.epam.eco.kafkamanager.ui.topics.browser.FilterClauseAbstractPredicate.KEY_ATTRIBUTE;
+import static com.epam.eco.kafkamanager.ui.topics.browser.TabularRecords.HEADER_PREFIX;
 
 /**
  * @author Mikhail_Vershkov
@@ -94,7 +94,7 @@ public class FilterClauseStringPredicateTest {
     public void testOrdinaryHeaderEquals() {
 
         FilterClauseStringPredicate filterClausePredicate =
-                getFilterClauseStringPredicate(HEADERS_ATTRIBUTE, FilterOperationEnum.EQUALS, HEADER_SIMPLE_FILTER_CLAUSE);
+                getFilterClauseStringPredicate(HEADER_PREFIX + HEADER_KEY, FilterOperationEnum.EQUALS, HEADER_SIMPLE_FILTER_CLAUSE);
         Assertions.assertTrue(filterClausePredicate
                      .test(generateConsumerRecordWithHeader(Map.of(HEADER_KEY, HEADER_VALUE))));
         Assertions.assertFalse(filterClausePredicate
@@ -105,7 +105,7 @@ public class FilterClauseStringPredicateTest {
     public void testOrdinaryHeaderContains() {
 
         FilterClauseStringPredicate filterClausePredicate =
-                getFilterClauseStringPredicate(HEADERS_ATTRIBUTE, FilterOperationEnum.CONTAINS, HEADER_SIMPLE_FILTER_CLAUSE);
+                getFilterClauseStringPredicate(HEADER_PREFIX + HEADER_KEY, FilterOperationEnum.CONTAINS, HEADER_SIMPLE_FILTER_CLAUSE);
         Assertions.assertTrue(filterClausePredicate
                                       .test(generateConsumerRecordWithHeader(Map.of(HEADER_KEY, PREFIX+HEADER_VALUE+SUFFIX))));
         Assertions.assertFalse(filterClausePredicate
@@ -115,7 +115,7 @@ public class FilterClauseStringPredicateTest {
     public void testOrdinaryHeaderStartsWith() {
 
         FilterClauseStringPredicate filterClausePredicate =
-                getFilterClauseStringPredicate(HEADERS_ATTRIBUTE, FilterOperationEnum.STARTS_WITH, HEADER_SIMPLE_FILTER_CLAUSE);
+                getFilterClauseStringPredicate(HEADER_PREFIX + HEADER_KEY, FilterOperationEnum.STARTS_WITH, HEADER_SIMPLE_FILTER_CLAUSE);
         Assertions.assertTrue(filterClausePredicate
                                       .test(generateConsumerRecordWithHeader(Map.of(HEADER_KEY, HEADER_VALUE+SUFFIX))));
         Assertions.assertFalse(filterClausePredicate
@@ -126,7 +126,7 @@ public class FilterClauseStringPredicateTest {
     public void testOrdinaryHeaderNotEmpty() {
 
         FilterClauseStringPredicate filterClausePredicate =
-                getFilterClauseStringPredicate(HEADERS_ATTRIBUTE, FilterOperationEnum.NOT_EMPTY, HEADER_EMPTY_FILTER_CLAUSE);
+                getFilterClauseStringPredicate(HEADER_PREFIX + HEADER_KEY, FilterOperationEnum.NOT_EMPTY, HEADER_EMPTY_FILTER_CLAUSE);
         Assertions.assertTrue(filterClausePredicate
                                       .test(generateConsumerRecordWithHeader(Map.of(HEADER_KEY, HEADER_VALUE+SUFFIX))));
         Assertions.assertFalse(filterClausePredicate

@@ -70,11 +70,7 @@ public final class FilterOperationUtils {
     }
 
     public static boolean executeHeaderOperation(FilterClause filterClause, Map<Object,Object> headersMap) {
-        if(filterClause.getValue().contains(KEY_VALUE_SEPARATOR)) {
-            return new FilterOperationMapHandler(filterClause).compare(headersMap);
-        } else {
-            return new FilterOperationStringHandler(filterClause).compare(headersMap.toString());
-        }
+        return new FilterOperationMapHandler(filterClause).compare(headersMap);
     }
 
     public static String stringifyValue(ConsumerRecord<String,Object> record) {

@@ -23,7 +23,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import com.epam.eco.kafkamanager.ui.topics.browser.FilterClauseAvroPredicate;
-import com.epam.eco.kafkamanager.ui.topics.browser.FilterClauseAvroPredicate;
 import com.epam.eco.kafkamanager.ui.topics.browser.handlers.FilterOperationEnum;
 
 import static com.epam.eco.kafkamanager.ui.browser.FilterPredicateUtils.FIELD_NAME;
@@ -45,10 +44,9 @@ import static com.epam.eco.kafkamanager.ui.browser.FilterPredicateUtils.SUFFIX;
 import static com.epam.eco.kafkamanager.ui.browser.FilterPredicateUtils.TOPIC_NAME;
 import static com.epam.eco.kafkamanager.ui.browser.FilterPredicateUtils.generateConsumerRecordWithHeader;
 import static com.epam.eco.kafkamanager.ui.browser.FilterPredicateUtils.getFilterClauseAvroPredicate;
-import static com.epam.eco.kafkamanager.ui.browser.FilterPredicateUtils.getFilterClauseAvroPredicate;
 import static com.epam.eco.kafkamanager.ui.browser.FilterPredicateUtils.getGenericRecord;
-import static com.epam.eco.kafkamanager.ui.topics.browser.FilterClauseAbstractPredicate.HEADERS_ATTRIBUTE;
 import static com.epam.eco.kafkamanager.ui.topics.browser.FilterClauseAbstractPredicate.KEY_ATTRIBUTE;
+import static com.epam.eco.kafkamanager.ui.topics.browser.TabularRecords.HEADER_PREFIX;
 
 /**
  * @author Mikhail_Vershkov
@@ -98,7 +96,7 @@ public class FilterClauseAvroPredicateTest {
     public void testOrdinaryHeaderEquals() {
 
         FilterClauseAvroPredicate filterClausePredicate =
-                getFilterClauseAvroPredicate(HEADERS_ATTRIBUTE, FilterOperationEnum.EQUALS, HEADER_SIMPLE_FILTER_CLAUSE);
+                getFilterClauseAvroPredicate(HEADER_PREFIX + HEADER_KEY, FilterOperationEnum.EQUALS, HEADER_SIMPLE_FILTER_CLAUSE);
         Assertions.assertTrue(filterClausePredicate
                                       .test(generateConsumerRecordWithHeader(Map.of(HEADER_KEY, HEADER_VALUE))));
         Assertions.assertFalse(filterClausePredicate
@@ -109,7 +107,7 @@ public class FilterClauseAvroPredicateTest {
     public void testOrdinaryHeaderContains() {
 
         FilterClauseAvroPredicate filterClausePredicate =
-                getFilterClauseAvroPredicate(HEADERS_ATTRIBUTE, FilterOperationEnum.CONTAINS, HEADER_SIMPLE_FILTER_CLAUSE);
+                getFilterClauseAvroPredicate(HEADER_PREFIX + HEADER_KEY, FilterOperationEnum.CONTAINS, HEADER_SIMPLE_FILTER_CLAUSE);
         Assertions.assertTrue(filterClausePredicate
                                       .test(generateConsumerRecordWithHeader(Map.of(HEADER_KEY, PREFIX+HEADER_VALUE+SUFFIX))));
         Assertions.assertFalse(filterClausePredicate
@@ -119,7 +117,7 @@ public class FilterClauseAvroPredicateTest {
     public void testOrdinaryHeaderStartsWith() {
 
         FilterClauseAvroPredicate filterClausePredicate =
-                getFilterClauseAvroPredicate(HEADERS_ATTRIBUTE, FilterOperationEnum.STARTS_WITH, HEADER_SIMPLE_FILTER_CLAUSE);
+                getFilterClauseAvroPredicate(HEADER_PREFIX + HEADER_KEY, FilterOperationEnum.STARTS_WITH, HEADER_SIMPLE_FILTER_CLAUSE);
         Assertions.assertTrue(filterClausePredicate
                                       .test(generateConsumerRecordWithHeader(Map.of(HEADER_KEY, HEADER_VALUE+SUFFIX))));
         Assertions.assertFalse(filterClausePredicate
@@ -130,7 +128,7 @@ public class FilterClauseAvroPredicateTest {
     public void testOrdinaryHeaderNotEmpty() {
 
         FilterClauseAvroPredicate filterClausePredicate =
-                getFilterClauseAvroPredicate(HEADERS_ATTRIBUTE, FilterOperationEnum.NOT_EMPTY, HEADER_EMPTY_FILTER_CLAUSE);
+                getFilterClauseAvroPredicate(HEADER_PREFIX + HEADER_KEY, FilterOperationEnum.NOT_EMPTY, HEADER_EMPTY_FILTER_CLAUSE);
         Assertions.assertTrue(filterClausePredicate
                                       .test(generateConsumerRecordWithHeader(Map.of(HEADER_KEY, HEADER_VALUE+SUFFIX))));
         Assertions.assertFalse(filterClausePredicate
