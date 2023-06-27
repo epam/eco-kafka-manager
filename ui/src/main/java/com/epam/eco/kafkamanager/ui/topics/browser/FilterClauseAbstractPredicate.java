@@ -23,11 +23,11 @@ import java.util.stream.Collectors;
 
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.common.header.Header;
-import org.apache.kafka.common.header.Headers;
 
 import com.epam.eco.commons.kafka.helpers.FilterClausePredicate;
 import com.epam.eco.kafkamanager.FilterClause;
 
+import static com.epam.eco.kafkamanager.ui.topics.browser.TabularRecords.HEADER_PREFIX;
 import static com.epam.eco.kafkamanager.ui.topics.browser.handlers.FilterOperationUtils.executeHeaderOperation;
 import static java.util.Objects.isNull;
 
@@ -39,9 +39,8 @@ public abstract class FilterClauseAbstractPredicate<K, V> implements FilterClaus
 
     public static final String KEY_ATTRIBUTE = "key";
     public static final String TOMBSTONE_ATTRIBUTE = "tombstones";
-    public static final String HEADERS_ATTRIBUTE = "headers";
 
-    private static final String[] RESERVED_ATTRIBUTES = {KEY_ATTRIBUTE,TOMBSTONE_ATTRIBUTE,HEADERS_ATTRIBUTE};
+    private static final String[] RESERVED_ATTRIBUTES = {KEY_ATTRIBUTE,TOMBSTONE_ATTRIBUTE};
     protected final boolean areClausesEmpty;
     protected final List<FilterClause> keyClauses;
     protected final List<FilterClause> headerClauses;
@@ -51,10 +50,15 @@ public abstract class FilterClauseAbstractPredicate<K, V> implements FilterClaus
     public FilterClauseAbstractPredicate(Map<String, List<FilterClause>> clauses) {
         areClausesEmpty = clauses.isEmpty();
         keyClauses = clauses.getOrDefault(KEY_ATTRIBUTE, Collections.emptyList());
-        headerClauses = clauses.getOrDefault(HEADERS_ATTRIBUTE, Collections.emptyList());
+        headerClauses = clauses.entrySet().stream()
+                               .filter(entry -> entry.getKey().startsWith(HEADER_PREFIX))
+                               .flatMap(entry->entry.getValue().stream())
+                               .map(clause-> new FilterClause(clause.getColumn().substring(HEADER_PREFIX.length()),
+                                                              clause.getOperation(), clause.getValue()))
+                               .collect(Collectors.toList());
         tombstoneClauses = clauses.getOrDefault(TOMBSTONE_ATTRIBUTE, Collections.emptyList());
         otherClauses = clauses.entrySet().stream()
-                                  .filter(clause->!Arrays.asList(RESERVED_ATTRIBUTES).contains(clause.getKey()))
+                                  .filter(clause->(!Arrays.asList(RESERVED_ATTRIBUTES).contains(clause.getKey()) && !clause.getKey().startsWith(HEADER_PREFIX)))
                                   .flatMap(clause->clause.getValue().stream())
                                   .collect(Collectors.toList());
     }
