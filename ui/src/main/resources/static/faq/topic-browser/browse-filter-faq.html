@@ -1,0 +1,70 @@
+<div class="faq">
+
+    <p>To apply filters, follow these steps:</p>
+
+    <ul>
+        <li>
+            <p>
+                <b>After the first fetch</b>, the list of columns will be populated with all the fetched columns and headers..
+            </p>
+        </li>
+        <li>
+            <p>You can filter by key, payload field, and message header.</p>
+        </li>
+
+        <li>
+            <p>
+                The filter supports various matching operations, including <b>"equals"</b>, <b>"contains"</b>, <b>"startWith"</b>, <b>"like"</b> and <b>"not empty"</b> operations.
+                There are also a few specific operations, such as <b>"include"</b>, <b>"only"</b> and <b>"exclude"</b> which are used exclusively for tombstones.
+            </p>
+        </li>
+
+        <li>
+            <p>
+                All chosen filters are combined using the <b>AND</b> operator.
+            </p>
+        </li>
+
+        <li>
+            <p>
+
+                If the chosen column has <b>JSON</b> or <b>Map</b> format,
+                including nested arrays, you can use dot notation to reference the nested parts.<br/>
+                For example, "a.b" on the left side of the filter references {a: {b: 123, c: "example"}},
+                or {a: [{b: 123, c: "example"},{b:100, c: "example2"}]}.
+                The supported matching operations for these formats are <b>"equals"</b>, <b>"contains"</b>, <b>"startWith"</b>, <b>"like"</b>.
+            </p>
+        </li>
+
+        <li>
+            <p>
+                The filter operates only on a set of records within a given timeout.
+                The offsets of these records are indicated in the offset range table.
+                If the set of records does not contain the desired data and the end offset has not been reached yet,
+                simply press the <img src="/kafka-manager/faq/topic-browser/img/fetch-forward-button.png"> button to search in
+                records with higher offsets.
+            </p>
+        </li>
+
+        <li>
+            <p>The filter also has the ability to filter records based on <b>header values</b>.</p>
+            <p>To apply filter across headers choose <b>"header: header-name"</b> in a column list and use <b>"headerValue"</b> or
+                <b>"subHeaderKey: subHeaderValue"</b> notation.</p>
+            <p>The supported matching operations for header filters are <b>"Equals"</b>, <b>"contains"</b>,
+                <b>"startWith"</b>, <b>"like"</b> and <b>"not empty"</b>.</p>
+        </li>
+
+        <li>
+            <p>Operations <b>"exclude"</b> and <b>"only"</b> operations are used exclusively for tombstone messages:</p>
+            <ul>
+                <li>
+                    <p>"exclude" operation <b>excludes tombstones</b> from fetched records</p>
+                </li>
+                <li>
+                    <p>"only" operation <b>shows only tombstone</b> messages</p>
+                </li>
+            </ul>
+        </li>
+
+    </ul>
+</div>

@@ -79,9 +79,9 @@
         const sortingOrderOffset = [1, 'asc'];
 
         const columnClasses = showGrid ?
-            [ { className: "vertical-line-class", targets: "_all" },
-                { className: "vertical-line-class-selected", targets: [ 1, 3, 4 ] } ] :
-            [ { className: "vertical-line-class-selected", targets: [ 1, 3, 4 ] } ];
+               [ { className: "vertical-line-class", targets: "_all" },
+                 { className: "vertical-line-class-selected", targets: [ 1, 3, 4 ] } ] :
+               [ { className: "vertical-line-class-selected", targets: [ 1, 3, 4 ] } ];
 
         const dataTableItem = $('#recordTable');
         const dataTable = dataTableItem.DataTable({
@@ -114,7 +114,22 @@
 
 
         $('#filter-faq-button').click(() => {
-            showFaq("Browser filter FAQ", "/kafka-manager/faq/browse-filter-faq.html");
+            showFaq("Browser filter FAQ", "/kafka-manager/faq/topic-browser/browse-filter-faq.html");
+        });
+        $('#offsets-faq-button').click(() => {
+            showFaq("Offsets FAQ", "/kafka-manager/faq/topic-browser/offsets-faq.html");
+        });
+        $('#timestamp-fetch-faq-button').click(() => {
+            showFaq("Timestamp fetch FAQ", "/kafka-manager/faq/topic-browser/timestamp-fetch-faq.html");
+        });
+        $('#fetch-faq-button').click(() => {
+            showFaq("Fetch FAQ", "/kafka-manager/faq/topic-browser/fetch-faq.html");
+        });
+        $('#timeout-faq-button').click(() => {
+            showFaq("Timeout FAQ", "/kafka-manager/faq/topic-browser/timeout-faq.html");
+        });
+        $('#limit-faq-button').click(() => {
+            showFaq("Limit FAQ", "/kafka-manager/faq/topic-browser/limit-faq.html");
         });
 
         const allPartitionCheckbox = $('#all-partition-checkbox');
@@ -454,8 +469,10 @@
                                     <div id="offsets-parameters">
                                         <div class="container-fluid" style="padding:0">
                                             <div class="row" style="margin-right: 1em;">
-
                                                 <div class="input-group offsets-timestamp-wrapper">
+                                                    <div class="timestamp-faq-item">
+                                                        <div id="timestamp-fetch-faq-button" class="faq-button"></div>
+                                                    </div>
                                                     <input id="offsets-timestamp"
                                                            type="text"
                                                            name="offsetsTimestamp"
@@ -482,7 +499,7 @@
                                             </div>
 
                                             <div class="mb-3">
-                                                <div><b>Offsets parameters</b></div>
+                                                <div><b>Offsets parameters</b>&nbsp;<div id="offsets-faq-button" class="faq-button"></div></div>
                                                 <div class="row">
 
                                                     <div class="form-group mb-1">
@@ -601,37 +618,42 @@
                         <div class="card-footer card-flex">
                             <div class="col-auto">
                                 <a
-                                        th:if="${hasPreviousOffsets != null AND hasPreviousOffsets}"
-                                        id="previous-offsets-link"
-                                        href="#"
-                                        class="btn btn-success btn-sm previous-offsets-link">
+                                    th:if="${hasPreviousOffsets != null AND hasPreviousOffsets}"
+                                    id="previous-offsets-link"
+                                    href="#"
+                                    class="btn btn-success btn-sm previous-offsets-link">
                                     <i class="fa fa-chevron-left"></i>
                                 </a>
                                 <a id="fetchButton" class="btn btn-success btn-sm" role="button">
-                                    Fetch
+                                   Fetch
                                 </a>
                                 <a
-                                        th:if="${hasNextOffsets != null AND hasNextOffsets}"
-                                        id="next-offsets-link"
-                                        href="#"
-                                        class="btn btn-success btn-sm next-offsets-link">
+                                    th:if="${hasNextOffsets != null AND hasNextOffsets}"
+                                    id="next-offsets-link"
+                                    href="#"
+                                    class="btn btn-success btn-sm next-offsets-link">
                                     <i class="fa fa-chevron-right"></i>
                                 </a>
+                                <div class="fetch-faq-button">
+                                    <div id="fetch-faq-button" class="faq-button"></div>
+                                </div>
                             </div>
 
 
                             <label class="centred to-right col-auto" for="timeout">Polling record timeout (MS)</label>
+                            <div id="timeout-faq-button" class="faq-button timeout-faq-button"></div>
                             <input
-                                    type="number"
-                                    class="form-control col-auto"
-                                    min="-1"
-                                    max="300000"
-                                    id="timeout"
-                                    name="timeout"
-                                    th:value="${browseParams.timeout}"/>
+                                type="number"
+                                class="form-control col-auto"
+                                min="-1"
+                                max="300000"
+                                id="timeout"
+                                name="timeout"
+                                th:value="${browseParams.timeout}"/>
 
 
                             <label class="centred col-auto" for="limit">Limit</label>
+                            <div id="limit-faq-button" class="faq-button timeout-faq-button"></div>
                             <input type="number"
                                    class="form-control col-auto"
                                    min="10"
@@ -699,22 +721,22 @@
                 <div id="recordTableContainer" class="card" th:if="${fetchedRecords != null}">
                     <div class="card-header card-flex">
 
-                        <a
-                                th:if="${hasPreviousOffsets != null AND hasPreviousOffsets}"
-                                id="previous-offsets-link-in-grid"
-                                href="#"
-                                style="display: none"
-                                class="btn btn-success btn-sm previous-offsets-link">
-                            <i class="fa fa-chevron-left"></i>
-                        </a>
-                        <a
-                                th:if="${hasNextOffsets != null AND hasNextOffsets}"
-                                id="next-offsets-link-in-grid"
-                                href="#"
-                                style="display: none"
-                                class="btn btn-success btn-sm next-offsets-link">
-                            <i class="fa fa-chevron-right"></i>
-                        </a>
+                            <a
+                                    th:if="${hasPreviousOffsets != null AND hasPreviousOffsets}"
+                                    id="previous-offsets-link-in-grid"
+                                    href="#"
+                                    style="display: none"
+                                    class="btn btn-success btn-sm previous-offsets-link">
+                                <i class="fa fa-chevron-left"></i>
+                            </a>
+                            <a
+                                    th:if="${hasNextOffsets != null AND hasNextOffsets}"
+                                    id="next-offsets-link-in-grid"
+                                    href="#"
+                                    style="display: none"
+                                    class="btn btn-success btn-sm next-offsets-link">
+                                <i class="fa fa-chevron-right"></i>
+                            </a>
                         <h7><span th:text="${fetchSummary}"></span></h7>
                         <button id="column-filter-button"
                                 class="btn btn-primary btn-sm to-right"

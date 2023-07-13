@@ -1,0 +1,108 @@
+<div class="faq">
+
+    <ul>
+        <li>
+            <p>The filter operations can be applied to various <b>types of columns</b>:</p>
+            <ul>
+                <li>
+                    <p>
+                        <b>String:</b> All columns of string type support the following operations:
+                        <b>"equals"</b>, <b>"contains"</b>, <b>"like"</b> and <b>"not empty"</b>.
+                        The <b>"like"</b> operation is similar to SQL's LIKE operator and allows the use of the "%" symbol.
+                        For example, if you need to select all records that contain the words "staff" and "roles,"
+                        the filter expression would be "%staff%roles%".
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        <b>Numeric:</b> Columns of numeric type require the operations "Greater than," "Less than," and "equals".
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        <b>Enum:</b> Columns of enum type only require the "equals" operation. This type has a limited array of values.
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        <b>JSON:</b> Columns of JSON type support the operations <b>"equals"</b>, <b>"contains"</b>, <b>"like"</b> and <b>"not empty"</b> operations.<br/>.
+                        These operations are applied to specific fields within the JSON. To use them, you should use the notation "field name: value;".
+                        For example, to select all records where the field "field" is equal to "value," you would use the "equals" operation with the value
+                        "field:value".
+                    </p>
+                </li>
+            </ul>
+        </li>
+        <li>
+            <p>The available filter options are:</p>
+            <ul>
+                <li>
+                    <p>
+                        <b>Topic name:</b> This option searches through all topics using a given topic name. It is a string type value.
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        <b>Partition count:</b> Searches across topics that have a specified number of partitions. It is a numeric value.
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        <b>Replication factor:</b> Searches across topics that have a specified number of replicas, including the leader.
+                        It is a numeric value.
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        <b>Consumer count:</b> Searches across topics that have a specified number of consumers. It is a numeric value.
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        <b>Replication state:</b> Searches across topics that have a specified replication state. It is an enum value.
+                    </p>
+                    <p>It can have one of the following values:</p>
+                    <ul>
+                        <li>
+                            <p>
+                                <b>"ANY_REPLICATED"</b>: Choose topics that have at least one replicated partition.
+                            </p>
+                        </li>
+                        <li>
+                            <p>
+                                <b>"FULLY_REPLICATED"</b> Choose topics that have all replicated partitions.
+                            </p>
+                        </li>
+                        <li>
+                            <p>
+                                <b>"UNDER_REPLICATED"</b> Choose topics that have at least one under-replicated partition.
+                            </p>
+                        </li>
+                    </ul>
+                </li>
+                <li>
+                    <p>
+                        <b>Config string:</b> Filters across the topic configuration map. It is a JSON type value.
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        <b>Description:</b> Filters across the description of the topic. It is a string value.
+                    </p>
+                </li>
+            </ul>
+
+        </li>
+        <li>
+            <p>All filter clauses are combined using the AND operation.</p>
+        </li>
+        <li>
+            <p>
+                Once you have selected all the appropriate filter clauses, press the button
+                <img src="/kafka-manager/faq/topic-list/img/find-button.png"/>
+                to apply the filters and retrieve the desired results.
+            </p>
+        </li>
+    </ul>
+
+</div>

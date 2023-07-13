@@ -1,0 +1,53 @@
+<div class="faq">
+
+    <p>To perform a fetch operation, follow these steps:</p>
+
+    <ul>
+        <li>
+            <p>
+                Start by making the <b>first fetch</b> to populate the columns and headers lists.
+                These lists are used by filters and the column selector.
+            </p>
+        </li>
+        <li>
+            <p>
+                Each <b>Fetch</b> operation retrieves a specified number of records called the "Limit"
+                <b>(the limit can be set in the <img src="/kafka-manager/faq/topic-browser/img/limit-input-item.png"/> input item)</b>.
+                If the topic has multiple partitions, KM automatically calculates the limit for each partition.
+                The sum of all partition limits equals the total limit you entered. The limits for each partition are <b>distributed evenly</b>.
+                For example, if the "Limit" is set to 100 and the topic has 16 partitions, each partition will have a limit of 6 records.
+                Therefore, after a fetch operation, KM will attempt to fetch 6 new records from each partition.
+                If a specific partition does not have 6 records, all the remaining records in that partition will be fetched,
+                resulting in a total number of records that is less than the "Limit".
+            </p>
+        </li>
+        <li>
+            <p>
+                Press the <img src="/kafka-manager/faq/topic-browser/img/fetch-button.png"/> button to execute a forward fetch operation
+                starting from the <b>"FIRST BATCH"</b> position. The fetch operation continues until the size of the fetched result set equals
+                the limit or until the fetch reaches the end offset of a partition in some partitions.<br/>
+                In this case, the overall number of fetched records will be less than the limit.
+            </p>
+        </li>
+        <li>
+            <p>
+                There is a <img src="/kafka-manager/faq/topic-browser/img/fetch-forward-button.png"/> <b>"Forward fetch button"</b> available.
+                Pressing this button <b>executes forward fetch operation</b> starting from the "LAST BATCH" position.
+                The fetch operation continues until the size of the fetched result set equals the limit or until the fetch reaches the
+                end offset of a partition in some partitions.<br/>
+                In this case, the overall number of fetched records will be less than the limit.
+                This button is shown only if the <b>"LAST BATCH" position is less than the "MAX"</b> position for any partition.
+            </p>
+        </li>
+        <li>
+            <p>
+                There is also a <img src="/kafka-manager/faq/topic-browser/img/fetch-backward-button.png"/> <b>"Backward fetch button"</b> available.
+                Pressing this button executes a backward fetch operation starting from the <b>"FIRST BATCH"</b> position in the <b>backward direction</b>.
+                The fetch operation continues until the size of the fetched result set equals the limit or until the fetch reaches the start offset
+                of a partition in some partitions.<br/>
+                In this case, the number of totally fetched records will be less than the limit.<br/>
+                This button is shown only if the <b>"MIN" position is less than the "FIRST BATCH"</b> position for any partition.
+            </p>
+        </li>
+    </ul>
+</div>
