@@ -583,6 +583,15 @@ div.schema-content-dialog-body {
     min-width: 20%;
     word-break: break-all;
 }
+.faq b {
+    color: var(--epm-faq-hilight-font-color);
+}
+
+.large-table-column-20 {
+    max-width: 20%;
+    min-width: 20%;
+    word-break: break-all;
+}
 .large-table-column-10 {
     max-width: 10%;
     min-width: 10%;
