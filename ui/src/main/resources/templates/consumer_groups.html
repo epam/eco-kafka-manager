@@ -115,7 +115,7 @@
             
             <div class="row">
         
-                <div class="col-md-10 offset-1">
+                <div class="col-md-12">
         
                     <div th:if="${page != null}">
                         <table class="table table-bordered table-striped table-hover">
@@ -139,7 +139,7 @@
                                     </td>
                                     <td th:text="${group.storageType}"/>
                                     <td th:text="${group.state}"/>
-                                    <td>
+                                    <td class="large-table-column-20">
                                         <th:block th:each="topic : ${group.getTopicNamesAsCollapsedCol(5)}">
                                             <a th:if="${!topic.divider}" th:href="@{/topics/{name}(name=${topic.value})}">
                                                 <span th:text="${topic.value}" style="float:left;clear:left;"></span>
@@ -148,14 +148,14 @@
                                             </span>
                                         </th:block>
                                     </td>
-                                    <td>
+                                    <td class="large-table-column-20">
                                         <span 
                                             th:each="member : ${group.getMembersAsCollapsedCol(5)}" 
                                             th:text="${member}"
                                             style="display:block;">
                                         </span>
                                     </td>
-                                    <td>
+                                    <td class="large-table-column-20">
                                         <span 
                                             th:each="offset : ${group.getOffsetsAsCollapsedCol(5)}" 
                                             th:text="${offset}"

@@ -47,7 +47,6 @@ import com.epam.eco.kafkamanager.ui.config.TopicBrowser;
 import com.epam.eco.kafkamanager.ui.topics.TopicController;
 import com.epam.eco.kafkamanager.ui.topics.browser.handlers.FilterOperationEnum;
 
-import static com.epam.eco.kafkamanager.ui.topics.browser.FilterClauseAbstractPredicate.HEADERS_ATTRIBUTE;
 import static com.epam.eco.kafkamanager.ui.topics.browser.FilterClauseAbstractPredicate.KEY_ATTRIBUTE;
 import static com.epam.eco.kafkamanager.ui.topics.browser.FilterClauseAbstractPredicate.TOMBSTONE_ATTRIBUTE;
 import static java.util.Objects.nonNull;
@@ -159,8 +158,8 @@ public class TopicBrowserController {
 
         List<String> columns = new ArrayList<>();
         columns.add(KEY_ATTRIBUTE);
-        columns.add(HEADERS_ATTRIBUTE);
         columns.add(TOMBSTONE_ATTRIBUTE);
+        columns.addAll(tabularRecords.getHeaderFilterLabels());
         columns.addAll(tabularRecords.listColumnsAsString());
 
         modelAttributes.accept(ATTR_FILTER_CLAUSE, browseParams.getFilterClauses());
@@ -205,8 +204,8 @@ public class TopicBrowserController {
     }
 
     private Map<Integer, OffsetRange> fetchOffsetRanges(String topicName) {
-        Map<TopicPartition, OffsetRange> ranges = kafkaManager.
-                                                                      getTopicOffsetRangeFetcherTaskExecutor().getResultIfActualOrRefresh(topicName).getValue();
+        Map<TopicPartition, OffsetRange> ranges = kafkaManager
+                .getTopicOffsetRangeFetcherTaskExecutor().getResultIfActualOrRefresh(topicName).getValue();
         return ranges.entrySet().stream().
                 collect(
                 Collectors.toMap(

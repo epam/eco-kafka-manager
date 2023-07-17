@@ -50,10 +50,15 @@ public class TabularRecords implements Iterable<Record> {
     private static final String DATETIME_PATTERN = "dd/MM/yyyy hh:mm:ss a"; // should be the same as in topic_browser.html (see #offsets-timestamp.format)
     private static final String NA = "N/A";
 
+    public static final String HEADER_PREFIX = "header: ";
+
     private static final int TRUNCATE_SIZE = 127;
 
     private final List<Record> records;
     private final Map<String, Column> columns;
+
+    private final Set<String> headerNames;
+    private final Set<String> headerLabels;
 
     private final String topicName;
 
@@ -79,8 +84,16 @@ public class TabularRecords implements Iterable<Record> {
                                 Collectors.toList(),
                                 Collections::unmodifiableList));
         this.columns = buildColumns(records, selectedColumnNames);
-
+        headerNames = buildHeaderNames(records);
+        headerLabels = buildHeaderFilterLabels();
         hasSelectedColumns = selectedColumnNames != null && !selectedColumnNames.isEmpty();
+    }
+
+    private Set<String> buildHeaderNames(List<Record> records) {
+        return records.stream()
+                          .filter(Record::hasHeaders)
+                          .flatMap(record -> record.headers.keySet().stream())
+                          .collect(Collectors.toSet());
     }
 
     private Map<String, Column> buildColumns(List<Record> records, Collection<String> selectedColumnNames) {
@@ -145,6 +158,16 @@ public class TabularRecords implements Iterable<Record> {
         return columns.values().stream().
                 filter(Column::isPresent).
                 collect(Collectors.toList());
+    }
+
+    private Set<String> buildHeaderFilterLabels() {
+        return headerNames.stream()
+                          .map(headerName -> HEADER_PREFIX + headerName)
+                          .collect(Collectors.toSet());
+    }
+
+    public Set<String> getHeaderFilterLabels() {
+        return headerLabels;
     }
 
     public boolean isEmpty() {
