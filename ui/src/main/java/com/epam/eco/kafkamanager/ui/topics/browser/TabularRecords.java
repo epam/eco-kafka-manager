@@ -58,6 +58,7 @@ public class TabularRecords implements Iterable<Record> {
     private final Map<String, Column> columns;
 
     private final Set<String> headerNames;
+    private final Set<String> headerLabels;
 
     private final String topicName;
 
@@ -83,9 +84,8 @@ public class TabularRecords implements Iterable<Record> {
                                 Collectors.toList(),
                                 Collections::unmodifiableList));
         this.columns = buildColumns(records, selectedColumnNames);
-
         headerNames = buildHeaderNames(records);
-
+        headerLabels = buildHeaderFilterLabels();
         hasSelectedColumns = selectedColumnNames != null && !selectedColumnNames.isEmpty();
     }
 
@@ -160,8 +160,14 @@ public class TabularRecords implements Iterable<Record> {
                 collect(Collectors.toList());
     }
 
+    private Set<String> buildHeaderFilterLabels() {
+        return headerNames.stream()
+                          .map(headerName -> HEADER_PREFIX + headerName)
+                          .collect(Collectors.toSet());
+    }
+
     public Set<String> getHeaderFilterLabels() {
-        return headerNames.stream().map(headerName -> HEADER_PREFIX + headerName).collect(Collectors.toSet());
+        return headerLabels;
     }
 
     public boolean isEmpty() {

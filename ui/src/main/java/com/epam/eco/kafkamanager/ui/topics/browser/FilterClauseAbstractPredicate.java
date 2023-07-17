@@ -19,6 +19,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.apache.kafka.clients.consumer.ConsumerRecord;
@@ -40,7 +41,7 @@ public abstract class FilterClauseAbstractPredicate<K, V> implements FilterClaus
     public static final String KEY_ATTRIBUTE = "key";
     public static final String TOMBSTONE_ATTRIBUTE = "tombstones";
 
-    private static final String[] RESERVED_ATTRIBUTES = {KEY_ATTRIBUTE,TOMBSTONE_ATTRIBUTE};
+    private static final Set<String> RESERVED_ATTRIBUTES = Set.of(KEY_ATTRIBUTE,TOMBSTONE_ATTRIBUTE);
     protected final boolean areClausesEmpty;
     protected final List<FilterClause> keyClauses;
     protected final List<FilterClause> headerClauses;
@@ -58,7 +59,7 @@ public abstract class FilterClauseAbstractPredicate<K, V> implements FilterClaus
                                .collect(Collectors.toList());
         tombstoneClauses = clauses.getOrDefault(TOMBSTONE_ATTRIBUTE, Collections.emptyList());
         otherClauses = clauses.entrySet().stream()
-                                  .filter(clause->(!Arrays.asList(RESERVED_ATTRIBUTES).contains(clause.getKey()) && !clause.getKey().startsWith(HEADER_PREFIX)))
+                                  .filter(clause->(!RESERVED_ATTRIBUTES.contains(clause.getKey()) && !clause.getKey().startsWith(HEADER_PREFIX)))
                                   .flatMap(clause->clause.getValue().stream())
                                   .collect(Collectors.toList());
     }
