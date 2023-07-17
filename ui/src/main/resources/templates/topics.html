@@ -60,6 +60,13 @@
 
         $(document).ready(function() {
 
+            $('#query-filter-faq-button').click(() => {
+                showFaq("Filter FAQ", "/kafka-manager/faq/topic-list/filter-faq.html");
+            });
+            $('#toolbar-faq-button').click(() => {
+                showFaq("Toolbar FAQ", "/kafka-manager/faq/topic-list/toolbar-faq.html");
+            });
+
             const generateQueryUrl = () => {
                 return '/kafka-manager/topic_list' + getClausesAsQueryParams(true);
             }
@@ -215,9 +222,10 @@
     </script>
 
     <div th:replace="templates :: info-modal"></div>
+    <div th:replace="templates :: faq-modal"></div>
     <div th:replace="templates :: confirm-modal"></div>
     <div th:replace="templates :: navbar"></div>
-    
+
     <div class="main-content">
 
         <div class="container-fluid">
@@ -225,20 +233,22 @@
             <div class="row">
 
                 <div class="col-md-12">
-                
+
                     <div class="card mb-3">
 
                         <div class="card-body">
-                        
+
+                            <div id="toolbar-faq-button" class="faq-button"></div>
+
                             <a  th:href="@{/topic_create}"
                                 class="btn btn-primary">
                                 Create <i class="fa fa-plus"></i>
                             </a>
-                        
+
                             <div class="dropdown" style="display:inline-block;">
                                 <button
                                     class="btn btn-primary dropdown-toggle"
-                                    type="button" 
+                                    type="button"
                                     id="exportButton"
                                     data-bs-toggle="dropdown"
                                     aria-haspopup="true"
@@ -274,11 +284,11 @@
                     <div th:replace="templates :: query-param-filter"></div>
 
                 </div>
-            
+
             </div>
-            
+
             <div class="row">
-        
+
                 <div class="col-md-12">
 
                     <div id="recordTableContainer" style="background: white;">
@@ -309,16 +319,16 @@
                             </thead>
                         </table>
                     </div>
-        
+
                 </div>
-        
+
             </div>
-        
+
         </div>
 
     </div>
 
     <div th:replace="templates :: footer"></div>
-    
+
 </body>
 </html>

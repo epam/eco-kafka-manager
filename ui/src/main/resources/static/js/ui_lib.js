@@ -196,13 +196,17 @@ function showFaq(dialogHeader, htmlPage) {
     header.textContent = dialogHeader;
     header.classList.add(headerClass);
 
-    const textContentElement = document.getElementById('faqModalTextContent');
-    textContentElement.innerHTML= '';
     const newDivElement = document.createElement("div");
-    $(newDivElement).load(htmlPage);
+    $(newDivElement)
+        .html("<div class='faq-spinner'><div class='fa fa-spinner fa-spin fa-2x'></div></div>")
+        .load(htmlPage);
+
+    const textContentElement = document.getElementById('faqModalTextContent');
+    textContentElement.innerHTML='';
     textContentElement.append(newDivElement);
 
     faqModal.show();
+
 }
 
 function showConfirm(headerText, bodyText, successCallback) {

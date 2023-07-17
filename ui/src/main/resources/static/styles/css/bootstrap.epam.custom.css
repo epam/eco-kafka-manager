@@ -562,6 +562,26 @@ div.schema-content-dialog-body {
 }
 .faq {
     color: var(--epm-faq-font-color);
+    padding-right: 2em;
+}
+/*.faq b {*/
+/*    color: var(--epm-faq-hilight-font-color);*/
+/*}*/
+.faq-content {
+    text-align:left;
+    font-size:1.2em;
+    padding: 0 2em 1em 0;
+}
+.faq-spinner {
+    width:100%;
+    text-align: center;
+}
+
+
+.large-table-column-20 {
+    max-width: 20%;
+    min-width: 20%;
+    word-break: break-all;
 }
 .faq b {
     color: var(--epm-faq-hilight-font-color);
@@ -576,4 +596,18 @@ div.schema-content-dialog-body {
     max-width: 10%;
     min-width: 10%;
     word-break: break-all;
+}
+.timestamp-faq-item {
+    padding: 0.6em 0.4em 0 0;
+}
+.fetch-faq-button {
+    padding: 0.6em 0 0 0.2em;
+    display: inline;
+}
+.timeout-faq-button {
+    padding-top: 0.6em;
+    margin-right: -0.2em;
+}
+.query-filter-faq-button {
+    padding: 0.6em 0.3em 0 0;
 }

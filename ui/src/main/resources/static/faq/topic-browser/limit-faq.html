@@ -1,0 +1,22 @@
+<div class="faq">
+
+    <ul>
+        <li>
+             <p>
+                 It is maximum size of result set that might be fetched. This value is the sum of all separate partitions limits.
+                 Whole limit <b>distributed through partitions evenly</b>.
+                 I.e. if limit = 100 and given topic has 6 partitions,
+                 after fetch in a result set will be 16 records for every partition.
+                 If there is not enough rooms to fetch limit records from some partition,
+                 then maximum available records will be fetched.
+
+             </p>
+        </li>
+        <li>
+            <p>
+                Now maximum summary limit might be chosen as 100 records.
+            </p>
+        </li>
+    </ul>
+
+</div>

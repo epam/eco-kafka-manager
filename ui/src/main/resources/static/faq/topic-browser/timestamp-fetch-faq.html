@@ -1,0 +1,47 @@
+<div class="faq">
+
+    <p>Timestamp fetch how to:</p>
+
+    <ul>
+        <li>
+            <p>To retrieve data based on time, follow these steps:<br/></p>
+            <ul>
+                <li>1. Select the appropriate date and time.</li>
+                <li>2. Press one of the buttons <img src="/kafka-manager/faq/topic-browser/img/time-fetch-backward-button.png"/> or
+                    <img src="/kafka-manager/faq/topic-browser/img/time-fetch-forward-button.png"/>.
+                </li>
+            </ul>
+        </li>
+
+        <li>
+            <p>
+                If you press the button <img src="/kafka-manager/faq/topic-browser/img/time-fetch-backward-button.png"/> for <b>"Backward fetch"</b>,
+                KM will search for the first record with a timestamp <b>greater than or equal</b> to the chosen timestamp.
+                It will then fetch records in a <b>backward direction</b> until the number of fetched records reaches the limit (default is 100) or
+                until there are not enough records. If there aren't enough records, KM will fetch all the records from the beginning of the partition
+                up to the record with the chosen timestamp. The result of the backward fetch will be a set of records where the last record's timestamp
+                is greater than or equal to the chosen timestamp, with a size limited by the set limit or from the first record of the partition.
+            </p>
+        </li>
+
+        <li>
+            <p>
+                If you press the button <img src="/kafka-manager/faq/topic-browser/img/time-fetch-forward-button.png"/> for <b>"Forward fetch"</b>,
+                KM will search for the first record with a timestamp <b>greater than or equal</b> to the chosen timestamp.
+                It will then fetch records in a <b>forward direction</b> until the number of fetched records reaches the limit (default is 100)
+                or until there are not enough records. If there aren't enough records, KM will fetch all the records from the record with the chosen timestamp
+                up to the end of each partition. The result of the forward fetch will be a set of records where the first record's timestamp is greater than or equal
+                to the chosen timestamp, with a size limited by the set limit or until the end of the partition.
+            </p>
+        </li>
+
+        <li>
+            <p>
+                The total limit of records will be <b>evenly distributed across partitions</b>.<br/>
+                For example, if the limit is set to 100 and the given topic has 6 partitions, the result message table will contain 16 records
+                for each partition after the fetch operation.
+            </p>
+        </li>
+
+    </ul>
+</div>

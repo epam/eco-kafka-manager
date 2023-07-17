@@ -1,0 +1,82 @@
+<div class="faq" xmlns="http://www.w3.org/1999/html">
+
+    <p>Fetch offsets table how to:</p>
+
+    <ul>
+        <li>
+            <p>The offsets table consists from five columns:</p>
+            <ul>
+                <li>
+                    <p>
+                        <b>Partition column:</b> This column displays the order number of each partition.
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        <b>Check column:</b> This column contains checkboxes to limit the result set to the necessary partitions.
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        <b>MIN column:</b> This column shows the minimum offset for each partition.<br/>
+                        The "[" symbol before the value indicates that this minimum offset is included in the range,
+                        while "(" means the offset is excluded from the range.
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        <b>FIRST BATCH column:</b> This column displays the minimum offset of the fetched range for each partition.<br/>
+                        The "[" symbol indicates that this minimum offset is included in the range, while "(" means the offset is excluded
+                        from the range. After the first fetch, the value in this column may be greater than the value in the MIN column.
+                        This is normal behavior because in rare cases, Kafka may return the beginning of the current segment as the minimum
+                        offset for the given partition. The real minimum offset for the current partition will be available in this column only
+                        after the first fetch.
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        <b>LAST BATCH column:</b> This column shows the maximum offset for each partition within the fetched range.<br/>
+                        The "]" symbol indicates that this maximum offset is included in the range, while ")" means the offset is excluded from the range.
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        <b>MAX column:</b> This column displays the maximum offset for each partition.<br/>
+                        The "]" symbol indicates that this maximum offset is included in the range, while ")" means the offset is excluded
+                        from the range.
+                    </p>
+                </li>
+            </ul>
+        </li>
+        <li>
+            <p>
+                During the fetch operation, the next offset range in the "FIRST BATCH" and "LAST BATCH" columns will start blinking and appear
+                in green color. If the values in these columns do not change color, it indicates that there is no suitable data in that partition,
+                and the offset values remain unchanged.
+            </p>
+        </li>
+        <li>
+            <p>
+                There are also two buttons available: <img src="/kafka-manager/faq/topic-browser/img/to-min-button.png"/> and <img src="/kafka-manager/faq/topic-browser/img/to-max-button.png"/>:
+            </p>
+            <ul>
+                <li>
+                    <p>
+                        <img src="/kafka-manager/faq/topic-browser/img/to-min-button.png"/>: <b>"Set fetched range to the beginning"</b>:
+                        Pressing this button will set the "FIRST BATCH" offset to the "MIN" value for each partition.<br/>
+                        This action ensures that any subsequent fetch operation starts from the beginning of the topic.
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        <img src="/kafka-manager/faq/topic-browser/img/to-max-button.png"/> Pressing this button will increase the values in the "LAST BATCH"
+                        offset column to the "MAX" value for each partition.<br/>
+                        The values in the "FIRST BATCH" column will be set to "LAST BATCH" value minus the limit of records for the current partition.
+                        This operation retrieves the most recent records for the given topic.
+                    </p>
+                </li>
+            </ul>
+        </li>
+    </ul>
+
+</div>
