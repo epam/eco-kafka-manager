@@ -14,7 +14,7 @@
 
         <li>
             <p>
-                The filter supports various matching operations, including <b>"equals"</b>, <b>"contains"</b>, <b>"startWith"</b>, <b>"like"</b> and <b>"not empty"</b> operations.
+                The filter supports various matching operations, including <b>"equals"</b>, <b>"contains"</b>, <b>"startWith"</b>, <b>"like"</b> and <b>"not empty"</b>.
                 There are also a few specific operations, such as <b>"include"</b>, <b>"only"</b> and <b>"exclude"</b> which are used exclusively for tombstones.
             </p>
         </li>
@@ -28,11 +28,11 @@
         <li>
             <p>
 
-                If the chosen column has <b>JSON</b> or <b>Map</b> format,
-                including nested arrays, you can use dot notation to reference the nested parts.<br/>
-                For example, "a.b" on the left side of the filter references {a: {b: 123, c: "example"}},
-                or {a: [{b: 123, c: "example"},{b:100, c: "example2"}]}.
-                The supported matching operations for these formats are <b>"equals"</b>, <b>"contains"</b>, <b>"startWith"</b>, <b>"like"</b>.
+                If the chosen column is of <b>JSON</b> or <b>Map</b> format,
+                including nested arrays, you can use dotted notation to reference the nested parts.<br/>
+                For example, "a.b: 123" choose records with {a: {b: 123, c: "example"}},
+                or {a: [{b: 123, c: "example"},{b:100, c: "example2"}]} values.
+                The supported matching operations for these formats are <b>"equals"</b>, <b>"contains"</b>, <b>"startWith"</b> and <b>"like"</b>.
             </p>
         </li>
 
@@ -47,9 +47,12 @@
         </li>
 
         <li>
-            <p>The filter also has the ability to filter records based on <b>header values</b>.</p>
-            <p>To apply filter across headers choose <b>"header: header-name"</b> in a column list and use <b>"headerValue"</b> or
-                <b>"subHeaderKey: subHeaderValue"</b> notation.</p>
+            <p>There has ability to filter records based on <b>header values</b>.</p>
+            <p>To apply filter across headers choose <b>"header: headerKey"</b> in a column list and use <b>"headerValue"</b> or
+                <b>"headerKey.subHeaderKey: subHeaderValue"</b> notation.</p> E.g. to choose a record with header "headerKey" equals "headerValue",
+                you should choose "header: headerKey" in a column list and set "headerValue" in a value input item. If it is necessary to
+                choose records with header {headerKey: {subHeaderKey: headerValue}} you
+                should choose column "header: headerKey" in a column list. As the value you should use "subHeaderKey: subHeaderValue" expression.
             <p>The supported matching operations for header filters are <b>"Equals"</b>, <b>"contains"</b>,
                 <b>"startWith"</b>, <b>"like"</b> and <b>"not empty"</b>.</p>
         </li>
