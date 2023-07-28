@@ -371,6 +371,34 @@
             }
         });
         return result;
+
+    }
+
+    function closeTombstoneModal(recordId) {
+        const resultItem = $('#tombstone-generation-result_'+recordId);
+        resultItem.removeClass("text-danger");
+        resultItem.text('');
+        $('#tombstone-modal-dialog-'+recordId).modal("hide");
+    }
+
+    function generateTombstone(recordKey, recordId) {
+        const headers = $('#header_content_'+recordId).val();
+        const resultItem = $('#tombstone-generation-result_'+recordId);
+        $.post("/kafka-manager/topics/"+topicName+"/browser/tombstone",
+            {"recordKey": recordKey,
+              "keyFormat": [[${browseParams.getKeyFormat()}]],
+             "headers": headers,
+             "method_": "POST",
+             [[${_csrf.parameterName}]]: [[${_csrf.token}]]})
+             .done(function(data) {
+                 closeTombstoneModal(recordId);
+                 showInfo('info','Tombstone generator',data);
+
+             })
+             .fail(function(xhr) {
+                     resultItem.addClass("text-danger");
+                     resultItem.text(xhr.responseText);
+             })
     }
 
 
@@ -785,10 +813,23 @@
                                         class="danger"
                                         title="Record Key is NULL">
                                 </td>
-                                <td
-                                        th:if="${!record.nullKey}"
-                                        th:text="${record.key}"
-                                        style="word-wrap: break-word;min-width:50px;max-width:300px;">
+                                <td th:if="${!record.nullKey}"
+                                    style="min-width:10em;max-width:21.5em;">
+
+                                    <div class="d-flex" style="justify-content: space-between">
+                                        <div class="tombstone-column" th:text="${record.key}"></div>
+                                        <a class="btn btn-sm info tombstone-icon-column"
+                                           th:if="${writeAllowed}"
+                                           type="button"
+                                           th:attr="data-bs-target=${'#tombstone-modal-dialog-'+recordId}"
+                                           data-bs-toggle='modal'
+                                           data-bs-html=true
+                                           data-bs-backdrop
+                                           style="padding-left: 0.3em" >
+                                            <img th:src="@{/assets/img/tombstone.png}" th:title="${'Generate tombstone for key='+record.key}" />
+                                        </a>
+                                    </div>
+
                                 </td>
                                 <td th:text="${record.keyValueSizeFormatted}"></td>
                                 <td style="text-align: center;vertical-align: middle;">
@@ -896,6 +937,45 @@
                                         <i class="fa fa-eye info"></i>
                                     </a>
                                 </td>
+                                <div th:id="${'tombstone-modal-dialog-'+recordId}"
+                                     th:if="${writeAllowed}"
+                                     class="modal fade"
+                                     role="dialog">
+                                    <div class="modal-dialog tombstone-content-dialog">
+                                        <div class="modal-content" style="max-height:90vh">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title">TOMBSTONE GENERATOR</h5>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal">&times;</button>
+                                            </div>
+                                            <div class="modal-body tombstone-content-dialog-body">
+                                                <h5 class="d-inline">Key:</h5>
+                                                <h5 class="d-inline" th:text="${record.key}"></h5>
+                                                <h5 class="pt-2">Headers:</h5>
+                                                <textarea class="tombstone-text-area"
+                                                          th:id="${'header_content_'+recordId}"
+                                                          th:text="${record.headersJson}">
+                                                    </textarea>
+                                                <div class="col-12" th:id="${'tombstone-generation-result_'+recordId}"></div>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <a class="btn btn-success"
+                                                   th:id="${'generate-button_'+recordId}"
+                                                   th:data-record-key="${record.key}"
+                                                   th:data-record-id="${recordId}"
+                                                   th:onclick="generateTombstone(this.getAttribute('data-record-key'),
+                                                                                 this.getAttribute('data-record-id') )">
+                                                    Generate <i th:class="${'fa fa-cogs'}"></i>
+                                                </a>
+                                                <button type="button"
+                                                        class="btn btn-primary"
+                                                        th:data-record-id="${recordId}"
+                                                        th:onclick="closeTombstoneModal(this.getAttribute('data-record-id'))">
+                                                    Exit
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                             </tr>
                             </tbody>
                         </table>

@@ -17,6 +17,7 @@ package com.epam.eco.kafkamanager.ui.topics.browser;
 
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.BiConsumer;
@@ -24,6 +25,7 @@ import java.util.stream.Collectors;
 
 import org.apache.kafka.common.TopicPartition;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -31,14 +33,20 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import com.epam.eco.commons.kafka.OffsetRange;
 import com.epam.eco.commons.kafka.helpers.FilterClausePredicate;
 import com.epam.eco.commons.kafka.helpers.PartitionRecordFetchResult;
 import com.epam.eco.commons.kafka.helpers.RecordFetchResult;
+import com.epam.eco.kafkamanager.Authorizer;
+import com.epam.eco.kafkamanager.EntityType;
 import com.epam.eco.kafkamanager.KafkaAdminOperations;
 import com.epam.eco.kafkamanager.KafkaManager;
+import com.epam.eco.kafkamanager.KafkaTombstoneProducer;
 import com.epam.eco.kafkamanager.TopicRecordFetchParams;
 import com.epam.eco.kafkamanager.TopicRecordFetchParams.DataFormat;
 import com.epam.eco.kafkamanager.exec.TaskResult;
@@ -75,16 +83,28 @@ public class TopicBrowserController {
     public static final String ATTR_SCHEMA_CATALOG_URL_TEMPLATE = "schemaCatalogUrlTemplate";
     public static final String ATTR_FILTER_CLAUSE = "filter-clause";
     public static final String ATTR_FILTER_OPERATIONS = "filterOperations";
+    public static final String ATTR_WRITE_ALLOWED = "writeAllowed";
+    public static final String ATTR_RECORD_KEY = "recordKey";
+    public static final String ATTR_KEY_FORMAT = "keyFormat";
+    public static final String ATTR_HEADERS = "headers";
+
     private static final long DEFAULT_FETCH_TIMEOUT = 30_000;
 
     @Autowired
     private KafkaManager kafkaManager;
 
     @Autowired
+    private KafkaTombstoneProducer kafkaTombstoneStringProducer;
+    @Autowired
+    private KafkaTombstoneProducer kafkaTombstoneAvroProducer;
+    @Autowired
     private KafkaAdminOperations kafkaAdminOperations;
 
     @Autowired
     private KafkaManagerUiProperties properties;
+
+    @Autowired
+    private Authorizer authorizer;
 
     @PreAuthorize("@authorizer.isPermitted('TOPIC', #topicName, 'READ')")
     @RequestMapping(value=MAPPING, method=RequestMethod.GET)
@@ -99,6 +119,8 @@ public class TopicBrowserController {
 
         handleParamsRequest(browseParams, model::addAttribute);
         model.addAttribute(ATTR_SCHEMA_CATALOG_URL_TEMPLATE, properties.getSchemaCatalogTool());
+        model.addAttribute(ATTR_WRITE_ALLOWED, authorizer.isPermitted(EntityType.TOPIC, topicName,
+                                                                      Authorizer.Operation.WRITE));
 
         return VIEW;
     }
@@ -116,6 +138,28 @@ public class TopicBrowserController {
         handleFetchRequest(browseParams, redirectAttrs::addFlashAttribute);
 
         return "redirect:" + buildBrowserUrl(topicName);
+    }
+
+    @PreAuthorize("@authorizer.isPermitted('TOPIC', #topicName, 'WRITE')")
+    @RequestMapping(value=MAPPING + "/tombstone", method=RequestMethod.POST)
+    public @ResponseBody ResponseEntity<String> generateTombstone(
+            @PathVariable("name") String topicName,
+            @RequestParam Map<String, String> requestParams) {
+
+        Object key = requestParams.get(ATTR_RECORD_KEY);
+        DataFormat keyFormat = DataFormat.valueOf(requestParams.get(ATTR_KEY_FORMAT));
+        String headers = requestParams.get(ATTR_HEADERS);
+
+        try {
+            Map<String,String> headerMap = new ObjectMapper().readValue(headers, HashMap.class);
+            return ResponseEntity.ok(getAppropriateProducer(keyFormat).send(topicName, key, headerMap));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    private KafkaTombstoneProducer getAppropriateProducer(DataFormat keyFormat) {
+         return keyFormat == DataFormat.AVRO ? kafkaTombstoneAvroProducer : kafkaTombstoneStringProducer;
     }
 
     private void handleParamsRequest(

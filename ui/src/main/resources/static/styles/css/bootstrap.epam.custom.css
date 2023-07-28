@@ -364,21 +364,23 @@ thead, tbody, tfoot, tr, td, th {
 .info-modal-text-danger,
 .info-modal-text-info {
     display: flex;
-    text-align: justify;
+    text-align: start;
     align-items: center;
 }
 .info-modal-text-danger::before {
     font-family: FontAwesome;
     content: "\f05a";
     color: var(--epm-button-danger-background);
-    padding: 10px;
+    padding: 0.2em;
     font-size: 3em;
 }
 .info-modal-text-info::before {
     font-family: FontAwesome;
     content: "\f06a";
+    color:  var(--epm-button-primary-background);
+    padding: 0.2em;
+    font-size: 3em;
 }
-
 
 .confirm-modal-text-info {
     display: flex;
@@ -438,7 +440,8 @@ a.external-tool-button>div {
     display: flex;
     justify-content: center;
 }
-select[name='topics-table_length'] {
+select[name='topics-table_length'],
+select[name='consumer-group-table_length'] {
     width: 5em !important;
 }
 pre.normal-pre {
@@ -476,6 +479,31 @@ div.schema-content-dialog-body {
     overflow-y: scroll;
     text-align: left;
     padding: 1em 3em 1em 3em;
+}
+
+div.tombstone-content-dialog {
+    min-width:20vw;
+    max-width:40vw;
+    max-height:90vh;
+}
+div.tombstone-content-dialog-body {
+    overflow-y: scroll;
+    text-align: left;
+}
+
+.tombstone-column {
+    word-wrap: break-word;
+    max-width: 20em;
+}
+.tombstone-icon-column {
+    display: inline;
+}
+.tombstone-text-area{
+    min-width:31vw;
+    min-height:40vh;
+    width:100%;
+    font-size:1.2em;
+    border-color:lightgray;
 }
 
 .column-selector-dialog {
@@ -571,21 +599,14 @@ div.schema-content-dialog-body {
     text-align:left;
     font-size:1.2em;
     padding: 0 2em 1em 0;
+    max-height: 40em;
+    overflow-y: scroll;
 }
 .faq-spinner {
     width:100%;
     text-align: center;
 }
 
-
-.large-table-column-20 {
-    max-width: 20%;
-    min-width: 20%;
-    word-break: break-all;
-}
-.faq b {
-    color: var(--epm-faq-hilight-font-color);
-}
 
 .large-table-column-20 {
     max-width: 20%;
@@ -610,4 +631,10 @@ div.schema-content-dialog-body {
 }
 .query-filter-faq-button {
     padding: 0.6em 0.3em 0 0;
+}
+
+.consumer-group-header {
+    display: flex;
+    justify-content: space-between;
+    padding-right: 2em;
 }

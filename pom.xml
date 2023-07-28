@@ -79,6 +79,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <java.version>17</java.version>
         <kafka.version>7.0.1-ccs</kafka.version>
+        <spring-kafka.version>3.0.9</spring-kafka.version>
         <cp.version>7.2.1</cp.version>
         <eco-commons.version>1.0.0</eco-commons.version>
         <eco-commons-kafka.version>3.0.2</eco-commons-kafka.version>
@@ -178,6 +179,11 @@
                 <groupId>io.confluent</groupId>
                 <artifactId>kafka-schema-registry-client</artifactId>
                 <version>${cp.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.kafka</groupId>
+                <artifactId>spring-kafka</artifactId>
+                <version>${spring-kafka.version}</version>
             </dependency>
             <dependency>
                 <groupId>io.confluent</groupId>
