@@ -60,6 +60,7 @@ import com.epam.eco.kafkamanager.ui.config.Replacement;
 import com.epam.eco.kafkamanager.ui.config.TopicBrowser;
 import com.epam.eco.kafkamanager.ui.topics.TopicController;
 import com.epam.eco.kafkamanager.ui.topics.browser.handlers.FilterOperationEnum;
+import com.epam.eco.kafkamanager.utils.PrettyHtmlMapper;
 
 import static com.epam.eco.kafkamanager.ui.topics.browser.FilterClauseAbstractPredicate.KEY_ATTRIBUTE;
 import static com.epam.eco.kafkamanager.ui.topics.browser.FilterClauseAbstractPredicate.TOMBSTONE_ATTRIBUTE;
@@ -127,7 +128,6 @@ public class TopicBrowserController {
         model.addAttribute(ATTR_SCHEMA_CATALOG_URL_TEMPLATE, properties.getSchemaCatalogTool());
         model.addAttribute(ATTR_WRITE_ALLOWED, authorizer.isPermitted(EntityType.TOPIC, topicName,
                                                                       Authorizer.Operation.WRITE));
-
         return VIEW;
     }
 
@@ -163,6 +163,22 @@ public class TopicBrowserController {
                 headerMap = TombstoneUtils.getReplacedTombstoneHeaders(headerMap,replacements);
             }
             return ResponseEntity.ok(getAppropriateProducer(keyFormat).send(topicName, key, headerMap));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    @RequestMapping(value=MAPPING + "/headers", method=RequestMethod.POST)
+    public @ResponseBody ResponseEntity<String> replaceHeaders(
+            @RequestParam(name="headers") String headers) {
+
+        List<Replacement> replacements = properties.getTopicBrowser().getTombstoneGeneratorReplacements();
+        try {
+            Map<String, String> headerMap = new ObjectMapper().readValue(headers, HashMap.class);
+            if(!CollectionUtils.isEmpty(replacements)) {
+                headerMap = TombstoneUtils.getReplacedTombstoneHeaders(headerMap,replacements);
+            }
+            return ResponseEntity.ok(PrettyHtmlMapper.toPretty(headerMap, PrettyHtmlMapper.PrettyFormat.JSON));
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }

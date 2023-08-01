@@ -341,7 +341,9 @@
             customParameters.addClass('text-primary');
         }
 
-    });
+        $('#tombstone-generate-button').click(()=>generateTombstone());
+
+    })
 
     function getMinBoundsLabel(offsetRange) {
         return offsetRange.smallestInclusive ? '[' : '(';
@@ -374,16 +376,40 @@
 
     }
 
-    function closeTombstoneModal(recordId) {
-        const resultItem = $('#tombstone-generation-result_'+recordId);
-        resultItem.removeClass("text-danger");
-        resultItem.text('');
-        $('#tombstone-modal-dialog-'+recordId).modal("hide");
+    function openTombstoneModal(recordId, recordKey) {
+        const headers = $('#headers-for_'+recordId).val();
+        $.post("/kafka-manager/topics/"+topicName+"/browser/headers",
+            {"headers": headers,
+             "method_": "POST",
+             [[${_csrf.parameterName}]]: [[${_csrf.token}]]})
+            .done(function(data) {
+                $("#tombstone-key-display").text(recordKey);
+                $("#tombstone-key").val(recordKey);
+                $("#tombstone-header-content").val(data);
+                $('#tombstone-modal-dialog').modal("show");
+            })
+            .fail(function(xhr) {
+                alert(xhr.responseText);
+            })
+
     }
 
-    function generateTombstone(recordKey, recordId) {
-        const headers = $('#header_content_'+recordId).val();
-        const resultItem = $('#tombstone-generation-result_'+recordId);
+    function closeTombstoneModal() {
+        const resultItem = $('#tombstone-generation-result');
+        resultItem.removeClass("text-danger");
+        resultItem.text('');
+        $('#tombstone-modal-dialog').modal("hide");
+    }
+
+    function generateTombstone() {
+        const recordKey = $('#tombstone-key').val();
+        if(!recordKey) {
+            resultItem.addClass("text-danger");
+            resultItem.text("Key doesn't defined!");
+            return;
+        }
+        const headers = $('#tombstone-header-content').val();
+        const resultItem = $('#tombstone-generation-result');
         $.post("/kafka-manager/topics/"+topicName+"/browser/tombstone",
             {"recordKey": recordKey,
               "keyFormat": [[${browseParams.getKeyFormat()}]],
@@ -391,7 +417,7 @@
              "method_": "POST",
              [[${_csrf.parameterName}]]: [[${_csrf.token}]]})
              .done(function(data) {
-                 closeTombstoneModal(recordId);
+                 closeTombstoneModal();
                  showInfo('info','Tombstone generator',data);
 
              })
@@ -411,6 +437,7 @@
 <div th:replace="templates :: data-modal"></div>
 <div th:replace="templates :: faq-modal"></div>
 <div th:replace="templates :: confirm-modal"></div>
+<div th:replace="templates :: tombstone-modal"></div>
 
 <div class="main-content">
 
@@ -821,10 +848,9 @@
                                         <a class="btn btn-sm info tombstone-icon-column"
                                            th:if="${writeAllowed}"
                                            type="button"
-                                           th:attr="data-bs-target=${'#tombstone-modal-dialog-'+recordId}"
-                                           data-bs-toggle='modal'
-                                           data-bs-html=true
-                                           data-bs-backdrop
+                                           th:data-record-id="${recordId}"
+                                           th:data-record-key="${record.key}"
+                                           th:onclick="openTombstoneModal(this.getAttribute('data-record-id'),this.getAttribute('data-record-key'))"
                                            style="padding-left: 0.3em" >
                                             <img th:src="@{/assets/img/tombstone.png}" th:title="${'Generate tombstone for key='+record.key}" />
                                         </a>
@@ -937,45 +963,7 @@
                                         <i class="fa fa-eye info"></i>
                                     </a>
                                 </td>
-                                <div th:id="${'tombstone-modal-dialog-'+recordId}"
-                                     th:if="${writeAllowed}"
-                                     class="modal fade"
-                                     role="dialog">
-                                    <div class="modal-dialog tombstone-content-dialog">
-                                        <div class="modal-content" style="max-height:90vh">
-                                            <div class="modal-header">
-                                                <h5 class="modal-title">TOMBSTONE GENERATOR</h5>
-                                                <button type="button" class="btn-close" data-bs-dismiss="modal">&times;</button>
-                                            </div>
-                                            <div class="modal-body tombstone-content-dialog-body">
-                                                <h5 class="d-inline">Key:</h5>
-                                                <h5 class="d-inline" th:text="${record.key}"></h5>
-                                                <h5 class="pt-2">Headers:</h5>
-                                                <textarea class="tombstone-text-area"
-                                                          th:id="${'header_content_'+recordId}"
-                                                          th:text="${record.headersJson}">
-                                                    </textarea>
-                                                <div class="col-12" th:id="${'tombstone-generation-result_'+recordId}"></div>
-                                            </div>
-                                            <div class="modal-footer">
-                                                <a class="btn btn-success"
-                                                   th:id="${'generate-button_'+recordId}"
-                                                   th:data-record-key="${record.key}"
-                                                   th:data-record-id="${recordId}"
-                                                   th:onclick="generateTombstone(this.getAttribute('data-record-key'),
-                                                                                 this.getAttribute('data-record-id') )">
-                                                    Generate <i th:class="${'fa fa-cogs'}"></i>
-                                                </a>
-                                                <button type="button"
-                                                        class="btn btn-primary"
-                                                        th:data-record-id="${recordId}"
-                                                        th:onclick="closeTombstoneModal(this.getAttribute('data-record-id'))">
-                                                    Exit
-                                                </button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
+                                <input type="hidden" th:id="${'headers-for_'+recordId}" th:value="${record.headersJson}" />
                             </tr>
                             </tbody>
                         </table>
