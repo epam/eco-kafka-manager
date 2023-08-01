@@ -403,13 +403,13 @@
 
     function generateTombstone() {
         const recordKey = $('#tombstone-key').val();
+        const resultItem = $('#tombstone-generation-result');
         if(!recordKey) {
             resultItem.addClass("text-danger");
             resultItem.text("Key doesn't defined!");
             return;
         }
         const headers = $('#tombstone-header-content').val();
-        const resultItem = $('#tombstone-generation-result');
         $.post("/kafka-manager/topics/"+topicName+"/browser/tombstone",
             {"recordKey": recordKey,
               "keyFormat": [[${browseParams.getKeyFormat()}]],
