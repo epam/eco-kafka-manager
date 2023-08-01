@@ -156,7 +156,7 @@ public class TopicBrowserController {
         DataFormat keyFormat = DataFormat.valueOf(requestParams.get(ATTR_KEY_FORMAT));
         String headers = requestParams.get(ATTR_HEADERS);
 
-        List<Replacement> replacements = properties.getTopicBrowser().getTombstoneGenerationReplacements();
+        List<Replacement> replacements = properties.getTopicBrowser().getTombstoneGeneratorReplacements();
         try {
             Map<String, String> headerMap = new ObjectMapper().readValue(headers, HashMap.class);
             if(!CollectionUtils.isEmpty(replacements)) {
