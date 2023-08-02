@@ -63,8 +63,8 @@ class FilterClause {
 let filterOperationArray = [
     FilterOperation.from({id:'GREATER', label:'greater than', dataTypes:['number'], required: true}),
     FilterOperation.from({id:'LESS', label:'less than', dataTypes:['number'], required: true}),
-    FilterOperation.from({id:'EQUALS', label:'equals', dataTypes:['number','enum','string','map'], required: true}),
     FilterOperation.from({id:'CONTAINS', label: 'contains', dataTypes:['string','map'], required: true}),
+    FilterOperation.from({id:'EQUALS', label:'equals', dataTypes:['number','enum','string','map'], required: true}),
     FilterOperation.from({id:'LIKE', label: 'like', dataTypes:['string','map'], required: true}),
     FilterOperation.from({id:'NOT_EMPTY', label: 'not empty', dataTypes:['string','map'], required: false})
 ];
@@ -381,6 +381,12 @@ $(document).ready( function () {
     function isEnumValueExists(filterColumn,value) {
         return filterColumn.values.includes(value);
     }
+
+    document.getElementById("query-param-filter-value").addEventListener('keydown', (event) => {
+       if(event.key==='Enter') {
+           document.getElementById("add-query-param-filter-button").click();
+       }
+    });
 
     document.getElementById("add-query-param-filter-button").addEventListener('click', () => {
 
