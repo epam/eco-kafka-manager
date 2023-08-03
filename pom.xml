@@ -79,6 +79,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <java.version>17</java.version>
         <kafka.version>7.0.1-ccs</kafka.version>
+        <spring-kafka.version>3.0.9</spring-kafka.version>
         <cp.version>7.2.1</cp.version>
         <eco-commons.version>1.0.0</eco-commons.version>
         <eco-commons-kafka.version>3.0.2</eco-commons-kafka.version>
@@ -96,6 +97,7 @@
         <byte-buddy.version>1.12.19</byte-buddy.version>
         <objenesis.version>2.6</objenesis.version>
         <spring-boot-starter-validation>2.7.6</spring-boot-starter-validation>
+        <spring-cloud-stream.version>3.0.9.RELEASE</spring-cloud-stream.version>
 
         <protobuf.version>3.21.7</protobuf.version>
 
@@ -178,6 +180,16 @@
                 <groupId>io.confluent</groupId>
                 <artifactId>kafka-schema-registry-client</artifactId>
                 <version>${cp.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.kafka</groupId>
+                <artifactId>spring-kafka</artifactId>
+                <version>${spring-kafka.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-stream</artifactId>
+                <version>${spring-cloud-stream.version}</version>
             </dependency>
             <dependency>
                 <groupId>io.confluent</groupId>

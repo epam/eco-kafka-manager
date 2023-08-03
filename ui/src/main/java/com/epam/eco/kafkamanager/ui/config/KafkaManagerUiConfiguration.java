@@ -17,8 +17,10 @@ package com.epam.eco.kafkamanager.ui.config;
 
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.cloud.stream.config.SpelExpressionConverterConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
 import org.springframework.security.web.session.HttpSessionEventPublisher;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.PathMatchConfigurer;
@@ -31,6 +33,7 @@ import com.epam.eco.kafkamanager.ui.LogoutListener;
  * @author Andrei_Tytsik
  */
 @Configuration
+@Import({SpelExpressionConverterConfiguration.class})
 @EnableConfigurationProperties(KafkaManagerUiProperties.class)
 public class KafkaManagerUiConfiguration implements WebMvcConfigurer {
 

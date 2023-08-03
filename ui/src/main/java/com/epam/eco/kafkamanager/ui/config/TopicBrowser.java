@@ -15,6 +15,8 @@
  *******************************************************************************/
 package com.epam.eco.kafkamanager.ui.config;
 
+import java.util.List;
+
 /**
  * @author Mikhail_Vershkov
  */
@@ -25,6 +27,8 @@ public class TopicBrowser {
     private Long cacheCleanerIntervalMin = 60L;
     private Boolean showGrid = Boolean.TRUE;
     private Boolean enableAnimation = Boolean.TRUE;
+    private List<HeaderReplacement> tombstoneGeneratorReplacements;
+
     public Boolean getUseCache() {
         return useCache;
     }
@@ -63,5 +67,13 @@ public class TopicBrowser {
 
     public void setEnableAnimation(Boolean enableAnimation) {
         this.enableAnimation = enableAnimation;
+    }
+
+    public List<HeaderReplacement> getTombstoneGeneratorReplacements() {
+        return tombstoneGeneratorReplacements;
+    }
+
+    public void setTombstoneGeneratorReplacements(List<HeaderReplacement> tombstoneGenerationReplacements) {
+        this.tombstoneGeneratorReplacements = tombstoneGenerationReplacements;
     }
 }

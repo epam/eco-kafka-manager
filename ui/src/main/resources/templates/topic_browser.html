@@ -341,7 +341,9 @@
             customParameters.addClass('text-primary');
         }
 
-    });
+        $('#tombstone-generate-button').click(()=>generateTombstone());
+
+    })
 
     function getMinBoundsLabel(offsetRange) {
         return offsetRange.smallestInclusive ? '[' : '(';
@@ -371,6 +373,58 @@
             }
         });
         return result;
+
+    }
+
+    function openTombstoneModal(recordId, recordKey) {
+        const headers = $('#headers-for_'+recordId).val();
+        $.post("/kafka-manager/topics/"+topicName+"/browser/headers",
+            {"headers": headers,
+             "method_": "POST",
+             [[${_csrf.parameterName}]]: [[${_csrf.token}]]})
+            .done(function(data) {
+                $("#tombstone-key-display").text(recordKey);
+                $("#tombstone-key").val(recordKey);
+                $("#tombstone-header-content").val(data);
+                $('#tombstone-modal-dialog').modal("show");
+            })
+            .fail(function(xhr) {
+                alert(xhr.responseText);
+            })
+
+    }
+
+    function closeTombstoneModal() {
+        const resultItem = $('#tombstone-generation-result');
+        resultItem.removeClass("text-danger");
+        resultItem.text('');
+        $('#tombstone-modal-dialog').modal("hide");
+    }
+
+    function generateTombstone() {
+        const recordKey = $('#tombstone-key').val();
+        const resultItem = $('#tombstone-generation-result');
+        if(!recordKey) {
+            resultItem.addClass("text-danger");
+            resultItem.text("Key doesn't defined!");
+            return;
+        }
+        const headers = $('#tombstone-header-content').val();
+        $.post("/kafka-manager/topics/"+topicName+"/browser/tombstone",
+            {"recordKey": recordKey,
+              "keyFormat": [[${browseParams.getKeyFormat()}]],
+             "headers": headers,
+             "method_": "POST",
+             [[${_csrf.parameterName}]]: [[${_csrf.token}]]})
+             .done(function(data) {
+                 closeTombstoneModal();
+                 showInfo('info','Tombstone generator',data);
+
+             })
+             .fail(function(xhr) {
+                     resultItem.addClass("text-danger");
+                     resultItem.text(xhr.responseText);
+             })
     }
 
 
@@ -383,6 +437,7 @@
 <div th:replace="templates :: data-modal"></div>
 <div th:replace="templates :: faq-modal"></div>
 <div th:replace="templates :: confirm-modal"></div>
+<div th:replace="templates :: tombstone-modal"></div>
 
 <div class="main-content">
 
@@ -785,10 +840,22 @@
                                         class="danger"
                                         title="Record Key is NULL">
                                 </td>
-                                <td
-                                        th:if="${!record.nullKey}"
-                                        th:text="${record.key}"
-                                        style="word-wrap: break-word;min-width:50px;max-width:300px;">
+                                <td th:if="${!record.nullKey}"
+                                    style="min-width:10em;max-width:21.5em;">
+
+                                    <div class="d-flex" style="justify-content: space-between">
+                                        <div class="tombstone-column" th:text="${record.key}"></div>
+                                        <a class="btn btn-sm info tombstone-icon-column"
+                                           th:if="${writeAllowed}"
+                                           type="button"
+                                           th:data-record-id="${recordId}"
+                                           th:data-record-key="${record.key}"
+                                           th:onclick="openTombstoneModal(this.getAttribute('data-record-id'),this.getAttribute('data-record-key'))"
+                                           style="padding-left: 0.3em" >
+                                            <img th:src="@{/assets/img/tombstone.png}" th:title="${'Generate tombstone for key='+record.key}" />
+                                        </a>
+                                    </div>
+
                                 </td>
                                 <td th:text="${record.keyValueSizeFormatted}"></td>
                                 <td style="text-align: center;vertical-align: middle;">
@@ -896,6 +963,7 @@
                                         <i class="fa fa-eye info"></i>
                                     </a>
                                 </td>
+                                <input type="hidden" th:id="${'headers-for_'+recordId}" th:value="${record.headersJson}" />
                             </tr>
                             </tbody>
                         </table>

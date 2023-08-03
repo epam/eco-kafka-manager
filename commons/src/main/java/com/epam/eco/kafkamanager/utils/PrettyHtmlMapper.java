@@ -43,11 +43,14 @@ public class PrettyHtmlMapper {
     private static final String JSON_SPACE = " ";
     private static final String HTML_SPACE = "&nbsp;";
     private static final String DELIMITER = "=";
+    private static final String JSON_DELIMITER = ":";
 
 
     private static final Map<PrettyFormat, MapperConfig> MAPPER_CONFIG =
-            Map.of(PrettyFormat.JSON,
+            Map.of(PrettyFormat.STRING,
                    new MapperConfig(JSON_NEW_LINE, JSON_START_BOLD, JSON_END_BOLD, JSON_SPACE, DELIMITER),
+                    PrettyFormat.JSON,
+                   new MapperConfig(JSON_NEW_LINE, JSON_START_BOLD, JSON_END_BOLD, JSON_SPACE, JSON_DELIMITER),
                    PrettyFormat.HTML,
                    new MapperConfig(HTML_NEW_LINE, HTML_START_BOLD, HTML_END_BOLD, HTML_SPACE, DELIMITER)
                   );
@@ -123,7 +126,7 @@ public class PrettyHtmlMapper {
     }
 
     public enum PrettyFormat {
-        JSON, HTML
+        STRING, JSON, HTML
     }
 
     private static class MapperConfig {

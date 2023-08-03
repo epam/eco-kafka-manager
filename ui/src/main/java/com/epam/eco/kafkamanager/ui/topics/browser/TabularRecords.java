@@ -49,19 +49,13 @@ public class TabularRecords implements Iterable<Record> {
 
     private static final String DATETIME_PATTERN = "dd/MM/yyyy hh:mm:ss a"; // should be the same as in topic_browser.html (see #offsets-timestamp.format)
     private static final String NA = "N/A";
-
     public static final String HEADER_PREFIX = "header: ";
-
     private static final int TRUNCATE_SIZE = 127;
-
     private final List<Record> records;
     private final Map<String, Column> columns;
-
     private final Set<String> headerNames;
     private final Set<String> headerLabels;
-
     private final String topicName;
-
     private final boolean hasSelectedColumns;
 
     public TabularRecords(List<Record> records, String topicName) {
@@ -374,7 +368,7 @@ public class TabularRecords implements Iterable<Record> {
                 return headersJson;
             }
 
-            headersJson = MapperUtils.toJson(headers);
+            headersJson = PrettyHtmlMapper.toPretty(headers, PrettyHtmlMapper.PrettyFormat.JSON);
             return headersJson;
         }
 
