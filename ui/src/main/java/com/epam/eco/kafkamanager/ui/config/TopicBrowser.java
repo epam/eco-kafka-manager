@@ -27,7 +27,7 @@ public class TopicBrowser {
     private Long cacheCleanerIntervalMin = 60L;
     private Boolean showGrid = Boolean.TRUE;
     private Boolean enableAnimation = Boolean.TRUE;
-    private List<Replacement> tombstoneGeneratorReplacements;
+    private List<HeaderReplacement> tombstoneGeneratorReplacements;
 
     public Boolean getUseCache() {
         return useCache;
@@ -69,11 +69,11 @@ public class TopicBrowser {
         this.enableAnimation = enableAnimation;
     }
 
-    public List<Replacement> getTombstoneGeneratorReplacements() {
+    public List<HeaderReplacement> getTombstoneGeneratorReplacements() {
         return tombstoneGeneratorReplacements;
     }
 
-    public void setTombstoneGeneratorReplacements(List<Replacement> tombstoneGenerationReplacements) {
+    public void setTombstoneGeneratorReplacements(List<HeaderReplacement> tombstoneGenerationReplacements) {
         this.tombstoneGeneratorReplacements = tombstoneGenerationReplacements;
     }
 }

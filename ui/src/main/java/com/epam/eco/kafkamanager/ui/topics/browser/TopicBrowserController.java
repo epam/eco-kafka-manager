@@ -15,9 +15,7 @@
  *******************************************************************************/
 package com.epam.eco.kafkamanager.ui.topics.browser;
 
-import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
@@ -39,7 +37,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-import org.thymeleaf.util.MapUtils;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -56,7 +53,7 @@ import com.epam.eco.kafkamanager.TopicRecordFetchParams;
 import com.epam.eco.kafkamanager.TopicRecordFetchParams.DataFormat;
 import com.epam.eco.kafkamanager.exec.TaskResult;
 import com.epam.eco.kafkamanager.ui.config.KafkaManagerUiProperties;
-import com.epam.eco.kafkamanager.ui.config.Replacement;
+import com.epam.eco.kafkamanager.ui.config.HeaderReplacement;
 import com.epam.eco.kafkamanager.ui.config.TopicBrowser;
 import com.epam.eco.kafkamanager.ui.topics.TopicController;
 import com.epam.eco.kafkamanager.ui.topics.browser.handlers.FilterOperationEnum;
@@ -156,7 +153,7 @@ public class TopicBrowserController {
         DataFormat keyFormat = DataFormat.valueOf(requestParams.get(ATTR_KEY_FORMAT));
         String headers = requestParams.get(ATTR_HEADERS);
 
-        List<Replacement> replacements = properties.getTopicBrowser().getTombstoneGeneratorReplacements();
+        List<HeaderReplacement> replacements = properties.getTopicBrowser().getTombstoneGeneratorReplacements();
         try {
             Map<String, String> headerMap = new ObjectMapper().readValue(headers, HashMap.class);
             if(!CollectionUtils.isEmpty(replacements)) {
@@ -172,7 +169,7 @@ public class TopicBrowserController {
     public @ResponseBody ResponseEntity<String> replaceHeaders(
             @RequestParam(name="headers") String headers) {
 
-        List<Replacement> replacements = properties.getTopicBrowser().getTombstoneGeneratorReplacements();
+        List<HeaderReplacement> replacements = properties.getTopicBrowser().getTombstoneGeneratorReplacements();
         try {
             Map<String, String> headerMap = new ObjectMapper().readValue(headers, HashMap.class);
             if(!CollectionUtils.isEmpty(replacements)) {

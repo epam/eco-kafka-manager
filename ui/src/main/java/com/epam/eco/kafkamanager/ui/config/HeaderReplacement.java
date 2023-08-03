@@ -6,13 +6,13 @@ import org.springframework.expression.Expression;
  * @author Mikhail_Vershkov
  */
 
-public class Replacement {
+public class HeaderReplacement {
     private String headerName;
     private Expression replacement;
 
-    public Replacement() {}
+    public HeaderReplacement() {}
 
-    public Replacement(String headerName, Expression replacement) {
+    public HeaderReplacement(String headerName, Expression replacement) {
         this.headerName = headerName;
         this.replacement = replacement;
     }

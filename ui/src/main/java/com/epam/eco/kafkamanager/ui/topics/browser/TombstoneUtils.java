@@ -20,7 +20,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import com.epam.eco.kafkamanager.ui.config.Replacement;
+import com.epam.eco.kafkamanager.ui.config.HeaderReplacement;
 
 import static java.util.Objects.nonNull;
 
@@ -30,14 +30,14 @@ import static java.util.Objects.nonNull;
 
 public class TombstoneUtils {
     public static Map<String,String> getReplacedTombstoneHeaders(Map<String,String> headers,
-                                                           List<Replacement> replacements) {
+                                                           List<HeaderReplacement> replacements) {
         return headers.entrySet().stream()
                       .map(entry->new AbstractMap.SimpleEntry<>(entry.getKey(), getReplacedHeaderIfExists(entry, replacements)))
                       .collect(Collectors.toMap(AbstractMap.SimpleEntry::getKey, AbstractMap.SimpleEntry::getValue));
     }
 
     private static String getReplacedHeaderIfExists(Map.Entry<String,String> entry,
-                                             List<Replacement> replacements) {
+                                             List<HeaderReplacement> replacements) {
         return replacements.stream()
                            .filter(replacement -> replacement.getHeaderName().equals(entry.getKey())
                                    && nonNull(replacement.getReplacement().getValue()))

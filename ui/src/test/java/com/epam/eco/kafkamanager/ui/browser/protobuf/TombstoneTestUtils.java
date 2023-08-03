@@ -23,7 +23,7 @@ import java.util.Map;
 
 import org.springframework.expression.spel.standard.SpelExpressionParser;
 
-import com.epam.eco.kafkamanager.ui.config.Replacement;
+import com.epam.eco.kafkamanager.ui.config.HeaderReplacement;
 
 /**
  * @author Mikhail_Vershkov
@@ -37,18 +37,18 @@ public class TombstoneTestUtils {
                                                                    .toInstant(ZoneOffset.UTC).toEpochMilli());
     private static final SpelExpressionParser PARSER = new SpelExpressionParser();
 
-    public static List<Replacement> REPLACEMENTS = List.of(
-            new Replacement("operation_type",
-                                      PARSER.parseExpression("\"delete\"")),
-            new Replacement("operation_time",
-                            PARSER.parseExpression("T(java.time.LocalDateTime).now().truncatedTo(T(java.time.temporal.ChronoUnit).HOURS).toInstant(T(java.time.ZoneOffset).UTC).toEpochMilli()")),
-             new Replacement("business_time",
-                             PARSER.parseExpression("T(java.time.LocalDateTime).now().truncatedTo(T(java.time.temporal.ChronoUnit).DAYS).toInstant(T(java.time.ZoneOffset).UTC).toEpochMilli()")),
-             new Replacement("null_header", null),
-             new Replacement("wrong_header", PARSER.parseExpression("T(java.time.LocalDateTime).long()")),
-             new Replacement("operation_type", PARSER.parseExpression("T(java.time.LocalDateTime).long()"))
+    public static List<HeaderReplacement> REPLACEMENTS = List.of(
+            new HeaderReplacement("operation_type",
+                                  PARSER.parseExpression("\"delete\"")),
+            new HeaderReplacement("operation_time",
+                                  PARSER.parseExpression("T(java.time.LocalDateTime).now().truncatedTo(T(java.time.temporal.ChronoUnit).HOURS).toInstant(T(java.time.ZoneOffset).UTC).toEpochMilli()")),
+             new HeaderReplacement("business_time",
+                                   PARSER.parseExpression("T(java.time.LocalDateTime).now().truncatedTo(T(java.time.temporal.ChronoUnit).DAYS).toInstant(T(java.time.ZoneOffset).UTC).toEpochMilli()")),
+             new HeaderReplacement("null_header", null),
+             new HeaderReplacement("wrong_header", PARSER.parseExpression("T(java.time.LocalDateTime).long()")),
+             new HeaderReplacement("operation_type", PARSER.parseExpression("T(java.time.LocalDateTime).long()"))
 
-           );
+                                                                );
 
     public static Map<String,String> TEST_HEADERS = Map.of("operation_type","merge",
                                                            "operation_time","1234567",
