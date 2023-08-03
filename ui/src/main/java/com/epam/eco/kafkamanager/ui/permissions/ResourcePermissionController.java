@@ -18,6 +18,7 @@ package com.epam.eco.kafkamanager.ui.permissions;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -30,6 +31,7 @@ import org.apache.kafka.common.resource.PatternType;
 import org.apache.kafka.common.resource.ResourceType;
 import org.apache.kafka.common.security.auth.KafkaPrincipal;
 import org.apache.kafka.common.utils.SecurityUtils;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -43,6 +45,8 @@ import com.epam.eco.kafkamanager.Metadata;
 import com.epam.eco.kafkamanager.PermissionInfo;
 import com.epam.eco.kafkamanager.PermissionMetadataDeleteParams;
 import com.epam.eco.kafkamanager.PermissionMetadataUpdateParams;
+import com.epam.eco.kafkamanager.PrincipalPermissionsDeleteParams;
+import com.epam.eco.kafkamanager.PrincipalPermissionsDeleteParams.ResourceExcludes;
 import com.epam.eco.kafkamanager.ResourcePermissionFilter;
 import com.epam.eco.kafkamanager.ResourcePermissionsDeleteParams;
 import com.epam.eco.kafkamanager.ui.utils.MetadataWrapper;
@@ -68,6 +72,10 @@ public class ResourcePermissionController {
 
     public static final String MAPPING_RESOURCE =
             PermissionController.MAPPING_PERMISSIONS + "/resource/{resourceType}/{resourceName}/{patternType}";
+
+    public static final String MAPPING_DELETE_BY_PRINCIPAL =
+            PermissionController.MAPPING_PERMISSIONS + "/resource/{resourceType}/{resourceName}/{patternType}/principal/{principal}";
+
     public static final String MAPPING_METADATA = MAPPING_RESOURCE + "/metadata";
 
     @Autowired
@@ -108,6 +116,24 @@ public class ResourcePermissionController {
         return RESOURCE_VIEW;
     }
 
+    @RequestMapping(value = MAPPING_DELETE_BY_PRINCIPAL, method = RequestMethod.DELETE)
+    public String deletePrincipalPermissions(
+            @PathVariable("resourceType") ResourceType resourceType,
+            @PathVariable("resourceName") String resourceName,
+            @PathVariable("patternType") PatternType patternType,
+            @PathVariable("principal") String kafkaPrincipalString,
+            @RequestParam Map<String, Object> paramsMap ) {
+
+        KafkaPrincipal principal = SecurityUtils.parseKafkaPrincipal(kafkaPrincipalString);
+        kafkaManager.deletePermissions(PrincipalPermissionsDeleteParams.builder()
+                                                    .principal(principal)
+                                                    .resourceType(ResourceType.TOPIC)
+                                                    .excludes(Set.of(new ResourceExcludes(resourceName, resourceType)))
+                                                    .build());
+
+        return getRedirectUrl(resourceType, resourceName, patternType, kafkaPrincipalString);
+    }
+
     @RequestMapping(value = MAPPING_RESOURCE, method = RequestMethod.DELETE)
     public String deletePermissions(
             @PathVariable("resourceType") ResourceType resourceType,
@@ -122,14 +148,14 @@ public class ResourcePermissionController {
             @RequestParam(value = "patternTypeRedirect", required = false) PatternType patternTypeRedirect,
             @RequestParam(value = "kafkaPrincipalRedirect", required = false) String kafkaPrincipalRedirect) {
         ResourcePermissionFilter filter = ResourcePermissionFilter.builder()
-                .resourceType(resourceType)
-                .resourceName(resourceName)
-                .patternType(patternType)
-                .principalFilter(kafkaPrincipalFilterString)
-                .permissionTypeFilterOrElseDefault(permissionTypeFilter)
-                .operationFilterOrElseDefault(operationFilter)
-                .hostFilter(hostFilter)
-                .build();
+                                                                  .resourceType(resourceType)
+                                                                  .resourceName(resourceName)
+                                                                  .patternType(patternType)
+                                                                  .principalFilter(kafkaPrincipalFilterString)
+                                                                  .permissionTypeFilterOrElseDefault(permissionTypeFilter)
+                                                                  .operationFilterOrElseDefault(operationFilter)
+                                                                  .hostFilter(hostFilter)
+                                                                  .build();
 
         kafkaManager.deletePermissions(new ResourcePermissionsDeleteParams(filter));
 
@@ -139,11 +165,17 @@ public class ResourcePermissionController {
         kafkaPrincipalFilterString =
                 !StringUtils.isBlank(kafkaPrincipalRedirect) ? kafkaPrincipalRedirect : kafkaPrincipalFilterString;
 
+        return getRedirectUrl(resourceType, resourceName, patternType, kafkaPrincipalFilterString);
+    }
+
+    @NotNull
+    private String getRedirectUrl(ResourceType resourceType, String resourceName, PatternType patternType, String kafkaPrincipalFilterString) {
+        ResourcePermissionFilter filter;
         filter = ResourcePermissionFilter.builder()
-                .resourceType(resourceType)
-                .resourceName(resourceName)
-                .patternType(patternType)
-                .build();
+                                         .resourceType(resourceType)
+                                         .resourceName(resourceName)
+                                         .patternType(patternType)
+                                         .build();
 
         List<PermissionInfo> resourcePermissions = kafkaManager.getPermissionsOfResource(filter);
         if (!CollectionUtils.isEmpty(resourcePermissions)) {
@@ -152,6 +184,7 @@ public class ResourcePermissionController {
             return "redirect:" + PermissionController.MAPPING_PERMISSIONS;
         }
     }
+
 
     @RequestMapping(value = MAPPING_METADATA, method = RequestMethod.GET)
     public String metadata(

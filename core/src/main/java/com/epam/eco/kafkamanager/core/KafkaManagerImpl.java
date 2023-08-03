@@ -16,10 +16,15 @@
 package com.epam.eco.kafkamanager.core;
 
 import java.security.Principal;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.Validate;
 import org.apache.kafka.common.resource.ResourcePattern;
+import org.apache.kafka.common.security.auth.KafkaPrincipal;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -49,7 +54,6 @@ import com.epam.eco.kafkamanager.PermissionMetadataDeleteParams;
 import com.epam.eco.kafkamanager.PermissionMetadataKey;
 import com.epam.eco.kafkamanager.PermissionMetadataUpdateParams;
 import com.epam.eco.kafkamanager.PermissionRepo;
-import com.epam.eco.kafkamanager.PermissionRepo.DeleteCallback;
 import com.epam.eco.kafkamanager.PermissionSearchCriteria;
 import com.epam.eco.kafkamanager.PrincipalPermissionsDeleteParams;
 import com.epam.eco.kafkamanager.ResourcePermissionFilter;
@@ -70,7 +74,6 @@ import com.epam.eco.kafkamanager.TopicRecordCounterTaskExecutor;
 import com.epam.eco.kafkamanager.TopicRecordFetcherTaskExecutor;
 import com.epam.eco.kafkamanager.TopicRepo;
 import com.epam.eco.kafkamanager.TopicSearchCriteria;
-import com.epam.eco.kafkamanager.TopicSearchCriteriaImpl;
 import com.epam.eco.kafkamanager.TransactionInfo;
 import com.epam.eco.kafkamanager.TransactionRepo;
 import com.epam.eco.kafkamanager.TransactionSearchCriteria;
@@ -567,31 +570,48 @@ public class KafkaManagerImpl implements KafkaManager {
         Validate.notNull(params, "ResourcePermissionsDeleteParams object is null");
 
         permissionRepo.deleteOfResource(
-                params.getFilter(),
-                new DeleteCallback() {
-                    @Override
-                    public void onBeforeDelete(List<PermissionInfo> permissionsToDelete) {
-                        if (params.getFilter().getPrincipalObjectFilter() == null) {
-                            return;
-                        }
+                params.getFilter(), permissionsToDelete -> {
+                    if (params.getFilter().getPrincipalObjectFilter() == null) {
+                        return;
+                    }
 
-                        List<PermissionInfo> allResourcePermissions =
-                                permissionRepo.findMatchingOfResource(params.getFilter().toMatchAnyFilter());
-                        if (allResourcePermissions.size() == permissionsToDelete.size()) {
-                            metadataRepo.delete(
-                                    PermissionMetadataKey.with(
-                                    params.getFilter().getPrincipalObjectFilter(),
-                                    params.getFilter().getResourceType(),
-                                    params.getFilter().getResourceName(),
-                                    params.getFilter().getPatternType()));
-                        }
+                    List<PermissionInfo> allResourcePermissions =
+                            permissionRepo.findMatchingOfResource(params.getFilter().toMatchAnyFilter());
+                    if (allResourcePermissions.size() == permissionsToDelete.size()) {
+                        metadataRepo.delete(
+                                PermissionMetadataKey.with(
+                                params.getFilter().getPrincipalObjectFilter(),
+                                params.getFilter().getResourceType(),
+                                params.getFilter().getResourceName(),
+                                params.getFilter().getPatternType()));
                     }
                 });
     }
 
     @Override
     public void deletePermissions(PrincipalPermissionsDeleteParams params) {
-        throw new UnsupportedOperationException();
+        List<PermissionInfo> permissions = getPrincipalPermissions(params.getPrincipalObject());
+        Set<ResourcePermissionFilter> filters = permissions.stream()
+                                               .filter(permissionInfo ->
+                                                       !params.containsInExcludes(permissionInfo.getResourceName(),
+                                                                                  permissionInfo.getResourceType())
+                                                       && params.matchResourceType(permissionInfo.getResourceType()))
+                                               .map(permissionInfo -> ResourcePermissionFilter.builder()
+                                                               .resourceType(permissionInfo.getResourceType())
+                                                               .resourceName(permissionInfo.getResourceName())
+                                                               .patternType(permissionInfo.getPatternType())
+                                                               .principalFilter(params.getPrincipalObject())
+                                                               .build())
+                                               .collect(Collectors.toSet());
+
+        filters.forEach(filter -> deletePermissions(new ResourcePermissionsDeleteParams(filter)));
+
+    }
+
+    private List<PermissionInfo> getPrincipalPermissions(KafkaPrincipal kafkaPrincipal) {
+        return getAllPermissions().stream()
+                                  .filter(permission -> permission.getKafkaPrincipal().equals(kafkaPrincipal))
+                                  .collect(Collectors.toList());
     }
 
     @Override
