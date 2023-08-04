@@ -216,8 +216,52 @@
                             <tr 
                                 th:if="${principalPermissions != null AND !principalPermissions.isEmpty()}"
                                 style="background-color: #FFFFFF; text-align:center;">
-                                <td colspan="8">
+                                <td colspan="7">
                                     Other <span th:text="${kafkaPrincipal}" style="font-weight:bold"></span>'s permissions:
+                                </td>
+                                <td style="text-align:start;">
+                                    <button
+                                            type="button"
+                                            class="btn btn-danger"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#delete-all-user-permissions-confirm">
+                                        Delete Other Permissions <i class="fa fa-trash"></i>
+                                    </button>
+
+                                    <div id="delete-all-user-permissions-confirm" class="modal fade" role="dialog">
+                                        <div class="modal-dialog">
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+                                                    <h4 class="modal-title">Confirm User Permission Delete</h4>
+                                                    <button type="button" class="btn-close" data-bs-dismiss="modal">&times;</button>
+                                                </div>
+                                                <div class="modal-body">
+                                                    <p>
+                                                        Are you sure you want to delete all user <b><span th:text="${kafkaPrincipal}"></span></b> permissions of <b><span th:text="${resourceType + ':' + patternType + ':' + resourceName}"></span></b>?
+                                                    </p>
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <form
+                                                          th:action="@{/permissions/resource/{resourceType}/{resourceName}/{patternType}/principal/{kafkaPrincipal}(resourceType=${resourceType},resourceName=${resourceName},patternType=${patternType},kafkaPrincipal=${kafkaPrincipal})}"
+                                                          method="post">
+                                                        <input type="hidden" name="_method" value="delete"/>
+                                                        <button
+                                                                type="button"
+                                                                class="btn btn-primary"
+                                                                data-bs-dismiss="modal">
+                                                            Cancel
+                                                        </button>
+                                                        <button
+                                                                type="submit"
+                                                                class="btn btn-danger">
+                                                            Delete
+                                                        </button>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
                                 </td>
                             </tr>
         

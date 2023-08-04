@@ -17,8 +17,10 @@ package com.epam.eco.kafkamanager;
 
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 
 import org.apache.commons.lang3.Validate;
+import org.apache.kafka.common.resource.ResourceType;
 import org.apache.kafka.common.security.auth.KafkaPrincipal;
 import org.apache.kafka.common.utils.SecurityUtils;
 
@@ -28,6 +30,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import com.epam.eco.kafkamanager.utils.MapperUtils;
 
+import static java.util.Objects.isNull;
+
 /**
  * @author Andrei_Tytsik
  */
@@ -35,29 +39,41 @@ public class PrincipalPermissionsDeleteParams {
 
     private final String principal;
     private final KafkaPrincipal principalObject;
+    private final Set<ResourceExcludes> excludes;
+    private final ResourceType resourceType;
 
     @JsonCreator
     public PrincipalPermissionsDeleteParams(
             @JsonProperty("principal") String principal) {
         this(
                 principal,
-                SecurityUtils.parseKafkaPrincipal(principal));
+                SecurityUtils.parseKafkaPrincipal(principal),
+                null,
+                null);
     }
 
     public PrincipalPermissionsDeleteParams(KafkaPrincipal principal) {
-        this(
-                principal != null ? principal.toString() : null,
-                principal);
+        this(principal != null ? principal.toString() : null, principal, null, null);
+    }
+
+    public PrincipalPermissionsDeleteParams(KafkaPrincipal principal,
+                                            ResourceType resourceType,
+                                            Set<ResourceExcludes> excludeds) {
+        this(principal != null ? principal.toString() : null, principal, resourceType,  excludeds);
     }
 
     private PrincipalPermissionsDeleteParams(
             String principal,
-            KafkaPrincipal principalObject) {
+            KafkaPrincipal principalObject,
+            ResourceType resourceType,
+            Set<ResourceExcludes> excludes) {
         Validate.notBlank(principal, "Principal is blank");
         Validate.notNull(principalObject, "Principal Object is null");
 
         this.principal = principal;
         this.principalObject = principalObject;
+        this.resourceType = resourceType;
+        this.excludes = excludes;
     }
 
     public String getPrincipal() {
@@ -66,6 +82,29 @@ public class PrincipalPermissionsDeleteParams {
     @JsonIgnore
     public KafkaPrincipal getPrincipalObject() {
         return principalObject;
+    }
+
+    public ResourceType getResourceType() {
+        return resourceType;
+    }
+
+    public Set<ResourceExcludes> getExcludes() {
+        return excludes;
+    }
+
+    public boolean containsInExcludes(String resourceName, ResourceType resourceType) {
+        if(isNull(this.excludes)) {
+            return false;
+        }
+        return this.excludes.contains(new ResourceExcludes(resourceName,resourceType));
+    }
+
+    public boolean matchResourceType(ResourceType type) {
+        if(isNull(this.resourceType)) {
+            return true;
+        }
+        return type==this.resourceType;
+
     }
 
     @Override
@@ -90,9 +129,10 @@ public class PrincipalPermissionsDeleteParams {
     @Override
     public String toString() {
         return
-                "{principal: " + principal +
-                "}";
+                "{principal: " + principal + "}";
     }
+
+    public record ResourceExcludes(String resourceName, ResourceType resourceType) {}
 
     public Builder toBuilder() {
         return builder(this);
@@ -122,12 +162,13 @@ public class PrincipalPermissionsDeleteParams {
 
         private String principal;
         private KafkaPrincipal principalObject;
+        private ResourceType resourceType;
+        private Set<ResourceExcludes> excludes;
 
         private Builder(PrincipalPermissionsDeleteParams origin) {
             if (origin == null) {
                 return;
             }
-
             this.principal = origin.principal;
         }
 
@@ -143,10 +184,22 @@ public class PrincipalPermissionsDeleteParams {
             return this;
         }
 
+        public Builder excludes(Set<ResourceExcludes> excludes) {
+            this.excludes = excludes;
+            return this;
+        }
+
+        public Builder resourceType(ResourceType resourceType) {
+            this.resourceType = resourceType;
+            return this;
+        }
+
         public PrincipalPermissionsDeleteParams build() {
             return new PrincipalPermissionsDeleteParams(
                     principal,
-                    principalObject);
+                    principalObject,
+                    resourceType,
+                    excludes);
         }
     }
 
