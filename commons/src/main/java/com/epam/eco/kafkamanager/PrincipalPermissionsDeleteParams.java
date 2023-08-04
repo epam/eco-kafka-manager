@@ -132,51 +132,7 @@ public class PrincipalPermissionsDeleteParams {
                 "{principal: " + principal + "}";
     }
 
-    public static class ResourceExcludes {
-        private String resourceName;
-        private ResourceType resourceType;
-
-        public ResourceExcludes(String resourceName, ResourceType resourceType) {
-            this.resourceName = resourceName;
-            this.resourceType = resourceType;
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if(this == o)
-                return true;
-            if(! (o instanceof ResourceExcludes))
-                return false;
-            ResourceExcludes that = (ResourceExcludes) o;
-
-            if(resourceName != null ? ! resourceName.equals(that.resourceName) : that.resourceName != null)
-                return false;
-            return resourceType == that.resourceType;
-        }
-
-        @Override
-        public int hashCode() {
-            int result = resourceName != null ? resourceName.hashCode() : 0;
-            result = 31 * result + (resourceType != null ? resourceType.hashCode() : 0);
-            return result;
-        }
-
-        public String getResourceName() {
-            return resourceName;
-        }
-
-        public void setResourceName(String resourceName) {
-            this.resourceName = resourceName;
-        }
-
-        public ResourceType getResourceType() {
-            return resourceType;
-        }
-
-        public void setResourceType(ResourceType resourceType) {
-            this.resourceType = resourceType;
-        }
-    }
+    public record ResourceExcludes(String resourceName, ResourceType resourceType) {}
 
     public Builder toBuilder() {
         return builder(this);
