@@ -25,6 +25,7 @@ import java.util.function.BiConsumer;
 import java.util.stream.Collectors;
 
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.kafka.common.TopicPartition;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -62,6 +63,7 @@ import com.epam.eco.kafkamanager.utils.PrettyHtmlMapper;
 
 import static com.epam.eco.kafkamanager.ui.topics.browser.FilterClauseAbstractPredicate.KEY_ATTRIBUTE;
 import static com.epam.eco.kafkamanager.ui.topics.browser.FilterClauseAbstractPredicate.TOMBSTONE_ATTRIBUTE;
+import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 
 /**
@@ -156,9 +158,14 @@ public class TopicBrowserController {
 
         List<HeaderReplacement> replacements = properties.getTopicBrowser().getTombstoneGeneratorReplacements();
         try {
-            Map<String, String> headerMap = new ObjectMapper().readValue(headers, HashMap.class);
-            if(!CollectionUtils.isEmpty(replacements)) {
-                headerMap = TombstoneUtils.getReplacedTombstoneHeaders(headerMap,replacements);
+            Map<String, String> headerMap;
+            if(StringUtils.isNotEmpty(headers)) {
+                headerMap = new ObjectMapper().readValue(headers, HashMap.class);
+                if(CollectionUtils.isNotEmpty(replacements)) {
+                    headerMap = TombstoneUtils.getReplacedTombstoneHeaders(headerMap, replacements);
+                }
+            } else {
+                headerMap = Maps.newHashMap();
             }
             return ResponseEntity.ok(getAppropriateProducer(keyFormat).send(topicName, key, headerMap));
         } catch (Exception e) {
@@ -170,11 +177,13 @@ public class TopicBrowserController {
     public @ResponseBody ResponseEntity<String> replaceHeaders(
             @RequestParam(name="headers") String headers) {
 
+        if(StringUtils.isEmpty(headers)) {
+            return ResponseEntity.ok("{}");
+        }
+
         List<HeaderReplacement> replacements = properties.getTopicBrowser().getTombstoneGeneratorReplacements();
         try {
-            Map<String, String> headerMap = headers.trim().isEmpty() ?
-                                            Maps.newHashMap() :
-                                            new ObjectMapper().readValue(headers, HashMap.class);
+            Map<String, String> headerMap = new ObjectMapper().readValue(headers, HashMap.class);
             if(!CollectionUtils.isEmpty(replacements)) {
                 headerMap = TombstoneUtils.getReplacedTombstoneHeaders(headerMap,replacements);
             }
@@ -185,7 +194,7 @@ public class TopicBrowserController {
     }
 
     private KafkaTombstoneProducer getAppropriateProducer(DataFormat keyFormat) {
-         return keyFormat == DataFormat.AVRO ? kafkaTombstoneAvroProducer : kafkaTombstoneStringProducer;
+        return keyFormat == DataFormat.AVRO ? kafkaTombstoneAvroProducer : kafkaTombstoneStringProducer;
     }
 
     private void handleParamsRequest(
