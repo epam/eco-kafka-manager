@@ -39,6 +39,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.collect.Maps;
 
 import com.epam.eco.commons.kafka.OffsetRange;
 import com.epam.eco.commons.kafka.helpers.FilterClausePredicate;
@@ -171,7 +172,9 @@ public class TopicBrowserController {
 
         List<HeaderReplacement> replacements = properties.getTopicBrowser().getTombstoneGeneratorReplacements();
         try {
-            Map<String, String> headerMap = new ObjectMapper().readValue(headers, HashMap.class);
+            Map<String, String> headerMap = headers.trim().isEmpty() ?
+                                            Maps.newHashMap() :
+                                            new ObjectMapper().readValue(headers, HashMap.class);
             if(!CollectionUtils.isEmpty(replacements)) {
                 headerMap = TombstoneUtils.getReplacedTombstoneHeaders(headerMap,replacements);
             }
