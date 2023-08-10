@@ -267,17 +267,22 @@ function printLinksArray (pattern,data) {
 }
 
 const toggleFullScreen = ( mode ) => {
+
+    const container = document.getElementById('recordTableContainer');
+    const scrollBody = document.getElementsByClassName('dataTables_scrollBody')[0];
     const fullScreenButton = document.getElementById('full-screen-button');
+    const fullScreenItem = document.getElementById('fullScreen');
+
     if(mode==='maximize') {
-        document.getElementById('recordTableContainer').classList.add("full-screen");
-        document.getElementsByClassName('dataTables_scrollBody')[0].style.minHeight = "80vh"
+        container.classList.add("full-screen");
+        scrollBody.style.minHeight = "80vh"
         fullScreenButton.innerHTML = "Exit full screen <i class='fa fa-window-restore'></i>";
-        document.getElementById('fullScreen').value=true;
+        if(fullScreenItem!==null) {fullScreenItem.value = true;}
     } else {
-        document.getElementById('recordTableContainer').classList.remove("full-screen");
-        document.getElementsByClassName('dataTables_scrollBody')[0].style.minHeight = "45vh"
+        container.classList.remove("full-screen");
+        scrollBody.style.minHeight = "45vh"
         fullScreenButton.innerHTML = "Full screen <i class='fa fa-window-maximize'></i>";
-        document.getElementById('fullScreen').value=false;
+        if(fullScreenItem!==null) {fullScreenItem.value = false;}
     }
 }
 
@@ -290,7 +295,7 @@ function initFullScreenButton(dataTable) {
         fullScreenButton.classList.add("full-screen-button", "btn", "btn-sm", "btn-secondary");
         filters[0].appendChild(fullScreenButton);
 
-        fullScreenButton.addEventListener('click', function (e) {
+        fullScreenButton.addEventListener('click',  () => {
             if ($('#recordTableContainer')[0].classList.contains("full-screen")) {
                 toggleFullScreen('minimize');
             } else {
