@@ -43,10 +43,10 @@ import com.epam.eco.kafkamanager.MetadataRepo;
 import com.epam.eco.kafkamanager.MetadataUpdateListener;
 import com.epam.eco.kafkamanager.NotFoundException;
 import com.epam.eco.kafkamanager.PartitionInfo;
+import com.epam.eco.kafkamanager.SearchCriteria;
 import com.epam.eco.kafkamanager.TopicInfo;
 import com.epam.eco.kafkamanager.TopicMetadataKey;
 import com.epam.eco.kafkamanager.TopicRepo;
-import com.epam.eco.kafkamanager.TopicSearchCriteria;
 import com.epam.eco.kafkamanager.core.spring.AsyncStartingBean;
 import com.epam.eco.kafkamanager.core.topic.repo.zk.ZkTopicCache.PartitionMetadata;
 import com.epam.eco.kafkamanager.core.topic.repo.zk.ZkTopicCache.PartitionState;
@@ -58,7 +58,7 @@ import com.epam.eco.kafkamanager.repo.CachedRepo;
 /**
  * @author Andrei_Tytsik
  */
-public class ZkTopicRepo extends AbstractKeyValueRepo<String, TopicInfo, TopicSearchCriteria> implements TopicRepo, CachedRepo<String>, ZkTopicCache.CacheListener, ZkTopicConfigCache.CacheListener, MetadataUpdateListener, AsyncStartingBean {
+public class ZkTopicRepo extends AbstractKeyValueRepo<String, TopicInfo, SearchCriteria<TopicInfo>> implements TopicRepo, CachedRepo<String>, ZkTopicCache.CacheListener, ZkTopicConfigCache.CacheListener, MetadataUpdateListener, AsyncStartingBean {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ZkTopicRepo.class);
 

@@ -40,9 +40,9 @@ public interface KafkaManager {
     boolean topicExists(String topicName);
     TopicInfo getTopic(String topicName);
     List<TopicInfo> getAllTopics();
-    List<TopicInfo> getTopics(TopicSearchCriteria criteria);
+    List<TopicInfo> getTopics(SearchCriteria<TopicInfo> criteria);
     Page<TopicInfo> getTopicPage(Pageable pageable);
-    Page<TopicInfo> getTopicPage(TopicSearchCriteria criteria, Pageable pageable);
+    Page<TopicInfo> getTopicPage(SearchCriteria<TopicInfo> criteria, Pageable pageable);
     TopicInfo createTopic(TopicCreateParams params);
     TopicInfo updateTopic(TopicConfigUpdateParams params);
     TopicInfo updateTopic(TopicPartitionsCreateParams params);
@@ -61,9 +61,9 @@ public interface KafkaManager {
     boolean consumerGroupExists(String groupName);
     ConsumerGroupInfo getConsumerGroup(String groupName);
     List<ConsumerGroupInfo> getAllConsumerGroups();
-    List<ConsumerGroupInfo> getConsumerGroups(ConsumerGroupSearchCriteria criteria);
+    List<ConsumerGroupInfo> getConsumerGroups(SearchCriteria<ConsumerGroupInfo> criteria);
     Page<ConsumerGroupInfo> getConsumerGroupPage(Pageable pageable);
-    Page<ConsumerGroupInfo> getConsumerGroupPage(ConsumerGroupSearchCriteria criteria, Pageable pageable);
+    Page<ConsumerGroupInfo> getConsumerGroupPage(SearchCriteria<ConsumerGroupInfo> criteria, Pageable pageable);
     List<ConsumerGroupInfo> getConsumerGroupsForTopic(String topicName);
     ConsumerGroupInfo updateConsumerGroup(ConsumerGroupDeleteTopicParams params);
     ConsumerGroupInfo updateConsumerGroup(ConsumerGroupMetadataUpdateParams params);

@@ -24,15 +24,15 @@ import org.apache.commons.lang3.Validate;
 
 import com.epam.eco.kafkamanager.ConsumerGroupInfo;
 import com.epam.eco.kafkamanager.ConsumerGroupRepo;
-import com.epam.eco.kafkamanager.ConsumerGroupSearchCriteria;
 import com.epam.eco.kafkamanager.NotFoundException;
+import com.epam.eco.kafkamanager.SearchCriteria;
 import com.epam.eco.kafkamanager.repo.AbstractKeyValueRepo;
 import com.epam.eco.kafkamanager.repo.CachedRepo;
 
 /**
  * @author Andrei_Tytsik
  */
-public class CompositeConsumerGroupRepo extends AbstractKeyValueRepo<String, ConsumerGroupInfo, ConsumerGroupSearchCriteria> implements ConsumerGroupRepo, CachedRepo<String> {
+public class CompositeConsumerGroupRepo extends AbstractKeyValueRepo<String, ConsumerGroupInfo, SearchCriteria<ConsumerGroupInfo>> implements ConsumerGroupRepo, CachedRepo<String> {
 
     @Resource(name="ZK")
     private ConsumerGroupRepo zkConsumerGroupRepo;

@@ -41,7 +41,6 @@ import com.epam.eco.kafkamanager.ConsumerGroupInfo.StorageType;
 import com.epam.eco.kafkamanager.ConsumerGroupMemberInfo;
 import com.epam.eco.kafkamanager.ConsumerGroupMetadataKey;
 import com.epam.eco.kafkamanager.ConsumerGroupRepo;
-import com.epam.eco.kafkamanager.ConsumerGroupSearchCriteria;
 import com.epam.eco.kafkamanager.EntityType;
 import com.epam.eco.kafkamanager.KafkaAdminOperations;
 import com.epam.eco.kafkamanager.Metadata;
@@ -50,6 +49,7 @@ import com.epam.eco.kafkamanager.MetadataRepo;
 import com.epam.eco.kafkamanager.MetadataUpdateListener;
 import com.epam.eco.kafkamanager.NotFoundException;
 import com.epam.eco.kafkamanager.OffsetAndMetadataInfo;
+import com.epam.eco.kafkamanager.SearchCriteria;
 import com.epam.eco.kafkamanager.core.autoconfigure.KafkaManagerProperties;
 import com.epam.eco.kafkamanager.core.spring.AsyncStartingBean;
 import com.epam.eco.kafkamanager.repo.AbstractKeyValueRepo;
@@ -58,7 +58,7 @@ import com.epam.eco.kafkamanager.repo.CachedRepo;
 /**
  * @author Andrei_Tytsik
  */
-public class KafkaConsumerGroupRepo extends AbstractKeyValueRepo<String, ConsumerGroupInfo, ConsumerGroupSearchCriteria> implements ConsumerGroupRepo, CachedRepo<String>, KafkaConsumerGroupCache.CacheListener, MetadataUpdateListener, AsyncStartingBean {
+public class KafkaConsumerGroupRepo extends AbstractKeyValueRepo<String, ConsumerGroupInfo, SearchCriteria<ConsumerGroupInfo>> implements ConsumerGroupRepo, CachedRepo<String>, KafkaConsumerGroupCache.CacheListener, MetadataUpdateListener, AsyncStartingBean {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(KafkaConsumerGroupRepo.class);
 

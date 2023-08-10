@@ -20,26 +20,19 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 import java.util.function.BiPredicate;
-import java.util.function.Function;
 import java.util.regex.Pattern;
-import java.util.regex.PatternSyntaxException;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.Validate;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import static java.util.Objects.isNull;
 
 /**
  * @author Mikhail_Vershkov
  */
-public class TopicListSearchCriteriaImpl implements TopicSearchCriteria {
+public class TopicListSearchCriteriaImpl extends AbstractSearchCriteriaImpl<TopicInfo> {
 
-    private static final String OPERATION_SEPARATOR = "_";
     private static final String TOPIC_NAME_ATTR = "topicName";
     private static final String PARTITION_COUNT_ATTR = "partitionCount";
     private static final String REPLICATION_COUNT_ATTR = "replicationFactor";
@@ -47,88 +40,23 @@ public class TopicListSearchCriteriaImpl implements TopicSearchCriteria {
     private static final String REPLICATION_STATE_ATTR = "replicationState";
     private static final String CONFIG_STRING_ATTR = "configString";
     private static final String DESCRIPTION_ATTR = "description";
-
     private static final String REGEX_CONFIG_STRING_PATTERN = "((.)+:(.)+(;|))+";
     private static final String[] ARRAY_ATTRS = {TOPIC_NAME_ATTR, PARTITION_COUNT_ATTR, REPLICATION_COUNT_ATTR, CONSUMER_COUNT_ATTR, REPLICATION_STATE_ATTR, CONFIG_STRING_ATTR, DESCRIPTION_ATTR};
 
 
-    public enum Operation {
-        EQUALS, CONTAINS, GREATER, LESS, LIKE, NOT_EMPTY
-    }
-
-    private final Set<ClausesWithHandler> clauses;
-    private final KafkaManager kafkaManager;
-
-    private TopicListSearchCriteriaImpl(Set<ClausesWithHandler> clauses, KafkaManager kafkaManager) {
-        this.clauses = clauses;
-        this.kafkaManager = kafkaManager;
-    }
-
-    @JsonIgnore
-    public KafkaManager kafkaManager() {
-        return kafkaManager;
-    }
-
-    @Override
-    public boolean matches(TopicInfo obj) {
-        Validate.notNull(obj, "Topic Info is null");
-        return clauses.stream().allMatch(clause -> clause.match(obj));
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if(this == obj) {
-            return true;
-        }
-        if(obj == null || getClass() != obj.getClass()) {
-            return false;
-        }
-        TopicListSearchCriteriaImpl that = (TopicListSearchCriteriaImpl) obj;
-        return Objects.equals(this.clauses, that.clauses);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(clauses);
-    }
-
-    @Override
-    public String toString() {
-        return "{ clauses: " + clauses + "}";
+    private TopicListSearchCriteriaImpl(Set<ClausesWithHandler> clauses) {
+        super(clauses);
     }
 
     public static TopicListSearchCriteriaImpl fromJsonWith(Map<String, ?> map, KafkaManager kafkaManager) {
         return parseTopicCriteria(map, kafkaManager);
     }
 
-    static Map<String, String> parseConfigString(String configString) {
-        String config = StringUtils.stripToNull(configString);
-        if(config == null) {
-            return Collections.emptyMap();
-        }
-
-        String[] parts = StringUtils.split(config, ";");
-        Map<String, String> configMap = new HashMap<>((int) Math.ceil(parts.length / 0.75));
-        for(String configEntry : parts) {
-            int colonIdx = configEntry.indexOf(':');
-            String key = colonIdx >= 0 ? StringUtils.stripToNull(configEntry.substring(0, colonIdx)) : null;
-            String value = colonIdx >= 0 ? StringUtils.stripToNull(configEntry.substring(colonIdx + 1)) : null;
-            configMap.put(key, value);
-        }
-        return configMap;
-    }
-
-    private static boolean like(String value, String regexp) {
-        return value.toLowerCase()
-                    .matches(regexp.toLowerCase().replace("?", ".")
-                                   .replaceAll("%", ".*"));
-    }
-
-    private static boolean ifKeyExists(String key) {
+    static boolean ifKeyExists(String key) {
         return Arrays.stream(ARRAY_ATTRS).anyMatch(key::startsWith);
     }
 
-    private static TopicListSearchCriteriaImpl parseTopicCriteria(Map<String, ?> map, KafkaManager kafkaManager) {
+    public static TopicListSearchCriteriaImpl parseTopicCriteria(Map<String, ?> map, KafkaManager kafkaManager) {
 
         Set<SingleClause<String>> topicClauses = new HashSet<>();
         Set<SingleClause<Integer>> partitionCountClauses = new HashSet<>();
@@ -169,95 +97,15 @@ public class TopicListSearchCriteriaImpl implements TopicSearchCriteria {
                 Set.of(new ClausesWithHandler<>(topicClauses, stringClausesHandler, TopicInfo::getName),
                        new ClausesWithHandler<>(partitionCountClauses, numericClausesHandler, TopicInfo::getPartitionCount),
                        new ClausesWithHandler<>(replicationFactorClauses, numericClausesHandler, TopicInfo::getReplicationFactor),
-                       new ClausesWithHandler<>(consumerCountClauses, numericClausesHandler,
+                       new ClausesWithHandler<Integer,Integer,TopicInfo>(consumerCountClauses, numericClausesHandler,
                                                 topicInfo -> kafkaManager.getConsumerGroupsForTopic(
                                                         topicInfo.getName()).size()),
-                       new ClausesWithHandler<>(Set.of(new SingleClause<>(replicationStateClause, Operation.EQUALS)),
+                       new ClausesWithHandler<ReplicationState,TopicInfo,TopicInfo>(Set.of(new SingleClause<>(replicationStateClause, Operation.EQUALS)),
                                                 replicationStateClausesHandler, topicInfo -> topicInfo),
-                       new ClausesWithHandler<>(configStringClauses, configMapClausesHandler, topicInfo -> topicInfo),
-                       new ClausesWithHandler<>(descriptionClauses, stringClausesHandler,
-                                                topicInfo -> topicInfo.getMetadata().map(Metadata::getDescription).orElse(null))),
-                kafkaManager);
+                       new ClausesWithHandler<String,TopicInfo,TopicInfo>(configStringClauses, configMapClausesHandler, topicInfo -> topicInfo),
+                       new ClausesWithHandler<String,String,TopicInfo>(descriptionClauses, stringClausesHandler,
+                                                topicInfo -> topicInfo.getMetadata().map(Metadata::getDescription).orElse(null))));
     }
-
-    private static class SingleClause<T> {
-        private final T filterValue;
-        private final Operation operation;
-
-        public SingleClause(T filterValue, Operation operation) {
-            this.filterValue = filterValue;
-            this.operation = operation;
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if(this == o)
-                return true;
-            if(! (o instanceof SingleClause<?> that))
-                return false;
-
-            if(! filterValue.equals(that.filterValue))
-                return false;
-            return operation == that.operation;
-        }
-
-        @Override
-        public int hashCode() {
-            int result = filterValue.hashCode();
-            result = 31 * result + operation.hashCode();
-            return result;
-        }
-
-        @Override
-        public String toString() {
-            return "SingleClause {" + "filterValue=" + filterValue + ", operation=" + operation + '}';
-        }
-
-        public T getFilterValue() {
-            return filterValue;
-        }
-
-        public Operation getOperation() {
-            return operation;
-        }
-    }
-
-    private static class ClausesWithHandler<T, V> {
-        private final Set<SingleClause<T>> clauses;
-        private final BiPredicate<Set<SingleClause<T>>, V> clausesHandler;
-        private final Function<TopicInfo, V> valueExtractor;
-
-        private ClausesWithHandler(Set<SingleClause<T>> clauses,
-                                   BiPredicate<Set<SingleClause<T>>, V> clausesHandler,
-                                   Function<TopicInfo, V> valueExtractor) {
-            this.clauses = clauses;
-            this.clausesHandler = clausesHandler;
-            this.valueExtractor = valueExtractor;
-        }
-
-        boolean match(TopicInfo obj) {
-            return getClausesHandler().test(getClauses(),getValueExtractor().apply(obj));
-        }
-        public Set<SingleClause<T>> getClauses() {
-            return clauses;
-        }
-
-        public BiPredicate<Set<SingleClause<T>>, V> getClausesHandler() {
-            return clausesHandler;
-        }
-
-        public Function<TopicInfo, V> getValueExtractor() {
-            return valueExtractor;
-        }
-
-    }
-
-    private static final BiPredicate<Set<SingleClause<String>>, String> stringClausesHandler = (Set<SingleClause<String>> stringClauses, String value) -> stringClauses.stream().allMatch(
-            clause -> compareStringValues(clause.getFilterValue(), value, clause.getOperation()));
-
-
-    private static final BiPredicate<Set<SingleClause<Integer>>, Integer> numericClausesHandler = (Set<SingleClause<Integer>> numericClauses, Integer value) -> numericClauses.stream().allMatch(
-            clause -> compareNumberValues(clause.getFilterValue(), value, clause.getOperation()));
 
     private static final BiPredicate<Set<SingleClause<ReplicationState>>, TopicInfo> replicationStateClausesHandler = (Set<SingleClause<ReplicationState>> clauses, TopicInfo topicInfo) -> clauses.stream().allMatch(
             clause -> {
@@ -287,57 +135,21 @@ public class TopicListSearchCriteriaImpl implements TopicSearchCriteria {
         return compareStringValues(clause.getFilterValue(), stripJsonString(topicInfo.getConfig().toString()), clause.getOperation());
     }
 
-    private static String stripJsonString(String string) {
-        return string
-                  .replace("{","")
-                  .replace("}","");
-    }
+    static Map<String, String> parseConfigString(String configString) {
+        String config = StringUtils.stripToNull(configString);
+        if(config == null) {
+            return Collections.emptyMap();
+        }
 
-    private static boolean compareStringValues(String filterValue, String value, Operation operation) {
-        if((isNull(filterValue) || StringUtils.isBlank(filterValue)) && operation != Operation.NOT_EMPTY) {
-            return true;
+        String[] parts = StringUtils.split(config, ";");
+        Map<String, String> configMap = new HashMap<>((int) Math.ceil(parts.length / 0.75));
+        for(String configEntry : parts) {
+            int colonIdx = configEntry.indexOf(':');
+            String key = colonIdx >= 0 ? StringUtils.stripToNull(configEntry.substring(0, colonIdx)) : null;
+            String value = colonIdx >= 0 ? StringUtils.stripToNull(configEntry.substring(colonIdx + 1)) : null;
+            configMap.put(key, value);
         }
-        if(isNull(value)) {
-            return false;
-        }
-        switch (operation) {
-            case EQUALS:
-                return filterValue.equalsIgnoreCase(value);
-            case CONTAINS:
-                return StringUtils.containsIgnoreCase(value, filterValue);
-            case NOT_EMPTY:
-                return !StringUtils.isBlank(value);
-            case LIKE: {
-                try {
-                    return like(value, filterValue);
-                } catch (PatternSyntaxException exception) {
-                    return false;
-                }
-            }
-            default: {
-                return false;
-            }
-        }
-    }
-
-    private static boolean compareNumberValues(Integer filterValue, Integer value, Operation operation) {
-        if(isNull(value)) {
-            return false;
-        }
-        if(isNull(filterValue) && operation != Operation.NOT_EMPTY) {
-            return true;
-        }
-        switch (operation) {
-            case EQUALS:
-                return value.equals(filterValue);
-            case GREATER:
-                return value > filterValue;
-            case LESS:
-                return value < filterValue;
-            default: {
-                return false;
-            }
-        }
+        return configMap;
     }
             
 

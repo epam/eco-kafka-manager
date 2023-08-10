@@ -16,8 +16,6 @@
 package com.epam.eco.kafkamanager.core;
 
 import java.security.Principal;
-import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -43,7 +41,6 @@ import com.epam.eco.kafkamanager.ConsumerGroupMetadataKey;
 import com.epam.eco.kafkamanager.ConsumerGroupMetadataUpdateParams;
 import com.epam.eco.kafkamanager.ConsumerGroupOffsetResetterTaskExecutor;
 import com.epam.eco.kafkamanager.ConsumerGroupRepo;
-import com.epam.eco.kafkamanager.ConsumerGroupSearchCriteria;
 import com.epam.eco.kafkamanager.ConsumerGroupTopicOffsetFetcherTaskExecutor;
 import com.epam.eco.kafkamanager.KafkaManager;
 import com.epam.eco.kafkamanager.Metadata;
@@ -54,10 +51,12 @@ import com.epam.eco.kafkamanager.PermissionMetadataDeleteParams;
 import com.epam.eco.kafkamanager.PermissionMetadataKey;
 import com.epam.eco.kafkamanager.PermissionMetadataUpdateParams;
 import com.epam.eco.kafkamanager.PermissionRepo;
+import com.epam.eco.kafkamanager.PermissionRepo.DeleteCallback;
 import com.epam.eco.kafkamanager.PermissionSearchCriteria;
 import com.epam.eco.kafkamanager.PrincipalPermissionsDeleteParams;
 import com.epam.eco.kafkamanager.ResourcePermissionFilter;
 import com.epam.eco.kafkamanager.ResourcePermissionsDeleteParams;
+import com.epam.eco.kafkamanager.SearchCriteria;
 import com.epam.eco.kafkamanager.SecurityContextAdapter;
 import com.epam.eco.kafkamanager.TopicConfigUpdateParams;
 import com.epam.eco.kafkamanager.TopicCreateParams;
@@ -73,7 +72,6 @@ import com.epam.eco.kafkamanager.TopicPurgerTaskExecutor;
 import com.epam.eco.kafkamanager.TopicRecordCounterTaskExecutor;
 import com.epam.eco.kafkamanager.TopicRecordFetcherTaskExecutor;
 import com.epam.eco.kafkamanager.TopicRepo;
-import com.epam.eco.kafkamanager.TopicSearchCriteria;
 import com.epam.eco.kafkamanager.TransactionInfo;
 import com.epam.eco.kafkamanager.TransactionRepo;
 import com.epam.eco.kafkamanager.TransactionSearchCriteria;
@@ -218,7 +216,7 @@ public class KafkaManagerImpl implements KafkaManager {
     }
 
     @Override
-    public List<TopicInfo> getTopics(TopicSearchCriteria criteria) {
+    public List<TopicInfo> getTopics(SearchCriteria<TopicInfo> criteria) {
         return topicRepo.values(criteria);
     }
 
@@ -228,7 +226,7 @@ public class KafkaManagerImpl implements KafkaManager {
     }
 
     @Override
-    public Page<TopicInfo> getTopicPage(TopicSearchCriteria criteria, Pageable pageable) {
+    public Page<TopicInfo> getTopicPage(SearchCriteria<TopicInfo> criteria, Pageable pageable) {
         return topicRepo.page(criteria, pageable);
     }
 
@@ -376,8 +374,9 @@ public class KafkaManagerImpl implements KafkaManager {
         return consumerGroupRepo.values();
     }
 
+
     @Override
-    public List<ConsumerGroupInfo> getConsumerGroups(ConsumerGroupSearchCriteria criteria) {
+    public List<ConsumerGroupInfo> getConsumerGroups(SearchCriteria<ConsumerGroupInfo> criteria) {
         return consumerGroupRepo.values(criteria);
     }
 
@@ -387,7 +386,7 @@ public class KafkaManagerImpl implements KafkaManager {
     }
 
     @Override
-    public Page<ConsumerGroupInfo> getConsumerGroupPage(ConsumerGroupSearchCriteria criteria, Pageable pageable) {
+    public Page<ConsumerGroupInfo> getConsumerGroupPage(SearchCriteria<ConsumerGroupInfo> criteria, Pageable pageable) {
         return consumerGroupRepo.page(criteria, pageable);
     }
 
@@ -570,20 +569,24 @@ public class KafkaManagerImpl implements KafkaManager {
         Validate.notNull(params, "ResourcePermissionsDeleteParams object is null");
 
         permissionRepo.deleteOfResource(
-                params.getFilter(), permissionsToDelete -> {
-                    if (params.getFilter().getPrincipalObjectFilter() == null) {
-                        return;
-                    }
+                params.getFilter(),
+                new DeleteCallback() {
+                    @Override
+                    public void onBeforeDelete(List<PermissionInfo> permissionsToDelete) {
+                        if (params.getFilter().getPrincipalObjectFilter() == null) {
+                            return;
+                        }
 
-                    List<PermissionInfo> allResourcePermissions =
-                            permissionRepo.findMatchingOfResource(params.getFilter().toMatchAnyFilter());
-                    if (allResourcePermissions.size() == permissionsToDelete.size()) {
-                        metadataRepo.delete(
-                                PermissionMetadataKey.with(
-                                params.getFilter().getPrincipalObjectFilter(),
-                                params.getFilter().getResourceType(),
-                                params.getFilter().getResourceName(),
-                                params.getFilter().getPatternType()));
+                        List<PermissionInfo> allResourcePermissions =
+                                permissionRepo.findMatchingOfResource(params.getFilter().toMatchAnyFilter());
+                        if (allResourcePermissions.size() == permissionsToDelete.size()) {
+                            metadataRepo.delete(
+                                    PermissionMetadataKey.with(
+                                    params.getFilter().getPrincipalObjectFilter(),
+                                    params.getFilter().getResourceType(),
+                                    params.getFilter().getResourceName(),
+                                    params.getFilter().getPatternType()));
+                        }
                     }
                 });
     }

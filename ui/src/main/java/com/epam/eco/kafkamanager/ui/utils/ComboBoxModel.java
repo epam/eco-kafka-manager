@@ -1,5 +1,5 @@
 /*******************************************************************************
- *  Copyright 2022 EPAM Systems
+ *  Copyright 2023 EPAM Systems
  *
  *  Licensed under the Apache License, Version 2.0 (the "License"); you may not
  *  use this file except in compliance with the License.  You may obtain a copy
@@ -13,25 +13,22 @@
  *  License for the specific language governing permissions and limitations under
  *  the License.
  *******************************************************************************/
-package com.epam.eco.kafkamanager;
+package com.epam.eco.kafkamanager.ui.utils;
 
-import java.util.List;
+import java.io.Serializable;
 
-import org.springframework.security.access.prepost.PreAuthorize;
-
-import com.epam.eco.kafkamanager.repo.KeyValueRepo;
+import com.fasterxml.jackson.annotation.JsonGetter;
 
 /**
- * @author Andrei_Tytsik
+ * @author Mikhail_Vershkov
  */
-public interface ConsumerGroupRepo extends KeyValueRepo<String, ConsumerGroupInfo, SearchCriteria<ConsumerGroupInfo>> {
 
-    List<ConsumerGroupInfo> groupsForTopic(String topicName);
-
-    @PreAuthorize("@authorizer.isPermitted('CONSUMER_GROUP', #groupName, 'READ')")
-    ConsumerGroupInfo unassignGroupFromTopic(String groupName, String topicName);
-
-    @PreAuthorize("@authorizer.isPermitted('CONSUMER_GROUP', #groupName, 'DELETE')")
-    void deleteConsumerGroup(String groupName);
-
+public record ComboBoxModel(@JsonGetter("id") String id,
+                            @JsonGetter("value") String value) implements Serializable {
+    public static ComboBoxModel build(String id) {
+        return new ComboBoxModel(id,id);
+    }
+    public static ComboBoxModel build(String id,String value) {
+        return new ComboBoxModel(id,value);
+    }
 }

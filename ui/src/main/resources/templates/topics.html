@@ -26,21 +26,10 @@
     <script type="text/javascript" th:inline="javascript">
         /*<![CDATA[*/
         const externalTools = [[${externalToolTemplates}]];
+        const replicationStates = [[${replicationStates}]];
         /*]]>*/
-        let dataTable;
 
-        const stringPlaceholders = [
-            { operation: 'LIKE', text: 'Format:%any string%any string%'},
-            { operation: 'NOT_EMPTY', text: 'Format: leave it blank'},
-            { operation: 'OTHERS', text: 'Format: any string'}
-        ];
-        const numberPlaceholders = [{operation: 'OTHERS', text: 'Format: numeric'}];
-        const mapPlaceholders = [
-            { operation: 'EQUALS', text: 'Format: config: value,...'},
-            { operation: 'NOT_EMPTY', text: 'Format: leave it blank'},
-            { operation: 'LIKE', text: 'Format: %any string%any other string%'},
-            { operation: 'OTHERS', text: 'Format: any string'}
-        ];
+        let dataTable;
 
         function initColumns() {
             setFilterColumnsArray( [
@@ -48,7 +37,7 @@
                 {id:'partitionCount', label: 'Partition count', type: 'number', placeholders: numberPlaceholders},
                 {id:'replicationFactor', label: 'Replication factor', type: 'number', placeholders: numberPlaceholders},
                 {id:'consumerCount', label: 'Consumer count', type: 'number', placeholders: numberPlaceholders},
-                {id:'replicationState', label: 'Replication state', type: 'enum', values: ['ANY_REPLICATED', 'FULLY_REPLICATED', 'UNDER_REPLICATED'], placeholders: []},
+                {id:'replicationState', label: 'Replication state', type: 'enum', values: replicationStates, placeholders: []},
                 {id:'configString', label: 'Config string', type: 'map', placeholders: mapPlaceholders},
                 {id:'description', label: 'Description', type: 'string', placeholders: stringPlaceholders}
             ]);
@@ -180,35 +169,13 @@
                 }
             });
 
-            const toggleFullScreen = ( mode ) => {
-                const fullScreenButton = $('#full-screen-button');
-                if(mode==='maximize') {
-                    $('#recordTableContainer').addClass("full-screen");
-                    $('.dataTables_scrollBody').css("min-height","80vh");
-                    fullScreenButton.html("Exit full screen <i class='fa fa-window-restore'></i>");
-                    $('#fullScreen').val(true);
-                } else {
-                    $('#recordTableContainer').removeClass("full-screen");
-                    $('.dataTables_scrollBody').css("min-height","45vh");
-                    fullScreenButton.html("Full screen <i class='fa fa-window-maximize'></i>");
-                    $('#fullScreen').val(false);
-                }
-            }
+            initFullScreenButton(dataTable);
 
             $('#query-param-filter-apply-button').click(function (e) {
                 dataTable.ajax.url(generateQueryUrl()).load(
                     function ( json ) {
                        dataTable.columns.adjust();
                     }, true);
-            });
-
-            $('#full-screen-button').click(function (e) {
-                if($('#recordTableContainer')[0].classList.contains("full-screen")) {
-                    toggleFullScreen('minimize');
-                } else {
-                    toggleFullScreen('maximize');
-                }
-                dataTable.columns.adjust();
             });
 
             $('.export-button').click(function (event) {
@@ -291,14 +258,7 @@
 
                 <div class="col-md-12">
 
-                    <div id="recordTableContainer" style="background: white;">
-                        <div class="d-flex" style="padding: 0 2em 0 2em">
-                            <h6>Topic list</h6>
-                            <button id="full-screen-button" class="btn btn-secondary btn-sm to-right">
-                                Full screen
-                                <i id="full-screen-icon" class="fa fa-window-maximize" aria-hidden="true"></i>
-                            </button>
-                        </div>
+                    <div id="recordTableContainer">
                         <table id="topics-table" class="table table-bordered table-striped table-hover">
                             <thead>
                                 <tr>

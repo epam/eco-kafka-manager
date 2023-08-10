@@ -56,6 +56,7 @@ import com.epam.eco.kafkamanager.PermissionSearchCriteria;
 import com.epam.eco.kafkamanager.PrincipalPermissionsDeleteParams;
 import com.epam.eco.kafkamanager.ResourcePermissionFilter;
 import com.epam.eco.kafkamanager.ResourcePermissionsDeleteParams;
+import com.epam.eco.kafkamanager.SearchCriteria;
 import com.epam.eco.kafkamanager.TopicConfigUpdateParams;
 import com.epam.eco.kafkamanager.TopicCreateParams;
 import com.epam.eco.kafkamanager.TopicInfo;
@@ -68,7 +69,6 @@ import com.epam.eco.kafkamanager.TopicPartitionsCreateParams;
 import com.epam.eco.kafkamanager.TopicPurgerTaskExecutor;
 import com.epam.eco.kafkamanager.TopicRecordCounterTaskExecutor;
 import com.epam.eco.kafkamanager.TopicRecordFetcherTaskExecutor;
-import com.epam.eco.kafkamanager.TopicSearchCriteria;
 import com.epam.eco.kafkamanager.TopicSearchCriteriaImpl;
 import com.epam.eco.kafkamanager.TransactionInfo;
 import com.epam.eco.kafkamanager.TransactionSearchCriteria;
@@ -273,7 +273,7 @@ public class RestKafkaManager implements KafkaManager {
     }
 
     @Override
-    public List<TopicInfo> getTopics(TopicSearchCriteria criteria) {
+    public List<TopicInfo> getTopics(SearchCriteria<TopicInfo> criteria) {
         return getTopicPage(criteria, PageRequest.of(0, Integer.MAX_VALUE)).getContent();
     }
 
@@ -283,7 +283,7 @@ public class RestKafkaManager implements KafkaManager {
     }
 
     @Override
-    public Page<TopicInfo> getTopicPage(TopicSearchCriteria searchCriteria, Pageable pageable) {
+    public Page<TopicInfo> getTopicPage(SearchCriteria<TopicInfo> searchCriteria, Pageable pageable) {
 
         Validate.notNull(searchCriteria, "Criteria can't be null");
         Validate.notNull(pageable, "Pageable can't be null");
@@ -497,7 +497,7 @@ public class RestKafkaManager implements KafkaManager {
     }
 
     @Override
-    public List<ConsumerGroupInfo> getConsumerGroups(ConsumerGroupSearchCriteria criteria) {
+    public List<ConsumerGroupInfo> getConsumerGroups(SearchCriteria<ConsumerGroupInfo> criteria) {
         return getConsumerGroupPage(criteria, PageRequest.of(0, Integer.MAX_VALUE)).getContent();
     }
 
@@ -507,9 +507,13 @@ public class RestKafkaManager implements KafkaManager {
     }
 
     @Override
-    public Page<ConsumerGroupInfo> getConsumerGroupPage(ConsumerGroupSearchCriteria criteria, Pageable pageable) {
-        Validate.notNull(criteria, "Criteria can't be null");
+    public Page<ConsumerGroupInfo> getConsumerGroupPage(SearchCriteria<ConsumerGroupInfo> searchCriteria, Pageable pageable) {
+        Validate.notNull(searchCriteria, "Criteria can't be null");
         Validate.notNull(pageable, "Pageable can't be null");
+
+        Validate.isTrue(searchCriteria instanceof ConsumerGroupSearchCriteria, "Wrong type of search criteria");
+
+        ConsumerGroupSearchCriteria criteria = (ConsumerGroupSearchCriteria)searchCriteria;
 
         HashMap<String, Object> params = new HashMap<>();
         params.put("page", pageable.getPageNumber());
