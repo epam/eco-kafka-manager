@@ -31,7 +31,7 @@ import static java.util.Objects.isNull;
 /**
  * @author Mikhail_Vershkov
  */
-public class TopicListSearchCriteriaImpl extends AbstractSearchCriteriaImpl<TopicInfo> {
+public class TopicListSearchCriteria extends AbstractSearchCriteria<TopicInfo> {
 
     private static final String TOPIC_NAME_ATTR = "topicName";
     private static final String PARTITION_COUNT_ATTR = "partitionCount";
@@ -44,11 +44,11 @@ public class TopicListSearchCriteriaImpl extends AbstractSearchCriteriaImpl<Topi
     private static final String[] ARRAY_ATTRS = {TOPIC_NAME_ATTR, PARTITION_COUNT_ATTR, REPLICATION_COUNT_ATTR, CONSUMER_COUNT_ATTR, REPLICATION_STATE_ATTR, CONFIG_STRING_ATTR, DESCRIPTION_ATTR};
 
 
-    private TopicListSearchCriteriaImpl(Set<ClausesWithHandler> clauses) {
+    private TopicListSearchCriteria(Set<ClausesWithHandler> clauses) {
         super(clauses);
     }
 
-    public static TopicListSearchCriteriaImpl fromJsonWith(Map<String, ?> map, KafkaManager kafkaManager) {
+    public static TopicListSearchCriteria fromJsonWith(Map<String, ?> map, KafkaManager kafkaManager) {
         return parseTopicCriteria(map, kafkaManager);
     }
 
@@ -56,7 +56,7 @@ public class TopicListSearchCriteriaImpl extends AbstractSearchCriteriaImpl<Topi
         return Arrays.stream(ARRAY_ATTRS).anyMatch(key::startsWith);
     }
 
-    public static TopicListSearchCriteriaImpl parseTopicCriteria(Map<String, ?> map, KafkaManager kafkaManager) {
+    public static TopicListSearchCriteria parseTopicCriteria(Map<String, ?> map, KafkaManager kafkaManager) {
 
         Set<SingleClause<String>> topicClauses = new HashSet<>();
         Set<SingleClause<Integer>> partitionCountClauses = new HashSet<>();
@@ -93,7 +93,7 @@ public class TopicListSearchCriteriaImpl extends AbstractSearchCriteriaImpl<Topi
 
         }
 
-        return new TopicListSearchCriteriaImpl(
+        return new TopicListSearchCriteria(
                 Set.of(new ClausesWithHandler<>(topicClauses, stringClausesHandler, TopicInfo::getName),
                        new ClausesWithHandler<>(partitionCountClauses, numericClausesHandler, TopicInfo::getPartitionCount),
                        new ClausesWithHandler<>(replicationFactorClauses, numericClausesHandler, TopicInfo::getReplicationFactor),
@@ -110,9 +110,9 @@ public class TopicListSearchCriteriaImpl extends AbstractSearchCriteriaImpl<Topi
     private static final BiPredicate<Set<SingleClause<ReplicationState>>, TopicInfo> replicationStateClausesHandler = (Set<SingleClause<ReplicationState>> clauses, TopicInfo topicInfo) -> clauses.stream().allMatch(
             clause -> {
                 Boolean underReplicated = null;
-                if(ReplicationState.FULLY_REPLICATED == clause.getFilterValue()) {
+                if(ReplicationState.FULLY_REPLICATED == clause.filterValue()) {
                     underReplicated = Boolean.FALSE;
-                } else if(ReplicationState.UNDER_REPLICATED == clause.getFilterValue()) {
+                } else if(ReplicationState.UNDER_REPLICATED == clause.filterValue()) {
                     underReplicated = Boolean.TRUE;
                 }
                 return (underReplicated == null || topicInfo.hasUnderReplicatedPartitions() == underReplicated);
@@ -123,16 +123,16 @@ public class TopicListSearchCriteriaImpl extends AbstractSearchCriteriaImpl<Topi
                     clauses.stream().allMatch(clause -> configMapSingleClauseHandler(clause, topicInfo));
 
     private static boolean configMapSingleClauseHandler(SingleClause<String> clause, TopicInfo topicInfo) {
-        if((isNull(clause.getFilterValue()) || clause.getFilterValue().isEmpty()) && clause.getOperation()!=Operation.NOT_EMPTY) {
+        if((isNull(clause.filterValue()) || clause.filterValue().isEmpty()) && clause.operation()!=Operation.NOT_EMPTY) {
             return false;
         }
-        if(Pattern.matches(REGEX_CONFIG_STRING_PATTERN, clause.getFilterValue()) && clause.getOperation()==Operation.EQUALS) {
-            return topicInfo.getConfig().entrySet().containsAll(parseConfigString(clause.getFilterValue()).entrySet());
-        } else if(!Pattern.matches(REGEX_CONFIG_STRING_PATTERN, clause.getFilterValue()) && clause.getOperation()==Operation.EQUALS) {
-            return topicInfo.getConfig().entrySet().stream().anyMatch(entry->entry.getKey().equals(clause.getFilterValue())
-                    || entry.getValue().equals(clause.getFilterValue()));
+        if(Pattern.matches(REGEX_CONFIG_STRING_PATTERN, clause.filterValue()) && clause.operation()==Operation.EQUALS) {
+            return topicInfo.getConfig().entrySet().containsAll(parseConfigString(clause.filterValue()).entrySet());
+        } else if(!Pattern.matches(REGEX_CONFIG_STRING_PATTERN, clause.filterValue()) && clause.operation()==Operation.EQUALS) {
+            return topicInfo.getConfig().entrySet().stream().anyMatch(entry->entry.getKey().equals(clause.filterValue())
+                    || entry.getValue().equals(clause.filterValue()));
         }
-        return compareStringValues(clause.getFilterValue(), stripJsonString(topicInfo.getConfig().toString()), clause.getOperation());
+        return compareStringValues(clause.filterValue(), stripJsonString(topicInfo.getConfig().toString()), clause.operation());
     }
 
     static Map<String, String> parseConfigString(String configString) {

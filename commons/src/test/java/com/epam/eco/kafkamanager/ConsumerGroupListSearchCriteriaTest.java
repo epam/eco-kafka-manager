@@ -43,21 +43,21 @@ public class ConsumerGroupListSearchCriteriaTest {
     @Test
     public void groupNameTest() {
 
-        AbstractSearchCriteriaImpl.SingleClause<String> expectedClause = new AbstractSearchCriteriaImpl.SingleClause<>(
-                TEST_GROUP_NAME, AbstractSearchCriteriaImpl.Operation.EQUALS);
+        AbstractSearchCriteria.SingleClause<String> expectedClause = new AbstractSearchCriteria.SingleClause<>(
+                TEST_GROUP_NAME, AbstractSearchCriteria.Operation.EQUALS);
         ConsumerGroupListSearchCriteria criteria = ConsumerGroupListSearchCriteria.parseTopicCriteria(Map.of("groupName_EQUALS", TEST_GROUP_NAME));
         checkClause( criteria, expectedClause);
 
         criteria = ConsumerGroupListSearchCriteria.parseTopicCriteria(Map.of("groupName_CONTAINS", TEST_GROUP_NAME));
-        expectedClause = new AbstractSearchCriteriaImpl.SingleClause<>(TEST_GROUP_NAME, AbstractSearchCriteriaImpl.Operation.CONTAINS);
+        expectedClause = new AbstractSearchCriteria.SingleClause<>(TEST_GROUP_NAME, AbstractSearchCriteria.Operation.CONTAINS);
         checkClause( criteria, expectedClause);
 
         criteria = ConsumerGroupListSearchCriteria.parseTopicCriteria(Map.of("groupName_LIKE", TEST_GROUP_NAME));
-        expectedClause = new AbstractSearchCriteriaImpl.SingleClause<>(TEST_GROUP_NAME, AbstractSearchCriteriaImpl.Operation.LIKE);
+        expectedClause = new AbstractSearchCriteria.SingleClause<>(TEST_GROUP_NAME, AbstractSearchCriteria.Operation.LIKE);
         checkClause( criteria, expectedClause);
 
         criteria = ConsumerGroupListSearchCriteria.parseTopicCriteria(Map.of("groupName_NOT_EMPTY", TEST_GROUP_NAME));
-        expectedClause = new AbstractSearchCriteriaImpl.SingleClause<>(TEST_GROUP_NAME, AbstractSearchCriteriaImpl.Operation.NOT_EMPTY);
+        expectedClause = new AbstractSearchCriteria.SingleClause<>(TEST_GROUP_NAME, AbstractSearchCriteria.Operation.NOT_EMPTY);
         checkClause( criteria, expectedClause);
 
         Assertions.assertThrows(IllegalArgumentException.class, ()->
@@ -70,14 +70,14 @@ public class ConsumerGroupListSearchCriteriaTest {
 
         ConsumerGroupListSearchCriteria criteria = ConsumerGroupListSearchCriteria.parseTopicCriteria(
                   Map.of("storage_EQUALS", ConsumerGroupInfo.StorageType.ZOOKEEPER.name()));
-        AbstractSearchCriteriaImpl.SingleClause<ConsumerGroupInfo.StorageType> expectedClause = new AbstractSearchCriteriaImpl.SingleClause<>(
-                ConsumerGroupInfo.StorageType.ZOOKEEPER, AbstractSearchCriteriaImpl.Operation.EQUALS);
+        AbstractSearchCriteria.SingleClause<ConsumerGroupInfo.StorageType> expectedClause = new AbstractSearchCriteria.SingleClause<>(
+                ConsumerGroupInfo.StorageType.ZOOKEEPER, AbstractSearchCriteria.Operation.EQUALS);
         checkClause( criteria, expectedClause);
 
         criteria = ConsumerGroupListSearchCriteria.parseTopicCriteria(
                 Map.of("storage_EQUALS", ConsumerGroupInfo.StorageType.KAFKA.name()));
-        expectedClause = new AbstractSearchCriteriaImpl.SingleClause<>(
-                ConsumerGroupInfo.StorageType.KAFKA, AbstractSearchCriteriaImpl.Operation.EQUALS);
+        expectedClause = new AbstractSearchCriteria.SingleClause<>(
+                ConsumerGroupInfo.StorageType.KAFKA, AbstractSearchCriteria.Operation.EQUALS);
         checkClause( criteria, expectedClause);
 
         Assertions.assertThrows(IllegalArgumentException.class, () ->
@@ -95,8 +95,8 @@ public class ConsumerGroupListSearchCriteriaTest {
 
         Arrays.stream(ConsumerGroupState.values()).forEach((state-> {
             ConsumerGroupListSearchCriteria criteria = ConsumerGroupListSearchCriteria.parseTopicCriteria(Map.of("state_EQUALS", state.name()));
-            AbstractSearchCriteriaImpl.SingleClause<ConsumerGroupState> expectedClause = new AbstractSearchCriteriaImpl.SingleClause<>(
-                    state, AbstractSearchCriteriaImpl.Operation.EQUALS);
+            AbstractSearchCriteria.SingleClause<ConsumerGroupState> expectedClause = new AbstractSearchCriteria.SingleClause<>(
+                    state, AbstractSearchCriteria.Operation.EQUALS);
             checkClause( criteria, expectedClause);
         }));
 
@@ -105,7 +105,7 @@ public class ConsumerGroupListSearchCriteriaTest {
         );
         Assertions.assertThrows(IllegalArgumentException.class, () ->
             ConsumerGroupListSearchCriteria.parseTopicCriteria(Map.of("state_"+TEST_WRONG_OPERATION,
-                                                                      AbstractSearchCriteriaImpl.Operation.EQUALS))
+                                                                      AbstractSearchCriteria.Operation.EQUALS))
         );
 
     }
@@ -113,26 +113,26 @@ public class ConsumerGroupListSearchCriteriaTest {
     @Test
     public void topicsTest() {
 
-        AbstractSearchCriteriaImpl.SingleClause<String> expectedClause = new AbstractSearchCriteriaImpl.SingleClause<>(
-                TEST_TOPIC_NAME, AbstractSearchCriteriaImpl.Operation.EQUALS);
+        AbstractSearchCriteria.SingleClause<String> expectedClause = new AbstractSearchCriteria.SingleClause<>(
+                TEST_TOPIC_NAME, AbstractSearchCriteria.Operation.EQUALS);
         ConsumerGroupListSearchCriteria criteria = ConsumerGroupListSearchCriteria.parseTopicCriteria(Map.of("topics_EQUALS", TEST_TOPIC_NAME));
         checkClause( criteria, expectedClause);
 
         criteria = ConsumerGroupListSearchCriteria.parseTopicCriteria(Map.of("topics_CONTAINS", TEST_TOPIC_NAME));
-        expectedClause = new AbstractSearchCriteriaImpl.SingleClause<>( TEST_TOPIC_NAME, AbstractSearchCriteriaImpl.Operation.CONTAINS);
+        expectedClause = new AbstractSearchCriteria.SingleClause<>(TEST_TOPIC_NAME, AbstractSearchCriteria.Operation.CONTAINS);
         checkClause( criteria, expectedClause);
 
         criteria = ConsumerGroupListSearchCriteria.parseTopicCriteria(Map.of("topics_LIKE", TEST_TOPIC_NAME));
-        expectedClause = new AbstractSearchCriteriaImpl.SingleClause<>( TEST_TOPIC_NAME, AbstractSearchCriteriaImpl.Operation.LIKE);
+        expectedClause = new AbstractSearchCriteria.SingleClause<>(TEST_TOPIC_NAME, AbstractSearchCriteria.Operation.LIKE);
         checkClause( criteria, expectedClause);
 
         criteria = ConsumerGroupListSearchCriteria.parseTopicCriteria(Map.of("topics_NOT_EMPTY", TEST_TOPIC_NAME));
-        expectedClause = new AbstractSearchCriteriaImpl.SingleClause<>( TEST_TOPIC_NAME, AbstractSearchCriteriaImpl.Operation.NOT_EMPTY);
+        expectedClause = new AbstractSearchCriteria.SingleClause<>(TEST_TOPIC_NAME, AbstractSearchCriteria.Operation.NOT_EMPTY);
         checkClause( criteria, expectedClause);
 
         criteria = ConsumerGroupListSearchCriteria.parseTopicCriteria(Map.of(TEST_WRONG_CLAUSE_NAME + "_NOT_EMPTY", TEST_GROUP_NAME));
         Assertions.assertEquals((criteria.getClauses().stream()
-                                              .mapToLong(clause->clause.getClauses().size()).sum()), 0L);
+                                         .mapToLong(clause->clause.clauses().size()).sum()), 0L);
 
         Assertions.assertThrows(IllegalArgumentException.class,
                                 () -> ConsumerGroupListSearchCriteria.parseTopicCriteria(Map.of("topics_" + TEST_WRONG_OPERATION, TEST_GROUP_NAME))
@@ -144,26 +144,26 @@ public class ConsumerGroupListSearchCriteriaTest {
 
         ConsumerGroupListSearchCriteria criteria = ConsumerGroupListSearchCriteria.parseTopicCriteria(
                 Map.of("topicsCount_EQUALS", TEST_GROUP_TOPICS_COUNT));
-        AbstractSearchCriteriaImpl.SingleClause<Integer> expectedClause = new AbstractSearchCriteriaImpl.SingleClause<>(
+        AbstractSearchCriteria.SingleClause<Integer> expectedClause = new AbstractSearchCriteria.SingleClause<>(
                 Integer.valueOf(TEST_GROUP_TOPICS_COUNT),
-                AbstractSearchCriteriaImpl.Operation.EQUALS);
-        Assertions.assertEquals(criteria.getClauses().stream().mapToLong(clause -> clause.getClauses().size()).sum(), 1L);
+                AbstractSearchCriteria.Operation.EQUALS);
+        Assertions.assertEquals(criteria.getClauses().stream().mapToLong(clause -> clause.clauses().size()).sum(), 1L);
         checkClause(criteria,expectedClause);
 
         criteria = ConsumerGroupListSearchCriteria.parseTopicCriteria(
                 Map.of("topicsCount_GREATER", TEST_GROUP_TOPICS_COUNT));
-        expectedClause = new AbstractSearchCriteriaImpl.SingleClause<>(
+        expectedClause = new AbstractSearchCriteria.SingleClause<>(
                 Integer.valueOf(TEST_GROUP_TOPICS_COUNT),
-                AbstractSearchCriteriaImpl.Operation.GREATER);
-        Assertions.assertEquals(criteria.getClauses().stream().mapToLong(clause -> clause.getClauses().size()).sum(), 1L);
+                AbstractSearchCriteria.Operation.GREATER);
+        Assertions.assertEquals(criteria.getClauses().stream().mapToLong(clause -> clause.clauses().size()).sum(), 1L);
         checkClause(criteria,expectedClause);
 
         criteria = ConsumerGroupListSearchCriteria.parseTopicCriteria(
                 Map.of("topicsCount_LESS", TEST_GROUP_TOPICS_COUNT));
-        expectedClause = new AbstractSearchCriteriaImpl.SingleClause<>(
+        expectedClause = new AbstractSearchCriteria.SingleClause<>(
                 Integer.valueOf(TEST_GROUP_TOPICS_COUNT),
-                AbstractSearchCriteriaImpl.Operation.LESS);
-        Assertions.assertEquals(criteria.getClauses().stream().mapToLong(clause -> clause.getClauses().size()).sum(), 1L);
+                AbstractSearchCriteria.Operation.LESS);
+        Assertions.assertEquals(criteria.getClauses().stream().mapToLong(clause -> clause.clauses().size()).sum(), 1L);
         checkClause(criteria,expectedClause);
 
         Assertions.assertThrows(IllegalArgumentException.class,
@@ -175,26 +175,26 @@ public class ConsumerGroupListSearchCriteriaTest {
     @Test
     public void membersTest() {
 
-        AbstractSearchCriteriaImpl.SingleClause<String> expectedClause = new AbstractSearchCriteriaImpl.SingleClause<>(
-                TEST_MEMBER_NAME, AbstractSearchCriteriaImpl.Operation.EQUALS);
+        AbstractSearchCriteria.SingleClause<String> expectedClause = new AbstractSearchCriteria.SingleClause<>(
+                TEST_MEMBER_NAME, AbstractSearchCriteria.Operation.EQUALS);
         ConsumerGroupListSearchCriteria criteria = ConsumerGroupListSearchCriteria.parseTopicCriteria(Map.of("members_EQUALS", TEST_MEMBER_NAME));
         checkClause( criteria, expectedClause);
 
         criteria = ConsumerGroupListSearchCriteria.parseTopicCriteria(Map.of("members_CONTAINS", TEST_MEMBER_NAME));
-        expectedClause = new AbstractSearchCriteriaImpl.SingleClause<>( TEST_MEMBER_NAME, AbstractSearchCriteriaImpl.Operation.CONTAINS);
+        expectedClause = new AbstractSearchCriteria.SingleClause<>(TEST_MEMBER_NAME, AbstractSearchCriteria.Operation.CONTAINS);
         checkClause( criteria, expectedClause);
 
         criteria = ConsumerGroupListSearchCriteria.parseTopicCriteria(Map.of("members_LIKE", TEST_MEMBER_NAME));
-        expectedClause = new AbstractSearchCriteriaImpl.SingleClause<>( TEST_MEMBER_NAME, AbstractSearchCriteriaImpl.Operation.LIKE);
+        expectedClause = new AbstractSearchCriteria.SingleClause<>(TEST_MEMBER_NAME, AbstractSearchCriteria.Operation.LIKE);
         checkClause( criteria, expectedClause);
 
         criteria = ConsumerGroupListSearchCriteria.parseTopicCriteria(Map.of("members_NOT_EMPTY", TEST_MEMBER_NAME));
-        expectedClause = new AbstractSearchCriteriaImpl.SingleClause<>( TEST_MEMBER_NAME, AbstractSearchCriteriaImpl.Operation.NOT_EMPTY);
+        expectedClause = new AbstractSearchCriteria.SingleClause<>(TEST_MEMBER_NAME, AbstractSearchCriteria.Operation.NOT_EMPTY);
         checkClause( criteria, expectedClause);
 
         criteria = ConsumerGroupListSearchCriteria.parseTopicCriteria(Map.of(TEST_WRONG_CLAUSE_NAME + "_NOT_EMPTY", TEST_MEMBER_NAME));
         Assertions.assertEquals((criteria.getClauses().stream()
-                                         .mapToLong(clause->clause.getClauses().size()).sum()), 0L);
+                                         .mapToLong(clause->clause.clauses().size()).sum()), 0L);
 
         Assertions.assertThrows(IllegalArgumentException.class,
                                 () -> ConsumerGroupListSearchCriteria.parseTopicCriteria(Map.of("topics_" + TEST_WRONG_OPERATION, TEST_MEMBER_NAME))
@@ -206,26 +206,26 @@ public class ConsumerGroupListSearchCriteriaTest {
 
         ConsumerGroupListSearchCriteria criteria = ConsumerGroupListSearchCriteria.parseTopicCriteria(
                 Map.of("membersCount_EQUALS", TEST_GROUP_MEMBERS_COUNT));
-        AbstractSearchCriteriaImpl.SingleClause<Integer> expectedClause = new AbstractSearchCriteriaImpl.SingleClause<>(
+        AbstractSearchCriteria.SingleClause<Integer> expectedClause = new AbstractSearchCriteria.SingleClause<>(
                 Integer.valueOf(TEST_GROUP_MEMBERS_COUNT),
-                AbstractSearchCriteriaImpl.Operation.EQUALS);
-        Assertions.assertEquals(criteria.getClauses().stream().mapToLong(clause -> clause.getClauses().size()).sum(), 1L);
+                AbstractSearchCriteria.Operation.EQUALS);
+        Assertions.assertEquals(criteria.getClauses().stream().mapToLong(clause -> clause.clauses().size()).sum(), 1L);
         checkClause(criteria,expectedClause);
 
         criteria = ConsumerGroupListSearchCriteria.parseTopicCriteria(
                 Map.of("membersCount_GREATER", TEST_GROUP_MEMBERS_COUNT));
-        expectedClause = new AbstractSearchCriteriaImpl.SingleClause<>(
+        expectedClause = new AbstractSearchCriteria.SingleClause<>(
                 Integer.valueOf(TEST_GROUP_MEMBERS_COUNT),
-                AbstractSearchCriteriaImpl.Operation.GREATER);
-        Assertions.assertEquals(criteria.getClauses().stream().mapToLong(clause -> clause.getClauses().size()).sum(), 1L);
+                AbstractSearchCriteria.Operation.GREATER);
+        Assertions.assertEquals(criteria.getClauses().stream().mapToLong(clause -> clause.clauses().size()).sum(), 1L);
         checkClause(criteria,expectedClause);
 
         criteria = ConsumerGroupListSearchCriteria.parseTopicCriteria(
                 Map.of("membersCount_LESS", TEST_GROUP_MEMBERS_COUNT));
-        expectedClause = new AbstractSearchCriteriaImpl.SingleClause<>(
+        expectedClause = new AbstractSearchCriteria.SingleClause<>(
                 Integer.valueOf(TEST_GROUP_MEMBERS_COUNT),
-                AbstractSearchCriteriaImpl.Operation.LESS);
-        Assertions.assertEquals(criteria.getClauses().stream().mapToLong(clause -> clause.getClauses().size()).sum(), 1L);
+                AbstractSearchCriteria.Operation.LESS);
+        Assertions.assertEquals(criteria.getClauses().stream().mapToLong(clause -> clause.clauses().size()).sum(), 1L);
         checkClause(criteria,expectedClause);
 
         Assertions.assertThrows(IllegalArgumentException.class,
@@ -238,26 +238,26 @@ public class ConsumerGroupListSearchCriteriaTest {
     @Test
     public void descriptionTest() {
 
-        AbstractSearchCriteriaImpl.SingleClause<String> expectedClause = new AbstractSearchCriteriaImpl.SingleClause<>(
-                TEST_GROUP_DESCRIPTION, AbstractSearchCriteriaImpl.Operation.EQUALS);
+        AbstractSearchCriteria.SingleClause<String> expectedClause = new AbstractSearchCriteria.SingleClause<>(
+                TEST_GROUP_DESCRIPTION, AbstractSearchCriteria.Operation.EQUALS);
         ConsumerGroupListSearchCriteria criteria = ConsumerGroupListSearchCriteria.parseTopicCriteria(Map.of("description_EQUALS", TEST_GROUP_DESCRIPTION));
         checkClause( criteria, expectedClause);
 
         criteria = ConsumerGroupListSearchCriteria.parseTopicCriteria(Map.of("description_CONTAINS", TEST_GROUP_DESCRIPTION));
-        expectedClause = new AbstractSearchCriteriaImpl.SingleClause<>( TEST_GROUP_DESCRIPTION, AbstractSearchCriteriaImpl.Operation.CONTAINS);
+        expectedClause = new AbstractSearchCriteria.SingleClause<>(TEST_GROUP_DESCRIPTION, AbstractSearchCriteria.Operation.CONTAINS);
         checkClause( criteria, expectedClause);
 
         criteria = ConsumerGroupListSearchCriteria.parseTopicCriteria(Map.of("description_LIKE", TEST_GROUP_DESCRIPTION));
-        expectedClause = new AbstractSearchCriteriaImpl.SingleClause<>( TEST_GROUP_DESCRIPTION, AbstractSearchCriteriaImpl.Operation.LIKE);
+        expectedClause = new AbstractSearchCriteria.SingleClause<>(TEST_GROUP_DESCRIPTION, AbstractSearchCriteria.Operation.LIKE);
         checkClause( criteria, expectedClause);
 
         criteria = ConsumerGroupListSearchCriteria.parseTopicCriteria(Map.of("description_NOT_EMPTY", TEST_GROUP_DESCRIPTION));
-        expectedClause = new AbstractSearchCriteriaImpl.SingleClause<>( TEST_GROUP_DESCRIPTION, AbstractSearchCriteriaImpl.Operation.NOT_EMPTY);
+        expectedClause = new AbstractSearchCriteria.SingleClause<>(TEST_GROUP_DESCRIPTION, AbstractSearchCriteria.Operation.NOT_EMPTY);
         checkClause( criteria, expectedClause);
 
         criteria = ConsumerGroupListSearchCriteria.parseTopicCriteria(Map.of(TEST_WRONG_CLAUSE_NAME + "_NOT_EMPTY", TEST_GROUP_DESCRIPTION));
         Assertions.assertEquals((criteria.getClauses().stream()
-                                         .mapToLong(clause->clause.getClauses().size()).sum()), 0L);
+                                         .mapToLong(clause->clause.clauses().size()).sum()), 0L);
 
         Assertions.assertThrows(IllegalArgumentException.class,
                                 () -> ConsumerGroupListSearchCriteria.parseTopicCriteria(Map.of("description_" + TEST_WRONG_OPERATION, TEST_GROUP_DESCRIPTION))
@@ -265,9 +265,9 @@ public class ConsumerGroupListSearchCriteriaTest {
     }
 
     private void checkClause(ConsumerGroupListSearchCriteria criteria,
-                             AbstractSearchCriteriaImpl.SingleClause expectedClause) {
+                             AbstractSearchCriteria.SingleClause expectedClause) {
         Assertions.assertTrue(criteria.getClauses().stream()
-                                      .flatMap(clauses->clauses.getClauses().stream())
+                                      .flatMap(clauses->clauses.clauses().stream())
                                       .allMatch(clause->clause.equals(expectedClause)));
 
     }

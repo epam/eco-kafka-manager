@@ -27,7 +27,7 @@ import org.apache.kafka.common.ConsumerGroupState;
 /**
  * @author Mikhail_Vershkov
  */
-public class ConsumerGroupListSearchCriteria extends AbstractSearchCriteriaImpl<ConsumerGroupInfo> {
+public class ConsumerGroupListSearchCriteria extends AbstractSearchCriteria<ConsumerGroupInfo> {
 
     private static final String GROUP_NAME_ATTR = "groupName";
     private static final String STATE_ATTR = "state";
@@ -103,17 +103,17 @@ public class ConsumerGroupListSearchCriteria extends AbstractSearchCriteriaImpl<
     }
 
     private static final BiPredicate<Set<SingleClause<ConsumerGroupInfo.StorageType>>, ConsumerGroupInfo> storageClausesHandler = (Set<SingleClause<ConsumerGroupInfo.StorageType>> clauses, ConsumerGroupInfo groupInfo) -> clauses.stream().allMatch(
-       clause -> groupInfo.getStorageType() == clause.getFilterValue());
+       clause -> groupInfo.getStorageType() == clause.filterValue());
 
     private static final BiPredicate<Set<SingleClause<ConsumerGroupState>>, ConsumerGroupInfo> stateClausesHandler = (Set<SingleClause<ConsumerGroupState>> clauses, ConsumerGroupInfo groupInfo) -> clauses.stream().allMatch(
-            clause -> groupInfo.getState() == clause.getFilterValue());
+            clause -> groupInfo.getState() == clause.filterValue());
 
     private static final BiPredicate<Set<SingleClause<String>>, ConsumerGroupInfo> topicsClausesHandler = (Set<SingleClause<String>> clauses, ConsumerGroupInfo groupInfo) -> clauses.stream().allMatch(
-            clause -> groupInfo.getTopicNames().stream().map(topic->compareStringValues(clause.getFilterValue(), topic, clause.getOperation() )).reduce((x,y) -> x||y).orElse(false));
+            clause -> groupInfo.getTopicNames().stream().map(topic->compareStringValues(clause.filterValue(), topic, clause.operation())).reduce((x, y) -> x||y).orElse(false));
 
     private static final BiPredicate<Set<SingleClause<String>>, ConsumerGroupInfo> membersClausesHandler = (Set<SingleClause<String>> clauses, ConsumerGroupInfo groupInfo) -> clauses.stream().allMatch(
-            clause -> groupInfo.getMembers().stream().map(member->compareStringValues(clause.getFilterValue(),
-                                                                                      member.getMemberId() + member.getClientHost(), clause.getOperation() )).reduce((x,y) -> x||y).orElse(false));
+            clause -> groupInfo.getMembers().stream().map(member->compareStringValues(clause.filterValue(),
+                                                                                      member.getMemberId() + member.getClientHost(), clause.operation())).reduce((x, y) -> x||y).orElse(false));
 
 
 

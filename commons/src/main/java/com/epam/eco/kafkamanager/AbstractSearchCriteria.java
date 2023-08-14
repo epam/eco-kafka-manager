@@ -30,7 +30,7 @@ import static java.util.Objects.isNull;
 /**
  * @author Mikhail_Vershkov
  */
-public abstract class AbstractSearchCriteriaImpl<D> implements SearchCriteria<D> {
+public abstract class AbstractSearchCriteria<D> implements SearchCriteria<D> {
 
     protected static final String OPERATION_SEPARATOR = "_";
 
@@ -41,7 +41,7 @@ public abstract class AbstractSearchCriteriaImpl<D> implements SearchCriteria<D>
     protected final Set<ClausesWithHandler> clauses;
 
 
-    protected AbstractSearchCriteriaImpl(Set<ClausesWithHandler> clauses) {
+    protected AbstractSearchCriteria(Set<ClausesWithHandler> clauses) {
         this.clauses = clauses;
     }
 
@@ -64,7 +64,7 @@ public abstract class AbstractSearchCriteriaImpl<D> implements SearchCriteria<D>
         if(obj == null || getClass() != obj.getClass()) {
             return false;
         }
-        AbstractSearchCriteriaImpl that = (AbstractSearchCriteriaImpl) obj;
+        AbstractSearchCriteria that = (AbstractSearchCriteria) obj;
         return Objects.equals(this.clauses, that.clauses);
     }
 
@@ -84,89 +84,46 @@ public abstract class AbstractSearchCriteriaImpl<D> implements SearchCriteria<D>
                                    .replaceAll("%", ".*"));
     }
 
-    protected static AbstractSearchCriteriaImpl parseTopicCriteria(Map<String, ?> map, KafkaManager kafkaManager) {
+    protected static AbstractSearchCriteria parseTopicCriteria(Map<String, ?> map,
+                                                               KafkaManager kafkaManager) {
         return null;
     }
 
-    protected static class SingleClause<T> {
-        private final T filterValue;
-        private final Operation operation;
-
-        public SingleClause(T filterValue, Operation operation) {
-            this.filterValue = filterValue;
-            this.operation = operation;
-        }
+    protected record SingleClause<T>(T filterValue, Operation operation) {
 
         @Override
-        public boolean equals(Object o) {
-            if(this == o)
-                return true;
-            if(! (o instanceof SingleClause<?> that))
-                return false;
+            public boolean equals(Object o) {
+                if(this == o)
+                    return true;
+                if(! (o instanceof SingleClause<?> that))
+                    return false;
 
-            if(! filterValue.equals(that.filterValue))
-                return false;
-            return operation == that.operation;
-        }
-
-        @Override
-        public int hashCode() {
-            int result = filterValue.hashCode();
-            result = 31 * result + operation.hashCode();
-            return result;
-        }
+                if(! filterValue.equals(that.filterValue))
+                    return false;
+                return operation == that.operation;
+            }
 
         @Override
-        public String toString() {
-            return "SingleClause {" + "filterValue=" + filterValue + ", operation=" + operation + '}';
+            public String toString() {
+                return "SingleClause {" + "filterValue=" + filterValue + ", operation=" + operation + '}';
+            }
+
         }
 
-        public T getFilterValue() {
-            return filterValue;
+    protected record ClausesWithHandler<T, C, R>(Set<SingleClause<T>> clauses,
+                                                 BiPredicate<Set<SingleClause<T>>, C> clausesHandler,
+                                                 Function<R, C> valueExtractor) {
+        boolean match(R obj) {
+                return clausesHandler().test(clauses(), valueExtractor().apply(obj));
+            }
         }
-
-        public Operation getOperation() {
-            return operation;
-        }
-
-    }
-
-    protected static class ClausesWithHandler<FILTERTYPE, COLUMNTYPE, RECORDTYPE> {
-        private final Set<SingleClause<FILTERTYPE>> clauses;
-        private final BiPredicate<Set<SingleClause<FILTERTYPE>>, COLUMNTYPE> clausesHandler;
-        private final Function<RECORDTYPE, COLUMNTYPE> valueExtractor;
-
-        protected ClausesWithHandler(Set<SingleClause<FILTERTYPE>> clauses,
-                                     BiPredicate<Set<SingleClause<FILTERTYPE>>, COLUMNTYPE> clausesHandler,
-                                     Function<RECORDTYPE, COLUMNTYPE> valueExtractor) {
-            this.clauses = clauses;
-            this.clausesHandler = clausesHandler;
-            this.valueExtractor = valueExtractor;
-        }
-
-        boolean match(RECORDTYPE obj) {
-            return getClausesHandler().test(getClauses(),getValueExtractor().apply(obj));
-        }
-        public Set<SingleClause<FILTERTYPE>> getClauses() {
-            return clauses;
-        }
-
-        public BiPredicate<Set<SingleClause<FILTERTYPE>>, COLUMNTYPE> getClausesHandler() {
-            return clausesHandler;
-        }
-
-        public Function<RECORDTYPE, COLUMNTYPE> getValueExtractor() {
-            return valueExtractor;
-        }
-
-    }
 
     protected static final BiPredicate<Set<SingleClause<String>>, String> stringClausesHandler = (Set<SingleClause<String>> stringClauses, String value) -> stringClauses.stream().allMatch(
-            clause -> compareStringValues(clause.getFilterValue(), value, clause.getOperation()));
+            clause -> compareStringValues(clause.filterValue(), value, clause.operation()));
 
 
     protected static final BiPredicate<Set<SingleClause<Integer>>, Integer> numericClausesHandler = (Set<SingleClause<Integer>> numericClauses, Integer value) -> numericClauses.stream().allMatch(
-            clause -> compareNumberValues(clause.getFilterValue(), value, clause.getOperation()));
+            clause -> compareNumberValues(clause.filterValue(), value, clause.operation()));
 
 
     protected static String stripJsonString(String string) {
@@ -176,9 +133,6 @@ public abstract class AbstractSearchCriteriaImpl<D> implements SearchCriteria<D>
     }
 
     protected static boolean compareStringValues(String filterValue, String value, Operation operation) {
-        if((isNull(filterValue) || StringUtils.isBlank(filterValue)) && operation != Operation.NOT_EMPTY) {
-            return true;
-        }
         if(isNull(value)) {
             return false;
         }

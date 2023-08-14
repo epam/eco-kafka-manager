@@ -50,7 +50,7 @@ import com.epam.eco.kafkamanager.KafkaManager;
 import com.epam.eco.kafkamanager.TopicConfigUpdateParams;
 import com.epam.eco.kafkamanager.TopicCreateParams;
 import com.epam.eco.kafkamanager.TopicInfo;
-import com.epam.eco.kafkamanager.TopicListSearchCriteriaImpl;
+import com.epam.eco.kafkamanager.TopicListSearchCriteria;
 import com.epam.eco.kafkamanager.TopicMetadataDeleteParams;
 import com.epam.eco.kafkamanager.TopicMetadataUpdateParams;
 import com.epam.eco.kafkamanager.TopicPartitionsCreateParams;
@@ -140,7 +140,7 @@ public class TopicController {
             @RequestParam(required=false) Integer page,
             @RequestParam Map<String, Object> paramsMap,
             Model model) {
-        TopicListSearchCriteriaImpl searchCriteria = TopicListSearchCriteriaImpl.fromJsonWith(paramsMap, kafkaManager);
+        TopicListSearchCriteria searchCriteria = TopicListSearchCriteria.fromJsonWith(paramsMap, kafkaManager);
 
         model.addAttribute(ATTR_SEARCH_CRITERIA, searchCriteria);
         model.addAttribute(ATTR_DATA_CATALOG_URL_TEMPLATE, properties.getDataCatalogTool());
@@ -157,7 +157,7 @@ public class TopicController {
     public @ResponseBody ResponseEntity<TopicTableModel> topicList(
             @RequestParam Map<String, Object> paramsMap,
             HttpServletRequest request) {
-        TopicListSearchCriteriaImpl criteria = TopicListSearchCriteriaImpl.fromJsonWith(paramsMap, kafkaManager);
+        TopicListSearchCriteria criteria = TopicListSearchCriteria.fromJsonWith(paramsMap, kafkaManager);
         //storedCriteria.put(request.getRequestedSessionId(), criteria);
         List<TopicInfo> topics = kafkaManager.getTopics(criteria);
         TopicInfoToModelMapper mapper =
@@ -209,7 +209,7 @@ public class TopicController {
             @RequestParam Map<String, Object> paramsMap,
             HttpServletResponse response) throws IOException {
 
-        TopicListSearchCriteriaImpl criteria = TopicListSearchCriteriaImpl.fromJsonWith(paramsMap, kafkaManager);
+        TopicListSearchCriteria criteria = TopicListSearchCriteria.fromJsonWith(paramsMap, kafkaManager);
         List<TopicInfo> topicInfos = kafkaManager.getTopics(criteria);
 
         response.setContentType(exporterType.contentType());

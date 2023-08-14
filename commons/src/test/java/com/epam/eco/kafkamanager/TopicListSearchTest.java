@@ -58,7 +58,7 @@ public class TopicListSearchTest {
                     ).collect(Collectors.toMap(TopicInfoGenerator.RecordConfig::getTopicName, Function.identity()));
 
     private static final KafkaManager kafkaManager = Mockito.mock(KafkaManager.class);
-    private TopicListSearchCriteriaImpl criteria;
+    private TopicListSearchCriteria criteria;
 
 
     @BeforeAll
@@ -93,7 +93,7 @@ public class TopicListSearchTest {
                 "partitionCount_LESS","5",
                 "replicationFactor_EQUALS", "2",
                 "configString_EQUALS", "cleanup.policy: compact");
-        criteria = TopicListSearchCriteriaImpl.fromJsonWith(filterMap, kafkaManager);
+        criteria = TopicListSearchCriteria.fromJsonWith(filterMap, kafkaManager);
         List<TopicInfo> topicInfos = TopicInfoGenerator.generate(TOPIC_LIST_CONFIG).values().stream()
                                           .filter(topicInfo -> criteria.matches(topicInfo)).toList();
         Assertions.assertEquals(1, topicInfos.size());
@@ -108,7 +108,7 @@ public class TopicListSearchTest {
                 "partitionCount_LESS","5",
                 "replicationFactor_EQUALS", "3",
                 "configString_EQUALS", "cleanup.policy: compact");
-        criteria = TopicListSearchCriteriaImpl.fromJsonWith(filterMap, kafkaManager);
+        criteria = TopicListSearchCriteria.fromJsonWith(filterMap, kafkaManager);
         List<TopicInfo> topicInfos = TopicInfoGenerator.generate(TOPIC_LIST_CONFIG).values().stream()
                                                        .filter(topicInfo -> criteria.matches(topicInfo)).toList();
         Assertions.assertEquals(1, topicInfos.size());
@@ -125,7 +125,7 @@ public class TopicListSearchTest {
                 "replicationFactor_GREATER", "0",
                 "replicationFactor_LESS", "100",
                 "configString_EQUALS", "cleanup.policy: delete");
-        criteria = TopicListSearchCriteriaImpl.fromJsonWith(filterMap, kafkaManager);
+        criteria = TopicListSearchCriteria.fromJsonWith(filterMap, kafkaManager);
         List<TopicInfo> topicInfos = TopicInfoGenerator.generate(TOPIC_LIST_CONFIG).values().stream()
                                                        .filter(topicInfo -> criteria.matches(topicInfo)).toList();
         Assertions.assertEquals(1, topicInfos.size());
@@ -143,7 +143,7 @@ public class TopicListSearchTest {
                 "configString_EQUALS", "cleanup.policy: compact",
                 "description_NOT_EMPTY","",
                 "description_LIKE","%test%string%");
-        criteria = TopicListSearchCriteriaImpl.fromJsonWith(filterMap, kafkaManager);
+        criteria = TopicListSearchCriteria.fromJsonWith(filterMap, kafkaManager);
         List<TopicInfo> topicInfos = TopicInfoGenerator.generate(TOPIC_LIST_CONFIG).values().stream()
                                                        .filter(topicInfo -> criteria.matches(topicInfo)).toList();
         Assertions.assertEquals(2, topicInfos.size());
