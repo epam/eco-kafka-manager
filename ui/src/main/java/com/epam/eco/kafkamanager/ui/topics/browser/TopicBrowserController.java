@@ -16,6 +16,7 @@
 package com.epam.eco.kafkamanager.ui.topics.browser;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
@@ -40,7 +41,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.collect.Maps;
 
 import com.epam.eco.commons.kafka.OffsetRange;
 import com.epam.eco.commons.kafka.helpers.FilterClausePredicate;
@@ -63,7 +63,7 @@ import com.epam.eco.kafkamanager.utils.PrettyHtmlMapper;
 
 import static com.epam.eco.kafkamanager.ui.topics.browser.FilterClauseAbstractPredicate.KEY_ATTRIBUTE;
 import static com.epam.eco.kafkamanager.ui.topics.browser.FilterClauseAbstractPredicate.TOMBSTONE_ATTRIBUTE;
-import static java.util.Objects.isNull;
+
 import static java.util.Objects.nonNull;
 
 /**
@@ -165,7 +165,7 @@ public class TopicBrowserController {
                     headerMap = TombstoneUtils.getReplacedTombstoneHeaders(headerMap, replacements);
                 }
             } else {
-                headerMap = Maps.newHashMap();
+                headerMap = Collections.emptyMap();
             }
             return ResponseEntity.ok(getAppropriateProducer(keyFormat).send(topicName, key, headerMap));
         } catch (Exception e) {
