@@ -18,6 +18,7 @@ package com.epam.eco.kafkamanager.ui.config;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.commons.collections4.MapUtils;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.Serializer;
 import org.apache.kafka.common.serialization.StringSerializer;
@@ -79,6 +80,9 @@ public class TombstoneProducerConfiguration {
         configProps.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, serializer);
         configProps.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, serializer);
         configProps.put(SCHEMA_REGISTRY_URL,properties.getSchemaRegistryUrl());
+        if(MapUtils.isNotEmpty(properties.getClientConfig())) {
+            configProps.putAll(properties.getClientConfig());
+        }
         return new DefaultKafkaProducerFactory<>(configProps);
     }
 
