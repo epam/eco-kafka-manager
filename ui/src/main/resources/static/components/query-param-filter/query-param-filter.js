@@ -104,9 +104,9 @@ let filterClauseArray=[
 //     new FilterClause('department_id', getOperationById('like'), 'EPM_ECO')
 ];
 
-let getClausesAsQueryParams = (forQuery) => {
+let getClausesAsQueryParams = () => {
     const result = filterClauseArray
-        .map(clause=>clause.column.id+'_'+clause.operation.id+'='+(forQuery ? clause.value.replaceAll('%','%25') : clause.value))
+        .map(clause=>clause.column.id+'_'+clause.operation.id+'='+ clause.value.replaceAll('%','%25'))
         .join('&');
     return result!=='' ? '?'+result : '';
 }
