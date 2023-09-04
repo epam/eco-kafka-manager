@@ -15,11 +15,8 @@
  *******************************************************************************/
 package com.epam.eco.kafkamanager;
 
-import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 import java.util.function.BiPredicate;
-import java.util.function.Function;
 import java.util.regex.PatternSyntaxException;
 
 import org.apache.commons.lang3.StringUtils;
@@ -40,7 +37,6 @@ public abstract class AbstractSearchCriteria<D> implements SearchCriteria<D> {
 
     protected final Set<ClausesWithHandler> clauses;
 
-
     protected AbstractSearchCriteria(Set<ClausesWithHandler> clauses) {
         this.clauses = clauses;
     }
@@ -49,33 +45,10 @@ public abstract class AbstractSearchCriteria<D> implements SearchCriteria<D> {
         return clauses;
     }
 
-
     @Override
     public boolean matches(D obj) {
         Validate.notNull(obj, "Topic Info is null");
         return clauses.stream().allMatch(clause -> clause.match(obj));
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if(this == obj) {
-            return true;
-        }
-        if(obj == null || getClass() != obj.getClass()) {
-            return false;
-        }
-        AbstractSearchCriteria that = (AbstractSearchCriteria) obj;
-        return Objects.equals(this.clauses, that.clauses);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(clauses);
-    }
-
-    @Override
-    public String toString() {
-        return "{ clauses: " + clauses + "}";
     }
 
     protected static boolean like(String value, String regexp) {
@@ -84,52 +57,18 @@ public abstract class AbstractSearchCriteria<D> implements SearchCriteria<D> {
                                    .replaceAll("%", ".*"));
     }
 
-    protected static AbstractSearchCriteria parseTopicCriteria(Map<String, ?> map,
-                                                               KafkaManager kafkaManager) {
-        return null;
-    }
-
-    protected record SingleClause<T>(T filterValue, Operation operation) {
-
-        @Override
-            public boolean equals(Object o) {
-                if(this == o)
-                    return true;
-                if(! (o instanceof SingleClause<?> that))
-                    return false;
-
-                if(! filterValue.equals(that.filterValue))
-                    return false;
-                return operation == that.operation;
-            }
-
-        @Override
-            public String toString() {
-                return "SingleClause {" + "filterValue=" + filterValue + ", operation=" + operation + '}';
-            }
-
-        }
-
-    protected record ClausesWithHandler<T, C, R>(Set<SingleClause<T>> clauses,
-                                                 BiPredicate<Set<SingleClause<T>>, C> clausesHandler,
-                                                 Function<R, C> valueExtractor) {
-        boolean match(R obj) {
-                return clausesHandler().test(clauses(), valueExtractor().apply(obj));
-            }
-        }
+    protected record SingleClause<T>(T filterValue, Operation operation) {}
 
     protected static final BiPredicate<Set<SingleClause<String>>, String> stringClausesHandler = (Set<SingleClause<String>> stringClauses, String value) -> stringClauses.stream().allMatch(
             clause -> compareStringValues(clause.filterValue(), value, clause.operation()));
 
-
     protected static final BiPredicate<Set<SingleClause<Integer>>, Integer> numericClausesHandler = (Set<SingleClause<Integer>> numericClauses, Integer value) -> numericClauses.stream().allMatch(
             clause -> compareNumberValues(clause.filterValue(), value, clause.operation()));
 
-
     protected static String stripJsonString(String string) {
         return string
-                  .replace("{","")
-                  .replace("}","");
+                .replace("{","")
+                .replace("}","");
     }
 
     protected static boolean compareStringValues(String filterValue, String value, Operation operation) {
