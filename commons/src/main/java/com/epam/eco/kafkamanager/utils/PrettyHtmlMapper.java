@@ -16,6 +16,7 @@
 package com.epam.eco.kafkamanager.utils;
 
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.apache.avro.util.Utf8;
@@ -44,16 +45,17 @@ public class PrettyHtmlMapper {
     private static final String HTML_SPACE = "&nbsp;";
     private static final String DELIMITER = "=";
     private static final String JSON_DELIMITER = ":";
-
+    private static Set<String> REPLACEMENT_PATTERNS = Set.of("<?xml");
+    private static final Map<String,String> REPLACE_IN_CONTENT_PATTERNS = Map.of("<","&lt;", ">","&gt;");
 
     private static final Map<PrettyFormat, MapperConfig> MAPPER_CONFIG =
             Map.of(PrettyFormat.STRING,
-                   new MapperConfig(JSON_NEW_LINE, JSON_START_BOLD, JSON_END_BOLD, JSON_SPACE, DELIMITER),
+                    new MapperConfig(JSON_NEW_LINE, JSON_START_BOLD, JSON_END_BOLD, JSON_SPACE, DELIMITER),
                     PrettyFormat.JSON,
-                   new MapperConfig(JSON_NEW_LINE, JSON_START_BOLD, JSON_END_BOLD, JSON_SPACE, JSON_DELIMITER),
-                   PrettyFormat.HTML,
-                   new MapperConfig(HTML_NEW_LINE, HTML_START_BOLD, HTML_END_BOLD, HTML_SPACE, DELIMITER)
-                  );
+                    new MapperConfig(JSON_NEW_LINE, JSON_START_BOLD, JSON_END_BOLD, JSON_SPACE, JSON_DELIMITER),
+                    PrettyFormat.HTML,
+                    new MapperConfig(HTML_NEW_LINE, HTML_START_BOLD, HTML_END_BOLD, HTML_SPACE, DELIMITER)
+            );
 
     private static final ObjectMapper MAPPER = new ObjectMapper();
 
@@ -64,10 +66,25 @@ public class PrettyHtmlMapper {
         MAPPER.registerModule(new JavaTimeModule());
     }
 
+    public static void setReplacementPatterns(Set<String> excludes) {
+        REPLACEMENT_PATTERNS = excludes;
+    }
+
     public static String toPretty(Map<?,?> map, PrettyFormat format) {
         return isMapKeyUtf8(map) ?
-               toPrettyUtf8((Map<Utf8, ?>) map,format,PADDING) :
-               toPrettyString((Map<String, ?>) map, format, PADDING);
+                toPrettyUtf8((Map<Utf8, ?>) map,format,PADDING) :
+                toPrettyString((Map<String, ?>) map, format, PADDING);
+    }
+
+    public static String shieldSpecSymbols(String text) {
+        if(REPLACEMENT_PATTERNS.stream().anyMatch(text::contains)) {
+            String result=text;
+            for(Map.Entry<String,String> entry: REPLACE_IN_CONTENT_PATTERNS.entrySet()) {
+                result=result.replace(entry.getKey(),entry.getValue());
+            }
+            return result;
+        }
+        return text;
     }
 
     private static String toPrettyString(Map<String,?> map, PrettyFormat format, int identity) {
@@ -75,10 +92,10 @@ public class PrettyHtmlMapper {
         String spaces = StringUtils.repeat(config.getSpace(), identity);
         String spaces2 = StringUtils.repeat(config.getSpace(), identity - PADDING < 0 ? identity : identity - PADDING);
         return "{" + config.getNewLine() + map.entrySet()
-                                              .stream()
-                                              .map(entry -> spaces + "\"" + config.getStartBold() + entry.getKey() + config.getEndBold() + "\" " + config.getDelimiter() + " " +
-                                                      objectToString(entry.getValue(), format, identity))
-                                              .collect(Collectors.joining(", " + config.getNewLine())) + config.getNewLine() + spaces2 + "}";
+                .stream()
+                .map(entry -> spaces + "\"" + config.getStartBold() + entry.getKey() + config.getEndBold() + "\" " + config.getDelimiter() + " " +
+                        objectToString(entry.getValue(), format, identity))
+                .collect(Collectors.joining(", " + config.getNewLine())) + config.getNewLine() + spaces2 + "}";
     }
 
     private static String toPrettyUtf8(Map<Utf8,?> map, PrettyFormat format, int identity) {
@@ -86,10 +103,10 @@ public class PrettyHtmlMapper {
         String spaces = StringUtils.repeat(config.getSpace(), identity);
         String spaces2 = StringUtils.repeat(config.getSpace(), identity - PADDING < 0 ? identity : identity - PADDING);
         return "{" + config.getNewLine() + map.entrySet()
-                                              .stream()
-                                              .map(entry -> spaces + "\"" + config.getStartBold() + entry.getKey().toString() + config.getEndBold() + "\" " + config.getDelimiter() + " " +
-                                                      objectToString(entry.getValue(), format, identity))
-                                              .collect(Collectors.joining(", " + config.getNewLine())) + config.getNewLine() + spaces2 + "}";
+                .stream()
+                .map(entry -> spaces + "\"" + config.getStartBold() + entry.getKey().toString() + config.getEndBold() + "\" " + config.getDelimiter() + " " +
+                        objectToString(entry.getValue(), format, identity))
+                .collect(Collectors.joining(", " + config.getNewLine())) + config.getNewLine() + spaces2 + "}";
     }
 
 
@@ -102,8 +119,8 @@ public class PrettyHtmlMapper {
                 return EMPTY_MAP;
             }
             return isMapKeyUtf8(mapObject) ?
-                   toPrettyUtf8(mapObject, format,identity + PADDING) :
-                   toPrettyString(mapObject, format,identity + PADDING);
+                    toPrettyUtf8(mapObject, format,identity + PADDING) :
+                    toPrettyString(mapObject, format,identity + PADDING);
         } else if (object instanceof Utf8) {
             try {
                 result = MAPPER.writeValueAsString(object.toString());

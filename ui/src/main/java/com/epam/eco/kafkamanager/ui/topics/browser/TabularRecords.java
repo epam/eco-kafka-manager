@@ -300,7 +300,7 @@ public class TabularRecords implements Iterable<Record> {
             if(truncatedValue.length()>TRUNCATE_SIZE) {
                 truncatedValue = truncatedValue.substring(0,TRUNCATE_SIZE);
             }
-            return truncatedValue;
+            return PrettyHtmlMapper.shieldSpecSymbols(truncatedValue);
 
         }
         public boolean isTruncated(String columnName) {
@@ -403,8 +403,9 @@ public class TabularRecords implements Iterable<Record> {
                 return PrettyHtmlMapper.toPretty((Map)content, PrettyHtmlMapper.PrettyFormat.JSON);
             }
             try {
-                return mapper.writerWithDefaultPrettyPrinter().writeValueAsString(mapper.readTree(content.toString()));
-            } catch (JsonProcessingException e) {
+                return PrettyHtmlMapper.shieldSpecSymbols(mapper.writerWithDefaultPrettyPrinter()
+                                                     .writeValueAsString(mapper.readTree(content.toString())));
+           } catch (JsonProcessingException e) {
                 return content.toString();
             }
         }

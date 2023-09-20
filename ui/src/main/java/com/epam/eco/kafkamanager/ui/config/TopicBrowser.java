@@ -16,6 +16,7 @@
 package com.epam.eco.kafkamanager.ui.config;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * @author Mikhail_Vershkov
@@ -28,7 +29,7 @@ public class TopicBrowser {
     private Boolean showGrid = Boolean.TRUE;
     private Boolean enableAnimation = Boolean.TRUE;
     private List<HeaderReplacement> tombstoneGeneratorReplacements;
-
+    private Set<String> replacementPatterns;
     public Boolean getUseCache() {
         return useCache;
     }
@@ -75,5 +76,13 @@ public class TopicBrowser {
 
     public void setTombstoneGeneratorReplacements(List<HeaderReplacement> tombstoneGenerationReplacements) {
         this.tombstoneGeneratorReplacements = tombstoneGenerationReplacements;
+    }
+
+    public Set<String> getReplacementPatterns() {
+        return replacementPatterns;
+    }
+
+    public void setReplacementPatterns(Set<String> replacementPatterns) {
+        this.replacementPatterns = replacementPatterns;
     }
 }
