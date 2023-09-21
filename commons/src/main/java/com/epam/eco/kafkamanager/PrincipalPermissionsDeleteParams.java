@@ -101,7 +101,7 @@ public class PrincipalPermissionsDeleteParams {
     }
 
     public boolean contains(ResourceType type) {
-        if(CollectionUtils.isEmpty(this.resourceTypes)) {
+        if(isNull(this.resourceTypes)) {
             return true;
         }
         return this.resourceTypes.contains(type);
