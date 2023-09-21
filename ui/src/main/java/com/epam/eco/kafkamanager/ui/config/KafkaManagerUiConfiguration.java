@@ -46,6 +46,11 @@ public class KafkaManagerUiConfiguration implements WebMvcConfigurer {
         return new KafkaManagerUiPropertiesValidator();
     }
 
+    @Bean
+    public PropertiesInitializer propertiesInitializer(KafkaManagerUiProperties properties) {
+        return new PropertiesInitializer(properties);
+    }
+
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(modelHandlerInterceptor());
