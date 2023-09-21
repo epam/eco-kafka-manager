@@ -24,7 +24,7 @@ import com.epam.eco.kafkamanager.repo.KeyValueRepo;
 /**
  * @author Andrei_Tytsik
  */
-public interface TopicRepo extends KeyValueRepo<String, TopicInfo, TopicSearchCriteria> {
+public interface TopicRepo extends KeyValueRepo<String, TopicInfo, SearchCriteria<TopicInfo>> {
 
     @PreAuthorize("@authorizer.isPermitted('TOPIC', #topicName, 'CREATE')")
     TopicInfo create(

@@ -290,7 +290,7 @@ table.dataTable thead>tr>td.sorting_desc_disabled:after {
     font-size: 0.8em;
 }
 div.dataTables_wrapper div.dataTables_filter label {
-    width: 100%;
+    width: 80%;
     margin: 10px 0 10px 0;
 }
 
@@ -637,4 +637,11 @@ div.tombstone-content-dialog-body {
     display: flex;
     justify-content: space-between;
     padding-right: 2em;
+}
+
+.full-screen-button {
+    display: inline;
+}
+#recordTableContainer {
+    background: white;
 }

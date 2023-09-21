@@ -15,12 +15,16 @@
  *******************************************************************************/
 package com.epam.eco.kafkamanager.ui.consumers;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.kafka.common.ConsumerGroupState;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -30,14 +34,17 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.epam.eco.kafkamanager.ConsumerGroupInfo;
+import com.epam.eco.kafkamanager.ConsumerGroupListSearchCriteria;
 import com.epam.eco.kafkamanager.ConsumerGroupMetadataDeleteParams;
 import com.epam.eco.kafkamanager.ConsumerGroupMetadataUpdateParams;
-import com.epam.eco.kafkamanager.ConsumerGroupSearchCriteria;
 import com.epam.eco.kafkamanager.KafkaManager;
 import com.epam.eco.kafkamanager.udmetrics.UDMetric;
 import com.epam.eco.kafkamanager.udmetrics.UDMetricManager;
 import com.epam.eco.kafkamanager.udmetrics.UDMetricType;
+import com.epam.eco.kafkamanager.ui.consumers.model.ConsumerGroupRecordModel;
+import com.epam.eco.kafkamanager.ui.consumers.model.ConsumerGroupTableModel;
 import com.epam.eco.kafkamanager.ui.metrics.udm.UDMetricWrapper;
+import com.epam.eco.kafkamanager.ui.utils.ComboBoxModel;
 import com.epam.eco.kafkamanager.ui.utils.MetadataWrapper;
 import com.epam.eco.kafkamanager.utils.MapperUtils;
 
@@ -50,23 +57,20 @@ public class ConsumerGroupController {
     public static final String GROUPS_VIEW = "consumer_groups";
     public static final String GROUP_VIEW = "consumer_group";
     public static final String GROUP_METADATA_VIEW = "consumer_group_metadata";
-
-    public static final String ATTR_PAGE = "page";
-
     public static final String ATTR_GROUP = "group";
-    public static final String ATTR_SEARCH_CRITERIA = "searchCriteria";
     public static final String ATTR_GROUP_LAG_UDM_TYPE = "groupLagUdmType";
     public static final String ATTR_GROUP_LAG_UDM_NAME = "groupLagUdmName";
     public static final String ATTR_GROUP_LAG_UDM = "groupLagUdm";
-    public static final String ATTR_TOTAL_COUNT = "totalCount";
     public static final String ATTR_METADATA = "metadata";
 
+    public static final String ATTR_CONSUMER_GROUP_STATES = "consumerGroupStates";
+    public static final String ATTR_CONSUMER_GROUP_STORAGES = "consumerGroupStorages";
+
     public static final String MAPPING_GROUPS = "/consumer_groups";
+    public static final String MAPPING_GROUPS_DATA = MAPPING_GROUPS + "/data";
     public static final String MAPPING_GROUP = MAPPING_GROUPS + "/{name}";
     public static final String MAPPING_DELETE = MAPPING_GROUP + "/delete";
     public static final String MAPPING_GROUP_METADATA = MAPPING_GROUP + "/metadata";
-
-    private static final int PAGE_SIZE = 30;
 
     @Autowired
     private KafkaManager kafkaManager;
@@ -79,18 +83,34 @@ public class ConsumerGroupController {
             @RequestParam(required=false) Integer page,
             @RequestParam Map<String, Object> paramsMap,
             Model model) {
-        ConsumerGroupSearchCriteria searchCriteria = ConsumerGroupSearchCriteria.fromJson(paramsMap);
-        page = page != null && page > 0 ? page -1 : 0;
-
-        Page<ConsumerGroupInfo> groupPage = kafkaManager.getConsumerGroupPage(
-                searchCriteria,
-                PageRequest.of(page, PAGE_SIZE));
-
-        model.addAttribute(ATTR_SEARCH_CRITERIA, searchCriteria);
-        model.addAttribute(ATTR_PAGE, wrap(groupPage));
-        model.addAttribute(ATTR_TOTAL_COUNT, kafkaManager.getConsumerGroupCount());
-
+        model.addAttribute(ATTR_CONSUMER_GROUP_STATES,
+                           Arrays.stream(ConsumerGroupState.values())
+                                 .map(m->ComboBoxModel.build(m.name(), m.toString()))
+                                 .collect(Collectors.toList()));
+        model.addAttribute(ATTR_CONSUMER_GROUP_STORAGES,
+                           Arrays.stream(ConsumerGroupInfo.StorageType.values())
+                                 .map(state -> ComboBoxModel.build(state.name(),StringUtils.capitalize(state.name().toLowerCase())))
+                                 .collect(Collectors.toList()));
         return GROUPS_VIEW;
+    }
+
+    @RequestMapping(value = MAPPING_GROUPS_DATA, method = RequestMethod.GET)
+    public ResponseEntity<ConsumerGroupTableModel> groupsList(
+            @RequestParam(required=false) Integer page,
+            @RequestParam Map<String, Object> paramsMap,
+            Model model) {
+        List<ConsumerGroupInfo> groups = kafkaManager.getConsumerGroups(
+                ConsumerGroupListSearchCriteria.fromJsonWith(paramsMap));
+        ConsumerGroupTableModel tableModel = ConsumerGroupTableModel.builder()
+                                                       .draw(1)
+                                                       .recordsTotal(groups.size())
+                                                       .recordsFiltered(groups.size())
+                                                       .data(groups.stream()
+                                                                  .map(ConsumerGroupRecordModel::new)
+                                                                  .collect(Collectors.toList()))
+                                                       .build();
+        return ResponseEntity.ok(tableModel);
+
     }
 
     @RequestMapping(value = MAPPING_GROUP, method = RequestMethod.GET)

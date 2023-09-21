@@ -42,11 +42,13 @@ class FilterClause {
     column;
     operation;
     value;
+    valueLabel;
 
-    constructor(column, operation, value) {
+    constructor(column, operation, value, valueLabel) {
         this.column = column;
         this.operation = operation;
         this.value = value;
+        this.valueLabel = valueLabel;
     }
 
     equals(testClause) {
@@ -56,11 +58,26 @@ class FilterClause {
         return this.column.equals(testClause.column) &&  this.operation.equals(testClause.operation);
     }
     getFilterClauseText() {
-        return this.column.label + ' ' + this.operation.label +' "' + this.value + '"';
+        return this.column.label + ' ' + this.operation.label +' "' + (this.valueLabel ? this.valueLabel : this.value + '"');
     }
 }
 
-let filterOperationArray = [
+const stringPlaceholders = [
+    { operation: 'LIKE', text: 'Format:%any string%any string%'},
+    { operation: 'NOT_EMPTY', text: 'Format: leave it blank'},
+    { operation: 'OTHERS', text: 'Format: any string'}
+];
+
+const numberPlaceholders = [{operation: 'OTHERS', text: 'Format: numeric'}];
+
+const mapPlaceholders = [
+    { operation: 'EQUALS', text: 'Format: config: value,...'},
+    { operation: 'NOT_EMPTY', text: 'Format: leave it blank'},
+    { operation: 'LIKE', text: 'Format: %any string%any other string%'},
+    { operation: 'OTHERS', text: 'Format: any string'}
+];
+
+const filterOperationArray = [
     FilterOperation.from({id:'GREATER', label:'greater than', dataTypes:['number'], required: true}),
     FilterOperation.from({id:'LESS', label:'less than', dataTypes:['number'], required: true}),
     FilterOperation.from({id:'CONTAINS', label: 'contains', dataTypes:['string','map'], required: true}),
@@ -69,7 +86,7 @@ let filterOperationArray = [
     FilterOperation.from({id:'NOT_EMPTY', label: 'not empty', dataTypes:['string','map'], required: false})
 ];
 
-let getOperationById = (operationId) => {
+const getOperationById = (operationId) => {
     for(let ii=0;ii<filterOperationArray.length;ii++) {
         if(filterOperationArray[ii].id === operationId) {
             return filterOperationArray[ii];
@@ -78,7 +95,7 @@ let getOperationById = (operationId) => {
     return undefined;
 }
 
-let getOperationByType = (dataType) => {
+const getOperationByType = (dataType) => {
     for(let ii=0;ii<filterOperationArray.length;ii++) {
         if(filterOperationArray[ii].dataTypes.includes(dataType)) {
             return filterOperationArray[ii];
@@ -87,7 +104,10 @@ let getOperationByType = (dataType) => {
     return undefined;
 }
 
-let getColumnById = (columnId) => {
+
+let filterColumnArray=[];
+
+const getColumnById = (columnId) => {
     for(let ii=0;ii<filterColumnArray.length;ii++) {
         if(filterColumnArray[ii].id === columnId) {
             return filterColumnArray[ii];
@@ -96,22 +116,16 @@ let getColumnById = (columnId) => {
     return undefined;
 }
 
-let filterColumnArray=[];
+let filterClauseArray=[];
 
-let filterClauseArray=[
-    //    new FilterClause(getColumnById('topicName'), getOperationById('equals'), '123846756538000009')
-//     new FilterClause('key', getOperationById('equals'), '67800009998000009')
-//     new FilterClause('department_id', getOperationById('like'), 'EPM_ECO')
-];
-
-let getClausesAsQueryParams = () => {
+const getClausesAsQueryParams = (forQuery) => {
     const result = filterClauseArray
-        .map(clause=>clause.column.id+'_'+clause.operation.id+'='+ clause.value.replaceAll('%','%25'))
+        .map(clause=>clause.column.id+'_'+clause.operation.id+'='+(forQuery ? clause.value.replaceAll('%','%25') : clause.value))
         .join('&');
     return result!=='' ? '?'+result : '';
 }
 
-let isBrowserFilterSet = () => {
+const isBrowserFilterSet = () => {
     return filterClauseArray!==null && filterClauseArray.length>0;
 }
 
@@ -119,7 +133,7 @@ let setFilterColumnsArray = (columns) => {
     filterColumnArray = columns.map(column => FilterColumn.from(column));
 }
 
-let setFilterClauseArray = (clauses) => {
+const setFilterClauseArray = (clauses) => {
     filterClauseArray = clauses
         .map(clause=>new FilterClause(
             FilterColumn.from(clause.column),
@@ -127,7 +141,7 @@ let setFilterClauseArray = (clauses) => {
             clause.value));
 }
 
-let loadFilterColumnArray = () => {
+const loadFilterColumnArray = () => {
 
     for(let ii=0;ii<filterColumnArray.length;ii++) {
 
@@ -140,7 +154,7 @@ let loadFilterColumnArray = () => {
     }
 }
 
-let loadFilterOperationArray = () => {
+const loadFilterOperationArray = () => {
 
     for(let ii=0;ii<filterOperationArray.length;ii++) {
 
@@ -153,7 +167,7 @@ let loadFilterOperationArray = () => {
     }
 }
 
-let loadFilterOperationArrayByType = (dataType) => {
+const loadFilterOperationArrayByType = (dataType) => {
 
     let operationsLoaded = [];
 
@@ -176,7 +190,7 @@ let loadFilterOperationArrayByType = (dataType) => {
     return operationsLoaded;
 }
 
-let getFilterClauseByText = (filterClauseText) => {
+const getFilterClauseByText = (filterClauseText) => {
     for(let ii=0;ii<filterClauseArray.length;ii++) {
         if(filterClauseArray[ii].getFilterClauseText() === filterClauseText) {
             return filterClauseArray[ii];
@@ -184,7 +198,7 @@ let getFilterClauseByText = (filterClauseText) => {
     }
 }
 
-let drawFilterClause = (filterClause) => {
+const drawFilterClause = (filterClause) => {
 
     var filterClauseSpan = document.createElement('span');
     filterClauseSpan.textContent=filterClause.getFilterClauseText();
@@ -199,7 +213,7 @@ let drawFilterClause = (filterClause) => {
 
 }
 
-let loadFilterClauses = () => {
+const loadFilterClauses = () => {
     const containerElement = document.getElementById('query-param-filter-clause-container');
     while (containerElement.firstChild && !containerElement.firstChild.remove());
     for(let ii=0;ii<filterClauseArray.length;ii++) {
@@ -209,7 +223,7 @@ let loadFilterClauses = () => {
     }
 }
 
-let isColumnExists = (column) => {
+const isColumnExists = (column) => {
 
     for(let ii=0;ii<filterColumnArray.length;ii++) {
         if(filterColumnArray[ii].id===column.id) {
@@ -220,7 +234,7 @@ let isColumnExists = (column) => {
     return false;
 }
 
-let isOperationExists = (operation) => {
+const isOperationExists = (operation) => {
     for(let ii=0;ii<filterOperationArray.length;ii++) {
         if(filterOperationArray[ii].equals(operation)) {
             return true;
@@ -230,13 +244,13 @@ let isOperationExists = (operation) => {
     return false;
 }
 
-let validateSingleFilterClause = ( singleFilterClause ) => {
+const validateSingleFilterClause = ( singleFilterClause ) => {
     return isColumnExists(singleFilterClause.column) &&
         isOperationExists(singleFilterClause.operation);
 
 }
 
-let validateFilterClause = () => {
+const validateFilterClause = () => {
     for(let ii=0;ii<filterClauseArray.length;ii++) {
         if(!validateSingleFilterClause(filterClauseArray[ii])) {
             return false;
@@ -305,26 +319,31 @@ function initiateFilterClauseArray() {
             if(operation===undefined) {
                 operation = 'EQUALS';
             }
-            filterClauseArray.push(new FilterClause(column, operation, urlSearchParams.get(key.columnId+'_'+key.operationId)));
+            const value = urlSearchParams.get(key.columnId+'_'+key.operationId);
+            const valueLabel = column.values ? getValueLabelById(column,value) : undefined;
+            filterClauseArray.push(new FilterClause(column, operation, value, valueLabel));
         }
     }
 
 }
 
-let loadValuesList = (values) => {
+const loadValuesList = (values) => {
+
+    const valueItem = document.getElementById('query-param-filter-value-select');
+    valueItem.innerHTML='';
 
     for(let value of values) {
 
         const filterValueItem = document.createElement('option');
-        filterValueItem.setAttribute('value', value);
-        filterValueItem.textContent = value;
+        filterValueItem.setAttribute('value', value.id);
+        filterValueItem.textContent = value.value;
 
-        document.getElementById('query-param-filter-value-select').appendChild(filterValueItem);
+        valueItem.appendChild(filterValueItem);
 
     }
 }
 
-let removeValuesList = () => {
+const removeValuesList = () => {
     document.getElementById('query-param-filter-value-select').innerHTML='';
 }
 
@@ -349,6 +368,19 @@ function handleValuesOnColumnChange(column) {
         setValuePlaceholder(operationId, column.placeholders);
         queryParamFilterValue.val('')
         removeValuesList();
+    }
+}
+
+function getValueLabelById(filterColumn,valueId) {
+    if(filterColumn.values && filterColumn.values.length>0) {
+        for(const val of filterColumn.values) {
+            if(val.id===valueId) {
+                return val.value;
+            }
+        }
+        return undefined;
+    } else {
+        return undefined;
     }
 }
 
@@ -379,7 +411,7 @@ $(document).ready( function () {
     });
 
     function isEnumValueExists(filterColumn,value) {
-        return filterColumn.values.includes(value);
+        return filterColumn.values.map(m=>m.id).includes(value);
     }
 
     document.getElementById("query-param-filter-value").addEventListener('keydown', (event) => {
@@ -431,7 +463,10 @@ $(document).ready( function () {
             }
         }
 
-        const newFilterClause = new FilterClause(filterColumn, getOperationById(filterOperationId), queryParamFilterValue.val());
+        const newFilterClause = new FilterClause(filterColumn,
+                                                 getOperationById(filterOperationId),
+                                                 queryParamFilterValue.val(),
+                                                 getValueLabelById(filterColumn,queryParamFilterValue.val()));
 
         filterClauseArray.push(newFilterClause);
 

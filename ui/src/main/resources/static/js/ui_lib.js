@@ -80,7 +80,7 @@ function hidePopoverIfClickedOutside(e) {
     });
 }
 
-let prettyJson = (object) => {
+const prettyJson = (object) => {
     let result = JSON.stringify(object,null, 1);
     result=result.replaceAll('\{','')
         .replaceAll('\}','')
@@ -89,7 +89,7 @@ let prettyJson = (object) => {
     return result;
 }
 
-let prettyJson2 = (object) => {
+const prettyJson2 = (object) => {
     let result = '';
     const properties= Object.getOwnPropertyNames(object);
     if(properties!==null && properties.length>0) {
@@ -118,6 +118,7 @@ $(document).ready(function() {
     if(document.getElementById("confirmModal")!==null) {
         confirmModal = new bootstrap.Modal(document.getElementById("confirmModal"));
     }
+
 })
 
 function showInfo(type,infoHeader,infoText) {
@@ -235,5 +236,78 @@ function showConfirm(headerText, bodyText, successCallback) {
         confirmModal.show();
 
     }
+
+}
+
+
+function printArray(data) {
+    let formatedArray='';
+    if (data && data.length > 0) {
+        for (let ii = 0; ii < data.length; ii++) {
+            formatedArray += data[ii] + ((ii < data.length - 1) ? '</br>' : '');
+        }
+    }
+    return formatedArray;
+}
+
+function printLink(pattern,data) {
+    return '<a href="'+pattern.replace('${data}',data)+'">\n' +
+        '   '+data+'\n' +
+        '</a>';
+}
+
+function printLinksArray (pattern,data) {
+    let links = '';
+    if (data && data.length>0) {
+        for(let ii=0;ii<data.length;ii++) {
+            links += printLink(pattern,data[ii]) + ((ii<data.length-1) ? '</br>' : '');
+        }
+    }
+    return links;
+}
+
+const toggleFullScreen = ( mode ) => {
+
+    const container = document.getElementById('recordTableContainer');
+    const scrollBody = document.getElementsByClassName('dataTables_scrollBody')[0];
+    const fullScreenButton = document.getElementById('full-screen-button');
+    const fullScreenItem = document.getElementById('fullScreen');
+
+    if(mode==='maximize') {
+        container.classList.add("full-screen");
+        scrollBody.style.minHeight = "80vh"
+        fullScreenButton.innerHTML = "Exit full screen <i class='fa fa-window-restore'></i>";
+        if(fullScreenItem!==null) {fullScreenItem.value = true;}
+    } else {
+        container.classList.remove("full-screen");
+        scrollBody.style.minHeight = "45vh"
+        fullScreenButton.innerHTML = "Full screen <i class='fa fa-window-maximize'></i>";
+        if(fullScreenItem!==null) {fullScreenItem.value = false;}
+    }
+}
+
+function initFullScreenButton(dataTable) {
+    const filters = document.getElementsByClassName('dataTables_filter');
+    if(filters && filters.length>0) {
+        const fullScreenButton = document.createElement("button");
+        fullScreenButton.setAttribute("id", "full-screen-button");
+        fullScreenButton.innerHTML = "Full screen <i class='fa fa-window-maximize'></i>";
+        fullScreenButton.classList.add("full-screen-button", "btn", "btn-sm", "btn-secondary");
+        filters[0].appendChild(fullScreenButton);
+
+        fullScreenButton.addEventListener('click',  () => {
+            if ($('#recordTableContainer')[0].classList.contains("full-screen")) {
+                toggleFullScreen('minimize');
+            } else {
+                toggleFullScreen('maximize');
+            }
+            if(dataTable) {
+                dataTable.columns.adjust();
+            }
+        });
+
+    }
+
+
 
 }

@@ -1,0 +1,137 @@
+<div class="faq">
+    <ul>
+        <li>
+            <p>
+                Filtering data can be performed in three different ways, depending on the type of data:
+                <b>String</b>, <b>Numeric</b> and <b>Enum</b>.
+            </p>
+            <ul>
+                <li>
+                    <p>
+                        <b>String</b> data type. You can use operations such as "equals", "contains", "like" and "not empty".
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        <b>Numeric</b> data type. Available operations include "Greater than", "Less than" and "equals".
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        <b>Enum</b> data type. This is a filtering option with a limited number of values. The only available
+                        operation is "equals".
+                    </p>
+                </li>
+            </ul>
+        </li>
+        <li>
+            <p>
+                <b>Filter options</b>:
+            </p>
+            <ul>
+                <li>
+                    <p>
+                        <b>Group name:</b> This allows you to filter by consumer group name, which is a string value.
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        <b>Storage type:</b> filter by storage type. This option lets you filter by storage type, an Enum value.
+                        Two possible options are <b>"KAFKA"</b> and <b>"ZOOKEEPER"</b>.
+                        In older Kafka versions, information about consumer groups was stored in <b>Zookeeper</b>,
+                        but since Kafka 0.10, consumer group lists are stored in <b>Kafka</b>, in "__consumer_offsets" topic.
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        <b>Group state:</b> An Enum value representing the state of the consumer group. Possible states are:
+                    </p>
+                    <ul>
+                        <li>
+                            <p>
+                                <b>Unknown</b>: No information about consumer group state
+                            </p>
+                        </li>
+                        <li>
+                            <p>
+                                <b>PreparingRebalance</b>: A change requiring partition reassignment is happening,
+                                so Kafka is in the middle of rebalancing process.
+                            </p>
+                        </li>
+                        <li>
+                            <p>
+                                <b>CompletingRebalance</b>: Kafka is still rebalancing the group.
+                            </p>
+                        </li>
+                        <li>
+                            <p>
+                                <b>Stable</b>: Rebalancing is complete, and consumers are functioning as expected.
+                            </p>
+                        </li>
+                        <li>
+                            <p>
+                                <b>Dead</b>: The group will be removed from this Kafka node soon. This may be due to inactivity,
+                                or the group could be migrating to a different group coordinator.
+                            </p>
+                        </li>
+                        <li>
+                            <p>
+                                <b>Empty</b>: The group exists but has no members.
+                            </p>
+                        </li>
+                    </ul>
+                </li>
+
+                <li>
+                    <p>
+                        <b>Topics:</b>: Filtering will be performed across all topics consumed by the given consumer group.
+                        The record will be accepted if at least one topic name meets the condition.
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        <b>Topics count:</b> It is a numeric value. This option filters consumer groups based on the number
+                        of consumed topics.
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        <b>Members:</b> A string value that can filter consumer groups across a list of the consumer
+                        group's members (as MemberMetadata per member ID).
+                    </p>
+                </li>
+
+                <li>
+                    <p>
+                        <b>Members count:</b> A numeric value that can filter consumer groups based on the number of the
+                        consumer group's members.
+                    </p>
+                </li>
+
+                <li>
+                    <p>
+                        <b>Description:</b> A string value that filters values across the consumer group metadata
+                        description field.
+                    </p>
+                </li>
+            </ul>
+        </li>
+        <li>
+            <p>
+                To add a new clause, select the appropriate filter option, operation, and desired value, then click on a
+                <img src="/kafka-manager/faq/consumer-group-list/img/add-button.png"/> button.
+                You can add more than one condition. After adding all the desired conditions, press the
+                <img src="/kafka-manager/faq/consumer-group-list/img/find-button.png"/> button.
+                All added conditions will be combined using the "AND" operation.
+            </p>
+        </li>
+        <li>
+            <p>
+                To share the page with the current result set, press the
+                <img src="/kafka-manager/faq/consumer-group-list/img/copy-button.png"/> button.
+                The relevant link will be copied to your clipboard. Then just paste it and use it as needed.
+            </p>
+        </li>
+    </ul>
+
+</div>

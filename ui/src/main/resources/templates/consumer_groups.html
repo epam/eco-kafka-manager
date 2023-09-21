@@ -15,179 +15,191 @@
  -->
 <!DOCTYPE HTML>
 <html xmlns:th="http://www.thymeleaf.org">
-<head th:replace="templates :: header(~{},~{},~{})">
+<head title="Consumer groups list" th:replace="templates :: header(~{::/html/head/link},~{::/html/head/script},~{})">
+
+    <link rel="stylesheet" type="text/css" th:href="@{/components/query-param-filter/query-param-filter.css}" />
+    <script type="text/javascript" th:src="@{/components/query-param-filter/query-param-filter.js}"></script>
+
 </head>
 <body>
 
-    <script type="text/javascript" th:inline="javascript">
-        /*<![CDATA[*/
-        const pageCurrent = [[${(page != null)?(page.number + 1):(0)}]];
-        const totalPagesCurrent = [[${(page != null)?(page.totalPages):(0)}]];
-        /*]]>*/
-        $(function() {
-            $('#search_form').submit(function(e) {
-                e.preventDefault();
-                location.params(
-                        {
-                            groupName: $('#groupName').val(), 
-                            state: $('#state').val(),
-                            storageType: $('#storageType').val(),
-                            description: $('#description').val(),
-                            page: 1
-                        }, 
-                        {}, 
-                        {});
-            });
-            $('#pagination').twbsPagination({
-                startPage: pageCurrent,
-                totalPages: totalPagesCurrent,
-                visiblePages: 11,
-                initiateStartPageClick: false,
-                first:'&lt;&lt;',
-                prev:'&lt;',
-                next:'&gt;',
-                last:'&gt;&gt;',
-                onPageClick: function (e, pageClicked) {
-                    e.preventDefault();
-                    location.params({page: pageClicked}, {}, {});
+<script type="text/javascript" th:inline="javascript">
+
+    /*<![CDATA[*/
+    const storageValues = [[${consumerGroupStorages}]];
+    const stateValues = [[${consumerGroupStates}]];
+    /*]]>*/
+
+    let dataTable;
+
+    function initColumns() {
+        setFilterColumnsArray( [
+            {id:'groupName', label: 'Group name', type: 'string', placeholders: stringPlaceholders },
+            {id:'storage', label: 'Storage type', type: 'enum', values: storageValues, placeholders: []},
+            {id:'state', label: 'Group state', type: 'enum', values: stateValues, placeholders: []},
+            {id:'topics', label: 'Topics', type: 'string',  placeholders: stringPlaceholders},
+            {id:'topicsCount', label: 'Topics count', type: 'number',  placeholders: numberPlaceholders},
+            {id:'members', label: 'Members', type: 'string',  placeholders: stringPlaceholders},
+            {id:'membersCount', label: 'Members count', type: 'number',  placeholders: numberPlaceholders},
+            {id:'description', label: 'Description', type: 'string', placeholders: stringPlaceholders}
+        ]);
+    }
+
+    function copyActualUrl() {
+        copyText(location.origin + location.pathname + getClausesAsQueryParams(false), $('#copyUrlButton'));
+    }
+
+    $(document).ready(function() {
+
+        $('#query-filter-faq-button').click(() => {
+            showFaq("Filter FAQ", "/kafka-manager/faq/consumer-group-list/filter-faq.html");
+        });
+
+        const generateQueryUrl = () => {
+            return location.origin + location.pathname + '/data' + getClausesAsQueryParams(true);
+        }
+
+        const columnsDef = [
+            { data: 'name',
+                render: function (data, type) {
+                    return printLink('/kafka-manager/consumer_groups/${data}',data);
+                }
+            },
+            { data: 'storage' },
+            { data: 'state' },
+            { data: 'topics',
+                render: function (data, type) {
+                    return printLinksArray("/kafka-manager/topics/${data}",data);
+                }
+            },
+            { data: 'members',
+                render:printArray
+            },
+            { data: 'offsets',
+                render: data => printArray(data)
+            },
+            {
+                data: 'description',
+                render: function (data, type) {
+                    return '<span>'+(data!==null ? data : '')+'</span>';
+                }
+            }
+        ];
+
+        const sortingOrderConsumerGroupName = [0, 'asc'];
+
+        dataTable = $('#consumer-group-table')
+            .on('xhr.dt',(e,settings,json) => $('#totalCount').html( json.data.length ))
+            .DataTable({
+                processing: true,
+                serverSide: false,
+                ajax: {
+                    url: generateQueryUrl(),
+                    type: 'GET'
+                },
+                initComplete: function() {
+                    setTimeout( api => api.columns.adjust(), 1000, this.api());
+                },
+                columns: columnsDef,
+                paging: true,
+                pagingType: 'full_numbers',
+                info: true,
+                lengthMenu: [ 10, 20, 30 ],
+                pageLength: 20,
+                scrollX: true,
+                scrollY: "60vh",
+                scrollCollapse: true,
+                // fixedColumns: {
+                //     left: 1
+                // },
+                order: [sortingOrderConsumerGroupName],
+                search: {
+                    return: true,
+                },
+                language: {
+                    searchPlaceholder: "Enter this page search expression",
+                    processing: "<span class='fa-stack fa-lg'>\n\
+                                     <i class='fa fa-spinner fa-spin fa-stack-2x fa-fw'></i>\n\
+                                 </span>&emsp;Processing ..."
                 }
             });
+
+        $('#query-param-filter-apply-button').click(function (e) {
+            dataTable.ajax.url(generateQueryUrl()).load(
+                function ( json ) {
+                    dataTable.columns.adjust();
+                }, true);
         });
-    </script>
 
-    <div th:replace="templates :: navbar"></div>
-        
-    <div class="main-content">
-    
-        <div class="container-fluid">
+        initFullScreenButton(dataTable);
+
+    });
+</script>
+
+<div th:replace="templates :: info-modal"></div>
+<div th:replace="templates :: faq-modal"></div>
+<div th:replace="templates :: confirm-modal"></div>
+<div th:replace="templates :: navbar"></div>
+
+<div class="main-content">
+
+    <div class="container-fluid">
+
+        <div class="row">
+            <div class="consumer-group-header col-md-12">
+                <h3>Consumer Groups (<span id="totalCount"></span>)</h3>
+                <a onclick="copyActualUrl()"
+                   id="copyUrlButton"
+                   class="btn btn-primary btn-success ms-3">
+                    Copy URL <i class="fa fa-copy"></i>
+                </a>
+            </div>
+        </div>
+
+        <div class="row">
+
+            <div class="col-md-12">
+
+                <div th:replace="templates :: query-param-filter"></div>
+
+            </div>
+
+        </div>
+
+        <div id="recordTableContainer">
 
             <div class="row">
+
                 <div class="col-md-12">
-                    <h3>Consumer Groups (<span th:text="${totalCount}"></span>)</h3>
+
+                    <table id="consumer-group-table" class="table table-bordered table-striped table-hover"
+                           style="width: 100%">
+                        <thead>
+                        <tr>
+                            <td>Name</td>
+                            <td>Storage</td>
+                            <td>State</td>
+                            <td>Topics</td>
+                            <td>Members</td>
+                            <td>Offsets</td>
+                            <td>Description</td>
+                        </tr>
+                        </thead>
+                    </table>
+
+
+
                 </div>
+
             </div>
-        
-            <div class="row">
-                
-                <div class="col-md-12">
-                
-                    <form class="form-inline form-flex" id="search_form">
-                        <input 
-                            type="text"
-                            class="form-control" 
-                            id="groupName" 
-                            placeholder="Group Name"
-                            th:value="${searchCriteria.groupName}"/>
-                        <select title="State" class="form-select" id="state">
-                            <option value="">-</option>
-                            <option 
-                                th:each="state : ${T(org.apache.kafka.common.ConsumerGroupState).values()}"
-                                th:value="${state.name()}" 
-                                th:text="${state}"
-                                th:selected="${state == searchCriteria.state}">
-                            </option>
-                        </select>
-                        <select title="Storage Type" class="form-select" id="storageType">
-                            <option value="">-</option>
-                            <option 
-                                th:each="type : ${T(com.epam.eco.kafkamanager.ConsumerGroupInfo$StorageType).values()}"
-                                th:value="${type}" 
-                                th:text="${type}"
-                                th:selected="${type == searchCriteria.storageType}">
-                            </option>
-                        </select>
-                        <input 
-                            type="text"
-                            class="form-control"
-                            id="description" 
-                            placeholder="Description"
-                            th:value="${searchCriteria.description}"/>
-                        <button 
-                            type="submit"
-                            class="btn btn-primary">
-                            Find
-                        </button>
-                    </form>
-                
-                </div>
-                
-            </div>
-            
-            <div class="row">
-        
-                <div class="col-md-12">
-        
-                    <div th:if="${page != null}">
-                        <table class="table table-bordered table-striped table-hover">
-                            <thead>
-                                <tr>
-                                    <td>Name</td>
-                                    <td>Storage</td>
-                                    <td>State</td>
-                                    <td>Topics</td>
-                                    <td>Members</td>
-                                    <td>Offsets</td>
-                                    <td>Description</td>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr th:each="group : ${page.content}">
-                                    <td>
-                                        <a th:href="@{/consumer_groups/{name}(name=${group.name})}">
-                                            <span th:text="${group.name}"></span>
-                                        </a>
-                                    </td>
-                                    <td th:text="${group.storageType}"/>
-                                    <td th:text="${group.state}"/>
-                                    <td class="large-table-column-20">
-                                        <th:block th:each="topic : ${group.getTopicNamesAsCollapsedCol(5)}">
-                                            <a th:if="${!topic.divider}" th:href="@{/topics/{name}(name=${topic.value})}">
-                                                <span th:text="${topic.value}" style="float:left;clear:left;"></span>
-                                            </a>
-                                            <span th:if="${topic.divider}" th:text="..." style="float:left;clear:left;">
-                                            </span>
-                                        </th:block>
-                                    </td>
-                                    <td class="large-table-column-20">
-                                        <span 
-                                            th:each="member : ${group.getMembersAsCollapsedCol(5)}" 
-                                            th:text="${member}"
-                                            style="display:block;">
-                                        </span>
-                                    </td>
-                                    <td class="large-table-column-20">
-                                        <span 
-                                            th:each="offset : ${group.getOffsetsAsCollapsedCol(5)}" 
-                                            th:text="${offset}"
-                                            style="display:block;">
-                                        </span>
-                                    </td>
-                                    <td 
-                                        th:text="${group.metadataDescription}" 
-                                        style="word-wrap:break-word;max-width:150px">
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                            
-                        <div
-                            th:if="${page.numberOfElements > 0}" 
-                            th:text="${'Showing ' + (page.number * page.size + 1) + ' to ' + (page.number * page.size + page.numberOfElements) + ' of ' + page.totalElements}">
-                        </div>
-                        
-                        <ul id="pagination" class="pagination pagination-sm"></ul>
-        
-                    </div>
-        
-                </div>
-        
-            </div>
-        
+
         </div>
 
     </div>
 
-    <div th:replace="templates :: footer"></div>
+</div>
+
+<div th:replace="templates :: footer"></div>
 
 </body>
 </html>
