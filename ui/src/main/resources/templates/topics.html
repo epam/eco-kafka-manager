@@ -44,7 +44,7 @@
         }
 
         function copyActualUrl() {
-            copyText(location.origin + location.pathname + getClausesAsQueryParams(false), $('#copyUrlButton'));
+            copyText(location.origin + location.pathname + getClausesAsQueryParams(), $('#copyUrlButton'));
         }
 
         $(document).ready(function() {
@@ -57,7 +57,7 @@
             });
 
             const generateQueryUrl = () => {
-                return '/kafka-manager/topic_list' + getClausesAsQueryParams(true);
+                return '/kafka-manager/topic_list' + getClausesAsQueryParams();
             }
 
             const columnsDef = [
@@ -180,7 +180,7 @@
 
             $('.export-button').click(function (event) {
                 const exporterType = $(event.target).data('export-type');
-                window.open('/kafka-manager/topics_export' + getClausesAsQueryParams(true) + '&exporterType=' + exporterType,'_blank');
+                window.open('/kafka-manager/topics_export' + getClausesAsQueryParams() + '&exporterType=' + exporterType,'_blank');
             })
 
         });

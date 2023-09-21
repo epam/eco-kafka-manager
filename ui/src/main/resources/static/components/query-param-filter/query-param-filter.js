@@ -459,8 +459,7 @@ $(document).ready( function () {
         for (let ii = 0; ii < filterClauseArray.length; ii++) {
             if (filterClauseArray[ii].column.id === filterColumn.id &&
                 filterClauseArray[ii].operation.id === filterOperationId) {
-                showInfo('error', 'Filter clause validation', 'Operation being added already exists in filer clause.');
-                return;
+                filterClauseArray.splice(ii,1);
             }
         }
 
@@ -471,8 +470,7 @@ $(document).ready( function () {
 
         filterClauseArray.push(newFilterClause);
 
-        const filterClauseItem = drawFilterClause(newFilterClause);
-        addRemoveListener(filterClauseItem);
+        loadFilterClauses();
 
     });
 
