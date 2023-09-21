@@ -19,6 +19,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.Validate;
 import org.apache.kafka.common.resource.ResourceType;
 import org.apache.kafka.common.security.auth.KafkaPrincipal;
@@ -40,7 +41,7 @@ public class PrincipalPermissionsDeleteParams {
     private final String principal;
     private final KafkaPrincipal principalObject;
     private final Set<ResourceExcludes> excludes;
-    private final ResourceType resourceType;
+    private final Set<ResourceType> resourceTypes;
 
     @JsonCreator
     public PrincipalPermissionsDeleteParams(
@@ -57,22 +58,22 @@ public class PrincipalPermissionsDeleteParams {
     }
 
     public PrincipalPermissionsDeleteParams(KafkaPrincipal principal,
-                                            ResourceType resourceType,
+                                            Set<ResourceType> resourceTypes,
                                             Set<ResourceExcludes> excludeds) {
-        this(principal != null ? principal.toString() : null, principal, resourceType,  excludeds);
+        this(principal != null ? principal.toString() : null, principal, resourceTypes,  excludeds);
     }
 
     private PrincipalPermissionsDeleteParams(
             String principal,
             KafkaPrincipal principalObject,
-            ResourceType resourceType,
+            Set<ResourceType> resourceTypes,
             Set<ResourceExcludes> excludes) {
         Validate.notBlank(principal, "Principal is blank");
         Validate.notNull(principalObject, "Principal Object is null");
 
         this.principal = principal;
         this.principalObject = principalObject;
-        this.resourceType = resourceType;
+        this.resourceTypes = resourceTypes;
         this.excludes = excludes;
     }
 
@@ -84,8 +85,8 @@ public class PrincipalPermissionsDeleteParams {
         return principalObject;
     }
 
-    public ResourceType getResourceType() {
-        return resourceType;
+    public Set<ResourceType> getResourceTypes() {
+        return resourceTypes;
     }
 
     public Set<ResourceExcludes> getExcludes() {
@@ -99,11 +100,11 @@ public class PrincipalPermissionsDeleteParams {
         return this.excludes.contains(new ResourceExcludes(resourceName,resourceType));
     }
 
-    public boolean matchResourceType(ResourceType type) {
-        if(isNull(this.resourceType)) {
+    public boolean contains(ResourceType type) {
+        if(CollectionUtils.isEmpty(this.resourceTypes)) {
             return true;
         }
-        return type==this.resourceType;
+        return this.resourceTypes.contains(type);
 
     }
 
@@ -162,7 +163,7 @@ public class PrincipalPermissionsDeleteParams {
 
         private String principal;
         private KafkaPrincipal principalObject;
-        private ResourceType resourceType;
+        private Set<ResourceType> resourceTypes;
         private Set<ResourceExcludes> excludes;
 
         private Builder(PrincipalPermissionsDeleteParams origin) {
@@ -189,8 +190,8 @@ public class PrincipalPermissionsDeleteParams {
             return this;
         }
 
-        public Builder resourceType(ResourceType resourceType) {
-            this.resourceType = resourceType;
+        public Builder resourceTypes(Set<ResourceType> resourceTypes) {
+            this.resourceTypes = resourceTypes;
             return this;
         }
 
@@ -198,7 +199,7 @@ public class PrincipalPermissionsDeleteParams {
             return new PrincipalPermissionsDeleteParams(
                     principal,
                     principalObject,
-                    resourceType,
+                    resourceTypes,
                     excludes);
         }
     }

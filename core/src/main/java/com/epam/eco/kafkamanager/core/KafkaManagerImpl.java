@@ -595,7 +595,7 @@ public class KafkaManagerImpl implements KafkaManager {
                                                .filter(permissionInfo ->
                                                        !params.containsInExcludes(permissionInfo.getResourceName(),
                                                                                   permissionInfo.getResourceType())
-                                                       && params.matchResourceType(permissionInfo.getResourceType()))
+                                                       && params.contains(permissionInfo.getResourceType()))
                                                .map(permissionInfo -> ResourcePermissionFilter.builder()
                                                                .resourceType(permissionInfo.getResourceType())
                                                                .resourceName(permissionInfo.getResourceName())
