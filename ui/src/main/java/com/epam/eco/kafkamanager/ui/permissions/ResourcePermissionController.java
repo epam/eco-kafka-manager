@@ -77,6 +77,7 @@ public class ResourcePermissionController {
             PermissionController.MAPPING_PERMISSIONS + "/resource/{resourceType}/{resourceName}/{patternType}/principal/{principal}";
 
     public static final String MAPPING_METADATA = MAPPING_RESOURCE + "/metadata";
+    private static final Set<ResourceType> DELETE_RESOURCE_TYPES = Set.of(ResourceType.TOPIC,ResourceType.GROUP,ResourceType.TRANSACTIONAL_ID);
 
     @Autowired
     private KafkaManager kafkaManager;
@@ -127,7 +128,7 @@ public class ResourcePermissionController {
         KafkaPrincipal principal = SecurityUtils.parseKafkaPrincipal(kafkaPrincipalString);
         kafkaManager.deletePermissions(PrincipalPermissionsDeleteParams.builder()
                                                     .principal(principal)
-                                                    .resourceType(ResourceType.TOPIC)
+                                                    .resourceTypes(DELETE_RESOURCE_TYPES)
                                                     .excludes(Set.of(new ResourceExcludes(resourceName, resourceType)))
                                                     .build());
 
