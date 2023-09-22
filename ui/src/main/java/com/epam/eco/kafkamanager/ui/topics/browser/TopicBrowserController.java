@@ -15,12 +15,7 @@
  *******************************************************************************/
 package com.epam.eco.kafkamanager.ui.topics.browser;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.BiConsumer;
 
 import java.util.stream.Collectors;
@@ -61,9 +56,7 @@ import com.epam.eco.kafkamanager.ui.topics.TopicController;
 import com.epam.eco.kafkamanager.ui.topics.browser.handlers.FilterOperationEnum;
 import com.epam.eco.kafkamanager.utils.PrettyHtmlMapper;
 
-import static com.epam.eco.kafkamanager.ui.topics.browser.FilterClauseAbstractPredicate.KEY_ATTRIBUTE;
-import static com.epam.eco.kafkamanager.ui.topics.browser.FilterClauseAbstractPredicate.TOMBSTONE_ATTRIBUTE;
-
+import static com.epam.eco.kafkamanager.ui.topics.browser.FilterClauseAbstractPredicate.*;
 import static java.util.Objects.nonNull;
 
 /**
@@ -95,6 +88,8 @@ public class TopicBrowserController {
     public static final String ATTR_KEY_FORMAT = "keyFormat";
     public static final String ATTR_HEADERS = "headers";
 
+    public static final String INITIAL_FILTER_ATTRIBUTE = "initialFilterColumns";
+    public static final Set<String> INITIAL_FILTER_COLUMNS = Set.of(TOMBSTONE_ATTRIBUTE,KEY_ATTRIBUTE);
     private static final long DEFAULT_FETCH_TIMEOUT = 30_000;
 
     @Autowired
@@ -102,8 +97,10 @@ public class TopicBrowserController {
 
     @Autowired
     private KafkaTombstoneProducer kafkaTombstoneStringProducer;
+
     @Autowired
     private KafkaTombstoneProducer kafkaTombstoneAvroProducer;
+
     @Autowired
     private KafkaAdminOperations kafkaAdminOperations;
 
@@ -212,6 +209,7 @@ public class TopicBrowserController {
 
         modelAttributes.accept(ATTR_BROWSE_PARAMS, browseParams);
         modelAttributes.accept(ATTR_OFFSET_RANGES, offsetRanges);
+        modelAttributes.accept(INITIAL_FILTER_ATTRIBUTE, INITIAL_FILTER_COLUMNS);
         modelAttributes.accept(ATTR_SHOW_GRID, nonNull(topicBrowser) ? topicBrowser.getShowGrid() : Boolean.TRUE);
         modelAttributes.accept(ATTR_ENABLE_ANIMATION,  nonNull(topicBrowser) ? topicBrowser.getEnableAnimation() : Boolean.TRUE);
         modelAttributes.accept(ATTR_FILTER_OPERATIONS, FilterOperationEnum.getFilterOperations());

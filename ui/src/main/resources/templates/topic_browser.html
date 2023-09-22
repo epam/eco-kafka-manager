@@ -34,7 +34,8 @@
     const fullScreen = [[${browseParams.getFullScreen()}]];
     const showGrid = [[${showGrid}]]
 
-    const filterColumns = [[${columnsList}]]
+    let filterColumns = [[${columnsList}]]
+    const initialFilterColumns = [[${initialFilterColumns}]]
     const filterClauses = [[${browseParams.getFilterClauses()}]]
     const filterOperations = [[${filterOperations}]]
 
@@ -48,8 +49,10 @@
         {columnName: 'tombstones', operations: ['include','exclude','only']},
     ];
 
+    filterColumns = (filterColumns === null ? initialFilterColumns : filterColumns);
+
     if(filterColumns!==null) {
-        setFilterColumnsArray(topicName, filterColumns);
+       setFilterColumnsArray(topicName, filterColumns);
     }
     if(excludes && excludes!=null) {
         setExcludes(excludes);
