@@ -70,7 +70,7 @@ public class TopicBrowseParams extends HashMap<String, Object> {
     private static final Pattern PARTITION_MIN_OFFSET_PATTERN = Pattern.compile("^p_min_(0|[1-9]\\d*)$");
     private static final Pattern COLUMN_ENABLED_PATTERN = Pattern.compile("^ce_(.+)$");
 
-    private static final Long DEFAULT_TIMEOUT = 10000L;
+    private static final Long DEFAULT_TIMEOUT = 20_000L;
 
     public TopicBrowseParams(Map<String, Object> requestParams) {
         if (requestParams != null) {

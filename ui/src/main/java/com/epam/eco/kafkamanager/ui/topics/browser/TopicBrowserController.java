@@ -20,9 +20,12 @@ import java.util.function.BiConsumer;
 
 import java.util.stream.Collectors;
 
+import com.epam.eco.kafkamanager.*;
+import com.epam.eco.kafkamanager.utils.KafkaUtils;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.kafka.common.TopicPartition;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -41,12 +44,6 @@ import com.epam.eco.commons.kafka.OffsetRange;
 import com.epam.eco.commons.kafka.helpers.FilterClausePredicate;
 import com.epam.eco.commons.kafka.helpers.PartitionRecordFetchResult;
 import com.epam.eco.commons.kafka.helpers.RecordFetchResult;
-import com.epam.eco.kafkamanager.Authorizer;
-import com.epam.eco.kafkamanager.EntityType;
-import com.epam.eco.kafkamanager.KafkaAdminOperations;
-import com.epam.eco.kafkamanager.KafkaManager;
-import com.epam.eco.kafkamanager.KafkaTombstoneProducer;
-import com.epam.eco.kafkamanager.TopicRecordFetchParams;
 import com.epam.eco.kafkamanager.TopicRecordFetchParams.DataFormat;
 import com.epam.eco.kafkamanager.exec.TaskResult;
 import com.epam.eco.kafkamanager.ui.config.KafkaManagerUiProperties;
@@ -254,10 +251,10 @@ public class TopicBrowserController {
     }
 
     private <K,V> TopicRecordFetchParams<K,V> toFetchParams(TopicBrowseParams browseParams) {
-        return new TopicRecordFetchParams<>(
+        return new TopicRecordFetchParams<K,V>(
                 browseParams.getKeyFormat(),
                 browseParams.getValueFormat(),
-                browseParams.getPartitionOffsets(),
+                getFetchedOffsets(browseParams),
                 browseParams.getLimit(),
                 browseParams.getTimeout() > 0 ? browseParams.getTimeout() : DEFAULT_FETCH_TIMEOUT,
                 browseParams.getFetchMode(),
@@ -266,6 +263,35 @@ public class TopicBrowserController {
                 properties.getTopicBrowser().getCacheExpirationPeriodMin(),
                 resolveFilterPredicate(browseParams)
         );
+    }
+
+    private Map<Integer, OffsetRange> getFetchedOffsets(TopicBrowseParams browseParams) {
+        return isItSearchByKeyEqualsClause(browseParams) ?
+                   getOffsetsFilteredOffsetsByKeyPartition(browseParams) :
+                   browseParams.getPartitionOffsets();
+    }
+
+    @NotNull
+    private Map<Integer, OffsetRange> getOffsetsFilteredOffsetsByKeyPartition(TopicBrowseParams browseParams) {
+        return browseParams.getPartitionOffsets().entrySet().stream()
+                   .filter(entry -> entry.getKey().equals(getKeyPartition(browseParams)))
+                   .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+    }
+
+    private boolean isItSearchByKeyEqualsClause(TopicBrowseParams browseParams) {
+        Map<String,List<FilterClause>> clauses = browseParams.getFilterClausesAsMap();
+        return clauses.containsKey(KEY_ATTRIBUTE)
+                  && clauses.get(KEY_ATTRIBUTE).stream()
+                                 .anyMatch(clause->FilterOperationEnum.getOperationEnum(clause.getOperation())==FilterOperationEnum.EQUALS);
+    }
+
+    private int getKeyPartition(TopicBrowseParams browseParams) {
+        Map<String,List<FilterClause>> clauses = browseParams.getFilterClausesAsMap();
+        FilterClause filterClause = clauses.get(KEY_ATTRIBUTE).stream()
+                .filter(clause->FilterOperationEnum.getOperationEnum(clause.getOperation())==FilterOperationEnum.EQUALS)
+                .findFirst()
+                .orElse(null);
+        return nonNull(filterClause) ? KafkaUtils.getPartitionByKey(filterClause.getValue(),browseParams.getPartitionOffsets().size()) : null;
     }
 
     private FilterClausePredicate resolveFilterPredicate(TopicBrowseParams browseParams) {
