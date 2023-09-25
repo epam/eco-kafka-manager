@@ -15,6 +15,8 @@
  *******************************************************************************/
 package com.epam.eco.kafkamanager.ui.config;
 
+import com.epam.eco.kafkamanager.PartitionByKeyResolver;
+import com.epam.eco.kafkamanager.PartitionByKeyResolverImpl;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.cloud.stream.config.SpelExpressionConverterConfiguration;
@@ -49,6 +51,10 @@ public class KafkaManagerUiConfiguration implements WebMvcConfigurer {
     @Bean
     public PropertiesInitializer propertiesInitializer(KafkaManagerUiProperties properties) {
         return new PropertiesInitializer(properties);
+    }
+    @Bean
+    public PartitionByKeyResolver partitionByKeyResolver() {
+        return new PartitionByKeyResolverImpl();
     }
 
     @Override
