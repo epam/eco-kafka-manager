@@ -30,6 +30,7 @@ public class TopicBrowser {
     private Boolean enableAnimation = Boolean.TRUE;
     private List<HeaderReplacement> tombstoneGeneratorReplacements;
     private Set<String> replacementPatterns;
+    private Boolean filterByKeyPartition = false;
     public Boolean getUseCache() {
         return useCache;
     }
@@ -84,5 +85,13 @@ public class TopicBrowser {
 
     public void setReplacementPatterns(Set<String> replacementPatterns) {
         this.replacementPatterns = replacementPatterns;
+    }
+
+    public Boolean isFilterByKeyPartition() {
+        return filterByKeyPartition;
+    }
+
+    public void setFilterByKeyPartition(Boolean filterByKeyPartition) {
+        this.filterByKeyPartition = filterByKeyPartition;
     }
 }

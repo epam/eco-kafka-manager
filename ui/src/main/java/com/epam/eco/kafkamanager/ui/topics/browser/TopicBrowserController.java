@@ -21,7 +21,6 @@ import java.util.function.BiConsumer;
 import java.util.stream.Collectors;
 
 import com.epam.eco.kafkamanager.*;
-import com.epam.eco.kafkamanager.utils.KafkaUtils;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.kafka.common.TopicPartition;
@@ -103,6 +102,9 @@ public class TopicBrowserController {
 
     @Autowired
     private KafkaManagerUiProperties properties;
+
+    @Autowired
+    private PartitionByKeyResolver partitionByKeyResolver;
 
     @Autowired
     private Authorizer authorizer;
@@ -266,7 +268,7 @@ public class TopicBrowserController {
     }
 
     private Map<Integer, OffsetRange> getFetchedOffsets(TopicBrowseParams browseParams) {
-        return isItSearchByKeyEqualsClause(browseParams) ?
+        return properties.getTopicBrowser().isFilterByKeyPartition() && isItSearchByKeyEqualsClause(browseParams) ?
                    getOffsetsFilteredOffsetsByKeyPartition(browseParams) :
                    browseParams.getPartitionOffsets();
     }
@@ -291,7 +293,8 @@ public class TopicBrowserController {
                 .filter(clause->FilterOperationEnum.getOperationEnum(clause.getOperation())==FilterOperationEnum.EQUALS)
                 .findFirst()
                 .orElse(null);
-        return nonNull(filterClause) ? KafkaUtils.getPartitionByKey(filterClause.getValue(),browseParams.getPartitionOffsets().size()) : null;
+        return nonNull(filterClause) ?
+                   partitionByKeyResolver.getPartitionByKey(filterClause.getValue(),browseParams.getPartitionOffsets().size()) : 0;
     }
 
     private FilterClausePredicate resolveFilterPredicate(TopicBrowseParams browseParams) {
