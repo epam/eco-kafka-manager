@@ -52,7 +52,7 @@ public class GlobalErrorController implements ErrorController {
 
     @RequestMapping(value = MAPPING)
     public String error(WebRequest request, Model model) {
-        Map<String, Object> attributes = errorAttributes.getErrorAttributes(request, false);
+        Map<String, Object> attributes = errorAttributes.getErrorAttributes(request, true);
         enrichErrorAttributes(request, attributes);
         model.addAttribute(ERROR_ATTRIBUTES, attributes);
 

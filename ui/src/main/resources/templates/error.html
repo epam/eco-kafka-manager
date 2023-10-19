@@ -20,6 +20,7 @@
 <body>
 
     <div th:replace="templates :: navbar"></div>
+    <div th:replace="templates :: data-modal"></div>
     
     <div class="main-content">    
     
@@ -43,13 +44,25 @@
                                 <span th:text="${errorAttributes.status}"></span> (<span th:text="${errorAttributes.error}"></span>)
                             </p>
                             <p>
-                                <b>Message:</b>
-                                <span th:text="${errorAttributes.message}"></span>
-                            </p>
-                            <p>
                                 <b>Occurred:</b>
                                 <span th:text="${errorAttributes.timestamp}"></span>
                             </p>
+                            <p>
+                                <b>Message:</b>
+                                <span th:text="${errorAttributes.message}"></span>
+                            </p>
+
+                            <div class="truncated-description" style="word-wrap:break-word;border:0;">
+                                <div>Stacktrace</div>
+                                <a class="btn btn-sm info"
+                                   type="button"
+                                   onclick="toggleStacktrace()">
+                                    <i class="fa fa-eye info"></i>
+                                </a>
+                            </div>
+                            <div class="d-none" id="stacktrace">
+                                <pre th:text="${errorAttributes.trace}"></pre>
+                            </div>
                         </th:block>
                     </div>
         
