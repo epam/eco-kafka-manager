@@ -19,6 +19,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import com.fasterxml.jackson.databind.SerializationFeature;
 import org.apache.avro.util.Utf8;
 import org.apache.commons.lang3.StringUtils;
 
@@ -49,12 +50,9 @@ public class PrettyHtmlMapper {
     private static final Map<String,String> REPLACE_IN_CONTENT_PATTERNS = Map.of("<","&lt;", ">","&gt;");
 
     private static final Map<PrettyFormat, MapperConfig> MAPPER_CONFIG =
-            Map.of(PrettyFormat.STRING,
-                    new MapperConfig(JSON_NEW_LINE, JSON_START_BOLD, JSON_END_BOLD, JSON_SPACE, DELIMITER),
-                    PrettyFormat.JSON,
-                    new MapperConfig(JSON_NEW_LINE, JSON_START_BOLD, JSON_END_BOLD, JSON_SPACE, JSON_DELIMITER),
-                    PrettyFormat.HTML,
-                    new MapperConfig(HTML_NEW_LINE, HTML_START_BOLD, HTML_END_BOLD, HTML_SPACE, DELIMITER)
+            Map.of(PrettyFormat.STRING, new MapperConfig(JSON_NEW_LINE, JSON_START_BOLD, JSON_END_BOLD, JSON_SPACE, DELIMITER),
+                    PrettyFormat.JSON, new MapperConfig(JSON_NEW_LINE, JSON_START_BOLD, JSON_END_BOLD, JSON_SPACE, JSON_DELIMITER),
+                    PrettyFormat.HTML, new MapperConfig(HTML_NEW_LINE, HTML_START_BOLD, HTML_END_BOLD, HTML_SPACE, DELIMITER)
             );
 
     private static final ObjectMapper MAPPER = new ObjectMapper();
@@ -63,6 +61,7 @@ public class PrettyHtmlMapper {
         MAPPER.configure(JsonGenerator.Feature.AUTO_CLOSE_TARGET, false);
         MAPPER.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         MAPPER.configure(DeserializationFeature.ACCEPT_EMPTY_STRING_AS_NULL_OBJECT, true);
+        MAPPER.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
         MAPPER.registerModule(new JavaTimeModule());
     }
 
