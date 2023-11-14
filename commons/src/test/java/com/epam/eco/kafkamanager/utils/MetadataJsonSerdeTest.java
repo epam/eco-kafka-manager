@@ -31,8 +31,8 @@ import com.epam.eco.kafkamanager.Metadata;
  */
 public class MetadataJsonSerdeTest {
 
-    private JsonSerializer serializer = new JsonSerializer();
-    private JsonDeserializer<Metadata> deserializer = new JsonDeserializer<>();
+    private final JsonSerializer serializer = new JsonSerializer();
+    private final JsonDeserializer<Metadata> deserializer = new JsonDeserializer<>();
     {
         deserializer.configure(
                 Collections.singletonMap(JsonDeserializer.VALUE_TYPE, Metadata.class),

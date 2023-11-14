@@ -30,8 +30,8 @@ import com.epam.eco.kafkamanager.udmetrics.UDMetricType;
  */
 public class UDMetricConfigJsonSerdeTest {
 
-    private JsonSerializer serializer = new JsonSerializer();
-    private JsonDeserializer<UDMetricConfig> deserializer = new JsonDeserializer<>();
+    private final JsonSerializer serializer = new JsonSerializer();
+    private final JsonDeserializer<UDMetricConfig> deserializer = new JsonDeserializer<>();
     {
         deserializer.configure(
                 Collections.singletonMap(JsonDeserializer.KEY_TYPE, UDMetricConfig.class),

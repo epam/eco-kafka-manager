@@ -158,7 +158,7 @@ public class TransactionMetadataInfo {
         private short producerEpoch;
         private int timeoutMs;
         private TransactionState state;
-        private List<TopicPartition> partitions = new ArrayList<>();
+        private final List<TopicPartition> partitions = new ArrayList<>();
         private LocalDateTime startDate;
         private LocalDateTime lastUpdateDate;
 

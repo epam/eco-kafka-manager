@@ -152,9 +152,9 @@ public class TopicCreateParams {
         private String topicName;
         private int partitionCount;
         private int replicationFactor;
-        private Map<String, String> config = new HashMap<>();
+        private final Map<String, String> config = new HashMap<>();
         private String description;
-        private Map<String, Object> attributes = new HashMap<>();
+        private final Map<String, Object> attributes = new HashMap<>();
 
         private Builder(TopicCreateParams origin) {
             if (origin == null) {

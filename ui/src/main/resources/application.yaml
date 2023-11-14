@@ -1,0 +1,111 @@
+SERVER_PORT: 8085                        # tomcat server port
+KAFKA_SERVERS_URL: localhost:9095        # kafka bootstrap server url
+SCHEMA_REGISTRY_URL: http://schema-registry:8081 # schema-registry url (optional)
+ZK_CONNECT: http://zookepper  # Zookeeper url (Optional)
+
+server:
+  port: ${SERVER_PORT:8082}
+  servlet:
+    context-path: /
+  tomcat:
+    remote-ip-header: x-forwarded-for
+    protocol-header: x-forwarded-proto
+
+# auth profiles: auth-disabled
+spring:
+  profiles:
+    active: auth-disabled
+  main:
+    allow-bean-definition-overriding: true
+    allow-circular-references: true
+  mvc:
+    hiddenmethod:
+      filter.enabled: true
+    async:
+      request-timeout: 300000
+    pathmatch:
+      matching-strategy: ANT_PATH_MATCHER
+management:
+  metrics:
+    export:
+      prometheus: true
+  endpoints:
+    web:
+      exposure:
+        include: info,health,metrics,prometheus
+
+eco:
+  kafkamanager:
+    core:
+      bootstrapServers: ${KAFKA_SERVERS_URL:localhost:9092}
+      zkConnect: ${ZK_CONNECT:}
+      schemaRegistryUrl: ${SCHEMA_REGISTRY_URL:}
+
+      metadataStoreBootstrapTimeoutInMs: ${METADATA_BOOTSTRAP_TIMEOUT_MS:180000}
+      transactionStoreBootstrapTimeoutInMs: ${TX_BOOTSTRAP_TIMEOUT_MS:180000}
+      transactionStoreBootstrapDataFreshness: ${TX_BOOTSTRAP_DATA_FRESHNESS:ONE_HOUR}
+
+      clientConfig[fetch.max.wait.ms]: 1500
+      clientConfig[fetch.min.bytes]: 20
+      clientConfig[max.poll.records]: 1000
+      clientConfig[security.protocol]: "SASL_SSL"
+      clientConfig[ssl.truststore.location]: "c:/<path-to-truststore>/truststore.jks"
+      clientConfig[ssl.truststore.password]: "<truststore-password>"
+      clientConfig[sasl.mechanism]: "GSSAPI"
+      clientConfig[sasl.kerberos.service.name]: "<service-name>"
+      clientConfig[sasl.jaas.config]: "com.sun.security.auth.module.Krb5LoginModule required \
+                                                 useKeyTab=true  \
+                                                 principal='<kafka-user>' \
+                                                 keyTab='c://<path-to-keytab>//kafka-manager.keytab' \
+                                                 storeKey=true;"
+
+      zkClientConfig[zookeeper.clientCnxnSocket]: org.apache.zookeeper.ClientCnxnSocketNetty
+      zkClientConfig[zookeeper.client.secure]: true
+      zkClientConfig[zookeeper.ssl.client.enable]: true
+      zkClientConfig[zookeeper.ssl.trustStore.location]: "c:/<path-to-truststore>/truststore.jks"
+      zkClientConfig[zookeeper.ssl.trustStore.password]: "<truststore-password>"
+
+
+    udmetrics:
+      enabled: ${UDM_ENABLED:false}
+      calculationIntervalInMs: ${UDM_CALCULATION_INTERVAL:60000}
+      config:
+        repo:
+          kafka:
+            bootstrapTimeoutInMs: ${UDM_BOOTSTRAP_TIMEOUT_MS:60000}
+    ui:
+      topicBrowser:
+        useCache: false
+        cacheExpirationPeriodMin: 60
+        showGrid: true
+        enableAnimation: true
+        replacementPatterns: <?xml,<xml
+        filterByKeyPartition: true
+        tombstoneGeneratorReplacements:
+          - headerName: cdm.operation_meta.operation_type
+            replacement: "delete"
+          - headerName: cdm.operation_meta.operation_time
+            replacement: T(java.time.LocalDateTime).now().toInstant(T(java.time.ZoneOffset).UTC).toEpochMilli()
+          - headerName: cdm.operation_meta.business_time
+            replacement: T(java.time.LocalDateTime).now().toInstant(T(java.time.ZoneOffset).UTC).toEpochMilli()
+  #      externalTools:
+  #        - name: External tool #1
+  #          urlTemplate: https://external-tools.com/external-tools/1/{topicname}
+  #          icon: fa-external-link
+  #        - name: External tool #2
+  #          urlTemplate: https://external-tools.com/external-tools/2/{topicname}
+  #          icon: fa-external-link
+
+#     gaTrackingId: XXX
+
+
+logging:
+  level:
+    root: info
+    # org.springframework.security: debug
+    # com.epam.eco.kafkamanager.core=debug
+
+
+
+
+

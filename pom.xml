@@ -4,7 +4,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>2.4.13</version>
+        <version>3.1.2</version>
     </parent>
 
     <groupId>com.epam.eco.kafkamanager</groupId>
@@ -84,22 +84,28 @@
         <eco-commons.version>1.0.0</eco-commons.version>
         <eco-commons-kafka.version>3.0.2</eco-commons-kafka.version>
         <ehcache.version>3.5.2</ehcache.version>
-        <curator.version>5.2.0</curator.version>
+        <curator.version>5.4.0</curator.version>
         <commons-collections4.version>4.1</commons-collections4.version>
         <commons-csv.version>1.5</commons-csv.version>
         <commons-math3.version>3.6.1</commons-math3.version>
         <commons-io.version>2.7</commons-io.version>
-        <avro.version>1.11.0</avro.version>
-        <slf4j.version>1.7.25</slf4j.version>
+        <avro.version>1.11.3</avro.version>
+        <slf4j.version>2.0.9</slf4j.version>
         <openapi.version>1.6.9</openapi.version>
         <jackson.version>2.13.4</jackson.version>
         <jackson-databind.version>2.13.4.2</jackson-databind.version>
         <byte-buddy.version>1.12.19</byte-buddy.version>
         <objenesis.version>2.6</objenesis.version>
+
+        <spring-boot.version>3.1.2</spring-boot.version>
         <spring-boot-starter-validation>2.7.6</spring-boot-starter-validation>
         <spring-cloud-stream.version>3.0.9.RELEASE</spring-cloud-stream.version>
+        <spring-security.version>6.1.2</spring-security.version>
 
         <protobuf.version>3.21.7</protobuf.version>
+        <keycloak.version>15.0.2</keycloak.version>
+        <keycloak-extensions.version>15.0.1</keycloak-extensions.version>
+        <kafka-auth.version>3.0.5</kafka-auth.version>
 
         <maven-release-plugin.version>2.5.3</maven-release-plugin.version>
         <maven-compiler-plugin.version>3.9.0</maven-compiler-plugin.version>
@@ -133,7 +139,22 @@
             <dependency>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-starter-validation</artifactId>
-                <version>${spring-boot-starter-validation}</version>
+                <version>${spring-boot.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-starter-security</artifactId>
+                <version>${spring-boot.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.security</groupId>
+                <artifactId>spring-security-oauth2-client</artifactId>
+                <version>${spring-security.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-stream</artifactId>
+                <version>${spring-cloud-stream.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.kafka</groupId>
@@ -154,6 +175,11 @@
                 <groupId>org.apache.kafka</groupId>
                 <artifactId>kafka-clients</artifactId>
                 <version>${kafka.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.kafka</groupId>
+                <artifactId>spring-kafka</artifactId>
+                <version>${spring-kafka.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.epam.eco</groupId>
@@ -180,16 +206,6 @@
                 <groupId>io.confluent</groupId>
                 <artifactId>kafka-schema-registry-client</artifactId>
                 <version>${cp.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.springframework.kafka</groupId>
-                <artifactId>spring-kafka</artifactId>
-                <version>${spring-kafka.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.springframework.cloud</groupId>
-                <artifactId>spring-cloud-stream</artifactId>
-                <version>${spring-cloud-stream.version}</version>
             </dependency>
             <dependency>
                 <groupId>io.confluent</groupId>

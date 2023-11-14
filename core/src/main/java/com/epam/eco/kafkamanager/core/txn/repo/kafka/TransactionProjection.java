@@ -146,10 +146,10 @@ class TransactionProjection {
 
     public static class Builder {
 
-        private Queue<TransactionMetadata> history = new CircularFifoQueue<>(HISTORY_SIZE);
+        private final Queue<TransactionMetadata> history = new CircularFifoQueue<>(HISTORY_SIZE);
         private int commitCount = 0;
         private int abortCount = 0;
-        private SummaryStatistics execTimeStats = new SummaryStatistics();
+        private final SummaryStatistics execTimeStats = new SummaryStatistics();
 
         public Builder() {
             this(null);

@@ -75,7 +75,7 @@ public class TopicTableModel implements Serializable {
 
     public static class Builder {
 
-        private TopicTableModel tableModel = new TopicTableModel();
+        private final TopicTableModel tableModel = new TopicTableModel();
 
         public Builder draw(Integer draw) {
             tableModel.setDraw(draw);

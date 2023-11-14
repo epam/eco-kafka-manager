@@ -115,7 +115,7 @@ public class Metadata {
     public static final class Builder {
 
         private String description;
-        private Map<String, Object> attributes = new HashMap<>();
+        private final Map<String, Object> attributes = new HashMap<>();
         private Date updatedAt;
         private String updatedBy;
 

@@ -85,7 +85,7 @@ public class TransactionController {
     }
 
     public static String buildTransactionUrl(String transactionalId) {
-        return MAPPING_TRANSACTION.replace("{id}", "" + transactionalId);
+        return MAPPING_TRANSACTION.replace("{id}", transactionalId);
     }
 
 }

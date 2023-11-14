@@ -20,4 +20,6 @@ package com.epam.eco.kafkamanager.ui.config;
  */
 public final class WebSecurityProfiles {
     public static final String DISABLED = "auth-disabled";
+    public static final String KEYCLOAK = "auth-keycloak";
+    public static final String GOOGLE = "auth-google";
 }

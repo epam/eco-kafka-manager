@@ -26,18 +26,18 @@ import com.epam.eco.kafkamanager.TopicInfo;
  */
 public interface TopicExporter {
 
-    public static final String HEADER_NAME = "Name";
-    public static final String HEADER_PARTITION_COUNT = "Partition Count";
-    public static final String HEADER_REPLICATION_FACTOR = "Replcation Factor";
-    public static final String HEADER_CONFIG = "Config";
-    public static final String HEADER_DESCRIPTION = "Description";
-    public static final String HEADER_PARTITIONS = "Partitions";
-    public static final String HEADER_PARTITION = "Partition";
-    public static final String HEADER_PARTITION_LEADER = "Leader";
-    public static final String HEADER_PARTITION_REPLICAS = "Replicas";
-    public static final String HEADER_PARTITION_ISR = "Isr";
+    String HEADER_NAME = "Name";
+    String HEADER_PARTITION_COUNT = "Partition Count";
+    String HEADER_REPLICATION_FACTOR = "Replcation Factor";
+    String HEADER_CONFIG = "Config";
+    String HEADER_DESCRIPTION = "Description";
+    String HEADER_PARTITIONS = "Partitions";
+    String HEADER_PARTITION = "Partition";
+    String HEADER_PARTITION_LEADER = "Leader";
+    String HEADER_PARTITION_REPLICAS = "Replicas";
+    String HEADER_PARTITION_ISR = "Isr";
 
-    public static final String[] HEADERS = new String[] {
+    String[] HEADERS = new String[] {
             HEADER_NAME,
             HEADER_PARTITION_COUNT,
             HEADER_REPLICATION_FACTOR,
@@ -50,16 +50,16 @@ public interface TopicExporter {
             HEADER_PARTITION_ISR
     };
 
-    public static final String KEY_NAME = "name";
-    public static final String KEY_PARTITION_COUNT = "partitionCount";
-    public static final String KEY_REPLICATION_FACTOR = "replicationFactor";
-    public static final String KEY_CONFIG = "config";
-    public static final String KEY_DESCRIPTION = "description";
-    public static final String KEY_PARTITIONS = "partitions";
-    public static final String KEY_PARTITION = "partition";
-    public static final String KEY_PARTITION_LEADER = "leader";
-    public static final String KEY_PARTITION_REPLICAS = "replicas";
-    public static final String KEY_PARTITION_ISR = "isr";
+    String KEY_NAME = "name";
+    String KEY_PARTITION_COUNT = "partitionCount";
+    String KEY_REPLICATION_FACTOR = "replicationFactor";
+    String KEY_CONFIG = "config";
+    String KEY_DESCRIPTION = "description";
+    String KEY_PARTITIONS = "partitions";
+    String KEY_PARTITION = "partition";
+    String KEY_PARTITION_LEADER = "leader";
+    String KEY_PARTITION_REPLICAS = "replicas";
+    String KEY_PARTITION_ISR = "isr";
 
     void export(Collection<TopicInfo> topicInfos, Writer out) throws IOException;
 

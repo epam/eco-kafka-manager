@@ -69,7 +69,7 @@ public class TabularRecordsTest {
         Assertions.assertEquals("key3", records.getRecord(2).getKey());
         Assertions.assertTrue(records.getRecord(2).containsColumn("columnE"));
 
-        Assertions.assertEquals(null, records.getRecord(3).getKey());
+        Assertions.assertNull(records.getRecord(3).getKey());
         Assertions.assertTrue(records.getRecord(3).isNullKey());
         Assertions.assertTrue(records.getRecord(3).containsColumn("columnF"));
 
@@ -77,7 +77,7 @@ public class TabularRecordsTest {
         Assertions.assertTrue(records.getRecord(4).isNullValue());
         Assertions.assertTrue(records.getRecord(4).getColumnNames().isEmpty());
 
-        Assertions.assertEquals(null, records.getRecord(5).getKey());
+        Assertions.assertNull(records.getRecord(5).getKey());
         Assertions.assertTrue(records.getRecord(5).isNullKey());
         Assertions.assertTrue(records.getRecord(5).isNullValue());
         Assertions.assertTrue(records.getRecord(4).getColumnNames().isEmpty());
@@ -87,32 +87,32 @@ public class TabularRecordsTest {
         Assertions.assertEquals(7, columns.size());
 
         Assertions.assertEquals("columnA", columns.get(0).getName());
-        Assertions.assertEquals(true, columns.get(0).isPresent());
-        Assertions.assertEquals(true, columns.get(0).isSelected());
+        Assertions.assertTrue(columns.get(0).isPresent());
+        Assertions.assertTrue(columns.get(0).isSelected());
 
         Assertions.assertEquals("columnB", columns.get(1).getName());
-        Assertions.assertEquals(true, columns.get(1).isPresent());
-        Assertions.assertEquals(true, columns.get(1).isSelected());
+        Assertions.assertTrue(columns.get(1).isPresent());
+        Assertions.assertTrue(columns.get(1).isSelected());
 
         Assertions.assertEquals("columnC", columns.get(2).getName());
-        Assertions.assertEquals(true, columns.get(2).isPresent());
-        Assertions.assertEquals(true, columns.get(2).isSelected());
+        Assertions.assertTrue(columns.get(2).isPresent());
+        Assertions.assertTrue(columns.get(2).isSelected());
 
         Assertions.assertEquals("columnD", columns.get(3).getName());
-        Assertions.assertEquals(true, columns.get(3).isPresent());
-        Assertions.assertEquals(true, columns.get(3).isSelected());
+        Assertions.assertTrue(columns.get(3).isPresent());
+        Assertions.assertTrue(columns.get(3).isSelected());
 
         Assertions.assertEquals("columnE", columns.get(4).getName());
-        Assertions.assertEquals(true, columns.get(4).isPresent());
-        Assertions.assertEquals(true, columns.get(4).isSelected());
+        Assertions.assertTrue(columns.get(4).isPresent());
+        Assertions.assertTrue(columns.get(4).isSelected());
 
         Assertions.assertEquals("columnF", columns.get(5).getName());
-        Assertions.assertEquals(true, columns.get(5).isPresent());
-        Assertions.assertEquals(true, columns.get(5).isSelected());
+        Assertions.assertTrue(columns.get(5).isPresent());
+        Assertions.assertTrue(columns.get(5).isSelected());
 
         Assertions.assertEquals("columnX", columns.get(6).getName());
-        Assertions.assertEquals(false, columns.get(6).isPresent());
-        Assertions.assertEquals(true, columns.get(6).isSelected());
+        Assertions.assertFalse(columns.get(6).isPresent());
+        Assertions.assertTrue(columns.get(6).isSelected());
 
         List<Column> columnsPresent = records.listPresentColumns();
         Assertions.assertNotNull(columnsPresent);

@@ -208,13 +208,11 @@ public class TopicInfoWrapper {
         if (result == null) {
             return "N/A";
         }
-        StringBuilder builder = new StringBuilder();
-        builder.
-            append("Started At: ").append(result.getStartedAt()).append('\n').
-            append("Finished At: ").append(result.getFinishedAt()).append('\n').
-            append("Elapsed: ").append(result.getElapsedFormattedAsHMS()).append('\n').
-            append("Error: ").append(WorkerUtils.getErrorMessageOrDefaultIfNoError(result, "-"));
-        return builder.toString();
+        String builder = "Started At: " + result.getStartedAt() + '\n' +
+                "Finished At: " + result.getFinishedAt() + '\n' +
+                "Elapsed: " + result.getElapsedFormattedAsHMS() + '\n' +
+                "Error: " + WorkerUtils.getErrorMessageOrDefaultIfNoError(result, "-");
+        return builder;
     }
 
     public String getConfigOverridesAsString() {

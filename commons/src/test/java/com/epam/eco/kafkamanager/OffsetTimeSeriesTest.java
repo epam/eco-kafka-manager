@@ -33,9 +33,9 @@ public class OffsetTimeSeriesTest {
     @Test
     public void testSerializedToJsonAndBack() throws Exception {
         OffsetTimeSeries origin = new OffsetTimeSeries(new TopicPartition("topic", 0));
-        origin.append(LocalDateTime.now(), 42l);
-        origin.append(LocalDateTime.now(), 43l);
-        origin.append(LocalDateTime.now(), 44l);
+        origin.append(LocalDateTime.now(), 42L);
+        origin.append(LocalDateTime.now(), 43L);
+        origin.append(LocalDateTime.now(), 44L);
 
         ObjectMapper mapper = TestObjectMapperSingleton.getObjectMapper();
 
@@ -53,8 +53,8 @@ public class OffsetTimeSeriesTest {
 
         LocalDateTime dateTime = LocalDateTime.now();
 
-        series.append(dateTime.minus(1, series.getGranularity()), 1l);
-        series.append(dateTime, 100l);
+        series.append(dateTime.minus(1, series.getGranularity()), 1L);
+        series.append(dateTime, 100L);
 
         Assertions.assertEquals(Long.valueOf(99), series.deltaAtDate(dateTime));
     }
@@ -70,9 +70,9 @@ public class OffsetTimeSeriesTest {
         LocalDateTime date2 = date.minus(1, series.getGranularity());
         LocalDateTime date3 = date;
 
-        series.append(date1, 0l);
-        series.append(date2, 120l);
-        series.append(date3, 200l);
+        series.append(date1, 0L);
+        series.append(date2, 120L);
+        series.append(date3, 200L);
 
         Assertions.assertNotNull(series.currentRatePerSec());
         Assertions.assertNotNull(series.currentRatePerMinute());
@@ -87,9 +87,9 @@ public class OffsetTimeSeriesTest {
         date2 = date.minus(5, series.getGranularity());
         date3 = date;
 
-        series.append(date1, 0l);
-        series.append(date2, 120l);
-        series.append(date3, 200l);
+        series.append(date1, 0L);
+        series.append(date2, 120L);
+        series.append(date3, 200L);
 
         Assertions.assertNotNull(series.currentRatePerSec());
         Assertions.assertNotNull(series.currentRatePerMinute());

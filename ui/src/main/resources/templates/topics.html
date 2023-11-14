@@ -15,7 +15,7 @@
  -->
 <!DOCTYPE HTML>
 <html xmlns:th="http://www.thymeleaf.org">
-<head title="Topic list" th:replace="templates :: header(~{::/html/head/link},~{::/html/head/script},~{})">
+<head title="Topic list" th:replace="~{/templates.html :: header(~{::/html/head/link},~{::/html/head/script},~{})}">
 
     <link rel="stylesheet" type="text/css" th:href="@{/components/query-param-filter/query-param-filter.css}" />
     <script type="text/javascript" th:src="@{/components/query-param-filter/query-param-filter.js}"></script>
@@ -26,6 +26,8 @@
     <script type="text/javascript" th:inline="javascript">
         /*<![CDATA[*/
         const externalTools = [[${externalToolTemplates}]];
+        const dataCatalogUrlTemplate = [[${dataCatalogUrlTemplate}]];
+        const grafanaMetricsUrlTemplate = [[${grafanaMetricsUrlTemplate}]];
         const replicationStates = [[${replicationStates}]];
         /*]]>*/
 
@@ -88,7 +90,21 @@
                         return consumerGroups;
                     }
                 },
-                { data: 'description' },
+                { data: 'description',
+                    render: (data, type, row) => {
+                        return data===null ? '' :
+                            '<div class="truncated-description"><pre>' + row['shortDescription'] + '</pre>' +
+                                '<a class="btn btn-sm info" ' +
+                                   'type="button" ' +
+                                   'data-param-header="description" ' +
+                                   'data-param-text="' + data + '" ' +
+                                   'onclick="showData(this.getAttribute(\'data-param-header\'), ' +
+                                                     'this.getAttribute(\'data-param-text\') )"> ' +
+                                    '<i class="fa fa-eye info"></i> ' +
+                                '</a> ' +
+                            '</div>';
+                    }
+                },
                 { data: 'topicDataURL',
                     render: (data, type) => {
                         return '<div class="external-tools">' +
@@ -97,18 +113,25 @@
                             '</a>' +
                             '</div>';
                     }
-                },
-                { data: 'schemaCatalog' ,
-                    render: (data, type) => {
+                }];
+
+            if(dataCatalogUrlTemplate!=null) {
+                columnsDef.push({
+                    data: 'schemaCatalog' , render :
+                    (data, type) => {
                         return data === null ? '' :
                             '<div class="external-tools">' +
-                            '<a href="'+data.url+'" target="_blank">' +
-                            '<i class="fa '+data.icon+' info" aria-hidden="true"></i> ' +
+                            '<a href="' + data.url + '" target="_blank">' +
+                            '<i class="fa ' + data.icon + ' info" aria-hidden="true"></i> ' +
                             '</a>' +
                             '</div>';
                     }
-                },
-                { data: 'grafanaMetrics' ,
+                });
+            }
+
+            if(grafanaMetricsUrlTemplate!=null) {
+                columnsDef.push({
+                    data: 'grafanaMetrics' ,
                     render: (data, type) => {
                         return data === null ? '' :
                             '<div class="external-tools">' +
@@ -117,8 +140,8 @@
                             '</a>' +
                             '</div>';
                     }
-                },
-            ];
+                });
+            }
 
             if(externalTools!==null && externalTools.length>0) {
                 for (let ii=0;ii<externalTools.length;ii++) {
@@ -154,7 +177,7 @@
                 info: true,
                 lengthMenu: [ 10, 20, 30 ],
                 pageLength: 20,
-                scrollY: "50vh",
+                scrollY: "64vh",
                 scrollCollapse: true,
                 scrollX: false,
                 order: [sortingOrderTopicName],
@@ -188,10 +211,11 @@
 
     </script>
 
-    <div th:replace="templates :: info-modal"></div>
-    <div th:replace="templates :: faq-modal"></div>
-    <div th:replace="templates :: confirm-modal"></div>
-    <div th:replace="templates :: navbar"></div>
+    <div th:replace="~{/templates.html :: info-modal}"></div>
+    <div th:replace="~{/templates.html :: data-modal}"></div>
+    <div th:replace="~{/templates.html :: faq-modal}"></div>
+    <div th:replace="~{/templates.html :: confirm-modal}"></div>
+    <div th:replace="~{/templates.html :: navbar}"></div>
 
     <div class="main-content">
 
@@ -248,7 +272,7 @@
 
                     </div>
 
-                    <div th:replace="templates :: query-param-filter"></div>
+                    <div th:replace="~{/templates.html :: query-param-filter}"></div>
 
                 </div>
 
@@ -288,7 +312,7 @@
 
     </div>
 
-    <div th:replace="templates :: footer"></div>
+    <div th:replace="~{/templates.html :: footer}"></div>
 
 </body>
 </html>

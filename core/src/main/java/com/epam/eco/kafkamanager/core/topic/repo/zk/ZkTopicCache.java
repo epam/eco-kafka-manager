@@ -429,7 +429,7 @@ class ZkTopicCache {
 
     }
 
-    public static interface CacheListener {
+    public interface CacheListener {
         void onTopicUpdated(Topic topic);
         void onTopicRemoved(String topicName);
     }

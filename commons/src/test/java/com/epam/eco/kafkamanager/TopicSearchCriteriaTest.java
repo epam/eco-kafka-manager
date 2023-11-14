@@ -121,51 +121,51 @@ public class TopicSearchCriteriaTest {
         Assertions.assertNotNull(config);
         Assertions.assertEquals(1, config.size());
         Assertions.assertTrue(config.containsKey(null));
-        Assertions.assertEquals(null, config.get(null));
+        Assertions.assertNull(config.get(null));
 
         config = TopicSearchCriteriaImpl.parseConfigString(" :");
         Assertions.assertNotNull(config);
         Assertions.assertEquals(1, config.size());
         Assertions.assertTrue(config.containsKey(null));
-        Assertions.assertEquals(null, config.get(null));
+        Assertions.assertNull(config.get(null));
 
         config = TopicSearchCriteriaImpl.parseConfigString(" : ");
         Assertions.assertNotNull(config);
         Assertions.assertEquals(1, config.size());
         Assertions.assertTrue(config.containsKey(null));
-        Assertions.assertEquals(null, config.get(null));
+        Assertions.assertNull(config.get(null));
 
         config = TopicSearchCriteriaImpl.parseConfigString(" : ;   :  ");
         Assertions.assertNotNull(config);
         Assertions.assertEquals(1, config.size());
         Assertions.assertTrue(config.containsKey(null));
-        Assertions.assertEquals(null, config.get(null));
+        Assertions.assertNull(config.get(null));
 
         config = TopicSearchCriteriaImpl.parseConfigString(" : ;  x :  ");
         Assertions.assertNotNull(config);
         Assertions.assertEquals(2, config.size());
         Assertions.assertTrue(config.containsKey(null));
-        Assertions.assertEquals(null, config.get(null));
+        Assertions.assertNull(config.get(null));
         Assertions.assertTrue(config.containsKey("x"));
-        Assertions.assertEquals(null, config.get("x"));
+        Assertions.assertNull(config.get("x"));
 
         config = TopicSearchCriteriaImpl.parseConfigString("x:");
         Assertions.assertNotNull(config);
         Assertions.assertEquals(1, config.size());
         Assertions.assertTrue(config.containsKey("x"));
-        Assertions.assertEquals(null, config.get("x"));
+        Assertions.assertNull(config.get("x"));
 
         config = TopicSearchCriteriaImpl.parseConfigString(" x:");
         Assertions.assertNotNull(config);
         Assertions.assertEquals(1, config.size());
         Assertions.assertTrue(config.containsKey("x"));
-        Assertions.assertEquals(null, config.get("x"));
+        Assertions.assertNull(config.get("x"));
 
         config = TopicSearchCriteriaImpl.parseConfigString(" x :");
         Assertions.assertNotNull(config);
         Assertions.assertEquals(1, config.size());
         Assertions.assertTrue(config.containsKey("x"));
-        Assertions.assertEquals(null, config.get("x"));
+        Assertions.assertNull(config.get("x"));
 
         config = TopicSearchCriteriaImpl.parseConfigString(":y");
         Assertions.assertNotNull(config);
@@ -199,7 +199,7 @@ public class TopicSearchCriteriaTest {
         Assertions.assertTrue(config.containsKey("a"));
         Assertions.assertEquals("b", config.get("a"));
         Assertions.assertTrue(config.containsKey("c"));
-        Assertions.assertEquals(null, config.get("c"));
+        Assertions.assertNull(config.get("c"));
     }
 
 }

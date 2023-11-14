@@ -18,7 +18,7 @@ package com.epam.eco.kafkamanager.core.consumer.repo;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 
 import org.apache.commons.lang3.Validate;
 

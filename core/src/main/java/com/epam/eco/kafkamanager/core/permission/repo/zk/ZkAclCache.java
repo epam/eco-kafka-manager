@@ -339,7 +339,7 @@ class ZkAclCache {
 
     }
 
-    public static interface CacheListener {
+    public interface CacheListener {
         void onAclUpdated(ACL acl);
         void onAclRemoved(ResourcePattern resource);
     }

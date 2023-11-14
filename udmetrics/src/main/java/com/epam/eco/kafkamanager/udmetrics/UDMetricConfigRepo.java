@@ -27,7 +27,7 @@ public interface UDMetricConfigRepo extends KeyValueRepo<String, UDMetricConfig,
     void remove(String name);
     void addUpdateListener(UpdateListener listener);
 
-    public static interface UpdateListener {
+    interface UpdateListener {
         void onConfigUpdated(String name, UDMetricConfig config);
         void onConfigRemoved(String name);
     }

@@ -31,14 +31,14 @@ public class ResetGroupOffsetsParamsTest {
         ResetGroupOffsetsParams params = ResetGroupOffsetsParams.with(null);
 
         Assertions.assertNotNull(params);
-        Assertions.assertEquals(null, params.getGroupName());
+        Assertions.assertNull(params.getGroupName());
         Assertions.assertNotNull(params.getPartitionOffsets());
         Assertions.assertEquals(0, params.getPartitionOffset(new TopicPartition("topic", 0)));
         Assertions.assertEquals(0, params.getPartitionOffset(new TopicPartition("topic", 1)));
         Assertions.assertEquals(0, params.getPartitionOffset(new TopicPartition("topic", 2)));
-        Assertions.assertEquals(true, params.isPartitionEnabled(new TopicPartition("topic", 0)));
-        Assertions.assertEquals(true, params.isPartitionEnabled(new TopicPartition("topic", 1)));
-        Assertions.assertEquals(true, params.isPartitionEnabled(new TopicPartition("topic", 2)));
+        Assertions.assertTrue(params.isPartitionEnabled(new TopicPartition("topic", 0)));
+        Assertions.assertTrue(params.isPartitionEnabled(new TopicPartition("topic", 1)));
+        Assertions.assertTrue(params.isPartitionEnabled(new TopicPartition("topic", 2)));
 
         List<TopicPartition> partitions = params.listPartitions();
         Assertions.assertNotNull(partitions);
@@ -54,11 +54,11 @@ public class ResetGroupOffsetsParamsTest {
 
         TopicPartition partition0 = new TopicPartition("topic", 0);
         params.setPartitionEnabled(partition0, true);
-        Assertions.assertEquals(true, params.isPartitionEnabled(partition0));
+        Assertions.assertTrue(params.isPartitionEnabled(partition0));
 
         TopicPartition partition1 = new TopicPartition("topic", 1);
         params.setPartitionEnabled(partition1, false);
-        Assertions.assertEquals(false, params.isPartitionEnabled(partition1));
+        Assertions.assertFalse(params.isPartitionEnabled(partition1));
 
         TopicPartition partition2 = new TopicPartition("topic", 2);
         params.addPartitionOffset(partition2, 999);

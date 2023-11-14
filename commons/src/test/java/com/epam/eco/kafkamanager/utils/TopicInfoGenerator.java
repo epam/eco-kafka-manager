@@ -29,7 +29,7 @@ public class TopicInfoGenerator {
 
     public static Map<String,TopicInfo> generate(Map<String,RecordConfig> configMap) {
         return configMap.entrySet().stream().map(
-                record -> (TopicInfo)TopicSearchCriteriaUtils.generateTopicInfo(record.getKey(),
+                record -> TopicSearchCriteriaUtils.generateTopicInfo(record.getKey(),
                                                                                 record.getValue().getPartitionNumber(),
                                                                                 record.getValue().getReplicationFactor(),
                                                                                 record.getValue().getConfig(),

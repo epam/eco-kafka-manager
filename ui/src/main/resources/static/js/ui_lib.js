@@ -185,7 +185,7 @@ const isHTML = (text) => {
     try {
         const fragment = new DOMParser().parseFromString(text,"text/html");
         return fragment.body.children.length>0
-    } catch(error) { ; }
+    } catch(error) {  }
     return false;
 }
 
@@ -308,6 +308,13 @@ function initFullScreenButton(dataTable) {
 
     }
 
+}
 
-
+function toggleStacktrace() {
+    const stacktraceItem = document.querySelector("#stacktrace");
+    if(stacktraceItem.classList.contains("d-none")) {
+        stacktraceItem.classList.remove("d-none");
+    } else {
+        stacktraceItem.classList.add("d-none");
+    }
 }

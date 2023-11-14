@@ -206,7 +206,7 @@ public class PermissionMetadataUpdateParams {
         private String principal;
         private KafkaPrincipal principalObject;
         private String description;
-        private Map<String, Object> attributes = new HashMap<>();
+        private final Map<String, Object> attributes = new HashMap<>();
 
         private Builder(PermissionMetadataUpdateParams origin) {
             if (origin == null) {

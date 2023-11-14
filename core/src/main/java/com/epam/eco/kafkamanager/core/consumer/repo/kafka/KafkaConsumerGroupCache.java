@@ -188,15 +188,13 @@ class KafkaConsumerGroupCache implements com.epam.eco.commons.kafka.cache.CacheL
         Map<String, Map<TopicPartition, OffsetAndMetadataAdapter>> offsetUpdates = new HashMap<>();
 
         cacheUpdate.forEach((key, value) -> {
-            if (key instanceof GroupMetadataKey) {
-                GroupMetadataKey groupMetadataKey = (GroupMetadataKey)key;
+            if (key instanceof GroupMetadataKey groupMetadataKey) {
                 GroupMetadataAdapter groupMetadata =
                         ServerGroupMetadata.ofNullable((GroupMetadata)value);
 
                 String groupName = groupMetadataKey.key();
                 groupUpdates.put(groupName, groupMetadata);
-            } else if (key instanceof OffsetKey) {
-                OffsetKey offsetKey = (OffsetKey)key;
+            } else if (key instanceof OffsetKey offsetKey) {
                 OffsetAndMetadataAdapter offsetAndMetadata =
                         ServerOffsetAndMetadata.ofNullable((OffsetAndMetadata)value);
 
@@ -517,11 +515,11 @@ class KafkaConsumerGroupCache implements com.epam.eco.commons.kafka.cache.CacheL
         return offsetUpdates;
     }
 
-    private static enum UpdateMode {
+    private enum UpdateMode {
         SET, UPDATE
     }
 
-    public static interface CacheListener {
+    public interface CacheListener {
         void onGroupMetadataUpdated(KafkaGroupMetadata groupMetadata);
         void onGroupMetadataRemoved(String groupName);
     }

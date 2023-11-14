@@ -107,7 +107,7 @@ public class TopicConfigUpdateParams {
     public static class Builder {
 
         private String topicName;
-        private Map<String, String> config = new HashMap<>();
+        private final Map<String, String> config = new HashMap<>();
 
         private Builder(TopicConfigUpdateParams origin) {
             if (origin == null) {

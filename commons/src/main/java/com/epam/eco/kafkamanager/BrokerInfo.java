@@ -150,11 +150,11 @@ public class BrokerInfo implements MetadataAware, Comparable<BrokerInfo> {
     public static class Builder {
 
         private int id;
-        private List<EndPointInfo> endPoints = new ArrayList<>();
+        private final List<EndPointInfo> endPoints = new ArrayList<>();
         private String rack;
         private int version = 0;
         private int jmxPort = 0;
-        private Map<String, String> config = new HashMap<>();
+        private final Map<String, String> config = new HashMap<>();
         private Metadata metadata;
 
         public Builder() {

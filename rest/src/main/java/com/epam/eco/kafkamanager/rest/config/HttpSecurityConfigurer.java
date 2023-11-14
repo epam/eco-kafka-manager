@@ -17,6 +17,7 @@ package com.epam.eco.kafkamanager.rest.config;
 
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 
 /**
  * @author Andrei_Tytsik
@@ -32,18 +33,17 @@ public final class HttpSecurityConfigurer {
     }
 
     public static HttpSecurity configureAuthorizeRequests(HttpSecurity http) throws Exception {
-        return http.authorizeRequests().
-                antMatchers("/actuator/health", "/actuator/info").permitAll().
-                antMatchers(HttpMethod.PUT, "/api/**").hasRole(ADMIN_ROLE).
-                antMatchers(HttpMethod.POST, "/api/**").hasRole(ADMIN_ROLE).
-                antMatchers(HttpMethod.DELETE, "/api/**").hasRole(ADMIN_ROLE).
-                anyRequest().authenticated().
-                and();
+        return http.
+                authorizeHttpRequests(request->request
+                        .requestMatchers("/actuator/health", "/actuator/info").permitAll()
+                        .requestMatchers(HttpMethod.PUT, "/api/**").hasRole(ADMIN_ROLE)
+                        .requestMatchers(HttpMethod.POST, "/api/**").hasRole(ADMIN_ROLE)
+                        .requestMatchers(HttpMethod.DELETE, "/api/**").hasRole(ADMIN_ROLE)
+                        .anyRequest().authenticated());
     }
 
     public static HttpSecurity configureCsrf(HttpSecurity http) throws Exception {
-        return http.csrf().
-                disable();
+        return http.csrf(AbstractHttpConfigurer::disable);
     }
 
 }

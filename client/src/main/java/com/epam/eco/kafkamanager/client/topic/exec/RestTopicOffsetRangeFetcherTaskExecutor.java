@@ -20,7 +20,7 @@ import java.util.Date;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 
-import javax.annotation.PreDestroy;
+import jakarta.annotation.PreDestroy;
 import javax.cache.CacheManager;
 
 import org.apache.commons.lang3.Validate;
@@ -76,7 +76,7 @@ public class RestTopicOffsetRangeFetcherTaskExecutor extends
                     "/api/tasks/topic-offset-range-fetcher",
                     HttpMethod.POST,
                     new HttpEntity<>(new TopicOffsetRangeFetchRequest(resourceKey)),
-                    new ParameterizedTypeReference<TaskResult<Map<TopicPartition, OffsetRange>>>() {});
+                    new ParameterizedTypeReference<>() {});
             return response.getBody();
         } catch (RestClientException ex) {
             throw ex;
@@ -102,7 +102,7 @@ public class RestTopicOffsetRangeFetcherTaskExecutor extends
         ResponseEntity<Map<TopicPartition, OffsetTimeSeries>> response = restTemplate.exchange(
                 builder.toUriString(),
                 HttpMethod.GET, null,
-                new ParameterizedTypeReference<Map<TopicPartition, OffsetTimeSeries>>(){});
+                new ParameterizedTypeReference<>(){});
 
         Map<TopicPartition, OffsetTimeSeries> responseMap = response.getBody();
         return responseMap != null ? responseMap : Collections.emptyMap();

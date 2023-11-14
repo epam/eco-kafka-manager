@@ -19,7 +19,7 @@ import java.util.Date;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 
-import javax.annotation.PreDestroy;
+import jakarta.annotation.PreDestroy;
 import javax.cache.CacheManager;
 
 import org.apache.kafka.common.TopicPartition;

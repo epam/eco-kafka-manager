@@ -20,6 +20,7 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.web.error.ErrorAttributeOptions;
 import org.springframework.boot.web.servlet.error.ErrorAttributes;
 import org.springframework.boot.web.servlet.error.ErrorController;
 import org.springframework.stereotype.Controller;
@@ -45,14 +46,10 @@ public class GlobalErrorController implements ErrorController {
     @Autowired
     private ErrorAttributes errorAttributes;
 
-    @Override
-    public String getErrorPath() {
-        return "/error";
-    }
-
     @RequestMapping(value = MAPPING)
     public String error(WebRequest request, Model model) {
-        Map<String, Object> attributes = errorAttributes.getErrorAttributes(request, false);
+        ErrorAttributeOptions errorAttributeOptions = ErrorAttributeOptions.of(ErrorAttributeOptions.Include.values());
+        Map<String, Object> attributes = errorAttributes.getErrorAttributes(request, errorAttributeOptions);
         enrichErrorAttributes(request, attributes);
         model.addAttribute(ERROR_ATTRIBUTES, attributes);
 

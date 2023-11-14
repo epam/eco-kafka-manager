@@ -113,8 +113,7 @@ public class PrettyHtmlMapper {
     @SuppressWarnings({ "unchecked", "rawtypes" })
     private static String objectToString(Object object, PrettyFormat format, int identity) {
         String result;
-        if (object instanceof Map) {
-            Map mapObject = (Map) object;
+        if (object instanceof Map mapObject) {
             if(mapObject.isEmpty())  {
                 return EMPTY_MAP;
             }

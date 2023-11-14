@@ -120,7 +120,7 @@ public class ConsumerGroupMetadataUpdateParams {
 
         private String groupName;
         private String description;
-        private Map<String, Object> attributes = new HashMap<>();
+        private final Map<String, Object> attributes = new HashMap<>();
 
         private Builder(ConsumerGroupMetadataUpdateParams origin) {
             if (origin == null) {

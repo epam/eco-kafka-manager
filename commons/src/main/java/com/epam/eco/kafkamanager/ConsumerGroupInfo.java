@@ -252,9 +252,9 @@ public class ConsumerGroupInfo implements MetadataAware, Comparable<ConsumerGrou
         private ConsumerGroupState state;
         private String protocolType;
         private String partitionAssignor;
-        private List<ConsumerGroupMemberInfo> members = new ArrayList<>();
-        private Map<TopicPartition, OffsetAndMetadataInfo> offsetsAndMetadata = new HashMap<>();
-        private Map<TopicPartition, OffsetTimeSeries> offsetTimeSeries = new HashMap<>();
+        private final List<ConsumerGroupMemberInfo> members = new ArrayList<>();
+        private final Map<TopicPartition, OffsetAndMetadataInfo> offsetsAndMetadata = new HashMap<>();
+        private final Map<TopicPartition, OffsetTimeSeries> offsetTimeSeries = new HashMap<>();
         private StorageType storageType;
         private Metadata metadata;
 
@@ -368,7 +368,7 @@ public class ConsumerGroupInfo implements MetadataAware, Comparable<ConsumerGrou
 
     }
 
-    public static enum StorageType {
+    public enum StorageType {
         KAFKA, ZOOKEEPER
     }
 

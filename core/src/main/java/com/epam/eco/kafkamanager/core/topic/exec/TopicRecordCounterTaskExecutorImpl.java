@@ -17,7 +17,7 @@ package com.epam.eco.kafkamanager.core.topic.exec;
 
 import java.util.concurrent.ExecutorService;
 
-import javax.annotation.PreDestroy;
+import jakarta.annotation.PreDestroy;
 import javax.cache.CacheManager;
 
 import org.springframework.beans.factory.annotation.Autowired;

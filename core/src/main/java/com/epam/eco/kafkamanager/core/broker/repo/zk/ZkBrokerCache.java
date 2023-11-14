@@ -240,7 +240,7 @@ class ZkBrokerCache {
         }
     }
 
-    public static interface CacheListener {
+    public interface CacheListener {
         void onBrokerUpdated(BrokerInfo broker);
         void onBrokerRemoved(Integer brokerId);
     }

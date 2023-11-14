@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -28,8 +29,10 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import com.epam.eco.kafkamanager.*;
+import com.epam.eco.kafkamanager.ui.utils.ComboBoxModel;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,15 +48,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.epam.eco.commons.kafka.config.TopicConfigDef;
-import com.epam.eco.kafkamanager.KafkaAdminOperations;
-import com.epam.eco.kafkamanager.KafkaManager;
-import com.epam.eco.kafkamanager.TopicConfigUpdateParams;
-import com.epam.eco.kafkamanager.TopicCreateParams;
-import com.epam.eco.kafkamanager.TopicInfo;
-import com.epam.eco.kafkamanager.TopicListSearchCriteria;
-import com.epam.eco.kafkamanager.TopicMetadataDeleteParams;
-import com.epam.eco.kafkamanager.TopicMetadataUpdateParams;
-import com.epam.eco.kafkamanager.TopicPartitionsCreateParams;
 import com.epam.eco.kafkamanager.udmetrics.UDMetric;
 import com.epam.eco.kafkamanager.udmetrics.UDMetricManager;
 import com.epam.eco.kafkamanager.udmetrics.UDMetricType;
@@ -88,7 +82,7 @@ public class TopicController {
     public static final String ATTR_DEFAULT_PARTITION_COUNT = "defaultPartitionCount";
     public static final String ATTR_DEFAULT_REPLICATION_FACTOR = "defaultReplicationFactor";
     public static final String ATTR_MAX_REPLICATION_FACTOR = "maxReplicationFactor";
-    public static final String ATTR_TOTAL_COUNT = "totalCount";
+    public static final String ATTR_REPLICATION_STATES = "replicationStates";
     public static final String ATTR_METADATA = "metadata";
     public static final String ATTR_DATA_CATALOG_URL_TEMPLATE = "dataCatalogUrlTemplate";
     public static final String ATTR_GRAFANA_METRICS_URL_TEMPLATE = "grafanaMetricsUrlTemplate";
@@ -136,18 +130,18 @@ public class TopicController {
     }
 
     @RequestMapping(value=MAPPING_TOPICS, method = RequestMethod.GET)
-    public String topics(
-            @RequestParam(required=false) Integer page,
-            @RequestParam Map<String, Object> paramsMap,
-            Model model) {
-        TopicListSearchCriteria searchCriteria = TopicListSearchCriteria.fromJsonWith(paramsMap, kafkaManager);
+    public String topics( @RequestParam Map<String, Object> paramsMap,
+                          Model model) {
 
-        model.addAttribute(ATTR_SEARCH_CRITERIA, searchCriteria);
         model.addAttribute(ATTR_DATA_CATALOG_URL_TEMPLATE, properties.getDataCatalogTool());
         model.addAttribute(ATTR_GRAFANA_METRICS_URL_TEMPLATE, properties.getGrafanaMetrics());
+        model.addAttribute(ATTR_REPLICATION_STATES,
+                           Arrays.stream(ReplicationState.values())
+                                                          .map(state-> ComboBoxModel.build(state.name()))
+                                                          .collect(Collectors.toList()));
+
         model.addAttribute(ATTR_EXTERNAL_TOOL_TEMPLATES, properties.getExternalTools());
 
-        model.addAttribute(ATTR_TOTAL_COUNT, kafkaManager.getTopicCount());
         model.addAttribute(ATTR_FULL_SCREEN, paramsMap.get(ATTR_FULL_SCREEN));
 
         return TOPICS_VIEW;
@@ -155,10 +149,10 @@ public class TopicController {
 
     @RequestMapping(value=MAPPING_TOPIC_LIST, method = RequestMethod.GET)
     public @ResponseBody ResponseEntity<TopicTableModel> topicList(
-            @RequestParam Map<String, Object> paramsMap,
-            HttpServletRequest request) {
+            @RequestParam Map<String, Object> paramsMap) {
+
         TopicListSearchCriteria criteria = TopicListSearchCriteria.fromJsonWith(paramsMap, kafkaManager);
-        //storedCriteria.put(request.getRequestedSessionId(), criteria);
+
         List<TopicInfo> topics = kafkaManager.getTopics(criteria);
         TopicInfoToModelMapper mapper =
                 new TopicInfoToModelMapper(properties.getDataCatalogTool(),
@@ -352,10 +346,6 @@ public class TopicController {
 
         UDMetric udm = udMetricManager.get(udmName);
         return udm != null ? UDMetricWrapper.wrap(udm) : null;
-    }
-
-    private Page<TopicInfoWrapper> wrap(Page<TopicInfo> page) {
-        return page.map((topicInfo) -> TopicInfoWrapper.wrap(topicInfo, kafkaManager, kafkaAdminOperations));
     }
 
 }

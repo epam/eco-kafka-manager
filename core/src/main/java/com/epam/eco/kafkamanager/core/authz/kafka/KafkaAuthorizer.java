@@ -24,7 +24,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
-import javax.annotation.PostConstruct;
+import jakarta.annotation.PostConstruct;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.Validate;
@@ -146,17 +146,17 @@ public class KafkaAuthorizer implements Authorizer {
     }
 
     private static AclOperation toAclOperation(Operation operation) {
-        switch (operation) {
-        case READ: return AclOperation.READ;
-        case WRITE: return AclOperation.WRITE;
-        case CREATE: return AclOperation.CREATE;
-        case DELETE: return AclOperation.DELETE;
-        case ALTER: return AclOperation.ALTER;
-        case ALTER_CONFIG: return AclOperation.ALTER_CONFIGS;
-        case DESCRIBE: return AclOperation.DESCRIBE;
-        default: throw new IllegalArgumentException(
-                String.format("Operation '%s' not supported", operation));
-        }
+        return switch (operation) {
+            case READ -> AclOperation.READ;
+            case WRITE -> AclOperation.WRITE;
+            case CREATE -> AclOperation.CREATE;
+            case DELETE -> AclOperation.DELETE;
+            case ALTER -> AclOperation.ALTER;
+            case ALTER_CONFIG -> AclOperation.ALTER_CONFIGS;
+            case DESCRIBE -> AclOperation.DESCRIBE;
+            default -> throw new IllegalArgumentException(
+                    String.format("Operation '%s' not supported", operation));
+        };
     }
 
     private static ResourcePattern toResourcePattern(EntityType entityType, Object entityId) {
@@ -170,12 +170,12 @@ public class KafkaAuthorizer implements Authorizer {
     }
 
     private static ResourceType toResourceType(EntityType entityType) {
-        switch (entityType) {
-        case CONSUMER_GROUP: return ResourceType.GROUP;
-        case TOPIC: return ResourceType.TOPIC;
-        case BROKER: return ResourceType.CLUSTER;
-        default: return null;
-        }
+        return switch (entityType) {
+            case CONSUMER_GROUP -> ResourceType.GROUP;
+            case TOPIC -> ResourceType.TOPIC;
+            case BROKER -> ResourceType.CLUSTER;
+            default -> null;
+        };
     }
 
     private static String toResourceName(Object entityId) {
