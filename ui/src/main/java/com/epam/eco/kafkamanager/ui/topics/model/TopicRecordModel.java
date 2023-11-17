@@ -20,7 +20,10 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
+import com.epam.eco.kafkamanager.ui.utils.UiUtils;
 import com.fasterxml.jackson.annotation.JsonGetter;
+
+import static java.util.Objects.nonNull;
 
 /**
  * @author Mikhail_Vershkov
@@ -70,6 +73,11 @@ public class TopicRecordModel implements Serializable {
     @JsonGetter("description")
     public String getDescription() {
         return description;
+    }
+
+    @JsonGetter("shortDescription")
+    public String getShortDescription() {
+        return UiUtils.getTruncatedDescription(this.description);
     }
 
     @JsonGetter("topicDataURL")

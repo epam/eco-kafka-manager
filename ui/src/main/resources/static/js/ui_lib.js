@@ -308,6 +308,13 @@ function initFullScreenButton(dataTable) {
 
     }
 
+}
 
-
+function toggleStacktrace() {
+    const stacktraceItem = document.querySelector("#stacktrace");
+    if(stacktraceItem.classList.contains("d-none")) {
+        stacktraceItem.classList.remove("d-none");
+    } else {
+        stacktraceItem.classList.add("d-none");
+    }
 }

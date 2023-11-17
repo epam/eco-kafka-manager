@@ -62,7 +62,8 @@
     
 
     <div th:replace="templates :: navbar"></div>
-    
+    <div th:replace="templates :: data-modal"></div>
+
     <div class="main-content"> 
 
         <div class="container-fluid">
@@ -248,9 +249,19 @@
                                     <td th:text="${permission.permissionType}"></td>
                                     <td th:text="${permission.operation}"></td>
                                     <td th:text="${permission.host}"></td>
-                                    <td 
-                                        th:text="${permission.metadataDescription}" 
-                                        style="word-wrap:break-word;max-width:150px">
+                                    <td>
+                                        <div class="truncated-description" style="word-wrap:break-word;border:0;">
+                                            <pre th:text="${permission.metadataShortDescription}"></pre>
+                                            <a class="btn btn-sm info"
+                                               type="button"
+                                               th:if="${permission.metadataDescription}!=null"
+                                               th:data-param-header="Description"
+                                               th:data-param-text="${permission.metadataDescription}"
+                                               th:onclick="showData(this.getAttribute('data-param-header'),
+                                                                    this.getAttribute('data-param-text') )">
+                                                <i class="fa fa-eye info"></i>
+                                            </a>
+                                        </div>
                                     </td>
                                 </tr>
                             </tbody>

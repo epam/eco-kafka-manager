@@ -88,7 +88,21 @@
                         return consumerGroups;
                     }
                 },
-                { data: 'description' },
+                { data: 'description',
+                    render: (data, type, row) => {
+                        return data===null ? '' :
+                            '<div class="truncated-description"><pre>' + row['shortDescription'] + '</pre>' +
+                                '<a class="btn btn-sm info" ' +
+                                   'type="button" ' +
+                                   'data-param-header="description" ' +
+                                   'data-param-text="' + data + '" ' +
+                                   'onclick="showData(this.getAttribute(\'data-param-header\'), ' +
+                                                     'this.getAttribute(\'data-param-text\') )"> ' +
+                                    '<i class="fa fa-eye info"></i> ' +
+                                '</a> ' +
+                            '</div>';
+                    }
+                },
                 { data: 'topicDataURL',
                     render: (data, type) => {
                         return '<div class="external-tools">' +
@@ -189,6 +203,7 @@
     </script>
 
     <div th:replace="templates :: info-modal"></div>
+    <div th:replace="templates :: data-modal"></div>
     <div th:replace="templates :: faq-modal"></div>
     <div th:replace="templates :: confirm-modal"></div>
     <div th:replace="templates :: navbar"></div>

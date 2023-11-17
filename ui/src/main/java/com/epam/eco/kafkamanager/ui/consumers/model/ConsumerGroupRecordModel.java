@@ -19,6 +19,7 @@ import java.io.Serializable;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import com.epam.eco.kafkamanager.ui.utils.UiUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import com.fasterxml.jackson.annotation.JsonGetter;
@@ -98,5 +99,10 @@ public class ConsumerGroupRecordModel implements Serializable {
     @JsonGetter("description")
     public String getDescription() {
         return description;
+    }
+
+    @JsonGetter
+    public String getShortDescription() {
+        return UiUtils.getTruncatedDescription(this.description);
     }
 }
