@@ -65,7 +65,7 @@ public class GlobalModelEnrichingInterceptor implements HandlerInterceptor {
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
-        if(nonNull(SecurityContextHolder.getContext().getAuthentication())) {
+        if(nonNull(authentication)) {
             if (authentication instanceof OAuth2AuthenticationToken) {
                 OAuth2User oAuth2User = ((OAuth2AuthenticationToken) authentication).getPrincipal();
                 modelAndView.addObject(

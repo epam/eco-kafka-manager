@@ -98,8 +98,10 @@ public class KeycloakBaseWebSecurityConfig extends BaseWebSecurityConfig {
                                    OidcUserAuthority oidcUserAuthority,
                                    Set<GrantedAuthority> mappedAuthorities) {
         Collection<String> roles = resourceAccess.values().stream()
-                .flatMap(x -> ((Map<String, Object>) x).entrySet().stream())
-                .filter(x -> x.getKey().equals(ROLES_CLAIM))
+                .filter(x->(x instanceof Map))
+                .flatMap(x -> ((Map<?,?>) x).entrySet().stream())
+                .filter(x -> (x.getKey() instanceof String) && x.getKey().equals(ROLES_CLAIM))
+                .filter(x -> x.getValue() instanceof Collection<?>)
                 .flatMap(x -> ((Collection<String>)x.getValue()).stream())
                 .collect(Collectors.toList());
         mappedAuthorities.addAll(generateAuthoritiesFromClaim(roles));

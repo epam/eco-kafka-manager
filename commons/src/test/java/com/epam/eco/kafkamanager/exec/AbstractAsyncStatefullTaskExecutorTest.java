@@ -37,7 +37,6 @@ import javax.cache.processor.EntryProcessorResult;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
-import org.springframework.lang.NonNull;
 
 /**
  * @author Andrei_Tytsik

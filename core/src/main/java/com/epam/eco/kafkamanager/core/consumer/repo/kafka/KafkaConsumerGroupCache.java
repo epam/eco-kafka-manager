@@ -508,7 +508,7 @@ class KafkaConsumerGroupCache implements com.epam.eco.commons.kafka.cache.CacheL
             Map<TopicPartition, OffsetAndMetadataAdapter> offsetsMetadata = rawOffsetsMetadata.entrySet().stream().
                     collect(
                             Collectors.toMap(
-                                    entry -> entry.getKey(),
+                                    Map.Entry::getKey,
                                     entry -> ClientOffsetAndMetadata.ofNullable(entry.getValue())));
             offsetUpdates.put(groupName, offsetsMetadata);
         });

@@ -43,7 +43,7 @@ public class BaseWebSecurityConfig {
         oidcUserService.setAccessibleScopes(Collections.emptySet());
         return oidcUserService;
     }
-    public HttpSecurity commonHttpConfig(HttpSecurity http) throws Exception {
+    protected HttpSecurity commonHttpConfig(HttpSecurity http) throws Exception {
 
         return http.authorizeHttpRequests(requests ->
                         requests.requestMatchers("/**/*.css",

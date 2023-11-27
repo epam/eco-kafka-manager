@@ -79,7 +79,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <java.version>17</java.version>
         <kafka.version>7.0.1-ccs</kafka.version>
-        <spring-kafka.version>3.0.10</spring-kafka.version>
+        <spring-kafka.version>3.0.12</spring-kafka.version>
         <cp.version>7.2.1</cp.version>
         <eco-commons.version>1.0.0</eco-commons.version>
         <eco-commons-kafka.version>3.0.2</eco-commons-kafka.version>

@@ -12,8 +12,8 @@ import org.mockito.Mockito;
 
 public class KafkaSchemaIdAwareAvroDeserializerTest {
 
-    private final static byte[] BYTES_SHORT = new byte[4];
-    private final static byte[] BYTES_NORMAL = new byte[20];
+    private final byte[] BYTES_SHORT = new byte[4];
+    private final byte[] BYTES_NORMAL = new byte[20];
     private final static byte BYTE_FILL = 1;
     private final static byte BYTE_ZERO = 0;
     private final KafkaSchemaIdAwareAvroDeserializer kafkaSchemaIdAwareAvroDeserializer =
