@@ -31,12 +31,10 @@ import java.util.stream.Collectors;
 
 import com.epam.eco.kafkamanager.*;
 import com.epam.eco.kafkamanager.ui.utils.ComboBoxModel;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
@@ -56,6 +54,7 @@ import com.epam.eco.kafkamanager.ui.metrics.udm.UDMetricWrapper;
 import com.epam.eco.kafkamanager.ui.topics.export.TopicExporterType;
 import com.epam.eco.kafkamanager.ui.topics.model.TopicInfoToModelMapper;
 import com.epam.eco.kafkamanager.ui.topics.model.TopicTableModel;
+import com.epam.eco.kafkamanager.ui.utils.ComboBoxModel;
 import com.epam.eco.kafkamanager.ui.utils.MetadataWrapper;
 import com.epam.eco.kafkamanager.utils.MapperUtils;
 
@@ -75,7 +74,6 @@ public class TopicController {
     public static final String TOPIC_METADATA_VIEW = "topic_metadata";
     public static final String ATTR_TOPIC = "topic";
     public static final String ATTR_CONFIG_DEF = "configDef";
-    public static final String ATTR_SEARCH_CRITERIA = "searchCriteria";
     public static final String ATTR_TOPIC_OFFSET_INCREASE_UDM_TYPE = "topicOffsetIncreaseUdmType";
     public static final String ATTR_TOPIC_OFFSET_INCREASE_UDM_NAME = "topicOffsetIncreaseUdmName";
     public static final String ATTR_TOPIC_OFFSET_INCREASE_UDM = "topicOffsetIncreaseUdm";

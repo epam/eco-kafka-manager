@@ -25,6 +25,9 @@ import org.apache.kafka.common.security.auth.KafkaPrincipal;
 import com.epam.eco.kafkamanager.Metadata;
 import com.epam.eco.kafkamanager.PermissionInfo;
 
+import static com.epam.eco.kafkamanager.ui.utils.UiUtils.getTruncatedDescription;
+import static java.util.Objects.nonNull;
+
 /**
  * @author Andrei_Tytsik
  */
@@ -68,6 +71,9 @@ public class PermissionInfoWrapper {
 
     public String getMetadataDescription() {
         return permissionInfo.getMetadata().map(Metadata::getDescription).orElse(null);
+    }
+    public String getMetadataShortDescription() {
+        return getTruncatedDescription(getMetadataDescription());
     }
 
     public static PermissionInfoWrapper wrap(PermissionInfo permissionInfo) {
