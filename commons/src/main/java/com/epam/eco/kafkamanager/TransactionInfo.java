@@ -157,8 +157,8 @@ public class TransactionInfo implements Comparable<TransactionInfo> {
 
     public static class Builder {
 
-        private List<TransactionMetadataInfo> history = new ArrayList<>();
-        private Set<String> topicNames = new HashSet<>();
+        private final List<TransactionMetadataInfo> history = new ArrayList<>();
+        private final Set<String> topicNames = new HashSet<>();
         private TransactionTimeSeries successTimeSeries;
         private TransactionTimeSeries failTimeSeries;
         private Statistics execTimeStats;

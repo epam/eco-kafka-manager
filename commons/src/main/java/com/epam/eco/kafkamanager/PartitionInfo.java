@@ -141,9 +141,9 @@ public class PartitionInfo {
     public static class Builder {
 
         private TopicPartition id;
-        private List<Integer> replicas = new ArrayList<>();
+        private final List<Integer> replicas = new ArrayList<>();
         private Integer leader;
-        private List<Integer> isr = new ArrayList<>();
+        private final List<Integer> isr = new ArrayList<>();
 
         public Builder id(TopicPartition id) {
             this.id = id;

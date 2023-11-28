@@ -18,7 +18,7 @@ package com.epam.eco.kafkamanager.client.autoconfigure;
 import java.io.IOException;
 import java.util.List;
 
-import javax.annotation.PostConstruct;
+import jakarta.annotation.PostConstruct;
 import javax.cache.CacheManager;
 import javax.cache.Caching;
 

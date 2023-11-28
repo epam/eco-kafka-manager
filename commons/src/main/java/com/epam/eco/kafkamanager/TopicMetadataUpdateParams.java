@@ -120,7 +120,7 @@ public class TopicMetadataUpdateParams {
 
         private String topicName;
         private String description;
-        private Map<String, Object> attributes = new HashMap<>();
+        private final Map<String, Object> attributes = new HashMap<>();
 
         private Builder(TopicMetadataUpdateParams origin) {
             if (origin == null) {

@@ -462,7 +462,7 @@ class ZkConsumerGroupCache {
 
     }
 
-    public static interface CacheListener {
+    public interface CacheListener {
         void onGroupUpdated(ConsumerGroup group);
         void onGroupRemoved(String groupName);
     }

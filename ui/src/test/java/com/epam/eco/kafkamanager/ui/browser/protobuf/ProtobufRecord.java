@@ -29,7 +29,7 @@ private static final long serialVersionUID = 0L;
   }
 
   @java.lang.Override
-  public final com.google.protobuf.UnknownFieldSet
+  public com.google.protobuf.UnknownFieldSet
   getUnknownFields() {
     return this.unknownFields;
   }
@@ -96,7 +96,7 @@ private static final long serialVersionUID = 0L;
       makeExtensionsImmutable();
     }
   }
-  public static final com.google.protobuf.Descriptors.Descriptor
+  public static com.google.protobuf.Descriptors.Descriptor
       getDescriptor() {
     return com.epam.eco.kafkamanager.ui.browser.protobuf.Schema.internal_static_kafkaManager_test_ProtobufRecord_descriptor;
   }
@@ -275,7 +275,7 @@ private static final long serialVersionUID = 0L;
 
   private byte memoizedIsInitialized = -1;
   @java.lang.Override
-  public final boolean isInitialized() {
+  public boolean isInitialized() {
     byte isInitialized = memoizedIsInitialized;
     if (isInitialized == 1) return true;
     if (isInitialized == 0) return false;
@@ -339,12 +339,11 @@ private static final long serialVersionUID = 0L;
     if (obj == this) {
      return true;
     }
-    if (!(obj instanceof com.epam.eco.kafkamanager.ui.browser.protobuf.ProtobufRecord)) {
+    if (!(obj instanceof ProtobufRecord other)) {
       return super.equals(obj);
     }
-    com.epam.eco.kafkamanager.ui.browser.protobuf.ProtobufRecord other = (com.epam.eco.kafkamanager.ui.browser.protobuf.ProtobufRecord) obj;
 
-    if (hasOperationId() != other.hasOperationId()) return false;
+      if (hasOperationId() != other.hasOperationId()) return false;
     if (hasOperationId()) {
       if (!getOperationId()
           .equals(other.getOperationId())) return false;
@@ -364,8 +363,7 @@ private static final long serialVersionUID = 0L;
       if (!getMetadataBt()
           .equals(other.getMetadataBt())) return false;
     }
-    if (!unknownFields.equals(other.unknownFields)) return false;
-    return true;
+    return unknownFields.equals(other.unknownFields);
   }
 
   @java.lang.Override
@@ -493,7 +491,7 @@ private static final long serialVersionUID = 0L;
       com.google.protobuf.GeneratedMessageV3.Builder<Builder> implements
       // @@protoc_insertion_point(builder_implements:kafkaManager.test.ProtobufRecord)
       com.epam.eco.kafkamanager.ui.browser.protobuf.ProtobufRecordOrBuilder {
-    public static final com.google.protobuf.Descriptors.Descriptor
+    public static com.google.protobuf.Descriptors.Descriptor
         getDescriptor() {
       return com.epam.eco.kafkamanager.ui.browser.protobuf.Schema.internal_static_kafkaManager_test_ProtobufRecord_descriptor;
     }
@@ -649,14 +647,11 @@ private static final long serialVersionUID = 0L;
     }
 
     @java.lang.Override
-    public final boolean isInitialized() {
+    public boolean isInitialized() {
       if (!hasOperationId()) {
         return false;
       }
-      if (!hasDocId()) {
-        return false;
-      }
-      return true;
+        return hasDocId();
     }
 
     @java.lang.Override
@@ -970,14 +965,14 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     @java.lang.Override
-    public final Builder setUnknownFields(
-        final com.google.protobuf.UnknownFieldSet unknownFields) {
+    public Builder setUnknownFields(
+            final com.google.protobuf.UnknownFieldSet unknownFields) {
       return super.setUnknownFields(unknownFields);
     }
 
     @java.lang.Override
-    public final Builder mergeUnknownFields(
-        final com.google.protobuf.UnknownFieldSet unknownFields) {
+    public Builder mergeUnknownFields(
+            final com.google.protobuf.UnknownFieldSet unknownFields) {
       return super.mergeUnknownFields(unknownFields);
     }
 

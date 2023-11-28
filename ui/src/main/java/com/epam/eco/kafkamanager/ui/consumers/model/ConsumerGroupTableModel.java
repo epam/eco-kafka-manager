@@ -75,7 +75,7 @@ public class ConsumerGroupTableModel implements Serializable {
 
     public static class Builder {
 
-        private ConsumerGroupTableModel tableModel = new ConsumerGroupTableModel();
+        private final ConsumerGroupTableModel tableModel = new ConsumerGroupTableModel();
 
         public Builder draw(Integer draw) {
             tableModel.setDraw(draw);

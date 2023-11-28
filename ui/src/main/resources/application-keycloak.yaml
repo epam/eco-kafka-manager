@@ -1,0 +1,150 @@
+KEYCLOAK_BASE: https://keycloak.epam.com/auth             # keycloak server base utl
+KAFKA_MANAGER_BASE: http://localhost:8085/kafka-manager   # kafka manager base url
+KEYCLOAK_REALM: realm_name                                # keycloak realm name
+KEYCLOAK_CLIENT_ID: kafka-manager-client-id               # client id
+KEYCLOAK_CLIENT_SECRET: <client secret>                   # client secret
+
+KEYCLOAK_CLIENT_BASE_URL: ${KEYCLOAK_BASE}/realms/${KEYCLOAK_REALM}/protocol/openid-connect
+KEYCLOAK_AUTH_URL: ${KEYCLOAK_CLIENT_BASE_URL}/auth
+KEYCLOAK_ISSUER_URL: ${KEYCLOAK_BASE}/realms/${KEYCLOAK_REALM}
+KEYCLOAK_REDIRECT_URI: ${KAFKA_MANAGER_BASE}/login/oauth2/code/${KEYCLOAK_CLIENT_ID}
+KEYCLOAK_LOGOUT_URL: ${KEYCLOAK_CLIENT_BASE_URL}/logout?redirect_uri=${KAFKA_MANAGER_BASE}/kafka-manager
+
+SERVER_PORT: 8085                        # tomcat server port
+KAFKA_SERVERS_URL: localhost:9095        # kafka bootstrap server url
+SCHEMA_REGISTRY_URL: http://schema-registry:8081 # schema-registry url (optional)
+ZK_CONNECT: http://zookepper  # Zookeeper url (Optional)
+
+server:
+  port: ${SERVER_PORT}
+  servlet:
+    context-path: /kafka-manager
+  max-http-request-header-size: 10000
+  tomcat:
+    remote-ip-header: x-forwarded-for
+    protocol-header: x-forwarded-proto
+    connection-timeout: 300000
+  forward-headers-strategy: framework
+
+# auth profiles: auth-disabled
+spring:
+  profiles:
+    active: auth-disabled
+  main:
+    allow-bean-definition-overriding: true
+    allow-circular-references: true
+  mvc:
+    hiddenmethod:
+      filter.enabled: true
+    async:
+      request-timeout: 300000
+    pathmatch:
+      matching-strategy: ANT_PATH_MATCHER
+  security:
+    oauth2:
+      client:
+        registration:
+          eco-kafka-manager-ui:
+            provider: keycloak
+            client-id: ${KEYCLOAK_CLIENT_ID}
+            client-secret: ${KEYCLOAK_CLIENT_SECRET}
+            client-authentication-method: client_secret_post
+            authorization-grant-type: authorization_code
+            redirect-uri: ${KEYCLOAK_REDIRECT_URI}
+            scope:
+              - openid
+              - roles
+        provider:
+          keycloak:
+            authorization-uri: ${KEYCLOAK_AUTH_URL}
+            issuer-uri: ${KEYCLOAK_ISSUER_URL}
+            token-uri: ${KEYCLOAK_CLIENT_BASE_URL}/token
+            user-info-uri: ${KEYCLOAK_CLIENT_BASE_URL}/userinfo
+            user-info-authentication-method: query
+            user-name-attribute: email
+            jwk-set-uri: ${KEYCLOAK_CLIENT_BASE_URL}/certs
+            logout-url: ${KEYCLOAK_LOGOUT_URL}
+management:
+  metrics:
+    export:
+      prometheus: true
+  endpoints:
+    web:
+      exposure:
+        include: info,health,metrics,prometheus
+
+eco:
+  kafkamanager:
+    core:
+      bootstrapServers: ${KAFKA_SERVERS_URL}
+      zkConnect: ${ZK_CONNECT:}
+      schemaRegistryUrl: ${SCHEMA_REGISTRY_URL}
+
+      metadataStoreBootstrapTimeoutInMs: ${METADATA_BOOTSTRAP_TIMEOUT_MS:180000}
+      transactionStoreBootstrapTimeoutInMs: ${TX_BOOTSTRAP_TIMEOUT_MS:180000}
+      transactionStoreBootstrapDataFreshness: ${TX_BOOTSTRAP_DATA_FRESHNESS:ONE_HOUR}
+
+      clientConfig[fetch.max.wait.ms]: 1500
+      clientConfig[fetch.min.bytes]: 20
+      clientConfig[max.poll.records]: 1000
+      clientConfig[security.protocol]: "SASL_SSL"
+      clientConfig[ssl.truststore.location]: "c:/<path-to-truststore>/truststore.jks"
+      clientConfig[ssl.truststore.password]: "<truststore-password>"
+      clientConfig[sasl.mechanism]: "GSSAPI"
+      clientConfig[sasl.kerberos.service.name]: "<service-name>"
+      clientConfig[sasl.jaas.config]: "com.sun.security.auth.module.Krb5LoginModule required \
+                                                 useKeyTab=true  \
+                                                 principal='<kafka-user>' \
+                                                 keyTab='c://<path-to-keytab>//kafka-manager.keytab' \
+                                                 storeKey=true;"
+
+      zkClientConfig[zookeeper.clientCnxnSocket]: org.apache.zookeeper.ClientCnxnSocketNetty
+      zkClientConfig[zookeeper.client.secure]: true
+      zkClientConfig[zookeeper.ssl.client.enable]: true
+      zkClientConfig[zookeeper.ssl.trustStore.location]: "c:/<path-to-truststore>/truststore.jks"
+      zkClientConfig[zookeeper.ssl.trustStore.password]: "<truststore-password>"
+
+    udmetrics:
+      enabled: ${UDM_ENABLED:false}
+      calculationIntervalInMs: ${UDM_CALCULATION_INTERVAL:60000}
+      config:
+        repo:
+          kafka:
+            bootstrapTimeoutInMs: ${UDM_BOOTSTRAP_TIMEOUT_MS:60000}
+    ui:
+      topicBrowser:
+        # Used only in case of a small topics! This enables topic caching
+        useCache: false
+        cacheExpirationPeriodMin: 60
+        # showGrid: Enable/disable grid lines in a topic browser
+        showGrid: true
+        # enableAnimation: Enable colored animation in offset grid in a topic browser.
+        #     blinking only topics which KM had been searched
+        #     other topics stayed gray
+        enableAnimation: true
+        # replacementPatterns: KM look for this pattern in every field.
+        # In case of finding KM shields all pseudo symbols. in this field.
+        replacementPatterns: <?xml,<xml
+        # filterByKeyPartition: true - In a case of filtering by the key eqyals clause
+        #  KM use default algorithm to calculate partition of this key and search values only in that partition
+        # if other key - partition strategy used, it needed to implement com.epam.eco.kafkamanager.PartitionByKeyResolver
+        # by you own one
+        filterByKeyPartition: true
+        # tombstoneGeneratorReplacements: when tombstone generator make a tombstone record from ordinary record
+        # this replacements will do automatic
+        tombstoneGeneratorReplacements:
+          - headerName: cdm.operation_meta.operation_type
+            replacement: "delete"
+          - headerName: cdm.operation_meta.operation_time
+            replacement: T(java.time.LocalDateTime).now().toInstant(T(java.time.ZoneOffset).UTC).toEpochMilli()
+          - headerName: cdm.operation_meta.business_time
+            replacement: T(java.time.LocalDateTime).now().toInstant(T(java.time.ZoneOffset).UTC).toEpochMilli()
+  #      externalTools:
+  #        - name: External tool #1
+  #          urlTemplate: https://external-tools.com/external-tools/1/{topicname}
+  #          icon: fa-external-link
+  #        - name: External tool #2
+  #          urlTemplate: https://external-tools.com/external-tools/2/{topicname}
+  #          icon: fa-external-link
+
+#     gaTrackingId: XXX

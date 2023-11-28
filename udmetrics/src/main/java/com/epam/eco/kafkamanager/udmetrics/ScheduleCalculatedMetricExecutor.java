@@ -19,8 +19,8 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
+import jakarta.annotation.PostConstruct;
+import jakarta.annotation.PreDestroy;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -56,7 +56,7 @@ public class ScheduleCalculatedMetricExecutor {
     private void initExecutorService() {
         executorService = Executors.newSingleThreadScheduledExecutor();
         executorService.scheduleAtFixedRate(
-                () ->  calculate(),
+                this::calculate,
                 metricManagerProperties.getCalculationIntervalInMs() / 2,
                 metricManagerProperties.getCalculationIntervalInMs(),
                 TimeUnit.MILLISECONDS);
@@ -67,17 +67,16 @@ public class ScheduleCalculatedMetricExecutor {
     }
 
     public void calculate() {
-        udMetricManager.listAll().forEach(udm -> {
-            udm.getMetrics().forEach(metric -> {
-                try {
-                    if (metric instanceof ScheduleCalculatedMetric) {
-                        ((ScheduleCalculatedMetric)metric).calculateValue();
+        udMetricManager.listAll().forEach(udm -> udm.getMetrics()
+                .forEach(metric -> {
+                    try {
+                        if (metric instanceof ScheduleCalculatedMetric) {
+                            ((ScheduleCalculatedMetric)metric).calculateValue();
+                        }
+                    } catch (Exception ex) {
+                        LOGGER.warn("Failed to calculate value for schedule-calculated metric " + metric, ex);
                     }
-                } catch (Exception ex) {
-                    LOGGER.warn("Failed to calculate value for schedule-calculated metric " + metric, ex);
-                }
-            });
-        });
+        }));
     }
 
 }

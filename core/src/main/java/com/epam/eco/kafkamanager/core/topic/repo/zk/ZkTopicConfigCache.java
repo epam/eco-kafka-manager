@@ -210,7 +210,7 @@ class ZkTopicConfigCache {
 
     }
 
-    public static interface CacheListener {
+    public interface CacheListener {
         void onTopicConfigUpdated(TopicConfig topicConfig);
         void onTopicConfigRemoved(String topicName);
     }

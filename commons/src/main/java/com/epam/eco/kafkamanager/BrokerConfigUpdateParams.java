@@ -107,7 +107,7 @@ public class BrokerConfigUpdateParams {
     public static class Builder {
 
         private int brokerId = -1;
-        private Map<String, String> config = new HashMap<>();
+        private final Map<String, String> config = new HashMap<>();
 
         private Builder(BrokerConfigUpdateParams origin) {
             if (origin == null) {

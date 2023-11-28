@@ -20,8 +20,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
+import jakarta.annotation.PostConstruct;
+import jakarta.annotation.PreDestroy;
 
 import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
@@ -183,9 +183,7 @@ public class KafkaUDMetricConfigRepo extends AbstractKeyValueRepo<String, UDMetr
     @Override
     public void onCacheUpdated(Map<String, UDMetricConfig> update) {
         updateListeners.forEach(listener -> {
-            update.entrySet().forEach(e -> {
-                String name = e.getKey();
-                UDMetricConfig config = e.getValue();
+            update.forEach((name, config) -> {
                 if (config != null) {
                     try {
                         listener.onConfigUpdated(name, config);

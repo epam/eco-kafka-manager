@@ -120,7 +120,7 @@ public class BrokerMetadataUpdateParams {
 
         private int brokerId;
         private String description;
-        private Map<String, Object> attributes = new HashMap<>();
+        private final Map<String, Object> attributes = new HashMap<>();
 
         private Builder(BrokerMetadataUpdateParams origin) {
             if (origin == null) {

@@ -15,7 +15,7 @@
  *******************************************************************************/
 package com.epam.eco.kafkamanager.client.autoconfigure;
 
-import javax.annotation.PostConstruct;
+import jakarta.annotation.PostConstruct;
 
 import org.apache.commons.lang3.Validate;
 import org.springframework.boot.context.properties.ConfigurationProperties;

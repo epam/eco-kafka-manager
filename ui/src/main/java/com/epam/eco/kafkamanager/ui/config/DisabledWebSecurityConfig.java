@@ -15,12 +15,13 @@
  *******************************************************************************/
 package com.epam.eco.kafkamanager.ui.config;
 
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.springframework.core.annotation.Order;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.csrf.HttpSessionCsrfTokenRepository;
 
 /**
@@ -30,22 +31,13 @@ import org.springframework.security.web.csrf.HttpSessionCsrfTokenRepository;
 @Configuration
 @EnableWebSecurity
 @Order(1)
-public class DisabledWebSecurityConfig extends WebSecurityConfigurerAdapter {
-
-    @Override
-    protected void configure(HttpSecurity http) throws Exception {
-        HttpSecurityConfigurer.
-            configureLogout(http).
-            logout().
-                logoutSuccessUrl("/"). // just to avoid redirect to default "/login?logout"
-                and().
-            csrf().
-                // https://github.com/thymeleaf/thymeleaf-spring/issues/110
-                // https://github.com/spring-projects/spring-security/issues/3906
-                csrfTokenRepository(new HttpSessionCsrfTokenRepository()).
-                and().
-            authorizeRequests().
-                anyRequest().permitAll();
+public class DisabledWebSecurityConfig  {
+    @Bean
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        http.csrf(csrf->csrf.csrfTokenRepository(new HttpSessionCsrfTokenRepository()))
+                .authorizeHttpRequests(requests->requests.anyRequest().permitAll())
+                .logout(logout->logout.logoutUrl("/"));
+        return http.build();
     }
 
 }

@@ -15,7 +15,7 @@
  -->
 <!DOCTYPE HTML>
 <html xmlns:th="http://www.thymeleaf.org">
-<head th:replace="templates :: header(~{},~{},~{})">
+<head th:replace="~{/templates.html :: header(~{},~{},~{})}">
 </head>
 <body>
 
@@ -30,7 +30,7 @@
         });
     </script>
 
-    <div th:replace="templates :: navbar"></div>
+    <div th:replace="~{/templates.html :: navbar}"></div>
         
     <div class="main-content">
     
@@ -131,7 +131,7 @@
 
     </div>
 
-    <div th:replace="templates :: footer"></div>
+    <div th:replace="~{/templates.html :: footer}"></div>
     
 </body>
 </html>

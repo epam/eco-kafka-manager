@@ -155,7 +155,7 @@ public class AbstractAsyncStatefullTaskExecutorTest {
 
     private class SimpleParrotTaskExecutor extends AbstractAsyncStatefullTaskExecutor<String, String> {
 
-        private Collection<String> phrases;
+        private final Collection<String> phrases;
         private Iterator<String> iterator;
 
         public SimpleParrotTaskExecutor(String ... phrases) {
@@ -186,8 +186,8 @@ public class AbstractAsyncStatefullTaskExecutorTest {
 
     private class SynchronizedParrotTaskExecutor extends SimpleParrotTaskExecutor {
 
-        private CountDownLatch latchStarted = new CountDownLatch(1);
-        private CountDownLatch latchCanContinue = new CountDownLatch(1);
+        private final CountDownLatch latchStarted = new CountDownLatch(1);
+        private final CountDownLatch latchCanContinue = new CountDownLatch(1);
 
         public SynchronizedParrotTaskExecutor(String phrase) {
             super(phrase);

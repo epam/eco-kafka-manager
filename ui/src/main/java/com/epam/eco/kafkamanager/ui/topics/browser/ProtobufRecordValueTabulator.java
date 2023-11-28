@@ -60,12 +60,11 @@ public class ProtobufRecordValueTabulator implements RecordValueTabulator<Object
     public Map<String, Object> getAttributes(ConsumerRecord<?, Object> record) {
         Validate.notNull(record, "Record is null");
 
-        if(record.value()==null || !(record.value() instanceof DynamicMessage)) {
+        if(record.value()==null || !(record.value() instanceof DynamicMessage message)) {
             return null;
         }
 
         // Schema schema = ((GenericContainer) record.value()).getSchema();
-        DynamicMessage message = (DynamicMessage) record.value();
 
         Map<String, Object> attributes = new HashMap<>();
         attributes.put("fullName", message.getDescriptorForType().getName());
@@ -85,11 +84,9 @@ public class ProtobufRecordValueTabulator implements RecordValueTabulator<Object
     public RecordSchema getSchema(ConsumerRecord<?, ?> record) {
         Validate.notNull(record, "Record is null");
 
-        if(record.value() == null || !(record.value() instanceof DynamicMessage)) {
+        if(record.value() == null || !(record.value() instanceof DynamicMessage message)) {
             return null;
         }
-
-        DynamicMessage message = (DynamicMessage) record.value();
 
         String schemaName = message.getDescriptorForType().getFullName();
         String schemaKey = SchemaSubjectUtils.getSchemaSubjectKey(record.topic(), schemaName, topicConfig);

@@ -58,7 +58,7 @@ public class ExternalToolModel implements Serializable {
     }
     static class Builder {
 
-        private ExternalToolModel toolModel = new ExternalToolModel();
+        private final ExternalToolModel toolModel = new ExternalToolModel();
 
         public Builder toolName(String toolName) {
             toolModel.setToolName(toolName);

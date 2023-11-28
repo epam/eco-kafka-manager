@@ -289,7 +289,7 @@ class KafkaTransactionCache implements CacheListener<String, TransactionProjecti
         });
     }
 
-    public static interface CacheListener {
+    public interface CacheListener {
         void onTransactionUpdated(TransactionProjection transaction);
         void onTransactionRemoved(String transactionalId);
     }

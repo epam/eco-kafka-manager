@@ -168,8 +168,8 @@ public class TopicInfo implements MetadataAware, Comparable<TopicInfo> {
     public static class Builder {
 
         private String name;
-        private Map<TopicPartition, PartitionInfo> partitions = new HashMap<>();
-        private Map<String, String> config = new HashMap<>();
+        private final Map<TopicPartition, PartitionInfo> partitions = new HashMap<>();
+        private final Map<String, String> config = new HashMap<>();
         private Metadata metadata;
 
         public Builder() {

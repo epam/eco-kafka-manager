@@ -67,7 +67,7 @@ public class TopicBrowseParamsTest {
         Assertions.assertEquals(DataFormat.STRING, params.getKeyFormat());
 
         params.deleteKeyFormat();
-        Assertions.assertEquals(null, params.getKeyFormat());
+        Assertions.assertNull(params.getKeyFormat());
 
         params.setKeyFormatIfMissing(DataFormat.AVRO);
         Assertions.assertEquals(DataFormat.AVRO, params.getKeyFormat());
@@ -79,7 +79,7 @@ public class TopicBrowseParamsTest {
         Assertions.assertEquals(DataFormat.HEX_STRING, params.getValueFormat());
 
         params.deleteValueFormat();
-        Assertions.assertEquals(null, params.getValueFormat());
+        Assertions.assertNull(params.getValueFormat());
 
         params.setValueFormatIfMissing(DataFormat.AVRO);
         Assertions.assertEquals(DataFormat.AVRO, params.getValueFormat());
@@ -91,10 +91,10 @@ public class TopicBrowseParamsTest {
         Assertions.assertEquals(10, params.getLimit());
 
         params.setPartitionEnabled(1, true);
-        Assertions.assertEquals(true, params.isPartitionEnabled(1));
+        Assertions.assertTrue(params.isPartitionEnabled(1));
 
         params.setPartitionEnabled(1, false);
-        Assertions.assertEquals(false, params.isPartitionEnabled(1));
+        Assertions.assertFalse(params.isPartitionEnabled(1));
 
         params.addPartitionOffset(0, OffsetRange.with(0,999, true));
         Assertions.assertTrue(params.containsPartition(0));
@@ -125,14 +125,14 @@ public class TopicBrowseParamsTest {
         Assertions.assertEquals(Collections.emptyList(), params.listColumns());
 
         params.setColumnEnabled("a", true);
-        Assertions.assertEquals(true, params.isColumnEnabled("a"));
+        Assertions.assertTrue(params.isColumnEnabled("a"));
         params.setColumnEnabled("b", false);
-        Assertions.assertEquals(false, params.isColumnEnabled("b"));
-        Assertions.assertEquals(Arrays.asList(new String[]{"a"}), params.listColumns());
+        Assertions.assertFalse(params.isColumnEnabled("b"));
+        Assertions.assertEquals(Arrays.asList("a"), params.listColumns());
 
         params.setColumnEnabled("b", true);
-        Assertions.assertEquals(true, params.isColumnEnabled("b"));
-        Assertions.assertEquals(Arrays.asList(new String[]{"a","b"}), params.listColumns());
+        Assertions.assertTrue(params.isColumnEnabled("b"));
+        Assertions.assertEquals(Arrays.asList("a","b"), params.listColumns());
     }
 
 }

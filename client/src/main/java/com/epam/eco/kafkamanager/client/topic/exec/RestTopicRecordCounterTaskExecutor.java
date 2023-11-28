@@ -18,7 +18,7 @@ package com.epam.eco.kafkamanager.client.topic.exec;
 import java.util.Date;
 import java.util.concurrent.ExecutorService;
 
-import javax.annotation.PreDestroy;
+import jakarta.annotation.PreDestroy;
 import javax.cache.CacheManager;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -65,7 +65,7 @@ public class RestTopicRecordCounterTaskExecutor extends AbstractAsyncStatefullTa
                     "/api/tasks/topic-record-counter",
                     HttpMethod.POST,
                     new HttpEntity<>(new TopicRecordCountRequest(resourceKey)),
-                    new ParameterizedTypeReference<TaskResult<Long>>() {
+                    new ParameterizedTypeReference<>() {
                     });
             return response.getBody();
         } catch (RestClientException ex) {

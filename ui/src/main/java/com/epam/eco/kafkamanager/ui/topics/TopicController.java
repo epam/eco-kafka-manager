@@ -29,7 +29,9 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
-import javax.servlet.http.HttpServletResponse;
+import com.epam.eco.kafkamanager.*;
+import com.epam.eco.kafkamanager.ui.utils.ComboBoxModel;
+import jakarta.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,16 +46,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.epam.eco.commons.kafka.config.TopicConfigDef;
-import com.epam.eco.kafkamanager.KafkaAdminOperations;
-import com.epam.eco.kafkamanager.KafkaManager;
-import com.epam.eco.kafkamanager.ReplicationState;
-import com.epam.eco.kafkamanager.TopicConfigUpdateParams;
-import com.epam.eco.kafkamanager.TopicCreateParams;
-import com.epam.eco.kafkamanager.TopicInfo;
-import com.epam.eco.kafkamanager.TopicListSearchCriteria;
-import com.epam.eco.kafkamanager.TopicMetadataDeleteParams;
-import com.epam.eco.kafkamanager.TopicMetadataUpdateParams;
-import com.epam.eco.kafkamanager.TopicPartitionsCreateParams;
 import com.epam.eco.kafkamanager.udmetrics.UDMetric;
 import com.epam.eco.kafkamanager.udmetrics.UDMetricManager;
 import com.epam.eco.kafkamanager.udmetrics.UDMetricType;
@@ -136,16 +128,14 @@ public class TopicController {
     }
 
     @RequestMapping(value=MAPPING_TOPICS, method = RequestMethod.GET)
-    public String topics(
-            @RequestParam(required=false) Integer page,
-            @RequestParam Map<String, Object> paramsMap,
-            Model model) {
+    public String topics( @RequestParam Map<String, Object> paramsMap,
+                          Model model) {
 
         model.addAttribute(ATTR_DATA_CATALOG_URL_TEMPLATE, properties.getDataCatalogTool());
         model.addAttribute(ATTR_GRAFANA_METRICS_URL_TEMPLATE, properties.getGrafanaMetrics());
         model.addAttribute(ATTR_REPLICATION_STATES,
                            Arrays.stream(ReplicationState.values())
-                                                          .map(state->ComboBoxModel.build(state.name()))
+                                                          .map(state-> ComboBoxModel.build(state.name()))
                                                           .collect(Collectors.toList()));
 
         model.addAttribute(ATTR_EXTERNAL_TOOL_TEMPLATES, properties.getExternalTools());
@@ -158,7 +148,9 @@ public class TopicController {
     @RequestMapping(value=MAPPING_TOPIC_LIST, method = RequestMethod.GET)
     public @ResponseBody ResponseEntity<TopicTableModel> topicList(
             @RequestParam Map<String, Object> paramsMap) {
+
         TopicListSearchCriteria criteria = TopicListSearchCriteria.fromJsonWith(paramsMap, kafkaManager);
+
         List<TopicInfo> topics = kafkaManager.getTopics(criteria);
         TopicInfoToModelMapper mapper =
                 new TopicInfoToModelMapper(properties.getDataCatalogTool(),

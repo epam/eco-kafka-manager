@@ -21,8 +21,7 @@ import java.util.TreeMap;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.actuate.metrics.MetricsEndpoint;
-import org.springframework.boot.actuate.metrics.MetricsEndpoint.ListNamesResponse;
-import org.springframework.boot.actuate.metrics.MetricsEndpoint.MetricResponse;
+
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -45,13 +44,11 @@ public class MetricsStateController {
     @RequestMapping(value="/metrics_state", method=RequestMethod.GET)
     public String state(Model model) throws Exception {
         Map<String, Object> state = new TreeMap<>();
-        ListNamesResponse names = metricsEndpoint.listNames();
-        names.getNames().forEach(name -> {
-            MetricResponse metric = metricsEndpoint.metric(name, Collections.emptyList());
+        metricsEndpoint.listNames().getNames().forEach(name -> {
+            MetricsEndpoint.MetricDescriptor metric = metricsEndpoint.metric(name, Collections.emptyList());
             state.put(name, metric);
         });
-        String stateJson = MapperUtils.toPrettyJson(state);
-        model.addAttribute(ATTR_STATE, stateJson);
+        model.addAttribute(ATTR_STATE, MapperUtils.toPrettyJson(state));
         return VIEW;
     }
 
