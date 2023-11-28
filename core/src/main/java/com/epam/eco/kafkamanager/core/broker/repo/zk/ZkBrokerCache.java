@@ -212,7 +212,14 @@ class ZkBrokerCache {
     }
 
     private Integer getBrokerIdFromPath(String path) {
-        return Integer.valueOf(ZKPaths.getNodeFromPath(path));
+        String node = ZKPaths.getNodeFromPath(path);
+        int intNode;
+        try {
+            intNode = Integer.parseInt(node);
+        } catch (Exception ex) {
+            intNode = 0;
+        }
+        return intNode;
     }
 
     private void fireCacheListener(BrokerInfo updatedBroker, Integer idOfRemovedBroker) {
