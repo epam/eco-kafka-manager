@@ -46,6 +46,8 @@ import kafka.coordinator.group.GroupMetadata;
 import kafka.coordinator.group.GroupMetadataKey;
 import kafka.coordinator.group.OffsetKey;
 
+import static java.util.Objects.nonNull;
+
 /**
  * @author Andrei_Tytsik
  */
@@ -505,8 +507,9 @@ class KafkaConsumerGroupCache implements com.epam.eco.commons.kafka.cache.CacheL
 
         Map<String, Map<TopicPartition, OffsetAndMetadataAdapter>> offsetUpdates = new HashMap<>();
         rawOffsets.forEach((groupName, rawOffsetsMetadata) -> {
-            Map<TopicPartition, OffsetAndMetadataAdapter> offsetsMetadata = rawOffsetsMetadata.entrySet().stream().
-                    collect(
+            Map<TopicPartition, OffsetAndMetadataAdapter> offsetsMetadata = rawOffsetsMetadata.entrySet().stream()
+                    .filter(offset -> nonNull(offset.getValue()))
+                    .collect(
                             Collectors.toMap(
                                     Map.Entry::getKey,
                                     entry -> ClientOffsetAndMetadata.ofNullable(entry.getValue())));
