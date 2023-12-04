@@ -1,0 +1,117 @@
+logging:
+  level:
+    com.epam.eco.kafkamanager: DEBUG
+#    root: debug
+#    com.epam.eco.kafkamanager.core: debug
+#    org.springframework.security.*: debug
+
+spring:
+  mvc:
+    hiddenmethod:
+      filter.enabled: true
+    pathmatch:
+      matching-strategy: ANT_PATH_MATCHER
+    async:
+      request-timeout=300000:
+  main:
+    allow-circular-references: true
+
+
+server:
+  port: 8085
+  max-http-header-size: 10000
+  servlet:
+    context-path: /kafka-manager
+  tomcat:
+    remote-ip-header: x-forwarded-for
+    protocol-header: x-forwarded-proto
+    connection-timeout: 300000
+
+management:
+  metrics:
+    export:
+      prometheus: false
+
+eco:
+  kafkamanager:
+    udmetrics:
+      enabled: true
+      calculationIntervalInMs: 60000
+      config.repo.kafka.bootstrapTimeoutInMs: 60000
+    core:
+      bootstrapServers: "kafka-int.epm-eco.projects.epam.com:9095"
+      schemaRegistryUrl: "http://schema-registry-int.epm-eco.projects.epam.com:8081"
+      transactionStoreBootstrapTimeoutInMs: 180000
+      transactionStoreBootstrapDataFreshness: ONE_HOUR
+      consumerStoreBootstrapTimeoutInMs: 180000
+      metadataStoreBootstrapTimeoutInMs: 180000
+
+      clientConfig[fetch.max.wait.ms]: 1500
+      clientConfig[fetch.min.bytes]: 20
+      clientConfig[max.poll.records]: 1000
+      clientConfig[security.protocol]: "SASL_SSL"
+      clientConfig[ssl.truststore.location]: "c:/ssl/epm-eco-int.truststore.jks"
+      clientConfig[ssl.truststore.password]: "pg0mt1mD"
+      clientConfig[sasl.mechanism]: "GSSAPI"
+      clientConfig[sasl.kerberos.service.name]: "kafka"
+      clientConfig[sasl.jaas.config]: "com.sun.security.auth.module.Krb5LoginModule required \
+                                                 useKeyTab=true  \
+                                                 principal='Auto_EPM-IASS_KM_Integration@EPAM.COM' \
+                                                 keyTab='c://ssl//km_int.keytab' \
+                                                 storeKey=true;"
+      authz:
+        kafka:
+          enabled: false
+          authorizerClass: com.epam.eco.kafka.auth.authorizer.ldap.LdapGroupBasedAclAuthorizer
+          adminRoles: ROLE_ECO-KM-ADMIN
+          authorizerConfig[authorizer.ldap.url]: "ldap://evzzazrsa0038.epam.com:3268"
+          authorizerConfig[authorizer.ldap.base]: "dc=epam,dc=com"
+          authorizerConfig[authorizer.ldap.user.dn]: "Auto_EPM-IASS_KM_Integration@epam.com"
+          authorizerConfig[authorizer.ldap.password]: "!e,US::F58S<-D/M8r-PndfQb"
+          authorizerConfig[authorizer.ldap.group.name.attribute]: "sAMAccountName"
+          authorizerConfig[authorizer.user.principal.name.mappers]: REMOVE_DOMAIN,TO_LOWER_CASE
+          authorizerConfig[authorizer.group.principal.name.mappers]: REMOVE_DOMAIN,TO_LOWER_CASE
+          authorizerConfig[authorizer.ldap.max.group.chain.depth]: 3
+          authorizerConfig[authorizer.ldap.read.timeout.ms]: 20000
+          authorizerConfig[authorizer.ldap.connect.timeout.ms]: 3000
+
+      zkClientConfig[zookeeper.clientCnxnSocket]: org.apache.zookeeper.ClientCnxnSocketNetty
+      zkClientConfig[zookeeper.client.secure]: true
+      zkClientConfig[zookeeper.ssl.client.enable]: true
+      zkClientConfig[zookeeper.ssl.trustStore.location]: "c:/ssl/epm-eco-int.truststore.jks"
+      zkClientConfig[zookeeper.ssl.trustStore.password]: "pg0mt1mD"
+    ui:
+      showGridInTopicBrowser: true
+      dataCatalogTool:
+        name: EPAM Data Catalog
+        urlTemplate: https://datacatalog.epam.com/data/permanent-link/{topicname}
+        icon: fa-share
+      schemaCatalogTool:
+        name: EPAM Schema Catalog
+        urlTemplate: https://integration.datahub.epam.com/schema-catalog/?query={schemaname}&versionLatestTerm=1
+        urlTemplateById: https://integration.datahub.epam.com/schema-catalog/?query=schemaRegistryId:{schemaId}
+        icon: fa-external-link
+      grafanaMetrics:
+        env: integration
+        name: Grafana metrics
+        urlTemplate: https://grafana.cloudapp.epam.com/d/z2yi3FY4z/pubsub-topic-insights?from=now-6h&to=now&orgId=1&var-env={env}&var-topic={topicname}
+        icon: fa-area-chart
+
+      topicBrowser:
+        useCache: false
+        cacheExpirationPeriodMin: 60
+        tombstoneGeneratorReplacements:
+        - headerName: cdm.operation_meta.operation_type
+          replacement: "delete"
+        - headerName: cdm.operation_meta.operation_time
+          replacement: T(java.time.LocalDateTime).now().toInstant(T(java.time.ZoneOffset).UTC).toEpochMilli()
+        - headerName: cdm.operation_meta.business_time
+          replacement: T(java.time.LocalDateTime).now().toInstant(T(java.time.ZoneOffset).UTC).toEpochMilli()
+
+      externalTools:
+      - name: External tool #1
+        urlTemplate: https://integration.datahub.epam.com/external-tools/1/{topicname}
+        icon: fa-external-link
+      - name: External tool #2
+        urlTemplate: https://integration.datahub.epam.com/external-tools/2/{topicname}
+        icon: fa-external-link

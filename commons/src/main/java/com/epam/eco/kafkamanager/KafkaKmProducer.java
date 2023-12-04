@@ -31,25 +31,26 @@ import org.springframework.kafka.core.KafkaTemplate;
  * @author Mikhail_Vershkov
  */
 
-public class KafkaTombstoneProducer<K,V> {
+public class KafkaKmProducer<K,V> {
 
-    private static final String RESULT_STRING_FORMAT = "Tombstone successfully sent to the topic %s with key = %s";
+    private static final String RESULT_STRING_FORMAT = "Successfully sent to the topic %s with key = %s";
     private static final long PRODUCER_TIMEOUT = 10L;
     private final KafkaTemplate<K, V> kafkaTemplate;
 
     @Autowired
-    public KafkaTombstoneProducer(KafkaTemplate<K, V> kafkaTemplate) {
+    public KafkaKmProducer(KafkaTemplate<K, V> kafkaTemplate) {
         this.kafkaTemplate = kafkaTemplate;
     }
 
     public String send(String topicName,
                        K key,
+                       V message,
                        Map<String, String> headers) throws ExecutionException, InterruptedException, TimeoutException {
 
         Validate.notNull(topicName,"Topic is null!");
         Validate.notNull(key,"Key is null!");
 
-        var record = new ProducerRecord<K,V>(topicName, key, null);
+        var record = new ProducerRecord<K,V>(topicName, key, message);
 
         if(MapUtils.isNotEmpty(headers)) {
             headers.keySet().forEach(headerKey -> record.headers().add(headerKey, headers.get(headerKey).getBytes(

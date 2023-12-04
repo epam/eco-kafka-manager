@@ -24,11 +24,12 @@ import java.util.Set;
 
 public class TopicBrowser {
     private Boolean useCache = true;
-    private Long cacheExpirationPeriodMin = 60L;
-    private Long cacheCleanerIntervalMin = 60L;
+    private Long cacheExpirationPeriodMin = 30L;
+    private Long cacheCleanerIntervalMin = 30L;
     private Boolean showGrid = Boolean.TRUE;
     private Boolean enableAnimation = Boolean.TRUE;
     private List<HeaderReplacement> tombstoneGeneratorReplacements;
+    private List<HeaderReplacement> copyRecordHeaderReplacements;
     private Set<String> replacementPatterns;
     private Boolean filterByKeyPartition = false;
     public Boolean getUseCache() {
@@ -77,6 +78,14 @@ public class TopicBrowser {
 
     public void setTombstoneGeneratorReplacements(List<HeaderReplacement> tombstoneGenerationReplacements) {
         this.tombstoneGeneratorReplacements = tombstoneGenerationReplacements;
+    }
+
+    public List<HeaderReplacement> getCopyRecordHeaderReplacements() {
+        return copyRecordHeaderReplacements;
+    }
+
+    public void setCopyRecordHeaderReplacements(List<HeaderReplacement> copyRecordHeaderReplacements) {
+        this.copyRecordHeaderReplacements = copyRecordHeaderReplacements;
     }
 
     public Set<String> getReplacementPatterns() {

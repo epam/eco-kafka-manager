@@ -60,7 +60,7 @@
                                     <i class="fa fa-eye info"></i>
                                 </a>
                             </div>
-                            <div class="d-none" id="stacktrace">
+                            <div th:if="${errorAttributes.containsKey('trace')}" class="d-none" id="stacktrace">
                                 <pre th:text="${errorAttributes.trace}"></pre>
                             </div>
                         </th:block>
