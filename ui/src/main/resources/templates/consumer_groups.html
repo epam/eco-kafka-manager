@@ -15,7 +15,7 @@
  -->
 <!DOCTYPE HTML>
 <html xmlns:th="http://www.thymeleaf.org">
-<head title="Consumer groups list" th:replace="~{/templates.html :: header(~{::/html/head/link},~{::/html/head/script},~{})}">
+<head title="Consumer groups list" th:replace="~{/templates :: header(~{::/html/head/link},~{::/html/head/script},~{})}">
 
     <link rel="stylesheet" type="text/css" th:href="@{/components/query-param-filter/query-param-filter.css}" />
     <script type="text/javascript" th:src="@{/components/query-param-filter/query-param-filter.js}"></script>
@@ -145,11 +145,11 @@
     });
 </script>
 
-<div th:replace="~{/templates.html :: info-modal}"></div>
-<div th:replace="~{/templates.html :: faq-modal}"></div>
-<div th:replace="~{/templates.html :: confirm-modal}"></div>
-<div th:replace="~{/templates.html :: navbar}"></div>
-<div th:replace="~{/templates.html :: data-modal}"></div>
+<div th:replace="~{/templates :: info-modal}"></div>
+<div th:replace="~{/templates :: faq-modal}"></div>
+<div th:replace="~{/templates :: confirm-modal}"></div>
+<div th:replace="~{/templates :: navbar}"></div>
+<div th:replace="~{/templates :: data-modal}"></div>
 
 <div class="main-content">
 
@@ -170,7 +170,7 @@
 
             <div class="col-md-12">
 
-                <div th:replace="~{/templates.html :: query-param-filter}"></div>
+                <div th:replace="~{/templates :: query-param-filter}"></div>
 
             </div>
 
@@ -209,7 +209,7 @@
 
 </div>
 
-<div th:replace="~{/templates.html :: footer}"></div>
+<div th:replace="~{/templates :: footer}"></div>
 
 </body>
 </html>
