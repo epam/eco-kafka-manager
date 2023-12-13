@@ -26,6 +26,7 @@ public class TopicBrowser {
     private Boolean useCache = true;
     private Long cacheExpirationPeriodMin = 30L;
     private Long cacheCleanerIntervalMin = 30L;
+    private Long cacheThresholdInMb = 100L;
     private Boolean showGrid = Boolean.TRUE;
     private Boolean enableAnimation = Boolean.TRUE;
     private List<HeaderReplacement> tombstoneGeneratorReplacements;
@@ -54,6 +55,14 @@ public class TopicBrowser {
 
     public void setCacheCleanerIntervalMin(Long cacheCleanerIntervalMin) {
         this.cacheCleanerIntervalMin = cacheCleanerIntervalMin;
+    }
+
+    public Long getCacheThresholdInMb() {
+        return cacheThresholdInMb;
+    }
+
+    public Boolean getFilterByKeyPartition() {
+        return filterByKeyPartition;
     }
 
     public Boolean getShowGrid() {
@@ -102,5 +111,9 @@ public class TopicBrowser {
 
     public void setFilterByKeyPartition(Boolean filterByKeyPartition) {
         this.filterByKeyPartition = filterByKeyPartition;
+    }
+
+    public void setCacheThresholdInMb(Long cacheThresholdInMb) {
+        this.cacheThresholdInMb = cacheThresholdInMb;
     }
 }

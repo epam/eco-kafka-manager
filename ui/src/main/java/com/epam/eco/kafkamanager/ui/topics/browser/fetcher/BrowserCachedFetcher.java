@@ -21,44 +21,75 @@ import com.epam.eco.kafkamanager.FetchMode;
 import com.epam.eco.kafkamanager.KafkaManager;
 import com.epam.eco.kafkamanager.TopicRecordFetchParams;
 import com.epam.eco.kafkamanager.exec.TaskResult;
+import com.epam.eco.kafkamanager.ui.config.KafkaManagerUiProperties;
 import com.epam.eco.kafkamanager.ui.topics.browser.FilterClauseNoopPredicate;
+import org.apache.commons.lang3.Validate;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
+import org.apache.kafka.common.header.Header;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.time.OffsetDateTime;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static java.time.OffsetDateTime.now;
+import static java.util.Objects.isNull;
 
 /**
  * @author Mikhail_Vershkov
  */
 public class BrowserCachedFetcher {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(BrowserCachedFetcher.class);
     private static final String PARTITION_OFFSET_DELIMITER = "_";
-    private static final long DEFAULT_FETCH_TIMEOUT = 10000L;
+    private static final long DEFAULT_FETCH_TIMEOUT_IN_MILS = 10000L;
     private static final long EXPIRATION_TIME_IN_MINUTES = 30L;
+    private static final long DIVIDER_TO_REACH_MB = 1_000_000L;
 
     private final KafkaManager kafkaManager;
-    public BrowserCachedFetcher(KafkaManager kafkaManager) {
+    private final long cacheThresholdInMb;
+
+    public BrowserCachedFetcher(KafkaManager kafkaManager,
+                                KafkaManagerUiProperties properties) {
         this.kafkaManager = kafkaManager;
+        cacheThresholdInMb = properties.getTopicBrowser().getCacheThresholdInMb();
     }
 
     private static final Map<String, CacheContent> resultsCache = new ConcurrentHashMap<>();
 
     public void put(String sessionId, List<ConsumerRecord<Object,Object>> consumerRecords) {
-        resultsCache.put(sessionId, new CacheContent(now().plusMinutes(EXPIRATION_TIME_IN_MINUTES), consumerRecords));
+        resultsCache.put(sessionId, new CacheContent(now().plusMinutes(EXPIRATION_TIME_IN_MINUTES),
+                 consumerRecords.stream().map(this::getConsumerRecordSize).reduce(Long::sum).orElse(0L),
+                 consumerRecords));
+    }
+
+    private long getConsumerRecordSize(ConsumerRecord consumerRecord) {
+        if(isNull(consumerRecord)) {
+            return 0L;
+        }
+        int headersLength = 0;
+        try {
+            for(Header header: consumerRecord.headers()) {
+               headersLength += header.key().getBytes().length + (isNull(header.value()) ? 0 : header.value().length);
+            }
+        } catch (Exception ex) {
+            LOGGER.warn(ex.getMessage());
+        }
+        return consumerRecord.serializedKeySize()+consumerRecord.serializedValueSize()+headersLength;
+
     }
 
     public Optional<ConsumerRecord<Object,Object>> getConsumerRecord(String sessionId,
-                                            String topicName,
-                                            TopicRecordFetchParams.DataFormat keyFormat,
-                                            TopicRecordFetchParams.DataFormat valueFormat,
-                                            String recordId) {
+                                                                     String topicName,
+                                                                     TopicRecordFetchParams.DataFormat keyFormat,
+                                                                     TopicRecordFetchParams.DataFormat valueFormat,
+                                                                     String recordId) {
 
         PartitionWithOffset partitionWithOffset = new PartitionWithOffset(recordId);
 
-        if(resultsCache.containsKey(sessionId)
+        if(getSizeMb(resultsCache)>cacheThresholdInMb
+                && resultsCache.containsKey(sessionId)
                 && resultsCache.get(sessionId).expirationTime().isAfter(now())
                 && !resultsCache.get(sessionId).records().isEmpty()) {
             return resultsCache.get(sessionId).records().stream()
@@ -75,7 +106,9 @@ public class BrowserCachedFetcher {
 
         Optional<ConsumerRecord<Object,Object>> consumerRecord = Optional.empty();
         if(taskResult.getValue().count()>0) {
-            consumerRecord = taskResult.getValue().getRecords().stream().filter(record->record.offset()==partitionWithOffset.getOffset()).findFirst();
+            consumerRecord = taskResult.getValue().getRecords().stream()
+                    .filter(message->message.offset()==partitionWithOffset.getOffset())
+                    .findFirst();
         }
         return consumerRecord;
 
@@ -87,9 +120,18 @@ public class BrowserCachedFetcher {
                                                                 long offset) {
         return new TopicRecordFetchParams( keyFormat, valueFormat,
                 Map.of(partition, new OffsetRange(offset>0?offset-1:offset,true, offset>0?offset-1:offset,true)),
-                1, DEFAULT_FETCH_TIMEOUT, FetchMode.FETCH_FORWARD, 0L, false, 0L,
+                1, DEFAULT_FETCH_TIMEOUT_IN_MILS, FetchMode.FETCH_FORWARD, 0L, false, 0L,
                 new FilterClauseNoopPredicate()
         );
+    }
+
+    private long getSizeMb(Map<String, CacheContent> map) {
+        return map.values().stream()
+                .map(CacheContent::recordSize)
+                .filter(size->size>0)
+                .reduce(Long::sum)
+                .map(sum->sum/DIVIDER_TO_REACH_MB)
+                .orElse(0L);
     }
 
     private static class PartitionWithOffset {
@@ -101,7 +143,7 @@ public class BrowserCachedFetcher {
                 partition = Integer.parseInt(recordIdArray[0]);
                 offset = Long.parseLong(recordIdArray[1]);
             } else {
-                throw new RuntimeException("Wrong format in \"partition_offset\" variable.");
+                throw new RuntimeException("Wrong format in \"partition_offset\" variable. (\"partition_offset\"="+partitionOffset+")");
             }
         }
         public int getPartition() {
@@ -112,30 +154,31 @@ public class BrowserCachedFetcher {
         }
     }
 
-    protected record CacheContent(OffsetDateTime expirationTime, List<ConsumerRecord<Object, Object>> records) {
+    protected record CacheContent(OffsetDateTime expirationTime, long recordSize, List<ConsumerRecord<Object, Object>> records) {
     }
 
     public static class BrowserCachedFetcherCleaner extends TimerTask {
         private static final String THREAD_NAME = "BrowserCachedFetcherCleaner";
 
-        public BrowserCachedFetcherCleaner(Long logIntervalMin) {
+        private BrowserCachedFetcherCleaner(long logIntervalMin) {
+            Validate.isTrue(logIntervalMin>0);
             long logIntervalMs = logIntervalMin * 60 * 1000;
-            new Timer().schedule(this, logIntervalMs, logIntervalMs);
+            new Timer(THREAD_NAME).schedule(this, logIntervalMs, logIntervalMs);
         }
 
-        public static BrowserCachedFetcherCleaner with(Long logIntervalMin) {
+        public static BrowserCachedFetcherCleaner with(long logIntervalMin) {
             return new BrowserCachedFetcherCleaner(logIntervalMin);
         }
 
         @Override
         public void run() {
-            Thread.currentThread().setName(THREAD_NAME);
             cleanup();
         }
 
         public void cleanup() {
+            OffsetDateTime now = now();
             List<String> recordsToRemove = resultsCache.entrySet().stream()
-                    .filter(cacheContent -> cacheContent.getValue().expirationTime().isBefore(now()))
+                    .filter(cacheContent -> cacheContent.getValue().expirationTime().isBefore(now))
                     .map(Map.Entry::getKey)
                     .toList();
             recordsToRemove.forEach(resultsCache::remove);
