@@ -44,22 +44,23 @@ public class BrowserCachedFetcher {
     private static final Logger LOGGER = LoggerFactory.getLogger(BrowserCachedFetcher.class);
     private static final String PARTITION_OFFSET_DELIMITER = "_";
     private static final long DEFAULT_FETCH_TIMEOUT_IN_MILS = 10000L;
-    private static final long EXPIRATION_TIME_IN_MINUTES = 30L;
     private static final long DIVIDER_TO_REACH_MB = 1_000_000L;
 
     private final KafkaManager kafkaManager;
     private final long cacheThresholdInMb;
+    private final long exparationTimeInMins;
 
     public BrowserCachedFetcher(KafkaManager kafkaManager,
                                 KafkaManagerUiProperties properties) {
         this.kafkaManager = kafkaManager;
         cacheThresholdInMb = properties.getTopicBrowser().getCacheThresholdInMb();
+        exparationTimeInMins = properties.getTopicBrowser().getCacheExpirationPeriodMin();
     }
 
     private static final Map<String, CacheContent> resultsCache = new ConcurrentHashMap<>();
 
     public void put(String sessionId, List<ConsumerRecord<Object,Object>> consumerRecords) {
-        resultsCache.put(sessionId, new CacheContent(now().plusMinutes(EXPIRATION_TIME_IN_MINUTES),
+        resultsCache.put(sessionId, new CacheContent(now().plusMinutes(exparationTimeInMins),
                  consumerRecords.stream().map(this::getConsumerRecordSize).reduce(Long::sum).orElse(0L),
                  consumerRecords));
     }
@@ -88,7 +89,7 @@ public class BrowserCachedFetcher {
 
         PartitionWithOffset partitionWithOffset = new PartitionWithOffset(recordId);
 
-        if(getSizeMb(resultsCache)>cacheThresholdInMb
+        if(getSizeMb(resultsCache)<cacheThresholdInMb
                 && resultsCache.containsKey(sessionId)
                 && resultsCache.get(sessionId).expirationTime().isAfter(now())
                 && !resultsCache.get(sessionId).records().isEmpty()) {
@@ -134,21 +135,25 @@ public class BrowserCachedFetcher {
                 .orElse(0L);
     }
 
-    private static class PartitionWithOffset {
+    public static class PartitionWithOffset {
+
         private final int partition;
         private final long offset;
-        PartitionWithOffset(String partitionOffset) {
-            if(partitionOffset.contains(PARTITION_OFFSET_DELIMITER)) {
+
+        public PartitionWithOffset(String partitionOffset) {
+            if (partitionOffset.contains(PARTITION_OFFSET_DELIMITER)) {
                 String[] recordIdArray = partitionOffset.split(PARTITION_OFFSET_DELIMITER);
                 partition = Integer.parseInt(recordIdArray[0]);
                 offset = Long.parseLong(recordIdArray[1]);
             } else {
-                throw new RuntimeException("Wrong format in \"partition_offset\" variable. (\"partition_offset\"="+partitionOffset+")");
+                throw new RuntimeException("Wrong format in \"partition_offset\" variable. (\"partition_offset\"=" + partitionOffset + ")");
             }
         }
+
         public int getPartition() {
             return partition;
         }
+
         public long getOffset() {
             return offset;
         }
