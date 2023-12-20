@@ -39,6 +39,11 @@ public class KafkaManagerRestConfiguration implements WebMvcConfigurer {
     }
 
     @Bean
+    public AuthenticationLogFilter authenticationLogFilter() {
+        return new AuthenticationLogFilter();
+    }
+
+    @Bean
     public Module kafkaModule() {
         return new KafkaModule();
     }

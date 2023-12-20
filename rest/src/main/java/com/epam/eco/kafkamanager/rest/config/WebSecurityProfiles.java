@@ -20,4 +20,5 @@ package com.epam.eco.kafkamanager.rest.config;
  */
 public final class WebSecurityProfiles {
     public static final String DISABLED = "auth-disabled";
+    public static final String KEYCLOAK = "auth-keycloak";
 }
