@@ -26,6 +26,8 @@ import com.epam.eco.commons.kafka.helpers.RecordFetchResult;
 import com.epam.eco.kafkamanager.TopicRecordFetchParams.DataFormat;
 import com.epam.eco.kafkamanager.ui.topics.browser.TabularRecords.Record;
 
+import static java.util.Objects.isNull;
+
 /**
  * @author Andrei_Tytsik
  */
@@ -64,7 +66,8 @@ public class ToTabularRecordsConverter {
                 valueTabulator.getAttributes((ConsumerRecord)consumerRecord);
 
         Map<String, String> headers = new HashMap<>();
-        consumerRecord.headers().forEach( header -> headers.put(header.key(),new String(header.value())));
+        consumerRecord.headers()
+                .forEach( header -> headers.put(header.key(), isNull(header.value()) ? null : new String(header.value())));
 
         return new Record(
                 consumerRecord,

@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import com.epam.eco.kafkamanager.ui.topics.browser.RecordSchema;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.common.header.internals.RecordHeaders;
 import org.apache.kafka.common.record.TimestampType;
@@ -166,6 +167,27 @@ public class TabularRecordsTest {
         Assertions.assertNotNull(record.getAttributesJson());
         Assertions.assertEquals("{\"attr_key\":\"attr_value\"}", record.getAttributesJson());
         Assertions.assertNotNull(record.getAttributesPrettyJson());
+    }
+
+    @Test
+    public void testIfHeaderValueIsNull() {
+        TabularRecords.Builder builder = TabularRecords.builder("testTopic");
+        Map<String, String> headers = new HashMap<>();
+        headers.put("headerName",null);
+        Record record = new Record(
+                new ConsumerRecord<>("testTopic",0,0L,"key","value"),
+                Map.of("key","value"),
+                Map.of(),
+                headers,
+                RecordSchema.DUMMY_AVRO_RECORD_SCHEMA
+        );
+        TabularRecords records = builder.addRecord(record).build();
+        Assertions.assertEquals(1,records.size());
+        Record actualRecord = records.getRecord(0);
+        Assertions.assertEquals("key", actualRecord.getKey());
+        Assertions.assertTrue(actualRecord.hasHeaders());
+        Assertions.assertTrue(actualRecord.getHeaders().containsKey("headerName"));
+        Assertions.assertNull(actualRecord.getHeaders().get("headerName"));
     }
 
     private Record createNullKeyNullValueTestRecord() {

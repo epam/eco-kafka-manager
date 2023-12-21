@@ -15,7 +15,7 @@
  -->
 <!DOCTYPE HTML>
 <html xmlns:th="http://www.thymeleaf.org">
-<head th:replace="~{/templates.html :: header(~{::/html/head/link},~{::/html/head/script},~{})}">
+<head th:replace="~{templates :: header(~{::/html/head/link},~{::/html/head/script},~{})}">
 
     <link rel="stylesheet" type="text/css" th:href="@{/components/browse-filter/browse-filter.css}" />
 
@@ -494,14 +494,14 @@
 
 </script>
 
-<div th:replace="~{/templates.html :: navbar}"></div>
-<div th:replace="~{/templates.html :: loading-modal}"></div>
-<div th:replace="~{/templates.html :: info-modal}"></div>
-<div th:replace="~{/templates.html :: data-modal}"></div>
-<div th:replace="~{/templates.html :: faq-modal}"></div>
-<div th:replace="~{/templates.html :: confirm-modal}"></div>
-<div th:replace="~{/templates.html :: tombstone-modal}"></div>
-<div th:replace="~{/templates.html :: copy-record-modal}"></div>
+<div th:replace="~{templates :: navbar}"></div>
+<div th:replace="~{templates :: loading-modal}"></div>
+<div th:replace="~{templates :: info-modal}"></div>
+<div th:replace="~{templates :: data-modal}"></div>
+<div th:replace="~{templates :: faq-modal}"></div>
+<div th:replace="~{templates :: confirm-modal}"></div>
+<div th:replace="~{templates :: tombstone-modal}"></div>
+<div th:replace="~{templates :: copy-record-modal}"></div>  
 
 <div class="main-content">
 
@@ -578,7 +578,7 @@
                                     <div id="browse-filter-block">
                                         <div
                                                 th:if="${browseParams.isAvroOrProtobufValueFormat()}"
-                                                th:replace="~{/templates.html :: browse-filter}">
+                                                th:replace="~{templates :: browse-filter}">
                                         </div>
                                     </div>
 
@@ -1054,7 +1054,7 @@
 
 </div>
 
-<div th:replace="~{/templates.html :: footer}"></div>
+<div th:replace="~{templates :: footer}"></div>
 
 </body>
 </html>
