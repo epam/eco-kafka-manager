@@ -18,6 +18,7 @@ package com.epam.eco.kafkamanager.ui.config;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.epam.eco.kafkamanager.KafkaKmProducer;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.Serializer;
@@ -29,7 +30,6 @@ import org.springframework.kafka.core.DefaultKafkaProducerFactory;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.core.ProducerFactory;
 
-import com.epam.eco.kafkamanager.KafkaTombstoneProducer;
 import com.epam.eco.kafkamanager.core.autoconfigure.KafkaManagerProperties;
 
 import io.confluent.kafka.serializers.KafkaAvroSerializer;
@@ -40,34 +40,34 @@ import io.confluent.kafka.serializers.KafkaAvroSerializer;
 
 @Configuration
 @EnableConfigurationProperties(KafkaManagerUiProperties.class)
-public class TombstoneProducerConfiguration {
+public class KmKafkaProducerConfiguration {
 
     private static final String SCHEMA_REGISTRY_URL = "schema.registry.url";
 
     @Bean
-    public KafkaTombstoneProducer<String,Object> kafkaTombstoneStringProducer(KafkaManagerProperties properties) {
-        return new KafkaTombstoneProducer<>(kafkaStringTemplate(properties));
+    public KafkaKmProducer<String,Object> kafkaKmStringProducer(KafkaManagerProperties properties) {
+        return new KafkaKmProducer<>(kafkaStringTemplate(properties));
     }
     @Bean
-    public KafkaTombstoneProducer<Object,Object> kafkaTombstoneAvroProducer(KafkaManagerProperties properties) {
-        return new KafkaTombstoneProducer<>(kafkaAvroTemplate(properties));
+    public KafkaKmProducer<Object,Object> kafkaKmAvroProducer(KafkaManagerProperties properties) {
+        return new KafkaKmProducer<>(kafkaAvroTemplate(properties));
     }
 
     @Bean
     public KafkaTemplate<String, Object> kafkaStringTemplate(KafkaManagerProperties properties) {
-        return new KafkaTemplate<>(tombStoneStringProducerFactory(properties));
+        return new KafkaTemplate<>(stringProducerFactory(properties));
     }
     @Bean
     public KafkaTemplate<Object, Object> kafkaAvroTemplate(KafkaManagerProperties properties) {
-        return new KafkaTemplate<>(tombStoneAvroProducerFactory(properties));
+        return new KafkaTemplate<>(avroProducerFactory(properties));
     }
 
     @Bean
-    public ProducerFactory<String, Object> tombStoneStringProducerFactory(KafkaManagerProperties properties) {
+    public ProducerFactory<String, Object> stringProducerFactory(KafkaManagerProperties properties) {
         return getProducerFactory(properties, StringSerializer.class);
     }
     @Bean
-    public ProducerFactory<Object, Object> tombStoneAvroProducerFactory(KafkaManagerProperties properties) {
+    public ProducerFactory<Object, Object> avroProducerFactory(KafkaManagerProperties properties) {
         return getProducerFactory(properties, KafkaAvroSerializer.class);
     }
 

@@ -345,6 +345,7 @@
         }
 
         $('#tombstone-generate-button').click(()=>generateTombstone());
+        $('#copy-record-button').click(()=>copyRecord());
 
     })
 
@@ -383,8 +384,9 @@
         const headers = $('#headers-for_'+recordId).val();
         $.post("/kafka-manager/topics/"+topicName+"/browser/headers",
             {"headers": headers,
-             "method_": "POST",
-             [[${_csrf.parameterName}]]: [[${_csrf.token}]]})
+                "method_": "POST",
+                "replacementType": "TOMBSTONE",
+                [[${_csrf.parameterName}]]: [[${_csrf.token}]]})
             .done(function(data) {
                 $("#tombstone-key-display").text(recordKey);
                 $("#tombstone-key").val(recordKey);
@@ -430,6 +432,64 @@
              })
     }
 
+    function openCopyRecordModal(recordId, recordKey) {
+        const headers = $('#headers-for_'+recordId).val();
+        $.post("/kafka-manager/topics/"+topicName+"/browser/headers",
+            {"headers": headers,
+                "method_": "POST",
+                "replacementType": "COPY_RECORD",
+                [[${_csrf.parameterName}]]: [[${_csrf.token}]]})
+            .done(function(data) {
+                $("#copy-record-key-display").text(recordKey);
+                $("#copy-record-key").val(recordKey);
+                $("#copy-record-id").val(recordId);
+                $("#copy-record-header-content").val(data);
+                $('#copy-record-modal-dialog').modal("show");
+            })
+            .fail(function(xhr) {
+                alert(xhr.responseText);
+            })
+
+    }
+
+    function closeCopyRecordModal() {
+        const resultItem = $('#copy-record-result');
+        resultItem.removeClass("text-danger");
+        resultItem.text('');
+        $('#copy-record-modal-dialog').modal("hide");
+    }
+
+    function copyRecord() {
+        const recordKey = $('#copy-record-key').val();
+        const recordId = $('#copy-record-id').val();
+        const resultItem = $('#copy-record-result');
+        if(!recordId) {
+            resultItem.addClass("text-danger");
+            resultItem.text("Record id doesn't defined!");
+            return;
+        }
+        const headers = $('#copy-record-header-content').val();
+        closeCopyRecordModal();
+        showWaitingSign("Wait...");
+        $.post("/kafka-manager/topics/"+topicName+"/browser/copyRecord",
+            {"recordKey": recordKey,
+                "recordId": recordId,
+                "keyFormat": [[${browseParams.getKeyFormat()}]],
+                "valueFormat": [[${browseParams.getValueFormat()}]],
+                "headers": headers,
+                "method_": "POST",
+                [[${_csrf.parameterName}]]: [[${_csrf.token}]]})
+            .done(function(data) {
+                hideWaitingSign();
+                showInfo('info','Copy record',data);
+
+            })
+            .fail(function(xhr) {
+                resultItem.addClass("text-danger");
+                resultItem.text(xhr.responseText);
+            })
+    }
+
 
 
 </script>
@@ -441,6 +501,7 @@
 <div th:replace="~{templates :: faq-modal}"></div>
 <div th:replace="~{templates :: confirm-modal}"></div>
 <div th:replace="~{templates :: tombstone-modal}"></div>
+<div th:replace="~{templates :: copy-record-modal}"></div>  
 
 <div class="main-content">
 
@@ -846,19 +907,29 @@
                                 <td th:if="${!record.nullKey}"
                                     style="min-width:10em;max-width:21.5em;">
 
-                                    <div class="d-flex" style="justify-content: space-between">
+                                    <div class="d-flex">
                                         <div class="tombstone-column" th:text="${record.key}"></div>
-                                        <a class="btn btn-sm info tombstone-icon-column"
-                                           th:if="${writeAllowed}"
-                                           type="button"
-                                           th:data-record-id="${recordId}"
-                                           th:data-record-key="${record.key}"
-                                           th:onclick="openTombstoneModal(this.getAttribute('data-record-id'),this.getAttribute('data-record-key'))"
-                                           style="padding-left: 0.3em" >
-                                            <img th:src="@{/assets/img/tombstone.png}" th:title="${'Generate tombstone for key='+record.key}" />
-                                        </a>
+                                        <div class="d-flex" style="flex-direction: column">
+                                            <a class="btn btn-sm info tombstone-icon-column"
+                                                   th:if="${writeAllowed}"
+                                                   type="button"
+                                                   th:data-record-id="${recordId}"
+                                                   th:data-record-key="${record.key}"
+                                                   th:onclick="openTombstoneModal(this.getAttribute('data-record-id'),this.getAttribute('data-record-key'))"
+                                                   style="padding-left: 0.3em" >
+                                                    <img th:src="@{/assets/img/tombstone.png}" th:title="${'Generate tombstone for key='+record.key}" />
+                                            </a>
+                                            <a class="btn btn-sm info tombstone-icon-column"
+                                               th:if="${writeAllowed}"
+                                               type="button"
+                                               th:data-record-id="${recordId}"
+                                               th:data-record-key="${record.key}"
+                                               th:onclick="openCopyRecordModal(this.getAttribute('data-record-id'),this.getAttribute('data-record-key'))"
+                                               style="padding-left: 0.3em" >
+                                                <i class="fa fa-copy info" th:title="${'Copy record for key='+record.key}"></i>
+                                            </a>
+                                        </div>
                                     </div>
-
                                 </td>
                                 <td th:text="${record.keyValueSizeFormatted}"></td>
                                 <td style="text-align: center;vertical-align: middle;">
@@ -943,7 +1014,7 @@
 
                                 </td>
 
-                                <td th:if="${record.nullValue and browseParams.isAvroOrProtobufValueFormat()}" class="bg-danger">
+                                <td th:if="${record.nullValue and record.hasAttributes()}" class="bg-danger">
                                     <span></span>
                                 </td>
 

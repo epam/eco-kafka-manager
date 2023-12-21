@@ -24,11 +24,13 @@ import java.util.Set;
 
 public class TopicBrowser {
     private Boolean useCache = true;
-    private Long cacheExpirationPeriodMin = 60L;
-    private Long cacheCleanerIntervalMin = 60L;
+    private Long cacheExpirationPeriodMin = 30L;
+    private Long cacheCleanerIntervalMin = 30L;
+    private Long cacheThresholdInMb = 100L;
     private Boolean showGrid = Boolean.TRUE;
     private Boolean enableAnimation = Boolean.TRUE;
     private List<HeaderReplacement> tombstoneGeneratorReplacements;
+    private List<HeaderReplacement> copyRecordHeaderReplacements;
     private Set<String> replacementPatterns;
     private Boolean filterByKeyPartition = false;
     public Boolean getUseCache() {
@@ -55,6 +57,14 @@ public class TopicBrowser {
         this.cacheCleanerIntervalMin = cacheCleanerIntervalMin;
     }
 
+    public Long getCacheThresholdInMb() {
+        return cacheThresholdInMb;
+    }
+
+    public Boolean getFilterByKeyPartition() {
+        return filterByKeyPartition;
+    }
+
     public Boolean getShowGrid() {
         return showGrid;
     }
@@ -79,6 +89,14 @@ public class TopicBrowser {
         this.tombstoneGeneratorReplacements = tombstoneGenerationReplacements;
     }
 
+    public List<HeaderReplacement> getCopyRecordHeaderReplacements() {
+        return copyRecordHeaderReplacements;
+    }
+
+    public void setCopyRecordHeaderReplacements(List<HeaderReplacement> copyRecordHeaderReplacements) {
+        this.copyRecordHeaderReplacements = copyRecordHeaderReplacements;
+    }
+
     public Set<String> getReplacementPatterns() {
         return replacementPatterns;
     }
@@ -93,5 +111,9 @@ public class TopicBrowser {
 
     public void setFilterByKeyPartition(Boolean filterByKeyPartition) {
         this.filterByKeyPartition = filterByKeyPartition;
+    }
+
+    public void setCacheThresholdInMb(Long cacheThresholdInMb) {
+        this.cacheThresholdInMb = cacheThresholdInMb;
     }
 }

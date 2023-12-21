@@ -15,8 +15,10 @@
  *******************************************************************************/
 package com.epam.eco.kafkamanager.ui.config;
 
+import com.epam.eco.kafkamanager.KafkaManager;
 import com.epam.eco.kafkamanager.PartitionByKeyResolver;
 import com.epam.eco.kafkamanager.PartitionByKeyResolverImpl;
+import com.epam.eco.kafkamanager.ui.topics.browser.fetcher.BrowserCachedFetcher;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.cloud.stream.config.SpelExpressionConverterConfiguration;
@@ -82,5 +84,15 @@ public class KafkaManagerUiConfiguration implements WebMvcConfigurer {
     public TopicOffsetCacheCleanerRunner topicOffsetCacheCleanerRunner(KafkaManagerUiProperties properties) {
         return new TopicOffsetCacheCleanerRunner(properties.getTopicBrowser().getCacheCleanerIntervalMin());
     }
+    @Bean
+    public BrowserCachedFetcher browserCachedFetcher(KafkaManager kafkaManager,
+                                                     KafkaManagerUiProperties properties) {
+        return new BrowserCachedFetcher(kafkaManager, properties);
+    }
+    @Bean(initMethod = "init")
+    public BrowserCachedFetcherCleanerRunner browserCachedFetcherCleanerRunner(KafkaManagerUiProperties properties) {
+        return new BrowserCachedFetcherCleanerRunner(properties.getTopicBrowser().getCacheCleanerIntervalMin());
+    }
+
 
 }

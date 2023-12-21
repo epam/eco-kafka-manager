@@ -21,8 +21,11 @@ import java.util.function.BiConsumer;
 import java.util.stream.Collectors;
 
 import com.epam.eco.kafkamanager.*;
+import com.epam.eco.kafkamanager.ui.topics.browser.fetcher.BrowserCachedFetcher;
+import jakarta.servlet.http.HttpServletRequest;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.common.TopicPartition;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -81,7 +84,10 @@ public class TopicBrowserController {
     public static final String ATTR_FILTER_OPERATIONS = "filterOperations";
     public static final String ATTR_WRITE_ALLOWED = "writeAllowed";
     public static final String ATTR_RECORD_KEY = "recordKey";
+    public static final String ATTR_RECORD_ID = "recordId";
+    public static final String REPUBLISHED_FROM_HEADER = "republished_from";
     public static final String ATTR_KEY_FORMAT = "keyFormat";
+    public static final String ATTR_VALUE_FORMAT = "valueFormat";
     public static final String ATTR_HEADERS = "headers";
 
     public static final String INITIAL_FILTER_ATTRIBUTE = "initialFilterColumns";
@@ -92,10 +98,10 @@ public class TopicBrowserController {
     private KafkaManager kafkaManager;
 
     @Autowired
-    private KafkaTombstoneProducer kafkaTombstoneStringProducer;
+    private KafkaKmProducer kafkaKmStringProducer;
 
     @Autowired
-    private KafkaTombstoneProducer kafkaTombstoneAvroProducer;
+    private KafkaKmProducer kafkaKmAvroProducer;
 
     @Autowired
     private KafkaAdminOperations kafkaAdminOperations;
@@ -108,6 +114,9 @@ public class TopicBrowserController {
 
     @Autowired
     private Authorizer authorizer;
+
+    @Autowired
+    private BrowserCachedFetcher browserCachedFetcher;
 
     @PreAuthorize("@authorizer.isPermitted('TOPIC', #topicName, 'READ')")
     @RequestMapping(value=MAPPING, method=RequestMethod.GET)
@@ -132,12 +141,13 @@ public class TopicBrowserController {
     public String fetch(
             @PathVariable("name") String topicName,
             @RequestParam Map<String, Object> requestParams,
-            RedirectAttributes redirectAttrs) {
+            RedirectAttributes redirectAttrs,
+            HttpServletRequest servletRequest) {
         TopicBrowseParams browseParams = TopicBrowseParams.with(requestParams);
         browseParams.setTopicName(topicName);
 
         handleParamsRequest(browseParams, redirectAttrs::addFlashAttribute);
-        handleFetchRequest(browseParams, redirectAttrs::addFlashAttribute);
+        handleFetchRequest(browseParams, redirectAttrs::addFlashAttribute, servletRequest.getSession().getId());
 
         return "redirect:" + buildBrowserUrl(topicName);
     }
@@ -163,7 +173,48 @@ public class TopicBrowserController {
             } else {
                 headerMap = Collections.emptyMap();
             }
-            return ResponseEntity.ok(getAppropriateProducer(keyFormat).send(topicName, key, headerMap));
+            return ResponseEntity.ok(getAppropriateProducer(keyFormat).send(topicName, key, null, headerMap));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    @PreAuthorize("@authorizer.isPermitted('TOPIC', #topicName, 'WRITE')")
+    @RequestMapping(value=MAPPING + "/copyRecord", method=RequestMethod.POST)
+    public @ResponseBody ResponseEntity<String> copyRecord(
+            @PathVariable("name") String topicName,
+            @RequestParam Map<String, String> requestParams,
+            HttpServletRequest httpRequest) {
+
+        Object key = requestParams.get(ATTR_RECORD_KEY);
+        String recordId = requestParams.get(ATTR_RECORD_ID);
+        DataFormat keyFormat = DataFormat.valueOf(requestParams.get(ATTR_KEY_FORMAT));
+        DataFormat valueFormat = DataFormat.valueOf(requestParams.get(ATTR_VALUE_FORMAT));
+        String headers = requestParams.get(ATTR_HEADERS);
+
+        String sessionId = httpRequest.getSession().getId();
+
+        try {
+            Map<String, String> headerMap;
+            if(StringUtils.isNotEmpty(headers)) {
+                headerMap = new ObjectMapper().readValue(headers, HashMap.class);
+            } else {
+                headerMap = Collections.emptyMap();
+            }
+            headerMap.put(REPUBLISHED_FROM_HEADER, recordId);
+
+
+            Optional<ConsumerRecord<Object,Object>> consumerRecord =
+                    browserCachedFetcher.getConsumerRecord(sessionId,topicName,keyFormat,valueFormat,recordId);
+            if(consumerRecord.isPresent()) {
+                String result = getAppropriateProducer(valueFormat)
+                                          .send(topicName, key,
+                                                KafkaSchemaIdAwareUtils.extractGenericRecordOrValue(consumerRecord.get()),
+                                                headerMap);
+                return ResponseEntity.ok(result);
+            } else {
+                return ResponseEntity.ok("Can't find record with partition_offset" + recordId);
+            }
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
@@ -171,13 +222,14 @@ public class TopicBrowserController {
 
     @RequestMapping(value=MAPPING + "/headers", method=RequestMethod.POST)
     public @ResponseBody ResponseEntity<String> replaceHeaders(
+            @RequestParam(name="replacementType") String replacementType,
             @RequestParam(name="headers") String headers) {
 
         if(StringUtils.isEmpty(headers)) {
             return ResponseEntity.ok("{}");
         }
 
-        List<HeaderReplacement> replacements = properties.getTopicBrowser().getTombstoneGeneratorReplacements();
+        List<HeaderReplacement> replacements = resolveReplacements(ReplacementType.valueOf(replacementType));
         try {
             Map<String, String> headerMap = new ObjectMapper().readValue(headers, HashMap.class);
             if(!CollectionUtils.isEmpty(replacements)) {
@@ -189,8 +241,14 @@ public class TopicBrowserController {
         }
     }
 
-    private KafkaTombstoneProducer getAppropriateProducer(DataFormat keyFormat) {
-        return keyFormat == DataFormat.AVRO ? kafkaTombstoneAvroProducer : kafkaTombstoneStringProducer;
+    private List<HeaderReplacement> resolveReplacements(ReplacementType replacementType) {
+        return replacementType==ReplacementType.TOMBSTONE ?
+                properties.getTopicBrowser().getTombstoneGeneratorReplacements() :
+                properties.getTopicBrowser().getCopyRecordHeaderReplacements();
+    }
+
+    private KafkaKmProducer getAppropriateProducer(DataFormat keyFormat) {
+        return keyFormat == DataFormat.AVRO ? kafkaKmAvroProducer : kafkaKmStringProducer;
     }
 
     private void handleParamsRequest(
@@ -222,13 +280,16 @@ public class TopicBrowserController {
     }
 
     private void handleFetchRequest(TopicBrowseParams browseParams,
-                                    BiConsumer<String, Object> modelAttributes) {
+                                    BiConsumer<String, Object> modelAttributes,
+                                    String sessionId) {
         TopicRecordFetchParams fetchParams = toFetchParams(browseParams);
 
         TaskResult<RecordFetchResult<Object, Object>> taskResult = kafkaManager.getTopicRecordFetcherTaskExecutor().
                 executeDetailed(browseParams.getTopicName(), fetchParams);
 
         RecordFetchResult<Object, Object> fetchResult = taskResult.getValue();
+
+        browserCachedFetcher.put(sessionId,fetchResult.getRecords());
 
         TabularRecords tabularRecords = ToTabularRecordsConverter.from(browseParams, fetchResult);
 
