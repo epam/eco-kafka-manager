@@ -15,6 +15,7 @@
  *******************************************************************************/
 package com.epam.eco.kafkamanager.ui.config;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -29,6 +30,7 @@ import org.springframework.security.core.authority.mapping.GrantedAuthoritiesMap
 import org.springframework.security.oauth2.core.oidc.user.OidcUserAuthority;
 import org.springframework.security.oauth2.core.user.OAuth2UserAuthority;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.AnonymousAuthenticationFilter;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -51,10 +53,14 @@ public class KeycloakBaseWebSecurityConfig extends BaseWebSecurityConfig {
     @Value("${spring.security.oauth2.client.provider.keycloak.logout-url}")
     private String logoutUrl;
 
+    @Autowired
+    private AuthenticationLogFilter authenticationLogFilter;
+
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return commonHttpConfig(http)
                 .oauth2Login(login -> login.userInfoEndpoint(config -> config.userAuthoritiesMapper(userAuthoritiesMapperForKeycloak())))
+                .addFilterAfter(authenticationLogFilter, AnonymousAuthenticationFilter.class)
                 .logout(logout -> logout
                         .logoutUrl("/logout")
                         .logoutSuccessUrl(logoutUrl)
