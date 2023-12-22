@@ -21,7 +21,6 @@ import jakarta.servlet.ServletRequest;
 import jakarta.servlet.ServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
@@ -39,22 +38,19 @@ public class AuthenticationLogFilter extends GenericFilterBean {
     private final static Logger LOGGER = LoggerFactory.getLogger(AuthenticationLogFilter.class);
     private static final String JWT_IDENTITY_ATTRIBUTE = "email";
 
-    @Value("${eco.kafkamanager.core.user-auth-logger:false}")
-    private Boolean loggerEnabled;
-
     @Override
     public void doFilter(
             ServletRequest request,
             ServletResponse response,
             FilterChain chain) throws IOException, ServletException {
+
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
-        if( nonNull(authentication) && nonNull(loggerEnabled) && loggerEnabled) {
-
+        if( nonNull(authentication)) {
             if(authentication instanceof JwtAuthenticationToken jwtAuthentication) {
-                LOGGER.info( "USER: {} have been logged in. Attributes: {}", jwtAuthentication.getTokenAttributes().get(JWT_IDENTITY_ATTRIBUTE), jwtAuthentication.getTokenAttributes());
+                LOGGER.debug( "USER: {} have been logged in. Attributes: {}", jwtAuthentication.getTokenAttributes().get(JWT_IDENTITY_ATTRIBUTE), jwtAuthentication.getTokenAttributes());
             } else {
-                LOGGER.info( "USER: {} have been logged", authentication.getName());
+                LOGGER.debug( "USER: {} have been logged", authentication.getName());
             }
         }
 

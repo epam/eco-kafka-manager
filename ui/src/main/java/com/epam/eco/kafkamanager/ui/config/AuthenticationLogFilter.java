@@ -21,7 +21,6 @@ import jakarta.servlet.ServletRequest;
 import jakarta.servlet.ServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
@@ -38,9 +37,6 @@ public class AuthenticationLogFilter extends GenericFilterBean {
 
     private final static Logger LOGGER = LoggerFactory.getLogger(AuthenticationLogFilter.class);
 
-    @Value("${eco.kafkamanager.core.user-auth-logger:false}")
-    private Boolean loggerEnabled;
-
     @Override
     public void doFilter(
             ServletRequest request,
@@ -49,11 +45,11 @@ public class AuthenticationLogFilter extends GenericFilterBean {
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
-        if(nonNull(authentication) && nonNull(loggerEnabled) && loggerEnabled) {
+        if(nonNull(authentication)) {
             if(authentication.getPrincipal() instanceof OidcUser oidcUser) {
-                LOGGER.info("OIDC-USER: {} have been logged in. Attributes: {}", oidcUser.getName(), oidcUser.getAttributes() );
+                LOGGER.debug("OIDC-USER: {} have been logged in. Attributes: {}", oidcUser.getName(), oidcUser.getAttributes() );
             } else {
-                LOGGER.info("USER: {} have been logged", authentication.getName());
+                LOGGER.debug("USER: {} have been logged", authentication.getName());
             }
         }
 
