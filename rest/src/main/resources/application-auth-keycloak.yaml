@@ -1,0 +1,88 @@
+KEYCLOAK_BASE: https://keycloak/auth
+KEYCLOAK_REALM: keycloak-realm
+CLIENT_ID: eco-kafka-manager-ui
+
+SERVER_PORT: 8086
+KAFKA_SERVERS_URL: kafka-server-uri:9095
+SCHEMA_REGISTRY_URL: schema-registry-server-uri:8081
+
+server:
+  port: ${SERVER_PORT}
+  servlet:
+    context-path: "/kafka-manager-rest"
+  tomcat:
+    remote-ip-header: x-forwarded-for
+    protocol-header: x-forwarded-proto
+
+
+#required to enable keycloak config in Spring-Boot2
+spring:
+  main:
+    allow-bean-definition-overriding: true
+    allow-circular-references: true
+#  profiles:
+#    active: auth-keycloak
+# auth profiles: auth-keycloak, auth-disabled
+  security:
+    oauth2:
+      client-id: ${CLIENT_ID}
+      resourceserver:
+        jwt:
+          jwk-set-uri: ${KEYCLOAK_BASE}/realms/${KEYCLOAK_REALM}/protocol/openid-connect/certs
+management:
+  metrics:
+    export:
+      prometheus: true
+  endpoints:
+    web:
+      exposure:
+        include: info,health,metrics,prometheus
+
+springdoc:
+  default-produces-media-type: application/json
+  api-docs.groups.enabled: true
+  swagger-ui:
+    display-request-duration: true
+    groups-order: desc
+    operations-sorter: method
+eco:
+  kafkamanager:
+    core:
+      auth-logger:
+        enabled: false
+      bootstrapServers: ${KAFKA_SERVERS_URL}
+      zkConnect: ${ZK_CONNECT:}
+      schemaRegistryUrl: ${SCHEMA_REGISTRY_URL:}
+      metadataStoreBootstrapTimeoutInMs: ${METADATA_BOOTSTRAP_TIMEOUT_MS:180000}
+      transactionStoreBootstrapTimeoutInMs: ${TX_BOOTSTRAP_TIMEOUT_MS:180000}
+      transactionStoreBootstrapDataFreshness: ${TX_BOOTSTRAP_DATA_FRESHNESS:ONE_HOUR}
+
+      clientConfig[fetch.max.wait.ms]: 1500
+      clientConfig[fetch.min.bytes]: 20
+      clientConfig[max.poll.records]: 1000
+      clientConfig[security.protocol]: "SASL_SSL"
+      clientConfig[ssl.truststore.location]: "truststore.jks"
+      clientConfig[ssl.truststore.password]: "trust-store-passwd"
+      clientConfig[sasl.mechanism]: "GSSAPI"
+      clientConfig[sasl.kerberos.service.name]: "kafka"
+      clientConfig[sasl.jaas.config]: "com.sun.security.auth.module.Krb5LoginModule required \
+                                                 useKeyTab=true  \
+                                                 principal='account@DOMAIN.COM' \
+                                                 keyTab='account.keytab' \
+                                                 storeKey=true;"
+      zkClientConfig[zookeeper.clientCnxnSocket]: org.apache.zookeeper.ClientCnxnSocketNetty
+      zkClientConfig[zookeeper.client.secure]: true
+      zkClientConfig[zookeeper.ssl.client.enable]: true
+      zkClientConfig[zookeeper.ssl.trustStore.location]: "truststore.jks"
+      zkClientConfig[zookeeper.ssl.trustStore.password]: "trust-store-passwd"
+
+    rest:
+      asyncRequestTimeoutInMs: ${ASYNC_REQUEST_TIMEOUT_MS:300000}
+
+logging:
+  level:
+    root: info
+    # com.epam.eco.kafkamanager.core=debug
+#    org:
+#      springframework:
+#        security: info

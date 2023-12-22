@@ -49,7 +49,10 @@ public class KafkaManagerUiConfiguration implements WebMvcConfigurer {
     public static KafkaManagerUiPropertiesValidator configurationPropertiesValidator() {
         return new KafkaManagerUiPropertiesValidator();
     }
-
+    @Bean
+    public AuthenticationLogFilter authenticationLogFilter() {
+        return new AuthenticationLogFilter();
+    }
     @Bean
     public PropertiesInitializer propertiesInitializer(KafkaManagerUiProperties properties) {
         return new PropertiesInitializer(properties);
