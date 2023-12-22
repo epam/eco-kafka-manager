@@ -1,2 +1,1 @@
-org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
 com.epam.eco.kafkamanager.udmetrics.autoconfigure.UDMetricManagerAutoConfiguration
