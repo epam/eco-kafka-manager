@@ -38,10 +38,9 @@ public class AuthenticationLogFilter extends GenericFilterBean {
 
     private final static Logger LOGGER = LoggerFactory.getLogger(AuthenticationLogFilter.class);
     private static final String JWT_IDENTITY_ATTRIBUTE = "email";
-    private static final String LOGGER_ENABLED = "true";
 
     @Value("${eco.kafkamanager.core.user-auth-logger:false}")
-    private String loggerEnabled;
+    private Boolean loggerEnabled;
 
     @Override
     public void doFilter(
@@ -50,7 +49,7 @@ public class AuthenticationLogFilter extends GenericFilterBean {
             FilterChain chain) throws IOException, ServletException {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
-        if( nonNull(authentication) && nonNull(loggerEnabled) && (LOGGER_ENABLED.equalsIgnoreCase(loggerEnabled))) {
+        if( nonNull(authentication) && nonNull(loggerEnabled) && loggerEnabled) {
 
             if(authentication instanceof JwtAuthenticationToken jwtAuthentication) {
                 LOGGER.info( "USER: {} have been logged in. Attributes: {}", jwtAuthentication.getTokenAttributes().get(JWT_IDENTITY_ATTRIBUTE), jwtAuthentication.getTokenAttributes());

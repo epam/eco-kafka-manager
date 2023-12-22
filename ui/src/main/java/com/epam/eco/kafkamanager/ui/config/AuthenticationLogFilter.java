@@ -39,7 +39,7 @@ public class AuthenticationLogFilter extends GenericFilterBean {
     private final static Logger LOGGER = LoggerFactory.getLogger(AuthenticationLogFilter.class);
 
     @Value("${eco.kafkamanager.core.user-auth-logger:false}")
-    private String loggerEnabled;
+    private Boolean loggerEnabled;
 
     @Override
     public void doFilter(
@@ -49,7 +49,7 @@ public class AuthenticationLogFilter extends GenericFilterBean {
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
-        if( nonNull(authentication) && nonNull(loggerEnabled) && ("true".equalsIgnoreCase(loggerEnabled))) {
+        if(nonNull(authentication) && nonNull(loggerEnabled) && loggerEnabled) {
             if(authentication.getPrincipal() instanceof OidcUser oidcUser) {
                 LOGGER.info("OIDC-USER: {} have been logged in. Attributes: {}", oidcUser.getName(), oidcUser.getAttributes() );
             } else {
