@@ -44,6 +44,7 @@ public class KafkaManagerUiConfiguration implements WebMvcConfigurer {
     @Override
     public void configurePathMatch(PathMatchConfigurer configurer) {
         configurer.setUseSuffixPatternMatch(Boolean.FALSE);
+        configurer.setUseTrailingSlashMatch(Boolean.TRUE);
     }
     @Bean
     public static KafkaManagerUiPropertiesValidator configurationPropertiesValidator() {
