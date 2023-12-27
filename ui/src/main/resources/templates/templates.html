@@ -336,31 +336,31 @@
         </div>
     </div>
 
-    <div th:fragment="copy-record-modal">
-        <div id="copy-record-modal-dialog"
+    <div th:fragment="republish-record-modal">
+        <div id="republish-record-modal-dialog"
              class="modal fade"
              role="dialog">
             <div class="modal-dialog tombstone-content-dialog">
                 <div class="modal-content" style="max-height:90vh">
                     <div class="modal-header">
-                        <h5 class="modal-title">REPUBLISH RECORD WITH KEY: </h5>&nbsp;<h5 class="d-inline modal-title text-primary" id="copy-record-key-display"></h5>
+                        <h5 class="modal-title">REPUBLISH RECORD WITH KEY: </h5>&nbsp;<h5 class="d-inline modal-title text-primary" id="republish-record-key-display"></h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal">&times;</button>
                     </div>
                     <div class="modal-body tombstone-content-dialog-body">
                         <h5>Headers:</h5>
-                        <textarea class="tombstone-text-area" id="copy-record-header-content"></textarea>
-                        <div class="col-12" id="copy-record-result"></div>
-                        <input type="hidden" id="copy-record-key"/>
-                        <input type="hidden" id="copy-record-id"/>
+                        <textarea class="tombstone-text-area" id="republish-record-header-content"></textarea>
+                        <div class="col-12" id="republish-record-result"></div>
+                        <input type="hidden" id="republish-record-key"/>
+                        <input type="hidden" id="republish-record-id"/>
                     </div>
                     <div class="modal-footer">
                         <a class="btn btn-success"
-                           id="copy-record-button">
-                            Copy <i th:class="${'fa fa-cogs'}"></i>
+                           id="republish-record-button">
+                            Republish <i th:class="${'fa fa-cogs'}"></i>
                         </a>
                         <button type="button"
                                 class="btn btn-primary"
-                                th:onclick="closeCopyRecordModal()">
+                                th:onclick="closeRepublishRecordModal()">
                             Exit
                         </button>
                     </div>

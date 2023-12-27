@@ -103,7 +103,7 @@
                            class="btn btn-primary">
                             Edit Metadata <i class="fa fa-tags"></i>
                         </a>
-                        <a th:href="@{/permissions/(resourceType=${T(org.apache.kafka.common.resource.ResourceType).TOPIC}, resourceName=${topic.name})}"
+                        <a th:href="@{/permissions(resourceType=${T(org.apache.kafka.common.resource.ResourceType).TOPIC}, resourceName=${topic.name})}"
                            class="btn btn-primary">
                             View Permissions <i class="fa fa-list"></i>
                         </a>

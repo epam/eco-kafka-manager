@@ -345,7 +345,7 @@
         }
 
         $('#tombstone-generate-button').click(()=>generateTombstone());
-        $('#copy-record-button').click(()=>copyRecord());
+        $('#republish-record-button').click(()=>republishRecord());
 
     })
 
@@ -440,11 +440,11 @@
                 "replacementType": "COPY_RECORD",
                 [[${_csrf.parameterName}]]: [[${_csrf.token}]]})
             .done(function(data) {
-                $("#copy-record-key-display").text(recordKey);
-                $("#copy-record-key").val(recordKey);
-                $("#copy-record-id").val(recordId);
-                $("#copy-record-header-content").val(data);
-                $('#copy-record-modal-dialog').modal("show");
+                $("#republish-record-key-display").text(recordKey);
+                $("#republish-record-key").val(recordKey);
+                $("#republish-record-id").val(recordId);
+                $("#republish-record-header-content").val(data);
+                $('#republish-record-modal-dialog').modal("show");
             })
             .fail(function(xhr) {
                 alert(xhr.responseText);
@@ -452,24 +452,24 @@
 
     }
 
-    function closeCopyRecordModal() {
-        const resultItem = $('#copy-record-result');
+    function closeRepublishRecordModal() {
+        const resultItem = $('#republish-record-result');
         resultItem.removeClass("text-danger");
         resultItem.text('');
-        $('#copy-record-modal-dialog').modal("hide");
+        $('#republish-record-modal-dialog').modal("hide");
     }
 
-    function copyRecord() {
-        const recordKey = $('#copy-record-key').val();
-        const recordId = $('#copy-record-id').val();
-        const resultItem = $('#copy-record-result');
+    function republishRecord() {
+        const recordKey = $('#republish-record-key').val();
+        const recordId = $('#republish-record-id').val();
+        const resultItem = $('#republish-record-result');
         if(!recordId) {
             resultItem.addClass("text-danger");
             resultItem.text("Record id doesn't defined!");
             return;
         }
-        const headers = $('#copy-record-header-content').val();
-        closeCopyRecordModal();
+        const headers = $('#republish-record-header-content').val();
+        closeRepublishRecordModal();
         showWaitingSign("Wait...");
         $.post("/kafka-manager/topics/"+topicName+"/browser/copyRecord",
             {"recordKey": recordKey,
@@ -481,7 +481,7 @@
                 [[${_csrf.parameterName}]]: [[${_csrf.token}]]})
             .done(function(data) {
                 hideWaitingSign();
-                showInfo('info','Copy record',data);
+                showInfo('info','Republish record',data);
 
             })
             .fail(function(xhr) {
@@ -501,7 +501,7 @@
 <div th:replace="~{templates :: faq-modal}"></div>
 <div th:replace="~{templates :: confirm-modal}"></div>
 <div th:replace="~{templates :: tombstone-modal}"></div>
-<div th:replace="~{templates :: copy-record-modal}"></div>  
+<div th:replace="~{templates :: republish-record-modal}"></div>
 
 <div class="main-content">
 
@@ -926,7 +926,7 @@
                                                th:data-record-key="${record.key}"
                                                th:onclick="openCopyRecordModal(this.getAttribute('data-record-id'),this.getAttribute('data-record-key'))"
                                                style="padding-left: 0.3em" >
-                                                <i class="fa fa-copy info" th:title="${'Copy record for key='+record.key}"></i>
+                                                <i class="fa fa-copy info" th:title="${'Republish record for key='+record.key}"></i>
                                             </a>
                                         </div>
                                     </div>
