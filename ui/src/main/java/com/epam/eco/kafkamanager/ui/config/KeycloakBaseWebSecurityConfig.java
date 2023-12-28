@@ -17,6 +17,7 @@ package com.epam.eco.kafkamanager.ui.config;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.security.oauth2.client.OAuth2ClientProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
@@ -35,6 +36,7 @@ import org.springframework.security.web.authentication.AnonymousAuthenticationFi
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 
 
@@ -52,6 +54,9 @@ public class KeycloakBaseWebSecurityConfig extends BaseWebSecurityConfig {
 
     @Value("${spring.security.oauth2.client.provider.keycloak.logout-url}")
     private String logoutUrl;
+
+    @Autowired
+    private OAuth2ClientProperties oAuth2ClientProperties;
 
     @Autowired
     private AuthenticationLogFilter authenticationLogFilter;
@@ -82,10 +87,10 @@ public class KeycloakBaseWebSecurityConfig extends BaseWebSecurityConfig {
                         nonNull(oidcUserAuthority.getUserInfo().getClaims()) &&
                         oidcUserAuthority.getUserInfo().getClaims().containsKey(RESOURCE_ACCESS_CLAIM)) {
                     Map<String, Object> resourceAccess = (Map<String, Object>) oidcUserAuthority.getUserInfo().getClaims().get(RESOURCE_ACCESS_CLAIM);
-                    addExtractedRoles(resourceAccess, oidcUserAuthority, mappedAuthorities);
+                    addExtractedRoles(resourceAccess, mappedAuthorities);
                 } else if (oidcUserAuthority.getAttributes().containsKey(RESOURCE_ACCESS_CLAIM)) {
                     Map<String, Object> resourceAccess = (Map<String, Object>) oidcUserAuthority.getAttributes().get(RESOURCE_ACCESS_CLAIM);
-                    addExtractedRoles(resourceAccess, oidcUserAuthority, mappedAuthorities);
+                    addExtractedRoles(resourceAccess, mappedAuthorities);
                 }
             } else {
                 var oauth2UserAuthority = (OAuth2UserAuthority) authority;
@@ -101,15 +106,23 @@ public class KeycloakBaseWebSecurityConfig extends BaseWebSecurityConfig {
     }
 
     private void addExtractedRoles(Map<String, Object> resourceAccess,
-                                   OidcUserAuthority oidcUserAuthority,
                                    Set<GrantedAuthority> mappedAuthorities) {
-        Collection<String> roles = resourceAccess.values().stream()
-                .filter(x->(x instanceof Map))
-                .flatMap(x -> ((Map<?,?>) x).entrySet().stream())
-                .filter(x -> (x.getKey() instanceof String) && x.getKey().equals(ROLES_CLAIM))
-                .filter(x -> x.getValue() instanceof Collection<?>)
-                .flatMap(x -> ((Collection<String>)x.getValue()).stream())
-                .collect(Collectors.toList());
+
+        Optional<String> clientId = oAuth2ClientProperties.getRegistration().values().stream()
+                .map(OAuth2ClientProperties.Registration::getClientId)
+                .findFirst();
+        if(clientId.isEmpty()) {
+            return;
+        }
+
+        Map<String,Object> clientResources = (Map<String,Object>)resourceAccess.get(clientId.get());
+        if(isNull(clientResources) || clientResources.isEmpty() || !clientResources.containsKey(ROLES_CLAIM)) {
+            return;
+        }
+        Collection<String> roles = (Collection<String>)clientResources.get(ROLES_CLAIM);
+        if(isNull(roles) || roles.isEmpty()) {
+            return;
+        }
         mappedAuthorities.addAll(generateAuthoritiesFromClaim(roles));
     }
 
