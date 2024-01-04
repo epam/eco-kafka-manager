@@ -471,7 +471,7 @@
         const headers = $('#republish-record-header-content').val();
         closeRepublishRecordModal();
         showWaitingSign("Wait...");
-        $.post("/kafka-manager/topics/"+topicName+"/browser/copyRecord",
+        $.post("/kafka-manager/topics/"+topicName+"/browser/republishRecord",
             {"recordKey": recordKey,
                 "recordId": recordId,
                 "keyFormat": [[${browseParams.getKeyFormat()}]],

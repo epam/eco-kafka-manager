@@ -50,7 +50,7 @@ public class KafkaKmProducer<K,V> {
         Validate.notNull(topicName,"Topic is null!");
         Validate.notNull(key,"Key is null!");
 
-        var record = new ProducerRecord<K,V>(topicName, key, message);
+        var record = new ProducerRecord<>(topicName, key, message);
 
         if(MapUtils.isNotEmpty(headers)) {
             headers.keySet().forEach(headerKey -> record.headers().add(headerKey, headers.get(headerKey).getBytes(
@@ -61,5 +61,8 @@ public class KafkaKmProducer<K,V> {
 
         return String.format(RESULT_STRING_FORMAT, topicName, key);
 
+    }
+    public KafkaTemplate<K,V> getKafkaTemplate() {
+        return kafkaTemplate;
     }
 }

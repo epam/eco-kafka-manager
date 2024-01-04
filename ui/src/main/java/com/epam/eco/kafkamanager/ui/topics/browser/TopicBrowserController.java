@@ -15,12 +15,29 @@
  *******************************************************************************/
 package com.epam.eco.kafkamanager.ui.topics.browser;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 import java.util.function.BiConsumer;
 
 import java.util.stream.Collectors;
 
-import com.epam.eco.kafkamanager.*;
+import com.epam.eco.kafkamanager.Authorizer;
+import com.epam.eco.kafkamanager.EntityType;
+import com.epam.eco.kafkamanager.FilterClause;
+import com.epam.eco.kafkamanager.KafkaAdminOperations;
+import com.epam.eco.kafkamanager.KafkaKmProducer;
+import com.epam.eco.kafkamanager.KafkaManager;
+import com.epam.eco.kafkamanager.KafkaSchemaIdAwareUtils;
+import com.epam.eco.kafkamanager.PartitionByKeyResolver;
+import com.epam.eco.kafkamanager.TopicRecordFetchParams;
+import com.epam.eco.kafkamanager.ui.config.producer.KafkaKmUiProducer;
+import com.epam.eco.kafkamanager.ui.config.producer.KafkaProducerResolver;
 import com.epam.eco.kafkamanager.ui.topics.browser.fetcher.BrowserCachedFetcher;
 import jakarta.servlet.http.HttpServletRequest;
 import org.apache.commons.collections4.CollectionUtils;
@@ -98,10 +115,7 @@ public class TopicBrowserController {
     private KafkaManager kafkaManager;
 
     @Autowired
-    private KafkaKmProducer kafkaKmStringProducer;
-
-    @Autowired
-    private KafkaKmProducer kafkaKmAvroProducer;
+    private KafkaProducerResolver kafkaProducerResolver;
 
     @Autowired
     private KafkaAdminOperations kafkaAdminOperations;
@@ -160,6 +174,7 @@ public class TopicBrowserController {
 
         Object key = requestParams.get(ATTR_RECORD_KEY);
         DataFormat keyFormat = DataFormat.valueOf(requestParams.get(ATTR_KEY_FORMAT));
+        DataFormat valueFormat = DataFormat.valueOf(requestParams.get(ATTR_VALUE_FORMAT));
         String headers = requestParams.get(ATTR_HEADERS);
 
         List<HeaderReplacement> replacements = properties.getTopicBrowser().getTombstoneGeneratorReplacements();
@@ -173,15 +188,15 @@ public class TopicBrowserController {
             } else {
                 headerMap = Collections.emptyMap();
             }
-            return ResponseEntity.ok(getAppropriateProducer(keyFormat).send(topicName, key, null, headerMap));
+            return ResponseEntity.ok(getAppropriateProducer(keyFormat, valueFormat).send(topicName, key, null, headerMap));
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
 
     @PreAuthorize("@authorizer.isPermitted('TOPIC', #topicName, 'WRITE')")
-    @RequestMapping(value=MAPPING + "/copyRecord", method=RequestMethod.POST)
-    public @ResponseBody ResponseEntity<String> copyRecord(
+    @RequestMapping(value=MAPPING + "/republishRecord", method=RequestMethod.POST)
+    public @ResponseBody ResponseEntity<String> republishRecord(
             @PathVariable("name") String topicName,
             @RequestParam Map<String, String> requestParams,
             HttpServletRequest httpRequest) {
@@ -207,7 +222,7 @@ public class TopicBrowserController {
             Optional<ConsumerRecord<Object,Object>> consumerRecord =
                     browserCachedFetcher.getConsumerRecord(sessionId,topicName,keyFormat,valueFormat,recordId);
             if(consumerRecord.isPresent()) {
-                String result = getAppropriateProducer(valueFormat)
+                String result = getAppropriateProducer(keyFormat, valueFormat)
                                           .send(topicName, key,
                                                 KafkaSchemaIdAwareUtils.extractGenericRecordOrValue(consumerRecord.get()),
                                                 headerMap);
@@ -247,8 +262,9 @@ public class TopicBrowserController {
                 properties.getTopicBrowser().getCopyRecordHeaderReplacements();
     }
 
-    private KafkaKmProducer getAppropriateProducer(DataFormat keyFormat) {
-        return keyFormat == DataFormat.AVRO ? kafkaKmAvroProducer : kafkaKmStringProducer;
+    @SuppressWarnings("unchecked")
+    private <K, V> KafkaKmProducer<K, V> getAppropriateProducer(DataFormat keyFormat, DataFormat valueFormat) {
+        return (KafkaKmProducer<K, V>) kafkaProducerResolver.resolve(new KafkaKmUiProducer.KafkaProducerType(keyFormat,valueFormat));
     }
 
     private void handleParamsRequest(
