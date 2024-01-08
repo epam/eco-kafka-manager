@@ -417,7 +417,8 @@
         const headers = $('#tombstone-header-content').val();
         $.post("/kafka-manager/topics/"+topicName+"/browser/tombstone",
             {"recordKey": recordKey,
-              "keyFormat": [[${browseParams.getKeyFormat()}]],
+             "keyFormat": [[${browseParams.getKeyFormat()}]],
+             "valueFormat": [[${browseParams.getValueFormat()}]],
              "headers": headers,
              "method_": "POST",
              [[${_csrf.parameterName}]]: [[${_csrf.token}]]})
