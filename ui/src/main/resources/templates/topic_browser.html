@@ -428,12 +428,12 @@
 
              })
              .fail(function(xhr) {
-                     resultItem.addClass("text-danger");
-                     resultItem.text(xhr.responseText);
+                 resultItem.addClass("text-danger");
+                 resultItem.text(xhr.responseText);
              })
     }
 
-    function openCopyRecordModal(recordId, recordKey) {
+    function openRepublishRecordModal(recordId, recordKey) {
         const headers = $('#headers-for_'+recordId).val();
         $.post("/kafka-manager/topics/"+topicName+"/browser/headers",
             {"headers": headers,
@@ -486,8 +486,8 @@
 
             })
             .fail(function(xhr) {
-                resultItem.addClass("text-danger");
-                resultItem.text(xhr.responseText);
+                hideWaitingSign();
+                showInfo('error','Republish record',xhr.responseText);
             })
     }
 
@@ -925,7 +925,7 @@
                                                type="button"
                                                th:data-record-id="${recordId}"
                                                th:data-record-key="${record.key}"
-                                               th:onclick="openCopyRecordModal(this.getAttribute('data-record-id'),this.getAttribute('data-record-key'))"
+                                               th:onclick="openRepublishRecordModal(this.getAttribute('data-record-id'),this.getAttribute('data-record-key'))"
                                                style="padding-left: 0.3em" >
                                                 <i class="fa fa-copy info" th:title="${'Republish record for key='+record.key}"></i>
                                             </a>
