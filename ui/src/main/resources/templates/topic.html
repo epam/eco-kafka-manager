@@ -76,6 +76,7 @@
 <div th:replace="~{templates :: loading-modal}"></div>
 
 <div th:replace="~{templates :: info-modal}"></div>
+<div th:replace="~{templates :: data-modal}"></div>
 
 <div class="main-content">
 
@@ -115,6 +116,15 @@
                         <a th:href="@{/topics/{name}/browser(name=${topic.name})}"
                            class="btn btn-success ms-3">
                             Browse Data <i class="fa fa-search"></i>
+                        </a>
+
+                        <a class="btn btn-sm info"
+                           type="button"
+                           th:data-param-header="'Injection test'"
+                           th:data-param-text="${testText}"
+                           th:onclick="showData(this.getAttribute('data-param-header'),
+                                                this.getAttribute('data-param-text') )">
+                            <i class="fa fa-bolt info"></i>
                         </a>
 
                         <button

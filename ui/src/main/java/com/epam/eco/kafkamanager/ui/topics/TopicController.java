@@ -184,6 +184,8 @@ public class TopicController {
         model.addAttribute(ATTR_SCHEMA_CATALOG_URL_TEMPLATE, properties.getSchemaCatalogTool() );
         model.addAttribute(ATTR_EXTERNAL_TOOL_TEMPLATES, properties.getExternalTools());
 
+        model.addAttribute("testText","Test text with javascript <script>alert(\"This is devastating injection issue!\")</script>");
+
         return TOPIC_VIEW;
     }
 

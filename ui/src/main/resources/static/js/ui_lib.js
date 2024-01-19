@@ -160,6 +160,7 @@ function showData(dialogHeader,dialogText) {
     textContentElement.innerHTML='';
 
     if(isHTML(dialogText)) {
+        //dialogText = checkInjectionSecure(dialogText);
         const newDivElement = document.createElement("div");
         newDivElement.innerHTML = stripLinkQuotes(dialogText);
         textContentElement.append(newDivElement);
@@ -175,6 +176,14 @@ function showData(dialogHeader,dialogText) {
     };
 
     dataModal.show();
+}
+
+function checkInjectionSecure(text) {
+    const patternBegin = /<script(.)*>/gmix;
+    const patternEnd = /<script([^\S\t\n\r])*\/>/gmix;
+    return text
+        .replaceAll(patternBegin,"&lt;script&gt;")
+        .replaceAll(patternEnd,"&lt;script\\&gt;");
 }
 
 function stripLinkQuotes(text) {
