@@ -1032,7 +1032,7 @@
                                        type="button"
                                        th:if="${record.isTruncated(column)}"
                                        th:data-param-header="${column.name}"
-                                       th:data-param-text="${record.getContentPrettyJson(column)}"
+                                       th:data-param-text="${record.getCellContent(column)}"
                                        th:onclick="showData(this.getAttribute('data-param-header'),
                                                             this.getAttribute('data-param-text') )">
                                         <i class="fa fa-eye info"></i>

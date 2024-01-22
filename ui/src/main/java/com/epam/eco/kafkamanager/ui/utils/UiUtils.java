@@ -15,6 +15,8 @@ package com.epam.eco.kafkamanager.ui.utils;
  *  the License.
  *******************************************************************************/
 
+import java.util.regex.Pattern;
+
 import static java.util.Objects.nonNull;
 
 /**
@@ -22,9 +24,22 @@ import static java.util.Objects.nonNull;
  */
 public class UiUtils {
     private static final int TRUNCATE_FIELD_LENGTH = 127;
+    private static final String DUMMY_REPLACEMENT = "";
+
+    private static final Pattern PATTERN_INLINE_SCRIPT = Pattern.compile("<script(.)*>(.)*</script([^\\S\t\n\r])*>", Pattern.CASE_INSENSITIVE);
+    private static final Pattern PATTERN_REMOTE_SCRIPT_SHORT = Pattern.compile("<script(.)*/>", Pattern.CASE_INSENSITIVE);
+    private static final Pattern PATTERN_REMOTE_SCRIPT_FULL = Pattern.compile("<script(.)*</script([^\\S\t\n\r])*>", Pattern.CASE_INSENSITIVE);
+
     public static String getTruncatedDescription(String description) {
         return nonNull(description) ?
                 description.substring(0,Math.min(TRUNCATE_FIELD_LENGTH,description.length())) :
                 null;
+    }
+
+    public static String removeJsScripts(String text) {
+        String result = PATTERN_INLINE_SCRIPT.matcher(text).replaceAll(DUMMY_REPLACEMENT);
+        result = PATTERN_REMOTE_SCRIPT_SHORT.matcher(result).replaceAll(DUMMY_REPLACEMENT);
+        result = PATTERN_REMOTE_SCRIPT_FULL.matcher(result).replaceAll(DUMMY_REPLACEMENT);
+        return result;
     }
 }

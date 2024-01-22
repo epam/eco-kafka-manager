@@ -16,6 +16,7 @@
 package com.epam.eco.kafkamanager.ui.topics.browser;
 
 import com.epam.eco.kafkamanager.ui.topics.browser.TabularRecords.Record;
+import com.epam.eco.kafkamanager.ui.utils.UiUtils;
 import com.epam.eco.kafkamanager.utils.MapperUtils;
 import com.epam.eco.kafkamanager.utils.PrettyHtmlMapper;
 import org.apache.commons.io.FileUtils;
@@ -296,7 +297,7 @@ public class TabularRecords implements Iterable<Record> {
             if(isNull(tabularValue) || isNull(tabularValue.get(columnName))) {
                 return null;
             }
-            String truncatedValue = tabularValue.get(columnName).toString();
+            String truncatedValue = UiUtils.removeJsScripts(tabularValue.get(columnName).toString());
             if(truncatedValue.length()>TRUNCATE_SIZE) {
                 truncatedValue = truncatedValue.substring(0,TRUNCATE_SIZE);
             }
@@ -408,6 +409,10 @@ public class TabularRecords implements Iterable<Record> {
            } catch (JsonProcessingException e) {
                 return content.toString();
             }
+        }
+
+        public String getCellContent(Column column) {
+            return UiUtils.removeJsScripts(getContentPrettyJson(column));
         }
 
         @Override // is not consistent with equals

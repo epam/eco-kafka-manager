@@ -160,7 +160,7 @@ function showData(dialogHeader,dialogText) {
     textContentElement.innerHTML='';
 
     if(isHTML(dialogText)) {
-        dialogText = checkInjectionSecure(dialogText);
+        dialogText = removeInjections(dialogText);
         const newDivElement = document.createElement("div");
         newDivElement.innerHTML = stripLinkQuotes(dialogText);
         textContentElement.append(newDivElement);
@@ -178,7 +178,7 @@ function showData(dialogHeader,dialogText) {
     dataModal.show();
 }
 
-function checkInjectionSecure(text) {
+function removeInjections(text) {
     const patternInlineScript = new RegExp('<script(.)*>(.)*<\/script([^\S\t\n\r])*>','gmi');
     const patternRemoteScriptShort = new RegExp('<script(.)*\/>','gmi');
     const patternRemoteScriptFull = new RegExp('<script(.)*<\/script([^\S\t\n\r])*>','gmi');
