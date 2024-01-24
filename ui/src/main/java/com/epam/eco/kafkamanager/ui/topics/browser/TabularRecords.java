@@ -297,7 +297,7 @@ public class TabularRecords implements Iterable<Record> {
             if(isNull(tabularValue) || isNull(tabularValue.get(columnName))) {
                 return null;
             }
-            String truncatedValue = UiUtils.removeJsScripts(tabularValue.get(columnName).toString());
+            String truncatedValue = tabularValue.get(columnName).toString();
             if(truncatedValue.length()>TRUNCATE_SIZE) {
                 truncatedValue = truncatedValue.substring(0,TRUNCATE_SIZE);
             }
@@ -412,7 +412,7 @@ public class TabularRecords implements Iterable<Record> {
         }
 
         public String getCellContent(Column column) {
-            return UiUtils.removeJsScripts(getContentPrettyJson(column));
+            return getContentPrettyJson(column);
         }
 
         @Override // is not consistent with equals
