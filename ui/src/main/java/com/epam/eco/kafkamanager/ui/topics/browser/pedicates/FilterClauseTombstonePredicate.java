@@ -1,5 +1,5 @@
 /*******************************************************************************
- *  Copyright 2023 EPAM Systems
+ *  Copyright 2024 EPAM Systems
  *
  *  Licensed under the Apache License, Version 2.0 (the "License"); you may not
  *  use this file except in compliance with the License.  You may obtain a copy
@@ -13,53 +13,49 @@
  *  License for the specific language governing permissions and limitations under
  *  the License.
  *******************************************************************************/
-package com.epam.eco.kafkamanager.ui.topics.browser;
+package com.epam.eco.kafkamanager.ui.topics.browser.pedicates;
 
 import java.util.List;
-import java.util.Map;
+import java.util.function.Predicate;
 
 import org.apache.kafka.clients.consumer.ConsumerRecord;
-import com.epam.eco.kafkamanager.FilterClause;
-import com.epam.eco.kafkamanager.ui.topics.browser.handlers.FilterOperationStringHandler;
-import com.epam.eco.kafkamanager.ui.topics.browser.handlers.FilterOperationUtils;
 
-import static java.util.Objects.isNull;
-import static java.util.Objects.nonNull;
+import com.epam.eco.kafkamanager.FilterClause;
+import com.epam.eco.kafkamanager.ui.topics.browser.handlers.FilterOperationUtils;
 
 /**
  * @author Mikhail_Vershkov
  */
 
-public class FilterClauseStringPredicate extends FilterClauseAbstractPredicate<String,Object> {
+public class FilterClauseTombstonePredicate<K, V> implements Predicate<ConsumerRecord<K, V>> {
 
-    public FilterClauseStringPredicate(Map<String, List<FilterClause>> clauses) {
-        super(clauses);
+    protected final boolean areClausesEmpty;
+    protected final List<FilterClause> clauses;
+
+    public FilterClauseTombstonePredicate(List<FilterClause> clauses) {
+        areClausesEmpty = clauses.isEmpty();
+        this.clauses = clauses;
     }
 
     @Override
-    protected boolean processValueClauses(ConsumerRecord<String,Object> record) {
-
-        if (otherClauses.isEmpty()) {
+    public boolean test(ConsumerRecord<K, V> record) {
+        if(areClausesEmpty) {
             return true;
         }
-
-        if(isNull(record.value())) {
+        if(!clauses.isEmpty() && !processTombstoneClauses(record)) {
             return false;
         }
+        return true;
+    }
 
-        String value = FilterOperationUtils.stringifyValue(record);
-
-        for (FilterClause filterClause : otherClauses) {
-            if (!executeOperation(filterClause, value)) {
+    private boolean processTombstoneClauses(ConsumerRecord<K, V> record) {
+        for(FilterClause clause : clauses) {
+            if(!FilterOperationUtils.executeAvroJsonOperation(clause, record.value())) {
                 return false;
             }
         }
         return true;
     }
 
-    @Override
-    protected boolean executeOperation(FilterClause filterClause, Object value) {
-        return new FilterOperationStringHandler(filterClause).compare((String)value);
-    }
 
 }

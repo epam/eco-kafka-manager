@@ -60,7 +60,6 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import com.epam.eco.commons.kafka.OffsetRange;
-import com.epam.eco.commons.kafka.helpers.FilterClausePredicate;
 import com.epam.eco.commons.kafka.helpers.PartitionRecordFetchResult;
 import com.epam.eco.commons.kafka.helpers.RecordFetchResult;
 import com.epam.eco.kafkamanager.TopicRecordFetchParams.DataFormat;
@@ -72,7 +71,8 @@ import com.epam.eco.kafkamanager.ui.topics.TopicController;
 import com.epam.eco.kafkamanager.ui.topics.browser.handlers.FilterOperationEnum;
 import com.epam.eco.kafkamanager.utils.PrettyHtmlMapper;
 
-import static com.epam.eco.kafkamanager.ui.topics.browser.FilterClauseAbstractPredicate.*;
+import static com.epam.eco.kafkamanager.ui.topics.browser.FilterClauseCompositePredicate.TOMBSTONE_ATTRIBUTE;
+import static com.epam.eco.kafkamanager.ui.topics.browser.pedicates.FilterClauseAbstractKeyPredicate.*;
 import static java.util.Objects.nonNull;
 
 /**
@@ -340,7 +340,7 @@ public class TopicBrowserController {
                 browseParams.getTimestamp(),
                 properties.getTopicBrowser().getUseCache(),
                 properties.getTopicBrowser().getCacheExpirationPeriodMin(),
-                resolveFilterPredicate(browseParams)
+                new FilterClauseCompositePredicate<>(browseParams)
         );
     }
 
@@ -372,18 +372,6 @@ public class TopicBrowserController {
                 .orElse(null);
         return nonNull(filterClause) ?
                    partitionByKeyResolver.getPartitionByKey(filterClause.getValue(),browseParams.getPartitionOffsets().size()) : 0;
-    }
-
-    private FilterClausePredicate resolveFilterPredicate(TopicBrowseParams browseParams) {
-        if(browseParams.isAvroValueFormat()) {
-            return new FilterClauseAvroPredicate(browseParams.getFilterClausesAsMap());
-        } else if(browseParams.isStringValueFormat()) {
-            return new FilterClauseStringPredicate(browseParams.getFilterClausesAsMap());
-        } else if(browseParams.isJsonValueFormat()) {
-            return new FilterClauseJsonPredicate(browseParams.getFilterClausesAsMap());
-        } else {
-            return new FilterClauseNoopPredicate();
-        }
     }
 
     private Map<Integer, OffsetRange> fetchOffsetRanges(String topicName) {

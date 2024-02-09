@@ -51,6 +51,9 @@ public final class FilterOperationUtils {
         if(isNull(value)) {
             return new FilterOperationTombstoneHandler(filterClause).compare(value);
         }
+        if(isNull(filterClause.getValue())) {
+            return false;
+        }
         if(filterClause.getValue().contains(KEY_VALUE_SEPARATOR)) {
             if(value instanceof Map) {
                 Map<Object,Object> map = (Map<Object,Object>)value;

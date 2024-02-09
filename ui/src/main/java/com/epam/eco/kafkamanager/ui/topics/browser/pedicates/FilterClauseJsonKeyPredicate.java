@@ -13,45 +13,21 @@
  *  License for the specific language governing permissions and limitations under
  *  the License.
  *******************************************************************************/
-package com.epam.eco.kafkamanager.ui.topics.browser;
+package com.epam.eco.kafkamanager.ui.topics.browser.pedicates;
 
 import java.util.List;
-import java.util.Map;
-
-import org.apache.kafka.clients.consumer.ConsumerRecord;
 
 import com.epam.eco.kafkamanager.FilterClause;
 import com.epam.eco.kafkamanager.ui.topics.browser.handlers.FilterOperationUtils;
-
-import static com.epam.eco.kafkamanager.ui.topics.browser.handlers.FilterOperationUtils.executeAvroJsonOperation;
-import static java.util.Objects.isNull;
-import static java.util.Objects.nonNull;
 
 /**
  * @author Mikhail_Vershkov
  */
 
-public class FilterClauseJsonPredicate extends FilterClauseAbstractPredicate<String,Object> {
+public class FilterClauseJsonKeyPredicate extends FilterClauseAbstractKeyPredicate<String,Object> {
 
-    public FilterClauseJsonPredicate(Map<String, List<FilterClause>> clauses) {
+    public FilterClauseJsonKeyPredicate(List<FilterClause> clauses) {
         super(clauses);
-    }
-
-    @Override
-    protected boolean processValueClauses(ConsumerRecord<String, Object> record) {
-        if (otherClauses.isEmpty()) {
-            return true;
-        }
-        if (isNull(record.value())) {
-            return false;
-        }
-        String json = FilterOperationUtils.stringifyValue(record);
-        for (FilterClause filterClause : otherClauses) {
-            if (!executeAvroJsonOperation(filterClause, json)) {
-                return false;
-            }
-        }
-        return true;
     }
 
     @Override

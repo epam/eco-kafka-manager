@@ -1,5 +1,5 @@
 /*******************************************************************************
- *  Copyright 2023 EPAM Systems
+ *  Copyright 2024 EPAM Systems
  *
  *  Licensed under the Apache License, Version 2.0 (the "License"); you may not
  *  use this file except in compliance with the License.  You may obtain a copy
@@ -13,10 +13,9 @@
  *  License for the specific language governing permissions and limitations under
  *  the License.
  *******************************************************************************/
-package com.epam.eco.kafkamanager.ui.topics.browser;
+package com.epam.eco.kafkamanager.ui.topics.browser.pedicates;
 
 import java.util.List;
-import java.util.Map;
 
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 
@@ -24,31 +23,29 @@ import com.epam.eco.kafkamanager.FilterClause;
 import com.epam.eco.kafkamanager.ui.topics.browser.handlers.FilterOperationUtils;
 
 import static com.epam.eco.kafkamanager.ui.topics.browser.handlers.FilterOperationUtils.executeAvroJsonOperation;
+import static java.util.Objects.isNull;
 
 /**
  * @author Mikhail_Vershkov
  */
 
-public class FilterClauseAvroPredicate extends FilterClauseAbstractPredicate<String, Object> {
+public class FilterClauseJsonValuePredicate extends FilterClauseAbstractValuePredicate<String,Object> {
 
-
-    public FilterClauseAvroPredicate(Map<String, List<FilterClause>> clauses) {
+    public FilterClauseJsonValuePredicate(List<FilterClause> clauses) {
         super(clauses);
     }
 
     @Override
-    protected boolean processValueClauses(ConsumerRecord<String,Object> record) {
-        if (otherClauses.isEmpty()) {
+    protected boolean processValueClauses(ConsumerRecord<String, Object> record) {
+        if (clauses.isEmpty()) {
             return true;
         }
-        Map<String, Object> mapOfValues = AvroRecordValuesExtractor.getValuesAsMap(record);
-        for (FilterClause filterClause : otherClauses) {
-            if (mapOfValues != null && mapOfValues.containsKey(filterClause.getColumn())) {
-                Object value = mapOfValues.get(filterClause.getColumn());
-                if (!executeAvroJsonOperation(filterClause, value)) {
-                    return false;
-                }
-            } else {
+        if (isNull(record.value())) {
+            return false;
+        }
+        String json = FilterOperationUtils.stringifyValue(record);
+        for (FilterClause filterClause : clauses) {
+            if (!executeAvroJsonOperation(filterClause, json)) {
                 return false;
             }
         }
@@ -57,6 +54,6 @@ public class FilterClauseAvroPredicate extends FilterClauseAbstractPredicate<Str
 
     @Override
     boolean executeOperation(FilterClause clause, Object value) {
-        return FilterOperationUtils.executeAvroJsonOperation(clause,value);
+        return FilterOperationUtils.executeAvroJsonOperation(clause, value);
     }
 }

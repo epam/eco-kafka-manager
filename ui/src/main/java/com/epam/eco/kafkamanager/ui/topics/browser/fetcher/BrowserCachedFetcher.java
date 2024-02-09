@@ -22,7 +22,7 @@ import com.epam.eco.kafkamanager.KafkaManager;
 import com.epam.eco.kafkamanager.TopicRecordFetchParams;
 import com.epam.eco.kafkamanager.exec.TaskResult;
 import com.epam.eco.kafkamanager.ui.config.KafkaManagerUiProperties;
-import com.epam.eco.kafkamanager.ui.topics.browser.FilterClauseNoopPredicate;
+import com.epam.eco.kafkamanager.ui.topics.browser.FilterClauseCompositeNoopPredicate;
 import org.apache.commons.lang3.Validate;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.common.header.Header;
@@ -122,7 +122,7 @@ public class BrowserCachedFetcher {
         return new TopicRecordFetchParams( keyFormat, valueFormat,
                 Map.of(partition, new OffsetRange(offset>0?offset-1:offset,true, offset>0?offset-1:offset,true)),
                 1, DEFAULT_FETCH_TIMEOUT_IN_MILS, FetchMode.FETCH_FORWARD, 0L, false, 0L,
-                new FilterClauseNoopPredicate()
+                new FilterClauseCompositeNoopPredicate()
         );
     }
 

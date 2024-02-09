@@ -32,10 +32,15 @@ import org.apache.kafka.common.record.TimestampType;
 import org.jetbrains.annotations.NotNull;
 
 import com.epam.eco.kafkamanager.FilterClause;
-import com.epam.eco.kafkamanager.ui.topics.browser.FilterClauseAvroPredicate;
-import com.epam.eco.kafkamanager.ui.topics.browser.FilterClauseJsonPredicate;
-import com.epam.eco.kafkamanager.ui.topics.browser.FilterClauseStringPredicate;
+import com.epam.eco.kafkamanager.ui.topics.browser.pedicates.FilterClauseAvroKeyPredicate;
+import com.epam.eco.kafkamanager.ui.topics.browser.pedicates.FilterClauseAvroValuePredicate;
+import com.epam.eco.kafkamanager.ui.topics.browser.pedicates.FilterClauseHeaderPredicate;
+import com.epam.eco.kafkamanager.ui.topics.browser.pedicates.FilterClauseJsonKeyPredicate;
+import com.epam.eco.kafkamanager.ui.topics.browser.pedicates.FilterClauseJsonValuePredicate;
+import com.epam.eco.kafkamanager.ui.topics.browser.pedicates.FilterClauseStringKeyPredicate;
 import com.epam.eco.kafkamanager.ui.topics.browser.handlers.FilterOperationEnum;
+import com.epam.eco.kafkamanager.ui.topics.browser.pedicates.FilterClauseStringValuePredicate;
+import com.epam.eco.kafkamanager.ui.topics.browser.pedicates.FilterClauseTombstonePredicate;
 
 import static java.time.LocalTime.now;
 
@@ -76,14 +81,23 @@ public class FilterPredicateUtils {
                                                           .endRecord();
 
     @NotNull
-    public static FilterClauseStringPredicate getFilterClauseStringPredicate(String clauseFieldName,
+    public static FilterClauseStringKeyPredicate getFilterClauseStringKeyPredicate(String clauseFieldName,
+                                                                                  FilterOperationEnum operationEnum,
+                                                                                  String clauseValue) {
+        List<FilterClause> clauses = List.of(new FilterClause(clauseFieldName,
+                                                              operationEnum.getOperation(),
+                                                              clauseValue));
+        return new FilterClauseStringKeyPredicate(clauses);
+    }
+
+    @NotNull
+    public static FilterClauseStringValuePredicate getFilterClauseStringValuePredicate(String clauseFieldName,
                                                                                        FilterOperationEnum operationEnum,
                                                                                        String clauseValue) {
-        Map<String, List<FilterClause>> clauses = Map.of(clauseFieldName,
-                                                         List.of(new FilterClause(clauseFieldName,
-                                                                                  operationEnum.getOperation(),
-                                                                                  clauseValue)));
-        return new FilterClauseStringPredicate(clauses);
+        List<FilterClause> clauses = List.of(new FilterClause(clauseFieldName,
+                                                              operationEnum.getOperation(),
+                                                              clauseValue));
+        return new FilterClauseStringValuePredicate(clauses);
     }
 
     public static String generateString(String fieldValue) {
@@ -91,15 +105,41 @@ public class FilterPredicateUtils {
     }
 
     @NotNull
-    public static FilterClauseAvroPredicate getFilterClauseAvroPredicate(String clauseFieldName,
+    public static FilterClauseHeaderPredicate getFilterClauseHeaderPredicate(String clauseFieldName,
+                                                                             FilterOperationEnum operationEnum,
+                                                                             String clauseValue) {
+        List<FilterClause> clauses = List.of(new FilterClause(clauseFieldName,
+                                                              operationEnum.getOperation(),
+                                                              clauseValue));
+        return new FilterClauseHeaderPredicate(clauses);
+    }
+
+    @NotNull
+    public static FilterClauseTombstonePredicate getFilterClauseTombstonePredicate(String clauseFieldName,
+                                                                                          FilterOperationEnum operationEnum,
+                                                                                          String clauseValue) {
+        List<FilterClause> clauses = List.of(new FilterClause(clauseFieldName,
+                                                              operationEnum.getOperation(),
+                                                              clauseValue));
+        return new FilterClauseTombstonePredicate(clauses);
+    }
+
+
+    @NotNull
+    public static FilterClauseAvroKeyPredicate getFilterClauseAvroKeyPredicate(String clauseFieldName,
+                                                                               FilterOperationEnum operationEnum,
+                                                                               String clauseValue) {
+        List<FilterClause> clauses = List.of(new FilterClause(clauseFieldName, operationEnum.getOperation(), clauseValue));
+        return new FilterClauseAvroKeyPredicate(clauses);
+    }
+
+    public static FilterClauseAvroValuePredicate getFilterClauseAvroValuePredicate(String clauseFieldName,
                                                                                    FilterOperationEnum operationEnum,
                                                                                    String clauseValue) {
-        Map<String, List<FilterClause>> clauses = Map.of(clauseFieldName,
-                                                         List.of(new FilterClause(clauseFieldName,
-                                                                                  operationEnum.getOperation(),
-                                                                                  clauseValue)));
-        return new FilterClauseAvroPredicate(clauses);
+        List<FilterClause> clauses = List.of(new FilterClause(clauseFieldName, operationEnum.getOperation(), clauseValue));
+        return new FilterClauseAvroValuePredicate(clauses);
     }
+
 
     @NotNull
     public static GenericRecord getGenericRecord(String fieldName, Object object) {
@@ -109,14 +149,19 @@ public class FilterPredicateUtils {
     }
 
     @NotNull
-    public static FilterClauseJsonPredicate getFilterClauseJsonPredicate(String clauseFieldName,
-                                                                                   FilterOperationEnum operationEnum,
-                                                                                   String clauseValue) {
-        Map<String, List<FilterClause>> clauses = Map.of(clauseFieldName,
-                                                         List.of(new FilterClause(clauseFieldName,
-                                                                                  operationEnum.getOperation(),
-                                                                                  clauseValue)));
-        return new FilterClauseJsonPredicate(clauses);
+    public static FilterClauseJsonKeyPredicate getFilterClauseJsonKeyPredicate(String clauseFieldName,
+                                                                               FilterOperationEnum operationEnum,
+                                                                               String clauseValue) {
+        List<FilterClause> clauses = List.of(new FilterClause(clauseFieldName, operationEnum.getOperation(), clauseValue));
+        return new FilterClauseJsonKeyPredicate(clauses);
+    }
+
+    @NotNull
+    public static FilterClauseJsonValuePredicate getFilterClauseJsonValuePredicate(String clauseFieldName,
+                                                                                 FilterOperationEnum operationEnum,
+                                                                                 String clauseValue) {
+        List<FilterClause> clauses = List.of(new FilterClause(clauseFieldName, operationEnum.getOperation(), clauseValue));
+        return new FilterClauseJsonValuePredicate(clauses);
     }
 
     public static String generateJson(String fieldValue) {
