@@ -166,7 +166,10 @@
                 serverSide: false,
                 ajax: {
                     url: generateQueryUrl(),
-                    type: 'GET'
+                    type: 'GET',
+                    error: function (xhr) {
+                        showException('Exception occurred while fetching topics',xhr.responseText);
+                    }
                 },
                 initComplete: function(settings, json) {
                     setTimeout( api => api.columns.adjust(), 1000, this.api());
@@ -216,6 +219,7 @@
     <div th:replace="~{templates :: faq-modal}"></div>
     <div th:replace="~{templates :: confirm-modal}"></div>
     <div th:replace="~{templates :: navbar}"></div>
+    <div th:replace="~{templates :: exception-modal}"></div>
 
     <div class="main-content">
 

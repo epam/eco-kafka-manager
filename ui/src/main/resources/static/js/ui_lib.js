@@ -104,6 +104,7 @@ let infoModal;
 let dataModal;
 let faqModal;
 let confirmModal;
+let exceptionModal;
 
 $(document).ready(function() {
     if(document.getElementById("infoModal")!==null) {
@@ -118,7 +119,9 @@ $(document).ready(function() {
     if(document.getElementById("confirmModal")!==null) {
         confirmModal = new bootstrap.Modal(document.getElementById("confirmModal"));
     }
-
+    if(document.getElementById("exceptionModal")!==null) {
+        exceptionModal = new bootstrap.Modal(document.getElementById("exceptionModal"));
+    }
 })
 
 function showInfo(type,infoHeader,infoText) {
@@ -176,6 +179,28 @@ function showData(dialogHeader,dialogText) {
     };
 
     dataModal.show();
+}
+
+function showException(dialogHeader,dialogText) {
+
+    const headerClass = "data-modal-header";
+
+    const header = document.getElementById('exceptionModalHeader');
+    header.textContent = dialogHeader;
+    header.classList.add(headerClass);
+
+    const textContentElement = document.getElementById('exceptionModalTextContent');
+    textContentElement.innerHTML='';
+
+    const newDivElement = document.createElement("div");
+    newDivElement.innerHTML = dialogText;
+    textContentElement.append(newDivElement);
+
+    document.getElementById('exceptionModalCopyButton').onclick = (event) => {
+        copyText(dialogText, event.target);
+    };
+
+    exceptionModal.show();
 }
 
 function removeInjections(text) {

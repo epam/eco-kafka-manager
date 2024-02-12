@@ -210,6 +210,25 @@
         </div>
     </div>
 
+    <div th:fragment="exception-modal">
+        <div id="exceptionModal" class="modal over-all-windows" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered" style="max-width:70vw">
+                <div class="modal-content" style="min-height:80vh;">
+                    <div class="modal-header">
+                        <div id="exceptionModalHeader"></div>
+                    </div>
+                    <div class="modal-body" style="overflow-y: scroll;max-height:70vh;">
+                        <div id="exceptionModalTextContent" style="text-align:left;font-size:1.2em;padding-left:1em"></div>
+                    </div>
+                    <div class="modal-footer">
+                        <button id="exceptionModalCopyButton" class="btn btn-success" >Copy</button>
+                        <button id="exceptionModalCloseButton" class="btn btn-primary" data-bs-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div th:fragment="faq-modal">
         <div id="faqModal" class="modal over-all-windows" tabindex="-1" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered" style="max-width:60vw">

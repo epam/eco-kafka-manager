@@ -15,6 +15,7 @@
  *******************************************************************************/
 package com.epam.eco.kafkamanager.ui;
 
+import java.util.List;
 import java.util.Map;
 
 import org.slf4j.Logger;
@@ -38,10 +39,13 @@ public class GlobalErrorController implements ErrorController {
 
     public static final String MAPPING = "/error";
     public static final String VIEW = "error";
-
+    public static final String VIEW_INTERNAL = "error_internal";
     public static final String ERROR_ATTRIBUTES = "errorAttributes";
-
     public static final String ATTR_PATH = "path";
+
+    private static final List<String> ASYNC_ERROR_HANDLED_PAGES =
+            List.of("/kafka-manager/topic_list",
+                    "/kafka-manager/consumer_groups/data");
 
     @Autowired
     private ErrorAttributes errorAttributes;
@@ -50,7 +54,6 @@ public class GlobalErrorController implements ErrorController {
     public String error(WebRequest request, Model model) {
         ErrorAttributeOptions errorAttributeOptions = ErrorAttributeOptions.of(ErrorAttributeOptions.Include.values());
         Map<String, Object> attributes = errorAttributes.getErrorAttributes(request, errorAttributeOptions);
-        enrichErrorAttributes(request, attributes);
         model.addAttribute(ERROR_ATTRIBUTES, attributes);
 
         Throwable error = errorAttributes.getError(request);
@@ -58,10 +61,7 @@ public class GlobalErrorController implements ErrorController {
             LOGGER.error(String.format("Request '%s' failed", attributes.get(ATTR_PATH)), error);
         }
 
-        return VIEW;
-    }
-
-    private void enrichErrorAttributes(WebRequest request, Map<String, Object> attributes) {
+        return ASYNC_ERROR_HANDLED_PAGES.contains(attributes.get(ATTR_PATH)) ? VIEW_INTERNAL : VIEW;
     }
 
 }
