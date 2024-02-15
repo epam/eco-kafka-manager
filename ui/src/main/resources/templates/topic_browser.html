@@ -908,25 +908,22 @@
                                 <td th:if="${!record.nullKey}"
                                     style="min-width:10em;max-width:21.5em;">
 
-                                    <div class="d-flex">
+                                    <div class="right-icons-in-cell" >
                                         <div class="tombstone-column" th:text="${record.key}"></div>
-                                        <div class="d-flex" style="flex-direction: column">
+                                        <div class="tombstone-republish-icons">
                                             <a class="btn btn-sm info tombstone-icon-column"
                                                    th:if="${writeAllowed}"
                                                    type="button"
                                                    th:data-record-id="${recordId}"
                                                    th:data-record-key="${record.key}"
-                                                   th:onclick="openTombstoneModal(this.getAttribute('data-record-id'),this.getAttribute('data-record-key'))"
-                                                   style="padding-left: 0.3em" >
+                                                   th:onclick="openTombstoneModal(this.getAttribute('data-record-id'),this.getAttribute('data-record-key'))" >
                                                     <img th:src="@{/assets/img/tombstone.png}" th:title="${'Generate tombstone for key='+record.key}" />
                                             </a>
                                             <a class="btn btn-sm info tombstone-icon-column"
                                                th:if="${writeAllowed}"
                                                type="button"
                                                th:data-record-id="${recordId}"
-                                               th:data-record-key="${record.key}"
-                                               th:onclick="openRepublishRecordModal(this.getAttribute('data-record-id'),this.getAttribute('data-record-key'))"
-                                               style="padding-left: 0.3em" >
+                                               th:data-record-key="${record.key}">
                                                 <i class="fa fa-copy info" th:title="${'Republish record for key='+record.key}"></i>
                                             </a>
                                         </div>

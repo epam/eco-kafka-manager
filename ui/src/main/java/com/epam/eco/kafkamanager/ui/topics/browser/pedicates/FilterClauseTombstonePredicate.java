@@ -29,23 +29,18 @@ import com.epam.eco.kafkamanager.ui.topics.browser.handlers.FilterOperationUtils
 
 public class FilterClauseTombstonePredicate<K, V> implements Predicate<ConsumerRecord<K, V>> {
 
-    protected final boolean areClausesEmpty;
     protected final List<FilterClause> clauses;
 
     public FilterClauseTombstonePredicate(List<FilterClause> clauses) {
-        areClausesEmpty = clauses.isEmpty();
         this.clauses = clauses;
     }
 
     @Override
     public boolean test(ConsumerRecord<K, V> record) {
-        if(areClausesEmpty) {
+        if(clauses.isEmpty()) {
             return true;
         }
-        if(!clauses.isEmpty() && !processTombstoneClauses(record)) {
-            return false;
-        }
-        return true;
+        return processTombstoneClauses(record);
     }
 
     private boolean processTombstoneClauses(ConsumerRecord<K, V> record) {

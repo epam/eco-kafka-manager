@@ -29,11 +29,10 @@ import static java.util.Objects.isNull;
  */
 
 public abstract class FilterClauseAbstractValuePredicate<K, V> implements Predicate<ConsumerRecord<K, V>> {
-    protected final boolean areClausesEmpty;
+
     protected final List<FilterClause> clauses;
 
     public FilterClauseAbstractValuePredicate(List<FilterClause> clauses) {
-        areClausesEmpty = clauses.isEmpty();
         this.clauses = clauses;
     }
 

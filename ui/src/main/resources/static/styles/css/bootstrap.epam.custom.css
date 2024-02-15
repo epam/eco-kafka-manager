@@ -502,6 +502,7 @@ div.tombstone-content-dialog-body {
 }
 .tombstone-icon-column {
     display: inline;
+    padding: 0.3em;
 }
 .tombstone-text-area{
     min-width:31vw;
@@ -649,4 +650,15 @@ div.tombstone-content-dialog-body {
 }
 #recordTableContainer {
     background: white;
+}
+
+.right-icons-in-cell {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+.tombstone-republish-icons {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
 }

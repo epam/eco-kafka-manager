@@ -17,7 +17,6 @@ package com.epam.eco.kafkamanager.ui.topics.browser.pedicates;
 
 import java.util.List;
 
-import org.apache.kafka.clients.consumer.ConsumerRecord;
 import com.epam.eco.kafkamanager.FilterClause;
 import com.epam.eco.kafkamanager.ui.topics.browser.handlers.FilterOperationStringHandler;
 
@@ -29,16 +28,6 @@ public class FilterClauseStringKeyPredicate extends FilterClauseAbstractKeyPredi
 
     public FilterClauseStringKeyPredicate(List<FilterClause> clauses) {
         super(clauses);
-    }
-
-    @Override
-    public boolean processKeyClauses(ConsumerRecord<String, Object> record) {
-        for (FilterClause clause : clauses) {
-            if (clause.getValue() == null || !executeOperation(clause, record.key())) {
-                return false;
-            }
-        }
-        return true;
     }
 
     @Override

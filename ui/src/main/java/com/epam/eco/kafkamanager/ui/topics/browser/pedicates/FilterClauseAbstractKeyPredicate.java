@@ -22,6 +22,8 @@ import org.apache.kafka.clients.consumer.ConsumerRecord;
 
 import com.epam.eco.kafkamanager.FilterClause;
 
+import static java.util.Objects.isNull;
+
 /**
  * @author Mikhail_Vershkov
  */
@@ -29,32 +31,29 @@ import com.epam.eco.kafkamanager.FilterClause;
 public abstract class FilterClauseAbstractKeyPredicate<K, V> implements Predicate<ConsumerRecord<K, V>> {
 
     public static final String KEY_ATTRIBUTE = "key";
-    protected final boolean areClausesEmpty;
     protected final List<FilterClause> clauses;
 
     public FilterClauseAbstractKeyPredicate(List<FilterClause> clauses) {
-        areClausesEmpty = clauses.isEmpty();
         this.clauses = clauses;
     }
 
     @Override
     public boolean test(ConsumerRecord<K, V> record) {
 
-        if(areClausesEmpty) {
+        if(clauses.isEmpty()) {
             return true;
         }
 
-        if(!clauses.isEmpty() && ! processKeyClauses(record)) {
-            return false;
-        }
-
-        return true;
+        return processKeyClauses(record);
 
     }
 
     protected boolean processKeyClauses(ConsumerRecord<K, V> record) {
         for(FilterClause clause : clauses) {
-            if(clause.getValue() == null || !executeOperation(clause, record.key().toString())) {
+            if(isNull(clause.getValue())) {
+                continue;
+            }
+            if(!executeOperation(clause, record.key().toString())) {
                 return false;
             }
         }
