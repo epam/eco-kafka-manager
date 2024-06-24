@@ -923,7 +923,8 @@
                                                th:if="${writeAllowed}"
                                                type="button"
                                                th:data-record-id="${recordId}"
-                                               th:data-record-key="${record.key}">
+                                               th:data-record-key="${record.key}"
+                                               th:onclick="openRepublishRecordModal(this.getAttribute('data-record-id'),this.getAttribute('data-record-key'))" >
                                                 <i class="fa fa-copy info" th:title="${'Republish record for key='+record.key}"></i>
                                             </a>
                                         </div>
