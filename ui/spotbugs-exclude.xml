@@ -100,22 +100,22 @@
         <Bug pattern="UP_UNUSED_PARAMETER" />
     </Match>
     <Match>
-        <Class name="com.epam.eco.kafkamanager.ui.permissions.export.GroupedByPrincipalJsonPermissionExporter" />
+        <Class name="com.epam.eco.kafkamanager.export.GroupedByPrincipalJsonPermissionExporter" />
         <Method name="toJsonRecord" />
         <Bug pattern="OCP_OVERLY_CONCRETE_PARAMETER" />
     </Match>
     <Match>
-        <Class name="com.epam.eco.kafkamanager.ui.permissions.export.GroupedByPrincipalJsonPermissionExporter" />
+        <Class name="com.epam.eco.kafkamanager.export.GroupedByPrincipalJsonPermissionExporter" />
         <Method name="lambda$toJsonRecord$1" />
         <Bug pattern="CE_CLASS_ENVY" />
     </Match>
     <Match>
-        <Class name="com.epam.eco.kafkamanager.ui.permissions.export.JsonPermissionExporter" />
+        <Class name="com.epam.eco.kafkamanager.export.JsonPermissionExporter" />
         <Method name="toJsonRecord" />
         <Bug pattern="CE_CLASS_ENVY" />
     </Match>
     <Match>
-        <Class name="com.epam.eco.kafkamanager.ui.permissions.export.PlainPermissionExporter" />
+        <Class name="com.epam.eco.kafkamanager.export.PlainPermissionExporter" />
         <Method name="export" />
         <Bug pattern="CE_CLASS_ENVY" />
     </Match>

@@ -29,7 +29,7 @@ import org.springframework.security.web.csrf.HttpSessionCsrfTokenRepository;
 /**
  * @author Andrei_Tytsik
  */
-@Profile(WebSecurityProfiles.DISABLED)
+@Profile({WebSecurityProfiles.DISABLED, WebSecurityProfiles.SBX})
 @Configuration
 @EnableWebSecurity
 @Order(1)
