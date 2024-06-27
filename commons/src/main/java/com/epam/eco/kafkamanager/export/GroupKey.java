@@ -13,7 +13,7 @@
  *  License for the specific language governing permissions and limitations under
  *  the License.
  *******************************************************************************/
-package com.epam.eco.kafkamanager.ui.permissions.export;
+package com.epam.eco.kafkamanager.export;
 
 import java.util.Objects;
 

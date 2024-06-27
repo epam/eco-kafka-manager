@@ -13,7 +13,7 @@
  *  License for the specific language governing permissions and limitations under
  *  the License.
  *******************************************************************************/
-package com.epam.eco.kafkamanager.ui.utils;
+package com.epam.eco.kafkamanager.utils;
 
 import java.util.Comparator;
 

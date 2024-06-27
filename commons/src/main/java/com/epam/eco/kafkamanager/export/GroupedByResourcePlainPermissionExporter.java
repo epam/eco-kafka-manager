@@ -13,7 +13,7 @@
  *  License for the specific language governing permissions and limitations under
  *  the License.
  *******************************************************************************/
-package com.epam.eco.kafkamanager.ui.permissions.export;
+package com.epam.eco.kafkamanager.export;
 
 import java.io.IOException;
 import java.io.Writer;
@@ -24,35 +24,34 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-import org.apache.kafka.common.security.auth.KafkaPrincipal;
-
+import com.epam.eco.kafkamanager.Metadata;
 import com.epam.eco.kafkamanager.PermissionInfo;
-import com.epam.eco.kafkamanager.ui.utils.KafkaPrincipalComparator;
 
 /**
  * @author Andrei_Tytsik
  */
-public class GroupedByPrincipalPlainPermissionExporter implements PermissionExporter {
+public class GroupedByResourcePlainPermissionExporter implements PermissionExporter {
 
     @Override
     public void export(Collection<PermissionInfo> permissionInfos, Writer out) throws IOException {
-        Map<KafkaPrincipal, List<PermissionInfo>> groupedByPrincipal = groupByPrincipal(permissionInfos);
-        for (Map.Entry<KafkaPrincipal, List<PermissionInfo>> entry : groupedByPrincipal.entrySet()) {
-            KafkaPrincipal principal = entry.getKey();
+        Map<GroupKey, List<PermissionInfo>> groupedByResource = groupByResource(permissionInfos);
+        for (Map.Entry<GroupKey, List<PermissionInfo>> entry : groupedByResource.entrySet()) {
+            GroupKey key = entry.getKey();
             List<PermissionInfo> group = entry.getValue();
 
             out.
-                append(principal.toString()).append("\n");
+                append(key.getResourceType().name()).append(" ").
+                append(key.getResourceName()).append(" ").
+                append(key.getPatternType().name()).append("\n");
 
             for (PermissionInfo permissionInfo : group) {
                 out.
                     append("\t").
-                    append(permissionInfo.getResourceType().name()).append(" ").
-                    append(permissionInfo.getResourceName()).append(" ").
-                    append(permissionInfo.getPatternType().name()).append(" ").
+                    append(permissionInfo.getKafkaPrincipal().toString()).append(" ").
                     append(permissionInfo.getPermissionType().name()).append(" ").
                     append(permissionInfo.getOperation().name()).append(" ").
-                    append(permissionInfo.getHost()).append("\n");
+                    append(permissionInfo.getHost()).append(" ").
+                    append(permissionInfo.getMetadata().map(Metadata::getDescription).orElse("")).append("\n");
             }
 
             out.
@@ -60,21 +59,23 @@ public class GroupedByPrincipalPlainPermissionExporter implements PermissionExpo
         }
     }
 
-    protected Map<KafkaPrincipal, List<PermissionInfo>> groupByPrincipal(
-            Collection<PermissionInfo> permissionInfos) {
-        Map<KafkaPrincipal, List<PermissionInfo>> groupedByPrincipal =
-                new TreeMap<>(KafkaPrincipalComparator.INSTANCE);
+    protected Map<GroupKey, List<PermissionInfo>> groupByResource(Collection<PermissionInfo> permissionInfos) {
+        Map<GroupKey, List<PermissionInfo>> groupedByResource = new TreeMap<>();
 
         permissionInfos.forEach(permissionInfo -> {
-            List<PermissionInfo> group =
-                    groupedByPrincipal.computeIfAbsent(permissionInfo.getKafkaPrincipal(), k -> new ArrayList<>());
+            GroupKey key = new GroupKey(
+                    permissionInfo.getResourceType(),
+                    permissionInfo.getResourceName(),
+                    permissionInfo.getPatternType());
+
+            List<PermissionInfo> group = groupedByResource.computeIfAbsent(key, k -> new ArrayList<>());
 
             group.add(permissionInfo);
         });
 
-        groupedByPrincipal.values().forEach(Collections::sort);
+        groupedByResource.values().forEach(Collections::sort);
 
-        return groupedByPrincipal;
+        return groupedByResource;
     }
 
 }
