@@ -13,7 +13,7 @@
  *  License for the specific language governing permissions and limitations under
  *  the License.
  *******************************************************************************/
-package com.epam.eco.kafkamanager.ui.topics.browser;
+package com.epam.eco.kafkamanager.ui.topics.browser.filter;
 
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 

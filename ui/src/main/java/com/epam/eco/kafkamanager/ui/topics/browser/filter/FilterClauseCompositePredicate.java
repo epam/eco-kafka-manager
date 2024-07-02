@@ -13,7 +13,7 @@
  *  License for the specific language governing permissions and limitations under
  *  the License.
  *******************************************************************************/
-package com.epam.eco.kafkamanager.ui.topics.browser;
+package com.epam.eco.kafkamanager.ui.topics.browser.filter;
 
 import java.util.List;
 import java.util.function.Predicate;
@@ -24,6 +24,7 @@ import org.apache.kafka.clients.consumer.ConsumerRecord;
 import com.epam.eco.commons.kafka.helpers.FilterClausePredicate;
 import com.epam.eco.kafkamanager.FilterClause;
 import com.epam.eco.kafkamanager.TopicRecordFetchParams;
+import com.epam.eco.kafkamanager.ui.topics.browser.TopicBrowseParams;
 import com.epam.eco.kafkamanager.ui.topics.browser.pedicates.FilterClauseAvroKeyPredicate;
 import com.epam.eco.kafkamanager.ui.topics.browser.pedicates.FilterClauseAvroValuePredicate;
 import com.epam.eco.kafkamanager.ui.topics.browser.pedicates.FilterClauseHeaderPredicate;

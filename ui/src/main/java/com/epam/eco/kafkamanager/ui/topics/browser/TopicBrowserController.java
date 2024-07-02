@@ -68,10 +68,11 @@ import com.epam.eco.kafkamanager.ui.config.KafkaManagerUiProperties;
 import com.epam.eco.kafkamanager.ui.config.HeaderReplacement;
 import com.epam.eco.kafkamanager.ui.config.TopicBrowser;
 import com.epam.eco.kafkamanager.ui.topics.TopicController;
+import com.epam.eco.kafkamanager.ui.topics.browser.filter.FilterClauseCompositePredicate;
 import com.epam.eco.kafkamanager.ui.topics.browser.handlers.FilterOperationEnum;
 import com.epam.eco.kafkamanager.utils.PrettyHtmlMapper;
 
-import static com.epam.eco.kafkamanager.ui.topics.browser.FilterClauseCompositePredicate.TOMBSTONE_ATTRIBUTE;
+import static com.epam.eco.kafkamanager.ui.topics.browser.filter.FilterClauseCompositePredicate.TOMBSTONE_ATTRIBUTE;
 import static com.epam.eco.kafkamanager.ui.topics.browser.pedicates.FilterClauseAbstractKeyPredicate.*;
 import static java.util.Objects.nonNull;
 
