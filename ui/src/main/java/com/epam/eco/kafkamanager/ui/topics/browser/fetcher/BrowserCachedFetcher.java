@@ -22,7 +22,7 @@ import com.epam.eco.kafkamanager.KafkaManager;
 import com.epam.eco.kafkamanager.TopicRecordFetchParams;
 import com.epam.eco.kafkamanager.exec.TaskResult;
 import com.epam.eco.kafkamanager.ui.config.KafkaManagerUiProperties;
-import com.epam.eco.kafkamanager.ui.topics.browser.FilterClauseCompositeNoopPredicate;
+import com.epam.eco.kafkamanager.ui.topics.browser.filter.FilterClauseCompositeNoopPredicate;
 import org.apache.commons.lang3.Validate;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.common.header.Header;

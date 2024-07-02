@@ -31,6 +31,8 @@ import static java.util.Objects.isNull;
 public abstract class FilterClauseAbstractKeyPredicate<K, V> implements Predicate<ConsumerRecord<K, V>> {
 
     public static final String KEY_ATTRIBUTE = "key";
+    public static final String KEY_OF_NULL = "null";
+
     protected final List<FilterClause> clauses;
 
     public FilterClauseAbstractKeyPredicate(List<FilterClause> clauses) {
@@ -53,11 +55,15 @@ public abstract class FilterClauseAbstractKeyPredicate<K, V> implements Predicat
             if(isNull(clause.getValue())) {
                 continue;
             }
-            if(!executeOperation(clause, record.key().toString())) {
+            if(!executeOperation(clause, getStringOfNullable(record))) {
                 return false;
             }
         }
         return true;
+    }
+
+    private static <K, V> String getStringOfNullable(ConsumerRecord<K, V> record) {
+        return isNull(record.key()) ? KEY_OF_NULL : record.key().toString();
     }
 
     abstract boolean executeOperation(FilterClause clause, Object value);

@@ -82,6 +82,18 @@ public class FilterClauseAvroPredicateTest {
                                    .test(new ConsumerRecord<>(TOPIC_NAME, 0, 0L, "testStartsWith", FIELD_VALUE_CORRECT)));
     }
 
+    @Test
+    public void testNullKeyEquals() {
+
+        FilterClauseAvroKeyPredicate filterClausePredicate =
+                getFilterClauseAvroKeyPredicate(KEY_ATTRIBUTE, FilterOperationEnum.EQUALS, "null");
+        Assertions.assertTrue(filterClausePredicate
+                                      .test(new ConsumerRecord<>(TOPIC_NAME, 0, 0L, null, FIELD_VALUE_CORRECT)));
+        Assertions.assertTrue(filterClausePredicate
+                                      .test(new ConsumerRecord<>(TOPIC_NAME, 0, 0L, "null", FIELD_VALUE_CORRECT)));
+        Assertions.assertFalse(filterClausePredicate
+                                      .test(new ConsumerRecord<>(TOPIC_NAME, 0, 0L, "not_null", FIELD_VALUE_CORRECT)));
+    }
 
     @Test
     public void testAvroOrdinaryFieldEquals() {
