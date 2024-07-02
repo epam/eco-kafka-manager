@@ -36,7 +36,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import com.epam.eco.kafkamanager.FilterClause;
 import com.epam.eco.kafkamanager.TopicRecordFetchParams;
-import com.epam.eco.kafkamanager.ui.topics.browser.FilterClauseCompositePredicate;
+import com.epam.eco.kafkamanager.ui.topics.browser.filter.FilterClauseCompositePredicate;
 import com.epam.eco.kafkamanager.ui.topics.browser.pedicates.FilterClauseAvroValuePredicate;
 import com.epam.eco.kafkamanager.ui.topics.browser.pedicates.FilterClauseHeaderPredicate;
 import com.epam.eco.kafkamanager.ui.topics.browser.pedicates.FilterClauseStringKeyPredicate;
