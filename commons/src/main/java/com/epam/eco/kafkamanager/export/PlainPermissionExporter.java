@@ -13,14 +13,11 @@
  *  License for the specific language governing permissions and limitations under
  *  the License.
  *******************************************************************************/
-package com.epam.eco.kafkamanager.ui.permissions.export;
+package com.epam.eco.kafkamanager.export;
 
 import java.io.IOException;
 import java.io.Writer;
 import java.util.Collection;
-
-import org.apache.commons.csv.CSVFormat;
-import org.apache.commons.csv.CSVPrinter;
 
 import com.epam.eco.kafkamanager.Metadata;
 import com.epam.eco.kafkamanager.PermissionInfo;
@@ -28,28 +25,21 @@ import com.epam.eco.kafkamanager.PermissionInfo;
 /**
  * @author Andrei_Tytsik
  */
-public class CsvPermissionExporter implements PermissionExporter {
+public class PlainPermissionExporter implements PermissionExporter {
 
     @Override
     public void export(Collection<PermissionInfo> permissionInfos, Writer out) throws IOException {
-        CSVPrinter csvPrinter = CSVFormat.DEFAULT.withHeader(HEADERS.toArray(new String[0])).print(out);
         for (PermissionInfo permissionInfo : permissionInfos) {
-            csvPrinter.printRecord(toCsvRecord(permissionInfo));
+            out.
+                append(permissionInfo.getKafkaPrincipal().toString()).append(" ").
+                append(permissionInfo.getResourceType().name()).append(" ").
+                append(permissionInfo.getResourceName()).append(" ").
+                append(permissionInfo.getPatternType().name()).append(" ").
+                append(permissionInfo.getPermissionType().name()).append(" ").
+                append(permissionInfo.getOperation().name()).append(" ").
+                append(permissionInfo.getHost()).append(" ").
+                append(permissionInfo.getMetadata().map(Metadata::getDescription).orElse("")).append("\n");
         }
-    }
-
-    private Object[] toCsvRecord(PermissionInfo permissionInfo) {
-        Object[] record = new Object[HEADERS.size()];
-        record[0] = permissionInfo.getKafkaPrincipal().toString();
-        record[1] = permissionInfo.getResourceType().name();
-        record[2] = permissionInfo.getResourceName();
-        record[3] = permissionInfo.getPatternType().name();
-        record[4] = permissionInfo.getPermissionType().name();
-        record[5] = permissionInfo.getOperation().name();
-        record[6] = permissionInfo.getHost();
-        Metadata metadata = permissionInfo.getMetadata().orElse(null);
-        record[7] = metadata != null ? metadata.getDescription() : null;
-        return record;
     }
 
 }

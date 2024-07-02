@@ -13,7 +13,7 @@
  *  License for the specific language governing permissions and limitations under
  *  the License.
  *******************************************************************************/
-package com.epam.eco.kafkamanager.ui.permissions.export;
+package com.epam.eco.kafkamanager.export;
 
 import java.io.IOException;
 import java.io.Writer;
@@ -24,34 +24,35 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-import com.epam.eco.kafkamanager.Metadata;
+import org.apache.kafka.common.security.auth.KafkaPrincipal;
+
 import com.epam.eco.kafkamanager.PermissionInfo;
+import com.epam.eco.kafkamanager.utils.KafkaPrincipalComparator;
 
 /**
  * @author Andrei_Tytsik
  */
-public class GroupedByResourcePlainPermissionExporter implements PermissionExporter {
+public class GroupedByPrincipalPlainPermissionExporter implements PermissionExporter {
 
     @Override
     public void export(Collection<PermissionInfo> permissionInfos, Writer out) throws IOException {
-        Map<GroupKey, List<PermissionInfo>> groupedByResource = groupByResource(permissionInfos);
-        for (Map.Entry<GroupKey, List<PermissionInfo>> entry : groupedByResource.entrySet()) {
-            GroupKey key = entry.getKey();
+        Map<KafkaPrincipal, List<PermissionInfo>> groupedByPrincipal = groupByPrincipal(permissionInfos);
+        for (Map.Entry<KafkaPrincipal, List<PermissionInfo>> entry : groupedByPrincipal.entrySet()) {
+            KafkaPrincipal principal = entry.getKey();
             List<PermissionInfo> group = entry.getValue();
 
             out.
-                append(key.getResourceType().name()).append(" ").
-                append(key.getResourceName()).append(" ").
-                append(key.getPatternType().name()).append("\n");
+                append(principal.toString()).append("\n");
 
             for (PermissionInfo permissionInfo : group) {
                 out.
                     append("\t").
-                    append(permissionInfo.getKafkaPrincipal().toString()).append(" ").
+                    append(permissionInfo.getResourceType().name()).append(" ").
+                    append(permissionInfo.getResourceName()).append(" ").
+                    append(permissionInfo.getPatternType().name()).append(" ").
                     append(permissionInfo.getPermissionType().name()).append(" ").
                     append(permissionInfo.getOperation().name()).append(" ").
-                    append(permissionInfo.getHost()).append(" ").
-                    append(permissionInfo.getMetadata().map(Metadata::getDescription).orElse("")).append("\n");
+                    append(permissionInfo.getHost()).append("\n");
             }
 
             out.
@@ -59,23 +60,21 @@ public class GroupedByResourcePlainPermissionExporter implements PermissionExpor
         }
     }
 
-    protected Map<GroupKey, List<PermissionInfo>> groupByResource(Collection<PermissionInfo> permissionInfos) {
-        Map<GroupKey, List<PermissionInfo>> groupedByResource = new TreeMap<>();
+    protected Map<KafkaPrincipal, List<PermissionInfo>> groupByPrincipal(
+            Collection<PermissionInfo> permissionInfos) {
+        Map<KafkaPrincipal, List<PermissionInfo>> groupedByPrincipal =
+                new TreeMap<>(KafkaPrincipalComparator.INSTANCE);
 
         permissionInfos.forEach(permissionInfo -> {
-            GroupKey key = new GroupKey(
-                    permissionInfo.getResourceType(),
-                    permissionInfo.getResourceName(),
-                    permissionInfo.getPatternType());
-
-            List<PermissionInfo> group = groupedByResource.computeIfAbsent(key, k -> new ArrayList<>());
+            List<PermissionInfo> group =
+                    groupedByPrincipal.computeIfAbsent(permissionInfo.getKafkaPrincipal(), k -> new ArrayList<>());
 
             group.add(permissionInfo);
         });
 
-        groupedByResource.values().forEach(Collections::sort);
+        groupedByPrincipal.values().forEach(Collections::sort);
 
-        return groupedByResource;
+        return groupedByPrincipal;
     }
 
 }

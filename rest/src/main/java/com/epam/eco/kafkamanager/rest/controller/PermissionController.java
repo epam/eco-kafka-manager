@@ -15,6 +15,11 @@
  *******************************************************************************/
 package com.epam.eco.kafkamanager.rest.controller;
 
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 import org.apache.kafka.common.acl.AclOperation;
@@ -46,8 +51,11 @@ import com.epam.eco.kafkamanager.PrincipalPermissionsDeleteParams;
 import com.epam.eco.kafkamanager.ResourcePermissionFilter;
 import com.epam.eco.kafkamanager.ResourcePermissionsDeleteParams;
 import com.epam.eco.kafkamanager.core.utils.PageUtils;
+import com.epam.eco.kafkamanager.export.PermissionExporterType;
 import com.epam.eco.kafkamanager.rest.request.MetadataRequest;
 import com.epam.eco.kafkamanager.rest.request.PermissionRequest;
+
+import jakarta.servlet.http.HttpServletResponse;
 
 /**
  * @author Raman_Babich
@@ -84,6 +92,43 @@ public class PermissionController {
                 .build();
 
         return kafkaManager.getPermissionPage(criteria, pageable);
+    }
+
+    @GetMapping("export")
+    public void exportPermissions(
+            @RequestParam(value = "exporterType", defaultValue = "CSV") PermissionExporterType exporterType,
+            @RequestParam(value = "kafkaPrincipal", required = false) String kafkaPrincipal,
+            @RequestParam(value = "resourceType", required = false) ResourceType resourceType,
+            @RequestParam(value = "resourceName", required = false) String resourceName,
+            @RequestParam(value = "patternType", required = false) PatternType patternType,
+            @RequestParam(value = "permissionType", required = false) AclPermissionType permissionType,
+            @RequestParam(value = "operation", required = false) AclOperation operation,
+            @RequestParam(value = "host", required = false) String host,
+            @RequestParam(value = "description", required = false) String description,
+            HttpServletResponse response) throws IOException {
+        PermissionSearchCriteria criteria = PermissionSearchCriteria.builder()
+                                                                    .kafkaPrincipal(kafkaPrincipal)
+                                                                    .resourceType(resourceType)
+                                                                    .resourceName(resourceName)
+                                                                    .patternType(patternType)
+                                                                    .permissionType(permissionType)
+                                                                    .operation(operation)
+                                                                    .host(host)
+                                                                    .description(description)
+                                                                    .build();
+        List<PermissionInfo> permissions = kafkaManager.getPermissions(criteria);
+        response.setContentType(exporterType.contentType());
+        response.setHeader(
+                "Content-Disposition",
+                String.format(
+                        "attachment; filename=\"%s_%d.txt\"",
+                        exporterType.name(), System.currentTimeMillis()));
+
+        try (Writer out = new BufferedWriter(
+                new OutputStreamWriter(response.getOutputStream(), StandardCharsets.UTF_8))) {
+            exporterType.exporter().export(permissions, out);
+            out.flush();
+        }
     }
 
     @PostMapping

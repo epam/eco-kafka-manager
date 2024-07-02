@@ -44,7 +44,7 @@ import com.epam.eco.kafkamanager.KafkaManager;
 import com.epam.eco.kafkamanager.PermissionCreateParams;
 import com.epam.eco.kafkamanager.PermissionInfo;
 import com.epam.eco.kafkamanager.PermissionSearchCriteria;
-import com.epam.eco.kafkamanager.ui.permissions.export.PermissionExporterType;
+import com.epam.eco.kafkamanager.export.PermissionExporterType;
 
 /**
  * @author Andrei_Tytsik

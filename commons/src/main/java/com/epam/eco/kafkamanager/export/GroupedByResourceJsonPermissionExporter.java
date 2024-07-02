@@ -13,7 +13,7 @@
  *  License for the specific language governing permissions and limitations under
  *  the License.
  *******************************************************************************/
-package com.epam.eco.kafkamanager.ui.permissions.export;
+package com.epam.eco.kafkamanager.export;
 
 import java.io.IOException;
 import java.io.Writer;
@@ -23,8 +23,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.kafka.common.security.auth.KafkaPrincipal;
-
 import com.epam.eco.kafkamanager.Metadata;
 import com.epam.eco.kafkamanager.PermissionInfo;
 import com.epam.eco.kafkamanager.utils.MapperUtils;
@@ -32,32 +30,33 @@ import com.epam.eco.kafkamanager.utils.MapperUtils;
 /**
  * @author Andrei_Tytsik
  */
-public class GroupedByPrincipalJsonPermissionExporter extends GroupedByPrincipalPlainPermissionExporter {
+public class GroupedByResourceJsonPermissionExporter extends GroupedByResourcePlainPermissionExporter {
 
     @Override
     public void export(Collection<PermissionInfo> permissionInfos, Writer out) throws IOException {
-        Map<KafkaPrincipal, List<PermissionInfo>> groupedByPrincipal = groupByPrincipal(permissionInfos);
+        Map<GroupKey, List<PermissionInfo>> groupedByResource = groupByResource(permissionInfos);
 
         List<Object> records = new ArrayList<>();
-        groupedByPrincipal.forEach((key, value) -> records.add(
-                toJsonRecord(key, value)));
+        groupedByResource.entrySet().forEach(
+                entry -> records.add(
+                        toJsonRecord(entry.getKey(), entry.getValue())));
         MapperUtils.writeAsPrettyJson(out, records);
     }
 
-    private Map<String, Object> toJsonRecord(KafkaPrincipal principal, List<PermissionInfo> permissionInfos) {
+    private Map<String, Object> toJsonRecord(GroupKey groupKey, List<PermissionInfo> permissionInfos) {
         Map<String, Object> groupRecord = new LinkedHashMap<>();
 
-        groupRecord.put(KEY_KAFKA_PRINCIPAL, principal.toString());
+        groupRecord.put(KEY_RESOURCE_TYPE, groupKey.getResourceType());
+        groupRecord.put(KEY_RESOURCE_NAME, groupKey.getResourceName());
+        groupRecord.put(KEY_PATTERN_TYPE, groupKey.getPatternType());
+
         List<Object> permissionRecords = new ArrayList<>();
         groupRecord.put(KEY_PERMISSIONS, permissionRecords);
 
         permissionInfos.forEach(permissionInfo -> {
             Map<String, Object> permissionRecord = new LinkedHashMap<>();
 
-            permissionRecord.put(KEY_RESOURCE_TYPE, permissionInfo.getResourceType().name());
-            permissionRecord.put(KEY_RESOURCE_NAME, permissionInfo.getResourceName());
-            permissionRecord.put(KEY_PATTERN_TYPE, permissionInfo.getPatternType());
-            permissionRecord.put(KEY_PERMISSION_TYPE, permissionInfo.getPermissionType().name());
+            permissionRecord.put(KEY_KAFKA_PRINCIPAL, permissionInfo.getKafkaPrincipal().toString());
             permissionRecord.put(KEY_OPERATION, permissionInfo.getOperation().name());
             permissionRecord.put(KEY_HOST, permissionInfo.getHost());
             Metadata metadata = permissionInfo.getMetadata().orElse(null);
