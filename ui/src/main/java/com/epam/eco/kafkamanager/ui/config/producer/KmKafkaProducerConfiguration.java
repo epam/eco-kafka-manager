@@ -24,6 +24,7 @@ import com.epam.eco.kafkamanager.TopicRecordFetchParams;
 import com.epam.eco.kafkamanager.ui.config.KafkaManagerUiProperties;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.kafka.clients.producer.ProducerConfig;
+import org.apache.kafka.common.serialization.ByteArraySerializer;
 import org.apache.kafka.common.serialization.Serializer;
 import org.apache.kafka.common.serialization.StringSerializer;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,88 +50,13 @@ public class KmKafkaProducerConfiguration {
     private static final String SCHEMA_REGISTRY_URL = "schema.registry.url";
 
     @Bean
-    public KafkaProducerResolver kafkaProducerResolver(@Autowired List<KafkaKmUiProducer<?, ?>> producers,
-                                                       KafkaManagerProperties properties) {
-        return new KafkaProducerResolver(producers, kafkaStringKeyStringValueProducer(properties));
-    }
-    @Bean
-    public KafkaKmUiProducer<String, String> kafkaStringKeyStringValueProducer(KafkaManagerProperties properties) {
-        return new KafkaKmUiProducer<>(
-                TopicRecordFetchParams.DataFormat.STRING,
-                TopicRecordFetchParams.DataFormat.STRING,
-                kafkaStringKeyStringValueTemplate(properties));
-    }
-    @Bean
-    public KafkaKmUiProducer<String,Object> kafkaStringKeyAvroValueProducer(KafkaManagerProperties properties) {
-        return new KafkaKmUiProducer<>(
-                TopicRecordFetchParams.DataFormat.STRING,
-                TopicRecordFetchParams.DataFormat.AVRO,
-                kafkaStringKeyAvroValueTemplate(properties));
-    }
-    @Bean
-    public KafkaKmUiProducer<Object,String> kafkaAvroKeyStringValueProducer(KafkaManagerProperties properties) {
-        return new KafkaKmUiProducer<>(
-                TopicRecordFetchParams.DataFormat.AVRO,
-                TopicRecordFetchParams.DataFormat.STRING,
-                kafkaAvroKeyStringValueTemplate(properties));
-    }
-    @Bean
-    public KafkaKmUiProducer<Object,Object> kafkaAvroKeyAvroValueProducer(KafkaManagerProperties properties) {
-        return new KafkaKmUiProducer<>(
-                TopicRecordFetchParams.DataFormat.AVRO,
-                TopicRecordFetchParams.DataFormat.AVRO,
-                kafkaAvroKeyAvroValueTemplate(properties));
-    }
-    @Bean
-    public KafkaKmUiProducer<String,Object> kafkaStringKeyJsonValueProducer(KafkaManagerProperties properties) {
-        return new KafkaKmUiProducer<>(
-                TopicRecordFetchParams.DataFormat.STRING,
-                TopicRecordFetchParams.DataFormat.JSON_STRING,
-                kafkaStringKeyJsonValueTemplate(properties));
-    }
-    @Bean
-    public KafkaKmUiProducer<Object,String> kafkaJsonKeyStringValueProducer(KafkaManagerProperties properties) {
-        return new KafkaKmUiProducer<>(
-                TopicRecordFetchParams.DataFormat.JSON_STRING,
-                TopicRecordFetchParams.DataFormat.STRING,
-                kafkaJsonKeyStringValueTemplate(properties));
-    }
-    @Bean
-    public KafkaKmUiProducer<Object,Object> kafkaJsonKeyJsonValueProducer(KafkaManagerProperties properties) {
-        return new KafkaKmUiProducer<>(
-                TopicRecordFetchParams.DataFormat.JSON_STRING,
-                TopicRecordFetchParams.DataFormat.JSON_STRING,
-                kafkaJsonKeyJsonValueTemplate(properties));
+    public KafkaManagerByteArrayProducer kafkaByteArrayProducer(KafkaManagerProperties properties) {
+        return new KafkaManagerByteArrayProducer(kafkaByteArrayTemplate(properties));
     }
 
-
     @Bean
-    public static KafkaTemplate<String, String> kafkaStringKeyStringValueTemplate(KafkaManagerProperties properties) {
-        return new KafkaTemplate<>(getProducerFactory(properties, StringSerializer.class, StringSerializer.class));
-    }
-    @Bean
-    public static KafkaTemplate<String, Object> kafkaStringKeyAvroValueTemplate(KafkaManagerProperties properties) {
-        return new KafkaTemplate<>(getProducerFactory(properties, StringSerializer.class, KafkaAvroSerializer.class));
-    }
-    @Bean
-    public static KafkaTemplate<Object, String> kafkaAvroKeyStringValueTemplate(KafkaManagerProperties properties) {
-        return new KafkaTemplate<>(getProducerFactory(properties,  KafkaAvroSerializer.class, StringSerializer.class));
-    }
-    @Bean
-    public static KafkaTemplate<Object, Object> kafkaAvroKeyAvroValueTemplate(KafkaManagerProperties properties) {
-        return new KafkaTemplate<>(getProducerFactory(properties, KafkaAvroSerializer.class, KafkaAvroSerializer.class));
-    }
-    @Bean
-    public static KafkaTemplate<String, Object> kafkaStringKeyJsonValueTemplate(KafkaManagerProperties properties) {
-        return new KafkaTemplate<>(getProducerFactory(properties, StringSerializer.class, JsonSerializer.class));
-    }
-    @Bean
-    public static KafkaTemplate<Object, String> kafkaJsonKeyStringValueTemplate(KafkaManagerProperties properties) {
-        return new KafkaTemplate<>(getProducerFactory(properties, JsonSerializer.class, StringSerializer.class));
-    }
-    @Bean
-    public static KafkaTemplate<Object, Object> kafkaJsonKeyJsonValueTemplate(KafkaManagerProperties properties) {
-        return new KafkaTemplate<>(getProducerFactory(properties, JsonSerializer.class, JsonSerializer.class));
+    public static KafkaTemplate<byte[], byte[]> kafkaByteArrayTemplate(KafkaManagerProperties properties) {
+        return new KafkaTemplate<>(getProducerFactory(properties, ByteArraySerializer.class, ByteArraySerializer.class));
     }
 
     private static <K,V> ProducerFactory<K,V> getProducerFactory(KafkaManagerProperties properties,

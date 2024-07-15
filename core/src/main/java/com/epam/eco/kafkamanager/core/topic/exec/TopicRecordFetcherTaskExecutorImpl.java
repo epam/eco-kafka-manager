@@ -20,6 +20,7 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.Validate;
 import org.apache.kafka.common.TopicPartition;
+import org.apache.kafka.common.serialization.ByteArrayDeserializer;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -123,6 +124,8 @@ public class TopicRecordFetcherTaskExecutorImpl<K, V> extends AbstractTaskExecut
             builder.deserializer(HexStringDeserializer.class, isKey);
         } else if (DataFormat.PROTOCOL_BUFFERS == dataFormat) {
             builder.deserializer(KafkaProtobufDeserializer.class, isKey);
+        } else if (DataFormat.BYTE_ARRAY == dataFormat) {
+            builder.deserializer(ByteArrayDeserializer.class, isKey);
         } else {
             throw new IllegalArgumentException(
                     String.format("Data format '%s' not supported", dataFormat));
