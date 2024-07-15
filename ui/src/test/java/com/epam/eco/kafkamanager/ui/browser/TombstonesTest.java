@@ -20,12 +20,11 @@ import java.util.Map;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import com.epam.eco.kafkamanager.ui.topics.browser.TombstoneUtils;
-
 import static com.epam.eco.kafkamanager.ui.browser.protobuf.TombstoneTestUtils.REPLACEMENTS;
 import static com.epam.eco.kafkamanager.ui.browser.protobuf.TombstoneTestUtils.TEST_DATE_1;
 import static com.epam.eco.kafkamanager.ui.browser.protobuf.TombstoneTestUtils.TEST_DATE_2;
 import static com.epam.eco.kafkamanager.ui.browser.protobuf.TombstoneTestUtils.TEST_HEADERS;
+import static com.epam.eco.kafkamanager.ui.utils.HeaderUtils.getReplacedHeaders;
 
 /**
  * @author Mikhail_Vershkov
@@ -35,7 +34,7 @@ public class TombstonesTest {
 
     @Test
     void headerReplacingTest() {
-        Map<String,String> map = TombstoneUtils.getReplacedTombstoneHeaders(TEST_HEADERS, REPLACEMENTS);
+        Map<String,String> map = getReplacedHeaders(TEST_HEADERS, REPLACEMENTS);
         Assertions.assertEquals(5,map.size());
         Assertions.assertEquals("delete", map.get("operation_type"));
         Assertions.assertEquals(map.get("operation_type"),"delete");

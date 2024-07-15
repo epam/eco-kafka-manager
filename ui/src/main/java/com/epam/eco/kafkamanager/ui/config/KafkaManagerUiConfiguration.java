@@ -18,7 +18,7 @@ package com.epam.eco.kafkamanager.ui.config;
 import com.epam.eco.kafkamanager.KafkaManager;
 import com.epam.eco.kafkamanager.PartitionByKeyResolver;
 import com.epam.eco.kafkamanager.PartitionByKeyResolverImpl;
-import com.epam.eco.kafkamanager.ui.topics.browser.fetcher.BrowserCachedFetcher;
+import com.epam.eco.kafkamanager.SecurityContextAdapter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.cloud.stream.config.SpelExpressionConverterConfiguration;
@@ -32,6 +32,9 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import com.epam.eco.kafkamanager.ui.GlobalModelEnrichingInterceptor;
 import com.epam.eco.kafkamanager.ui.LogoutListener;
+import com.epam.eco.kafkamanager.ui.config.producer.KafkaManagerByteArrayProducer;
+import com.epam.eco.kafkamanager.ui.topics.browser.KafkaRecordRepublisher;
+import com.epam.eco.kafkamanager.ui.topics.browser.KafkaRecordRepublisherImpl;
 
 /**
  * @author Andrei_Tytsik
@@ -83,19 +86,13 @@ public class KafkaManagerUiConfiguration implements WebMvcConfigurer {
         return new LogoutListener();
     }
 
-    @Bean(initMethod = "init")
-    @ConditionalOnProperty(name="eco.kafkamanager.ui.topicBrowser.useCache", havingValue="true")
-    public TopicOffsetCacheCleanerRunner topicOffsetCacheCleanerRunner(KafkaManagerUiProperties properties) {
-        return new TopicOffsetCacheCleanerRunner(properties.getTopicBrowser().getCacheCleanerIntervalMin());
-    }
     @Bean
-    public BrowserCachedFetcher browserCachedFetcher(KafkaManager kafkaManager,
-                                                     KafkaManagerUiProperties properties) {
-        return new BrowserCachedFetcher(kafkaManager, properties);
-    }
-    @Bean(initMethod = "init")
-    public BrowserCachedFetcherCleanerRunner browserCachedFetcherCleanerRunner(KafkaManagerUiProperties properties) {
-        return new BrowserCachedFetcherCleanerRunner(properties.getTopicBrowser().getCacheCleanerIntervalMin());
+    public KafkaRecordRepublisher republisher(
+            KafkaManagerUiProperties properties,
+            KafkaManager kafkaManager,
+            KafkaManagerByteArrayProducer producer
+    ) {
+        return new KafkaRecordRepublisherImpl(properties, kafkaManager, producer);
     }
 
 

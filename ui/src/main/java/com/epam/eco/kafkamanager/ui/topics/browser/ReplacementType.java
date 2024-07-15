@@ -15,9 +15,27 @@
  *******************************************************************************/
 package com.epam.eco.kafkamanager.ui.topics.browser;
 
+import java.util.List;
+import java.util.function.Function;
+
+import com.epam.eco.kafkamanager.ui.config.HeaderReplacement;
+import com.epam.eco.kafkamanager.ui.config.TopicBrowser;
+
 /**
  * @author Mikhail_Vershkov
  */
 public enum ReplacementType {
-    TOMBSTONE, COPY_RECORD
+
+    TOMBSTONE(TopicBrowser::getTombstoneGeneratorReplacements),
+    COPY_RECORD(TopicBrowser::getCopyRecordHeaderReplacements);
+
+    private final Function<TopicBrowser, List<HeaderReplacement>> replacements;
+
+    ReplacementType(Function<TopicBrowser, List<HeaderReplacement>> replacements) {
+        this.replacements = replacements;
+    }
+
+    public Function<TopicBrowser, List<HeaderReplacement>> getReplacements() {
+        return replacements;
+    }
 }
