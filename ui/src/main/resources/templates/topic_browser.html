@@ -390,6 +390,7 @@
             .done(function(data) {
                 $("#tombstone-key-display").text(recordKey);
                 $("#tombstone-key").val(recordKey);
+                $("#tombstone-record-id").val(recordId);
                 $("#tombstone-header-content").val(data);
                 $('#tombstone-modal-dialog').modal("show");
             })
@@ -408,6 +409,7 @@
 
     function generateTombstone() {
         const recordKey = $('#tombstone-key').val();
+        const recordId = $('#tombstone-record-id').val();
         const resultItem = $('#tombstone-generation-result');
         if(!recordKey) {
             resultItem.addClass("text-danger");
@@ -415,17 +417,18 @@
             return;
         }
         const headers = $('#tombstone-header-content').val();
-        $.post("/kafka-manager/topics/"+topicName+"/browser/tombstone",
-            {"recordKey": recordKey,
-             "keyFormat": [[${browseParams.getKeyFormat()}]],
-             "valueFormat": [[${browseParams.getValueFormat()}]],
-             "headers": headers,
-             "method_": "POST",
-             [[${_csrf.parameterName}]]: [[${_csrf.token}]]})
+        closeTombstoneModal();
+        showWaitingSign("Publishing tombstone...");
+        $.post("/kafka-manager/topics/"+topicName+"/browser/republishRecord",
+            {   "replacementType": "TOMBSTONE",
+                "recordId": recordId,
+                "headers": headers,
+                "timeout": $('#timeout').val(),
+                "method_": "POST",
+                [[${_csrf.parameterName}]]: [[${_csrf.token}]]})
              .done(function(data) {
-                 closeTombstoneModal();
-                 showInfo('info','Tombstone generator',data);
-
+                 hideWaitingSign();
+                 showInfo('info','Tombstone generator',data.replaceAll("<key>", recordKey));
              })
              .fail(function(xhr) {
                  resultItem.addClass("text-danger");
@@ -436,7 +439,7 @@
     function openRepublishRecordModal(recordId, recordKey) {
         const headers = $('#headers-for_'+recordId).val();
         $.post("/kafka-manager/topics/"+topicName+"/browser/headers",
-            {"headers": headers,
+            {   "headers": headers,
                 "method_": "POST",
                 "replacementType": "COPY_RECORD",
                 [[${_csrf.parameterName}]]: [[${_csrf.token}]]})
@@ -471,18 +474,17 @@
         }
         const headers = $('#republish-record-header-content').val();
         closeRepublishRecordModal();
-        showWaitingSign("Wait...");
+        showWaitingSign("Republishing record...");
         $.post("/kafka-manager/topics/"+topicName+"/browser/republishRecord",
-            {"recordKey": recordKey,
+               {"replacementType": "COPY_RECORD",
                 "recordId": recordId,
-                "keyFormat": [[${browseParams.getKeyFormat()}]],
-                "valueFormat": [[${browseParams.getValueFormat()}]],
                 "headers": headers,
+                "timeout": $('#timeout').val(),
                 "method_": "POST",
                 [[${_csrf.parameterName}]]: [[${_csrf.token}]]})
             .done(function(data) {
                 hideWaitingSign();
-                showInfo('info','Republish record',data);
+                showInfo('info','Republish record',data.replaceAll("<key>", recordKey));
 
             })
             .fail(function(xhr) {

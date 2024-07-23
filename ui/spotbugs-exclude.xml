@@ -129,11 +129,6 @@
         <Bug pattern="FCCD_FIND_CLASS_CIRCULAR_DEPENDENCY" />
     </Match>
     <Match>
-        <Class name="com.epam.eco.kafkamanager.ui.utils.InetAddressUtils" />
-        <Method name="getHostName" />
-        <Bug pattern="MDM_INETADDRESS_GETLOCALHOST,EXS_EXCEPTION_SOFTENING_NO_CONSTRAINTS" />
-    </Match>
-    <Match>
         <Class name="com.epam.eco.kafkamanager.ui.GlobalErrorController" />
         <Method name="error" />
         <Bug pattern="SPRING_CSRF_UNRESTRICTED_REQUEST_MAPPING" />

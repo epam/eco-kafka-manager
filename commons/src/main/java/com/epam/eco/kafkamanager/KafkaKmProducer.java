@@ -21,11 +21,14 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
-import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.Validate;
 import org.apache.kafka.clients.producer.ProducerRecord;
+import org.apache.kafka.clients.producer.RecordMetadata;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.kafka.support.SendResult;
+
+import static org.apache.commons.collections4.MapUtils.isNotEmpty;
 
 /**
  * @author Mikhail_Vershkov
@@ -33,8 +36,8 @@ import org.springframework.kafka.core.KafkaTemplate;
 
 public class KafkaKmProducer<K,V> {
 
-    private static final String RESULT_STRING_FORMAT = "Successfully sent to the topic %s with key = %s";
-    private static final long PRODUCER_TIMEOUT = 10L;
+    private static final String RESULT_STRING_FORMAT = "Successfully sent to the topic %s with key = <key>, partition = %d, offset = %d";
+    private static final long PRODUCER_TIMEOUT_SEC = 10L;
     private final KafkaTemplate<K, V> kafkaTemplate;
 
     @Autowired
@@ -51,18 +54,28 @@ public class KafkaKmProducer<K,V> {
         Validate.notNull(key,"Key is null!");
 
         var record = new ProducerRecord<>(topicName, key, message);
-
-        if(MapUtils.isNotEmpty(headers)) {
-            headers.keySet().forEach(headerKey -> record.headers().add(headerKey, headers.get(headerKey).getBytes(
-                    StandardCharsets.UTF_8)));
+        if(isNotEmpty(headers)) {
+            populateHeaders(headers, record);
         }
+        SendResult<K, V> sendResult = kafkaTemplate.send(record).get(PRODUCER_TIMEOUT_SEC, TimeUnit.SECONDS);
 
-        kafkaTemplate.send(record).get(PRODUCER_TIMEOUT, TimeUnit.SECONDS);
-
-        return String.format(RESULT_STRING_FORMAT, topicName, key);
+        return getResultString(sendResult);
 
     }
-    public KafkaTemplate<K,V> getKafkaTemplate() {
-        return kafkaTemplate;
+
+    private static <K, V> void populateHeaders(
+            Map<String, String> headers,
+            ProducerRecord<K, V> record
+    ) {
+         headers.keySet().forEach(
+                 headerKey -> record.headers()
+                         .add(headerKey, headers.get(headerKey).getBytes(StandardCharsets.UTF_8))
+         );
     }
+
+    private static <K, V> String getResultString(SendResult<K, V> sendResult) {
+        RecordMetadata metadata = sendResult.getRecordMetadata();
+        return String.format(RESULT_STRING_FORMAT, metadata.topic(), metadata.partition(), metadata.offset());
+    }
+
 }
