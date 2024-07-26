@@ -32,6 +32,7 @@ import com.epam.eco.kafkamanager.KafkaManager;
 import com.epam.eco.kafkamanager.PartitionByKeyResolver;
 import com.epam.eco.kafkamanager.TopicRecordFetchParams;
 
+import org.apache.commons.collections4.list.TreeList;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.kafka.common.TopicPartition;
 import org.jetbrains.annotations.NotNull;
@@ -223,7 +224,7 @@ public class TopicBrowserController {
 
         TabularRecords tabularRecords = ToTabularRecordsConverter.from(browseParams, fetchResult);
 
-        List<String> columns = new ArrayList<>();
+        List<String> columns = new TreeList<>();
         columns.add(KEY_ATTRIBUTE);
         columns.add(TOMBSTONE_ATTRIBUTE);
         columns.addAll(tabularRecords.getHeaderFilterLabels());
