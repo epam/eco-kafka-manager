@@ -1,3 +1,8 @@
+.filter-clause-container {
+    display: flex;
+    flex-flow: wrap;
+}
+
 .input-group .dropdown-toggle {
     border-radius: 0;
 }
@@ -11,7 +16,7 @@ div.filter-clause-item {
     border-radius: 50rem !important;
     color: white;
     margin: 2px;
-    display: inline-block;
+    display: flex;
     padding: 0.35em 0.65em;
     font-size: 1em;
     font-weight: 700;
@@ -20,20 +25,29 @@ div.filter-clause-item {
     white-space: nowrap;
     vertical-align: baseline;
     pointer-events: none;
+    place-self: flex-start;
+    max-width: 100%;
 }
 
 .filter-clause-item::after {
     content: url('x-circle-fill.svg');
-    margin-left: 0.5em;
+    margin-left: auto;
     pointer-events: auto;
     cursor: pointer;
 }
 
 .filter-clause-item>span {
     vertical-align: text-top;
+    width: 94%;
+    display: flex;
 }
 
 .add-filter-button {
     background-color: #29c729;
     color: white;
+}
+
+.browse-filter-value-label {
+    display: inline-flex;
+    overflow: hidden;
 }
