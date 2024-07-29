@@ -39,11 +39,17 @@ class FilterClause {
         return this.column + ' ' + this.operation.label +
             (this.operation.required ? ' "' + this.value + '"' : '');
     }
+    getFilterClauseHtml() {
+        const open_div = "<div class='browse-filter-value-label' title='"+this.value+"'>";
+        const close_div = "</div>";
+        const label = this.operation.required ? ' "' + open_div + this.value + close_div + '"' : '';
+        return this.column + ' ' + this.operation.label + label;
+    }
 }
 
 let filterOperationArray = [];
 
-let getOperationById = (operationId) => {
+const getOperationById = (operationId) => {
     for(let ii=0;ii<filterOperationArray.length;ii++) {
         if(filterOperationArray[ii].id === operationId) {
             return filterOperationArray[ii];
@@ -58,18 +64,18 @@ let excludesArray = [];
 
 let filterColumnArray = [];
 
-let isBrowserFilterSet = () => {
+const isBrowserFilterSet = () => {
     return filterClauseArray!==null && filterClauseArray.length>0;
 }
-let setFilterOperationArray = (operations) => {
+const setFilterOperationArray = (operations) => {
     filterOperationArray = operations
         .map(operation=>FilterOperation.from(operation));
 }
-let setExcludes = (excludes) => {
+const setExcludes = (excludes) => {
     excludesArray = excludes;
 }
 
-let setFilterColumnsArray = (topic, columns) => {
+const setFilterColumnsArray = (topic, columns) => {
 
     let storedColumns = JSON.parse(localStorage.getItem(topic));
 
@@ -92,14 +98,14 @@ let setFilterColumnsArray = (topic, columns) => {
     filterColumnArray = storedColumns;
 }
 
-let setFilterClauseArray = (clauses) => {
+const setFilterClauseArray = (clauses) => {
     filterClauseArray = clauses
         .map(clause=>new FilterClause(clause.column,
             FilterOperation.from(clause.operation),
             clause.value));
 }
 
-let loadFilterColumnArray = () => {
+const loadFilterColumnArray = () => {
 
     for(let ii=0;ii<filterColumnArray.length;ii++) {
 
@@ -112,7 +118,7 @@ let loadFilterColumnArray = () => {
     }
 }
 
-let getOperationIdsByColumn = (columnId) => {
+const getOperationIdsByColumn = (columnId) => {
     let operations = excludesArray.filter( e => e.columnName === columnId).flatMap(e => e.operations);
     if(operations && operations.length===0) {
         operations = excludesArray.filter(e => e.columnName === 'default').flatMap(e => e.operations);
@@ -120,12 +126,12 @@ let getOperationIdsByColumn = (columnId) => {
     return operations;
 }
 
-let getOperationsByColumn = ( columnId ) => {
-    let operations = getOperationIdsByColumn(columnId);
+const getOperationsByColumn = ( columnId ) => {
+    const operations = getOperationIdsByColumn(columnId);
     return filterOperationArray.filter(operation => operations.includes(operation.id));
 }
 
-let loadFilterOperationArray = (columnId) => {
+const loadFilterOperationArray = (columnId) => {
 
     document.getElementById('filter-operation-select').innerHTML='';
 
@@ -144,7 +150,7 @@ let loadFilterOperationArray = (columnId) => {
 }
 
 
-let getFilterClauseByText = (filterClauseText) => {
+const getFilterClauseByText = (filterClauseText) => {
     for(let ii=0;ii<filterClauseArray.length;ii++) {
         if(filterClauseArray[ii].getFilterClauseText() === filterClauseText) {
             return filterClauseArray[ii];
@@ -152,10 +158,10 @@ let getFilterClauseByText = (filterClauseText) => {
     }
 }
 
-let drawFilterClause = (filterClause) => {
+const drawFilterClause = (filterClause) => {
 
     const filterClauseSpan = document.createElement('span');
-    filterClauseSpan.textContent=filterClause.getFilterClauseText();
+    filterClauseSpan.innerHTML=filterClause.getFilterClauseHtml();
 
     const filterClauseItem = document.createElement('div');
     filterClauseItem.classList.add('filter-clause-item');
@@ -167,7 +173,7 @@ let drawFilterClause = (filterClause) => {
 
 }
 
-let loadFilterClauses = () => {
+const loadFilterClauses = () => {
     const containerElement = document.getElementById('filter-clause-container');
     while(containerElement.firstChild && !containerElement.firstChild.remove());
     for(let ii=0;ii<filterClauseArray.length;ii++) {
@@ -206,32 +212,23 @@ const validateSingleFilterClause = ( singleFilterClause ) => {
 
 }
 
-const validateFilterClause = () => {
-    for(let ii=0;ii<filterClauseArray.length;ii++) {
-        if(!validateSingleFilterClause(filterClauseArray[ii])) {
-            return false;
-        }
-    }
-    return true;
-}
-
-let thisClausePredicate = (clause,filterClause) => {
+const thisClausePredicate = (clause,filterClause) => {
     return !clause.equals(filterClause);
 }
 
-let removeFilterClause = (filterClauseText) => {
+const removeFilterClause = (filterClauseText) => {
     showConfirm("Remove filter clause",
         "Are you sure to remove filter clause?",
         () => confirmRemoveClause(filterClauseText));
 }
 
-let confirmRemoveClause = (filterClauseText) => {
+const confirmRemoveClause = (filterClauseText) => {
     const filterClause = getFilterClauseByText(filterClauseText);
     filterClauseArray = filterClauseArray.filter(clause => thisClausePredicate(clause,filterClause));
     loadFilterClauses();
 }
 
-let addRemoveListener = (elem) => {
+const addRemoveListener = (elem) => {
     elem.addEventListener('click', function() {
         removeFilterClause(elem.textContent);
     });
@@ -247,6 +244,20 @@ function setValuePlaceholder(operationId) {
     }
 
     filterValueElement.setAttribute('placeholder', operation.placeholder);
+}
+
+function findFilterClause( filterColumnName, filterOperationId) {
+    for (let ii = 0; ii < filterClauseArray.length; ii++) {
+        if (filterClauseArray[ii].column === filterColumnName &&
+            filterClauseArray[ii].operation.id === filterOperationId) {
+            return filterClauseArray[ii];
+        }
+    }
+    return undefined;
+}
+
+function isClauseExists(existedFilterClause) {
+    return existedFilterClause!==undefined;
 }
 
 
@@ -265,43 +276,45 @@ $(document).ready( function () {
         loadFilterOperationArray(event.target.value)
     });
 
-    document.getElementById("add-filter-button").addEventListener('click', () => {
-
-        let filterColumnName;
-        let filterOperationId;
-
-        $("#filter-column-select option:selected").each(function () {
-            filterColumnName = $(this).val();
-        });
-
-        $("#filter-operation-select option:selected").each(function () {
-            filterOperationId = $(this).val();
-        });
-
-        if (filterColumnName === undefined ||
-            filterOperationId === undefined ) {
-            return;
-        }
-
-        if ($('#filter-value').val() === '' && filterOperationArray.filter(op=>op.required).map(op=>op.id).includes(filterOperationId) ) {
-            showInfo('error', 'Filter clause validation', 'Operation "' + filterOperationId + '" requires value.');
-            return;
-        }
-
-        for (let ii = 0; ii < filterClauseArray.length; ii++) {
-            if (filterClauseArray[ii].column === filterColumnName &&
-                filterClauseArray[ii].operation.id === filterOperationId) {
-                showInfo('error', 'Filter clause validation', 'Operation being added already exists in filer clause.');
-                return;
-            }
-        }
-
-        const newFilterClause = new FilterClause(filterColumnName, getOperationById(filterOperationId), $('#filter-value').val());
-
-        filterClauseArray.push(newFilterClause);
-
-        const filterClauseItem = drawFilterClause(newFilterClause);
-        addRemoveListener(filterClauseItem);
-
-    });
+    document.getElementById("add-filter-button").addEventListener('click', addNewFilterItem);
 })
+
+function addNewFilterItem() {
+
+    let filterColumnName;
+    let filterOperationId;
+
+    $("#filter-column-select option:selected").each(function () {
+        filterColumnName = $(this).val();
+    });
+
+    $("#filter-operation-select option:selected").each(function () {
+        filterOperationId = $(this).val();
+    });
+
+    if (filterColumnName === undefined || filterOperationId === undefined ) {
+        return;
+    }
+
+    const currentFilterValue = $('#filter-value').val();
+    if (currentFilterValue === '' &&
+        filterOperationArray
+            .filter(op=>op.required)
+            .map(op=>op.id)
+            .includes(filterOperationId) ) {
+        showInfo('error', 'Filter clause validation', 'Operation "' + filterOperationId + '" requires value.');
+        return;
+    }
+
+    const existedFilterClause = findFilterClause(filterColumnName, filterOperationId);
+
+    if(isClauseExists(existedFilterClause)) {
+        existedFilterClause.value = currentFilterValue;
+        loadFilterClauses();
+    } else {
+        const newFilterClause = new FilterClause(filterColumnName, getOperationById(filterOperationId), currentFilterValue);
+        filterClauseArray.push(newFilterClause);
+        addRemoveListener(drawFilterClause(newFilterClause));
+    }
+
+}

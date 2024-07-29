@@ -250,15 +250,6 @@ const validateSingleFilterClause = ( singleFilterClause ) => {
 
 }
 
-const validateFilterClause = () => {
-    for(let ii=0;ii<filterClauseArray.length;ii++) {
-        if(!validateSingleFilterClause(filterClauseArray[ii])) {
-            return false;
-        }
-    }
-    return true;
-}
-
 function thisClausePredicate(clause,filterClause) {
     return !clause.equals(filterClause);
 }

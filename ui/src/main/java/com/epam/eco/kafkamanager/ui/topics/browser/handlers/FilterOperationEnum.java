@@ -52,8 +52,9 @@ public enum FilterOperationEnum {
     }
 
     public static Collection<FilterOperation> getFilterOperations() {
-        return Arrays.stream(FilterOperationEnum.values()).map(
-                FilterOperationEnum::getOperation).collect(Collectors.toList());
+        return Arrays.stream(FilterOperationEnum.values())
+                .map(FilterOperationEnum::getOperation)
+                .collect(Collectors.toList());
     }
 
 }
