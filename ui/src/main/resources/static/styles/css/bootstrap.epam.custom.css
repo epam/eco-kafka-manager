@@ -654,11 +654,11 @@ div.tombstone-content-dialog-body {
 
 .right-icons-in-cell {
     display: flex;
-    flex-direction: row;
+    flex-direction: column;
     justify-content: space-between;
 }
 .tombstone-republish-icons {
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     justify-content: flex-end;
 }

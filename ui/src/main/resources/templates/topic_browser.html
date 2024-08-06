@@ -485,7 +485,6 @@
             .done(function(data) {
                 hideWaitingSign();
                 showInfo('info','Republish record',data.replaceAll("<key>", recordKey));
-
             })
             .fail(function(xhr) {
                 hideWaitingSign();
@@ -493,6 +492,14 @@
             })
     }
 
+    function saveRecord(recordId, record) {
+        const tempLink = document.createElement("a");
+        const taBlob = new Blob([record], {type: 'text/json'});
+        tempLink.setAttribute('href', URL.createObjectURL(taBlob));
+        tempLink.setAttribute('download', `${topicName}_${recordId}.json`);
+        tempLink.click();
+        URL.revokeObjectURL(tempLink.href);
+    }
 
 
 </script>
@@ -913,6 +920,14 @@
                                     <div class="right-icons-in-cell" >
                                         <div class="tombstone-column" th:text="${record.key}"></div>
                                         <div class="tombstone-republish-icons">
+                                            <a class="btn btn-sm info tombstone-icon-column"
+                                               th:if="${writeAllowed}"
+                                               type="button"
+                                               th:data-record-id="${recordId}"
+                                               th:data-record="${record.toString()}"
+                                               th:onclick="saveRecord(this.getAttribute('data-record-id'),this.getAttribute('data-record'))" >
+                                                <i class="fa fa-save info" th:title="${'Save record for key='+record.key}"></i>
+                                            </a>
                                             <a class="btn btn-sm info tombstone-icon-column"
                                                    th:if="${writeAllowed}"
                                                    type="button"
