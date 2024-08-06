@@ -26,6 +26,12 @@ import org.apache.commons.lang3.time.DateFormatUtils;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.common.record.TimestampType;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -461,6 +467,20 @@ public class TabularRecords implements Iterable<Record> {
         @Override
         public int hashCode() {
             return Objects.hash(consumerRecord, tabularValue, attributes);
+        }
+
+        @Override
+        public String toString() {
+            return String.format("key: %s,%n" +
+                                 "timestamp: %s,%n" +
+                                 "headers: %s,%n" +
+                                 "values: %s",
+                                 getKey(),
+                                 LocalDateTime.ofInstant(Instant.ofEpochMilli(getTimestamp()),
+                                                         ZoneId.systemDefault()).format(
+                                                         DateTimeFormatter.ISO_DATE_TIME),
+                                 headers,
+                                 tabularValue);
         }
     }
 
