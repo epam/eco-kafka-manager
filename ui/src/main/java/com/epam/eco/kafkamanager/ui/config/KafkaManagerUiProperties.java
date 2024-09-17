@@ -16,8 +16,6 @@
 package com.epam.eco.kafkamanager.ui.config;
 
 import java.util.Collection;
-import java.util.Date;
-import java.util.List;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.validation.annotation.Validated;

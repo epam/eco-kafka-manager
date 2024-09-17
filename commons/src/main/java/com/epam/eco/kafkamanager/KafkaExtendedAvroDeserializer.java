@@ -23,6 +23,8 @@ import org.apache.avro.Schema;
 import org.apache.avro.generic.GenericRecord;
 import org.apache.commons.lang3.Validate;
 
+import com.epam.eco.kafkamanager.logicaltype.LogicalTypeSchemaConverter;
+
 import io.confluent.kafka.schemaregistry.client.SchemaRegistryClient;
 import io.confluent.kafka.serializers.KafkaAvroDeserializer;
 
@@ -30,19 +32,19 @@ import io.confluent.kafka.serializers.KafkaAvroDeserializer;
  * @author Mikhail_Vershkov
  */
 
-public class KafkaSchemaIdAwareAvroDeserializer extends KafkaAvroDeserializer {
+public class KafkaExtendedAvroDeserializer extends KafkaAvroDeserializer {
 
     private static final int START_SCHEMA_ID_POSITION = 1;
     private static final int END_SCHEMA_ID_POSITION = 5;
     private boolean isKey;
 
-    public KafkaSchemaIdAwareAvroDeserializer() {}
+    public KafkaExtendedAvroDeserializer() {}
 
-    public KafkaSchemaIdAwareAvroDeserializer(SchemaRegistryClient schemaRegistryClient) {
+    public KafkaExtendedAvroDeserializer(SchemaRegistryClient schemaRegistryClient) {
         super(schemaRegistryClient);
     }
 
-    public KafkaSchemaIdAwareAvroDeserializer(SchemaRegistryClient client, Map<String, ?> props) {
+    public KafkaExtendedAvroDeserializer(SchemaRegistryClient client, Map<String, ?> props) {
         super(client, props);
     }
 
@@ -65,7 +67,9 @@ public class KafkaSchemaIdAwareAvroDeserializer extends KafkaAvroDeserializer {
     private Object getDeserializedResult(String topic, byte[] bytes) {
         Object obj = deserialize(topic, isKey, bytes, null);
         if(obj instanceof GenericRecord) {
-            return new GenericRecordWrapper(obj, getSchemaId(bytes));
+            return new GenericRecordWrapper((GenericRecord) obj,
+                                            getSchemaId(bytes),
+                                            LogicalTypeSchemaConverter.convert((GenericRecord) obj));
         } else {
             return obj;
         }
@@ -78,15 +82,20 @@ public class KafkaSchemaIdAwareAvroDeserializer extends KafkaAvroDeserializer {
     }
 
     protected static class GenericRecordWrapper {
-        private final Object value;
+        private final GenericRecord value;
         private final long schemaId;
+        private final Map<String,Object> valuesAsMap;
 
-        private GenericRecordWrapper(Object value, long schemaId) {
+        private GenericRecordWrapper(GenericRecord value,
+                                     long schemaId,
+                                     Map<String, Object> valuesAsMap
+        ) {
             this.value = value;
             this.schemaId = schemaId;
+            this.valuesAsMap = valuesAsMap;
         }
 
-        public Object getValue() {
+        public GenericRecord getValue() {
             return value;
         }
 
@@ -94,6 +103,9 @@ public class KafkaSchemaIdAwareAvroDeserializer extends KafkaAvroDeserializer {
             return schemaId;
         }
 
+        public Map<String, Object> getValuesAsMap() {
+            return valuesAsMap;
+        }
     }
 
 }
