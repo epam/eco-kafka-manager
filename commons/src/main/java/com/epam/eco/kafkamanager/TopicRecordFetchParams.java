@@ -16,6 +16,7 @@
 package com.epam.eco.kafkamanager;
 
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang3.Validate;
@@ -24,6 +25,11 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.epam.eco.commons.kafka.OffsetRange;
 import com.epam.eco.commons.kafka.helpers.FilterClausePredicate;
 
+import static com.epam.eco.kafkamanager.TopicRecordFetchParams.DataFormat.AVRO;
+import static com.epam.eco.kafkamanager.TopicRecordFetchParams.DataFormat.HEX_STRING;
+import static com.epam.eco.kafkamanager.TopicRecordFetchParams.DataFormat.JSON_STRING;
+import static com.epam.eco.kafkamanager.TopicRecordFetchParams.DataFormat.PROTOCOL_BUFFERS;
+import static com.epam.eco.kafkamanager.TopicRecordFetchParams.DataFormat.STRING;
 import static java.util.Objects.isNull;
 
 /**
@@ -107,6 +113,11 @@ public class TopicRecordFetchParams<K,V> {
 
     public FilterClausePredicate<K,V> getPredicate() {
         return predicate;
+    }
+
+
+    public static List<DataFormat> getUiDataFormats() {
+        return List.of(AVRO, STRING, JSON_STRING, HEX_STRING, PROTOCOL_BUFFERS);
     }
 
     public enum DataFormat {

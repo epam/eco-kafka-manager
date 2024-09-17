@@ -33,6 +33,11 @@ public class TopicBrowser {
     private List<HeaderReplacement> copyRecordHeaderReplacements;
     private Set<String> replacementPatterns;
     private Boolean filterByKeyPartition = false;
+    private String dateTimeFormat = "yyyy-MM-dd HH:mm:ss.SSS";
+    private String dateFormat = "yyyy-MM-dd";
+    private String timeFormat = "HH:mm:ss.SSS";
+    private Boolean emptyIfNull = true;
+
     public Boolean getUseCache() {
         return useCache;
     }
@@ -115,5 +120,37 @@ public class TopicBrowser {
 
     public void setCacheThresholdInMb(Long cacheThresholdInMb) {
         this.cacheThresholdInMb = cacheThresholdInMb;
+    }
+
+    public String getDateFormat() {
+        return dateFormat;
+    }
+
+    public void setDateFormat(String dateFormat) {
+        this.dateFormat = dateFormat;
+    }
+
+    public String getDateTimeFormat() {
+        return dateTimeFormat;
+    }
+
+    public void setDateTimeFormat(String dateTimeFormat) {
+        this.dateTimeFormat = dateTimeFormat;
+    }
+
+    public String getTimeFormat() {
+        return timeFormat;
+    }
+
+    public void setTimeFormat(String timeFormat) {
+        this.timeFormat = timeFormat;
+    }
+
+    public Boolean getEmptyIfNull() {
+        return emptyIfNull;
+    }
+
+    public void setEmptyIfNull(Boolean emptyIfNull) {
+        this.emptyIfNull = emptyIfNull;
     }
 }
