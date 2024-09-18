@@ -222,7 +222,7 @@ public class TopicBrowserController {
 
         RecordFetchResult<Object, Object> fetchResult = taskResult.getValue();
 
-        TabularRecords tabularRecords = ToTabularRecordsConverter.from(browseParams, fetchResult);
+        TabularRecords tabularRecords = ToTabularRecordsConverter.from(browseParams, fetchResult, properties.getTopicBrowser());
 
         List<String> columns = new TreeList<>();
         columns.add(KEY_ATTRIBUTE);

@@ -10,14 +10,14 @@ import org.mockito.Mockito;
  * @author Mikhail_Vershkov
  */
 
-public class KafkaSchemaIdAwareAvroDeserializerTest {
+public class KafkaExtendedAvroDeserializerTest {
 
     private final byte[] BYTES_SHORT = new byte[4];
     private final byte[] BYTES_NORMAL = new byte[20];
     private final static byte BYTE_FILL = 1;
     private final static byte BYTE_ZERO = 0;
-    private final KafkaSchemaIdAwareAvroDeserializer kafkaSchemaIdAwareAvroDeserializer =
-            Mockito.spy(KafkaSchemaIdAwareAvroDeserializer.class);
+    private final KafkaExtendedAvroDeserializer kafkaSchemaIdAwareAvroDeserializer =
+            Mockito.spy(KafkaExtendedAvroDeserializer.class);
 
     @Test
     public void illegalLengthTest() {

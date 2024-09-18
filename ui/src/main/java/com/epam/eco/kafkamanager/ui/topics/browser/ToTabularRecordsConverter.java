@@ -24,6 +24,7 @@ import org.apache.kafka.clients.consumer.ConsumerRecord;
 
 import com.epam.eco.commons.kafka.helpers.RecordFetchResult;
 import com.epam.eco.kafkamanager.TopicRecordFetchParams.DataFormat;
+import com.epam.eco.kafkamanager.ui.config.TopicBrowser;
 import com.epam.eco.kafkamanager.ui.topics.browser.TabularRecords.Record;
 
 import static java.util.Objects.isNull;
@@ -35,11 +36,13 @@ public class ToTabularRecordsConverter {
 
     public static TabularRecords from(
             TopicBrowseParams browseParams,
-            RecordFetchResult<?, ?> fetchResult) {
+            RecordFetchResult<?, ?> fetchResult,
+            TopicBrowser topicBrowser
+    ) {
         Validate.notNull(browseParams, "Params object is null");
         Validate.notNull(fetchResult, "Result is null");
 
-        RecordValueTabulator<?> valueTabulator = determineValueTabulator(browseParams);
+        RecordValueTabulator<?> valueTabulator = determineValueTabulator(browseParams, topicBrowser);
 
         TabularRecords.Builder builder = TabularRecords.builder(browseParams.getTopicName());
         for (ConsumerRecord<?, ?> record : fetchResult) {
@@ -78,10 +81,11 @@ public class ToTabularRecordsConverter {
     }
 
     private static RecordValueTabulator<?> determineValueTabulator(
-            TopicBrowseParams browseParams) {
+            TopicBrowseParams browseParams,
+            TopicBrowser topicBrowser) {
         DataFormat dataFormat = browseParams.getValueFormat();
         if (DataFormat.AVRO == dataFormat) {
-            return new AvroRecordValueTabulator(browseParams.getKafkaTopicConfig());
+            return new AvroRecordValueTabulator(browseParams.getKafkaTopicConfig(), topicBrowser);
         } else if (DataFormat.PROTOCOL_BUFFERS == dataFormat) {
             return new ProtobufRecordValueTabulator(browseParams.getKafkaTopicConfig());
         } else if (

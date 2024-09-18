@@ -15,8 +15,14 @@
  *******************************************************************************/
 package com.epam.eco.kafkamanager.ui.topics.browser;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
+
+import javax.annotation.Nonnull;
 
 import org.apache.avro.Schema;
 import org.apache.avro.generic.GenericRecord;
@@ -24,21 +30,29 @@ import org.apache.commons.lang3.Validate;
 import org.apache.kafka.clients.admin.Config;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 
-import com.epam.eco.kafkamanager.KafkaSchemaIdAwareUtils;
+import com.epam.eco.kafkamanager.KafkaExtendedDeserializerUtils;
 import com.epam.eco.kafkamanager.TopicRecordFetchParams;
+import com.epam.eco.kafkamanager.ui.config.TopicBrowser;
 import com.epam.eco.kafkamanager.ui.utils.SchemaSubjectUtils;
+
+import static java.util.Objects.isNull;
 
 /**
  * @author Andrei_Tytsik
  */
 public class AvroRecordValueTabulator implements RecordValueTabulator<Object> {
 
-    private final Config topicConfig;
+    private static final String NULL_FORMAT = "null";
+    private static final String EMPTY_FORMAT = "";
 
-    public AvroRecordValueTabulator(Config topicConfig) {
+    private final Config topicConfig;
+    private final TopicBrowser topicBrowser;
+
+    public AvroRecordValueTabulator(Config topicConfig, TopicBrowser topicBrowser) {
         Validate.notNull(topicConfig, "Topic config is null");
 
         this.topicConfig = topicConfig;
+        this.topicBrowser = topicBrowser;
     }
 
     public Config getKafkaTopicConfig() {
@@ -47,7 +61,45 @@ public class AvroRecordValueTabulator implements RecordValueTabulator<Object> {
 
     @Override
     public Map<String, Object> toTabularValue(ConsumerRecord<?, Object> record) {
-        return AvroRecordValuesExtractor.getValuesAsMap(record);
+        Map<String, Object> map = AvroRecordValuesExtractor.getValuesAsMap(record);
+        return isNull(map) ? null : flatValues(map, new HashMap<>(), "");
+    }
+
+    public Map<String,Object> flatValues(@Nonnull Map<String, Object> map,
+                                         Map<String, Object> flatedMap,
+                                         String prefix) {
+
+        for(Map.Entry<String,Object> entry: map.entrySet()) {
+            if(entry.getValue() instanceof Map) {
+                flatValues((Map)entry.getValue(), flatedMap, entry.getKey());
+            } else {
+                flatedMap.put( prefixedKey(prefix, entry), convertValue(entry.getValue()) );
+            }
+        }
+        return flatedMap;
+    }
+
+    private static String prefixedKey(
+            String prefix,
+            Map.Entry<String, Object> entry
+    ) {
+        return prefix.isEmpty() ? entry.getKey() : prefix + "." + entry.getKey();
+    }
+
+    private String convertValue(Object value) {
+         if(value instanceof LocalDateTime) {
+             return ((LocalDateTime)value).format(DateTimeFormatter.ofPattern(topicBrowser.getDateTimeFormat()));
+         } else if(value instanceof LocalDate) {
+             return ((LocalDate)value).format(DateTimeFormatter.ofPattern(topicBrowser.getDateFormat()));
+         } else if(value instanceof LocalTime) {
+             return ((LocalTime)value).format(DateTimeFormatter.ofPattern(topicBrowser.getTimeFormat()));
+         } else {
+             return isNull(value) ? getNullRepresentation() : value.toString();
+         }
+    }
+
+    private String getNullRepresentation() {
+        return topicBrowser.getEmptyIfNull() ? EMPTY_FORMAT : NULL_FORMAT;
     }
 
     @Override
@@ -60,7 +112,7 @@ public class AvroRecordValueTabulator implements RecordValueTabulator<Object> {
 
         Map<String, Object> attributes = new HashMap<>();
 
-        Object object = KafkaSchemaIdAwareUtils.extractGenericRecordOrValue(record);
+        Object object = KafkaExtendedDeserializerUtils.extractGenericRecordOrValue(record);
 
         if(object instanceof GenericRecord genericRecord) {
 
@@ -84,7 +136,7 @@ public class AvroRecordValueTabulator implements RecordValueTabulator<Object> {
             return null;
         }
 
-        Object object = KafkaSchemaIdAwareUtils.extractGenericRecordOrValue(record);
+        Object object = KafkaExtendedDeserializerUtils.extractGenericRecordOrValue(record);
 
         if(object instanceof GenericRecord genericRecord) {
 
@@ -95,7 +147,7 @@ public class AvroRecordValueTabulator implements RecordValueTabulator<Object> {
             String schemaValue = SchemaSubjectUtils.getSchemaSubjectValue(record.topic(), schemaName, topicConfig);
             String schemaAsString = schema.toString(true);
 
-            return new RecordSchema(KafkaSchemaIdAwareUtils.extractSchemaId(record), schemaName, schemaKey, schemaValue,
+            return new RecordSchema(KafkaExtendedDeserializerUtils.extractSchemaId(record), schemaName, schemaKey, schemaValue,
                                     schemaAsString, TopicRecordFetchParams.DataFormat.AVRO);
         } else {
             return RecordSchema.DUMMY_AVRO_RECORD_SCHEMA;
