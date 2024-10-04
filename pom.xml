@@ -88,7 +88,7 @@
         <commons-collections4.version>4.1</commons-collections4.version>
         <commons-csv.version>1.5</commons-csv.version>
         <commons-math3.version>3.6.1</commons-math3.version>
-        <commons-io.version>2.7</commons-io.version>
+        <commons-io.version>2.14.0</commons-io.version>
         <avro.version>1.11.3</avro.version>
         <slf4j.version>2.0.9</slf4j.version>
         <openapi.version>1.6.9</openapi.version>
