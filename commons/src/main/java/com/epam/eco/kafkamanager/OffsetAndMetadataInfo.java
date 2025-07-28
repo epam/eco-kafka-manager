@@ -23,18 +23,21 @@ import java.time.temporal.TemporalUnit;
 import java.util.Objects;
 import java.util.TimeZone;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 import org.apache.kafka.common.TopicPartition;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 
 import com.epam.eco.commons.kafka.TopicPartitionComparator;
 
 /**
  * @author Andrei_Tytsik
  */
+@JsonDeserialize(builder = OffsetAndMetadataInfo.Builder.class)
 public class OffsetAndMetadataInfo implements Comparable<OffsetAndMetadataInfo> {
 
     private final TopicPartition topicPartition;
@@ -43,22 +46,6 @@ public class OffsetAndMetadataInfo implements Comparable<OffsetAndMetadataInfo> 
     private final LocalDateTime commitDate;
     private final LocalDateTime expireDate;
 
-    @JsonCreator
-    public OffsetAndMetadataInfo(
-            @JsonProperty("topic") String topic,
-            @JsonProperty("partition") int partition,
-            @JsonProperty("offset") long offset,
-            @JsonProperty("metadata") String metadata,
-            @JsonProperty("commitDate") LocalDateTime commitDate,
-            @JsonProperty("expireDate") LocalDateTime expireDate) {
-        this(
-                topic != null && partition >= 0 ? new TopicPartition(topic, partition) : null,
-                offset,
-                metadata,
-                commitDate,
-                expireDate);
-    }
-
     public OffsetAndMetadataInfo(
             TopicPartition topicPartition,
             long offset,
@@ -66,7 +53,6 @@ public class OffsetAndMetadataInfo implements Comparable<OffsetAndMetadataInfo> 
             LocalDateTime commitDate,
             LocalDateTime expireDate) {
         Validate.notNull(topicPartition, "TopicPartition is null");
-        Validate.isTrue(offset >= 0, "Offset is invalid");
 
         this.topicPartition = topicPartition;
         this.offset = offset;
@@ -140,21 +126,21 @@ public class OffsetAndMetadataInfo implements Comparable<OffsetAndMetadataInfo> 
         OffsetAndMetadataInfo that = (OffsetAndMetadataInfo)obj;
         return
                 Objects.equals(this.topicPartition, that.topicPartition) &&
-                Objects.equals(this.offset, that.offset) &&
-                Objects.equals(this.metadata, that.metadata) &&
-                Objects.equals(this.commitDate, that.commitDate) &&
-                Objects.equals(this.expireDate, that.expireDate);
+                        Objects.equals(this.offset, that.offset) &&
+                        Objects.equals(this.metadata, that.metadata) &&
+                        Objects.equals(this.commitDate, that.commitDate) &&
+                        Objects.equals(this.expireDate, that.expireDate);
     }
 
     @Override
     public String toString() {
         return
                 "{topicPartition: " + topicPartition +
-                ", offset: " + offset +
-                ", metadata: " + metadata +
-                ", commitDate: " + commitDate +
-                ", expireDate: " + expireDate +
-                "}";
+                        ", offset: " + offset +
+                        ", metadata: " + metadata +
+                        ", commitDate: " + commitDate +
+                        ", expireDate: " + expireDate +
+                        "}";
     }
 
     @Override
@@ -168,9 +154,12 @@ public class OffsetAndMetadataInfo implements Comparable<OffsetAndMetadataInfo> 
         return new Builder();
     }
 
+    @JsonPOJOBuilder(withPrefix = StringUtils.EMPTY)
     public static class Builder {
 
         private TopicPartition topicPartition;
+        private String topic;
+        private int partition;
         private long offset;
         private String metadata;
         private LocalDateTime commitDate;
@@ -181,8 +170,18 @@ public class OffsetAndMetadataInfo implements Comparable<OffsetAndMetadataInfo> 
             return this;
         }
 
+        public Builder topic(String topic) {
+            this.topic = topic;
+            return this;
+        }
+
+        public Builder partition(int partition) {
+            this.partition = partition;
+            return this;
+        }
+
         public Builder offset(long offset) {
-            this.offset = offset;
+            this.offset = offset >= 0 ? offset : 0;
             return this;
         }
 
@@ -202,6 +201,7 @@ public class OffsetAndMetadataInfo implements Comparable<OffsetAndMetadataInfo> 
             }
         }
 
+        @JsonFormat
         public Builder commitDate(LocalDateTime commitDate) {
             this.commitDate = commitDate;
             return this;
@@ -218,14 +218,24 @@ public class OffsetAndMetadataInfo implements Comparable<OffsetAndMetadataInfo> 
             }
         }
 
+        @JsonFormat
         public Builder expireDate(LocalDateTime expireDate) {
             this.expireDate = expireDate;
             return this;
         }
 
+        private TopicPartition buildTopicPartition() {
+            if (topicPartition != null) {
+                return topicPartition;
+            } else if (topic != null && partition >= 0) {
+                return new TopicPartition(topic, partition);
+            }
+            return null;
+        }
+
         public OffsetAndMetadataInfo build() {
             return new OffsetAndMetadataInfo(
-                    topicPartition,
+                    buildTopicPartition(),
                     offset,
                     metadata,
                     commitDate,
