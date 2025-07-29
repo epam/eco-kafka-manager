@@ -26,10 +26,10 @@ import com.epam.eco.kafkamanager.utils.TestObjectMapperSingleton;
 /**
  * @author Andrei_Tytsik
  */
-public class OffsetAndMetadataInfoTest {
+class OffsetAndMetadataInfoTest {
 
     @Test
-    public void testSerializedToJsonAndBack() throws Exception {
+    void testSerializedToJsonAndBack() throws Exception {
         OffsetAndMetadataInfo origin = OffsetAndMetadataInfo.builder().
                 topicPartition(new TopicPartition("topic", 0)).
                 offset(42).
@@ -48,6 +48,30 @@ public class OffsetAndMetadataInfoTest {
                 OffsetAndMetadataInfo.class);
         Assertions.assertNotNull(deserialized);
         Assertions.assertEquals(origin, deserialized);
+    }
+
+    @Test
+    void testFixNegativeOffsetToZero() throws Exception {
+        long now = System.currentTimeMillis();
+        OffsetAndMetadataInfo origin = OffsetAndMetadataInfo.builder().
+                topicPartition(new TopicPartition("topic", 0)).
+                offset(-1).
+                metadata("metadata").
+                commitDate(now).
+                expireDate(now).
+                build();
+
+        ObjectMapper mapper = TestObjectMapperSingleton.getObjectMapper();
+
+        String json = mapper.writeValueAsString(origin);
+        Assertions.assertNotNull(json);
+
+        OffsetAndMetadataInfo deserialized = mapper.readValue(
+                json,
+                OffsetAndMetadataInfo.class);
+        Assertions.assertNotNull(deserialized);
+        Assertions.assertEquals(origin, deserialized);
+        Assertions.assertEquals(0L, deserialized.getOffset());
     }
 
 }
