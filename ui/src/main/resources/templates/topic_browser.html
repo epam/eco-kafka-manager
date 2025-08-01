@@ -501,6 +501,15 @@
         URL.revokeObjectURL(tempLink.href);
     }
 
+    function maxLimitCheck(object)  {
+        if (object.value.length > object.maxLength) {
+            object.value = object.value.slice(0, object.maxLength)
+        }
+        if (Number(object.value) > Number(object.max)) {
+            object.value = object.max
+        }
+    }
+
 
 </script>
 
@@ -786,9 +795,11 @@
                             <input type="number"
                                    class="form-control col-auto"
                                    min="10"
-                                   max="100"
+                                   max="10000"
+                                   maxLength="5"
                                    id="limit"
                                    name="limit"
+                                   oninput="maxLimitCheck(this)"
                                    th:value="${browseParams.limit}"/>
 
                         </div>

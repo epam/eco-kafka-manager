@@ -194,8 +194,8 @@ public class TopicBrowseParams extends HashMap<String, Object> {
     }
 
     public long getTimeout() {
-        Long limit = getAsLong(TIMEOUT);
-        return limit != null ? limit : DEFAULT_TIMEOUT;
+        Long timeout = getAsLong(TIMEOUT);
+        return timeout != null ? timeout : DEFAULT_TIMEOUT;
     }
 
     public void setTimeout(long timeout) {
@@ -204,7 +204,7 @@ public class TopicBrowseParams extends HashMap<String, Object> {
 
     public long getLimit() {
         Long limit = getAsLong(LIMIT);
-        return limit != null ? limit : TopicRecordFetchParams.MAX_LIMIT;
+        return limit != null ? limit : TopicRecordFetchParams.DEFAULT_LIMIT;
     }
 
     public void setLimit(long limit) {

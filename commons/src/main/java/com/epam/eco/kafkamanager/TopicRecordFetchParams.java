@@ -38,7 +38,8 @@ import static java.util.Objects.isNull;
 public class TopicRecordFetchParams<K,V> {
 
     public static final long MIN_LIMIT = 1;
-    public static final long MAX_LIMIT = 100;
+    public static final long MAX_LIMIT = 10_000;
+    public static final long DEFAULT_LIMIT = 100;
 
     private final DataFormat keyDataFormat;
     private final DataFormat valueDataFormat;
@@ -114,7 +115,6 @@ public class TopicRecordFetchParams<K,V> {
     public FilterClausePredicate<K,V> getPredicate() {
         return predicate;
     }
-
 
     public static List<DataFormat> getUiDataFormats() {
         return List.of(AVRO, STRING, JSON_STRING, HEX_STRING, PROTOCOL_BUFFERS);
