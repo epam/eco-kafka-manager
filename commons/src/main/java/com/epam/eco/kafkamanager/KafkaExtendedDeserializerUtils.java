@@ -15,7 +15,6 @@
  *******************************************************************************/
 package com.epam.eco.kafkamanager;
 
-import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.kafka.clients.consumer.ConsumerRecord;
@@ -35,7 +34,7 @@ public class KafkaExtendedDeserializerUtils extends KafkaExtendedAvroDeserialize
     public static Map<String,Object> extractValuesAsMap(ConsumerRecord record) {
         return record.value() instanceof GenericRecordWrapper ?
                ((GenericRecordWrapper) record.value()).getValuesAsMap() :
-               new HashMap<>();
+               null;
     }
 
     public static long extractSchemaId(ConsumerRecord record) {

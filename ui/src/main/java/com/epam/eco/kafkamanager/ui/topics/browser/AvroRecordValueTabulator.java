@@ -20,9 +20,8 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
-
-import javax.annotation.Nonnull;
 
 import org.apache.avro.Schema;
 import org.apache.avro.generic.GenericRecord;
@@ -61,38 +60,31 @@ public class AvroRecordValueTabulator implements RecordValueTabulator<Object> {
 
     @Override
     public Map<String, Object> toTabularValue(ConsumerRecord<?, Object> record) {
-        Map<String, Object> map = AvroRecordValuesExtractor.getValuesAsMap(record);
-        return isNull(map) ? null : flatValues(map, new HashMap<>(), "");
+        Map<String, Object> map = AvroRecordValuesExtractor.getValuesAsFlattenedMap(record);
+        return isNull(map) ? null : formatValues(map);
     }
 
-    public Map<String,Object> flatValues(@Nonnull Map<String, Object> map,
-                                         Map<String, Object> flatedMap,
-                                         String prefix) {
+    private Map<String,Object> formatValues(Map<String, Object> map) {
+        Map<String, Object> result = new LinkedHashMap<>();
 
-        for(Map.Entry<String,Object> entry: map.entrySet()) {
-            if(entry.getValue() instanceof Map) {
-                flatValues((Map)entry.getValue(), flatedMap, entry.getKey());
+        for(Map.Entry<String,Object> entry : map.entrySet()) {
+            if (entry.getValue() instanceof Map valueMap) {
+                result.put(entry.getKey(), formatValues(valueMap));
             } else {
-                flatedMap.put( prefixedKey(prefix, entry), convertValue(entry.getValue()) );
+                result.put(entry.getKey(), convertValue(entry.getValue()));
             }
         }
-        return flatedMap;
-    }
 
-    private static String prefixedKey(
-            String prefix,
-            Map.Entry<String, Object> entry
-    ) {
-        return prefix.isEmpty() ? entry.getKey() : prefix + "." + entry.getKey();
+        return result;
     }
 
     private String convertValue(Object value) {
-         if(value instanceof LocalDateTime) {
-             return ((LocalDateTime)value).format(DateTimeFormatter.ofPattern(topicBrowser.getDateTimeFormat()));
-         } else if(value instanceof LocalDate) {
-             return ((LocalDate)value).format(DateTimeFormatter.ofPattern(topicBrowser.getDateFormat()));
-         } else if(value instanceof LocalTime) {
-             return ((LocalTime)value).format(DateTimeFormatter.ofPattern(topicBrowser.getTimeFormat()));
+         if (value instanceof LocalDateTime dateTime) {
+             return dateTime.format(DateTimeFormatter.ofPattern(topicBrowser.getDateTimeFormat()));
+         } else if (value instanceof LocalDate date) {
+             return date.format(DateTimeFormatter.ofPattern(topicBrowser.getDateFormat()));
+         } else if (value instanceof LocalTime time) {
+             return time.format(DateTimeFormatter.ofPattern(topicBrowser.getTimeFormat()));
          } else {
              return isNull(value) ? getNullRepresentation() : value.toString();
          }

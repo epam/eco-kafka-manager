@@ -38,7 +38,8 @@ public class KafkaExtendedAvroDeserializer extends KafkaAvroDeserializer {
     private static final int END_SCHEMA_ID_POSITION = 5;
     private boolean isKey;
 
-    public KafkaExtendedAvroDeserializer() {}
+    public KafkaExtendedAvroDeserializer() {
+    }
 
     public KafkaExtendedAvroDeserializer(SchemaRegistryClient schemaRegistryClient) {
         super(schemaRegistryClient);
@@ -61,38 +62,33 @@ public class KafkaExtendedAvroDeserializer extends KafkaAvroDeserializer {
 
     @Override
     public Object deserialize(String topic, byte[] bytes, Schema readerSchema) {
-        return getDeserializedResult(topic,bytes);
+        return getDeserializedResult(topic, bytes);
     }
 
     private Object getDeserializedResult(String topic, byte[] bytes) {
         Object obj = deserialize(topic, isKey, bytes, null);
-        if(obj instanceof GenericRecord) {
-            return new GenericRecordWrapper((GenericRecord) obj,
-                                            getSchemaId(bytes),
-                                            LogicalTypeSchemaConverter.convert((GenericRecord) obj));
+        if (obj instanceof GenericRecord genericRecord) {
+            return new GenericRecordWrapper(genericRecord, getSchemaId(bytes));
         } else {
             return obj;
         }
     }
 
     protected int getSchemaId(byte[] bytes) {
-        Validate.isTrue(bytes[0]==0x0,"Deserialization exception: not avro record!");
-        Validate.isTrue(bytes.length>END_SCHEMA_ID_POSITION,"Serialized message too short! (bytes length<="+END_SCHEMA_ID_POSITION+")");
+        Validate.isTrue(bytes[0] == 0x0, "Deserialization exception: not avro record!");
+        Validate.isTrue(bytes.length > END_SCHEMA_ID_POSITION, "Serialized message too short! (bytes length<=" + END_SCHEMA_ID_POSITION + ")");
         return ByteBuffer.wrap(Arrays.copyOfRange(bytes, START_SCHEMA_ID_POSITION, END_SCHEMA_ID_POSITION)).getInt();
     }
 
-    protected static class GenericRecordWrapper {
+    public static class GenericRecordWrapper {
         private final GenericRecord value;
         private final long schemaId;
-        private final Map<String,Object> valuesAsMap;
+        private final Map<String, Object> valuesAsMap;
 
-        private GenericRecordWrapper(GenericRecord value,
-                                     long schemaId,
-                                     Map<String, Object> valuesAsMap
-        ) {
+        public GenericRecordWrapper(GenericRecord value, long schemaId) {
             this.value = value;
             this.schemaId = schemaId;
-            this.valuesAsMap = valuesAsMap;
+            this.valuesAsMap = LogicalTypeSchemaConverter.convert(value);
         }
 
         public GenericRecord getValue() {

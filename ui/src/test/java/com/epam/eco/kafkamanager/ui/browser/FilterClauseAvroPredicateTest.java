@@ -17,13 +17,15 @@ package com.epam.eco.kafkamanager.ui.browser;
 
 import java.util.Map;
 
+import org.apache.avro.generic.GenericData;
 import org.apache.avro.generic.GenericRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import com.epam.eco.kafkamanager.ui.topics.browser.pedicates.FilterClauseAvroKeyPredicate;
+import com.epam.eco.kafkamanager.KafkaExtendedAvroDeserializer.GenericRecordWrapper;
 import com.epam.eco.kafkamanager.ui.topics.browser.handlers.FilterOperationEnum;
+import com.epam.eco.kafkamanager.ui.topics.browser.pedicates.FilterClauseAvroKeyPredicate;
 import com.epam.eco.kafkamanager.ui.topics.browser.pedicates.FilterClauseAvroValuePredicate;
 
 import static com.epam.eco.kafkamanager.ui.browser.FilterPredicateUtils.FIELD_NAME;
@@ -34,7 +36,10 @@ import static com.epam.eco.kafkamanager.ui.browser.FilterPredicateUtils.KEY_VALU
 import static com.epam.eco.kafkamanager.ui.browser.FilterPredicateUtils.MAP_FIELD_NAME;
 import static com.epam.eco.kafkamanager.ui.browser.FilterPredicateUtils.NULL_VALUE;
 import static com.epam.eco.kafkamanager.ui.browser.FilterPredicateUtils.PREFIX;
+import static com.epam.eco.kafkamanager.ui.browser.FilterPredicateUtils.RECORD_FIELD_NAME;
+import static com.epam.eco.kafkamanager.ui.browser.FilterPredicateUtils.RECORD_SUB_FIELD_NAME;
 import static com.epam.eco.kafkamanager.ui.browser.FilterPredicateUtils.SUFFIX;
+import static com.epam.eco.kafkamanager.ui.browser.FilterPredicateUtils.TEST_SUB_RECORD_SCHEMA;
 import static com.epam.eco.kafkamanager.ui.browser.FilterPredicateUtils.TOPIC_NAME;
 import static com.epam.eco.kafkamanager.ui.browser.FilterPredicateUtils.getFilterClauseAvroKeyPredicate;
 import static com.epam.eco.kafkamanager.ui.browser.FilterPredicateUtils.getFilterClauseAvroValuePredicate;
@@ -45,13 +50,13 @@ import static com.epam.eco.kafkamanager.ui.topics.browser.pedicates.FilterClause
  * @author Mikhail_Vershkov
  */
 
-public class FilterClauseAvroPredicateTest {
+class FilterClauseAvroPredicateTest {
 
     private static final String TEST_JSON = "{\"testField\": \"testValue\", \"innerField\" : { \"innerField2\":\"innerValue2\"}}";
     private static final Map<String,String> TEST_MAP = Map.of("testField","testValue", "testField2", "testValue2");
 
     @Test
-    public void testOrdinaryKeyEquals() {
+    void testOrdinaryKeyEquals() {
 
         FilterClauseAvroKeyPredicate filterClausePredicate =
                 getFilterClauseAvroKeyPredicate(KEY_ATTRIBUTE, FilterOperationEnum.EQUALS,KEY_VALUE);
@@ -62,7 +67,7 @@ public class FilterClauseAvroPredicateTest {
     }
 
     @Test
-    public void testOrdinaryKeyContains() {
+    void testOrdinaryKeyContains() {
 
         FilterClauseAvroKeyPredicate filterClausePredicate =
                 getFilterClauseAvroKeyPredicate(KEY_ATTRIBUTE, FilterOperationEnum.CONTAINS,"TestKey");
@@ -72,7 +77,7 @@ public class FilterClauseAvroPredicateTest {
                                    .test(new ConsumerRecord<>(TOPIC_NAME, 0, 0L, "testKeyContains", KEY_VALUE)));
     }
     @Test
-    public void testOrdinaryKeyStartsWith() {
+    void testOrdinaryKeyStartsWith() {
 
         FilterClauseAvroKeyPredicate filterClausePredicate =
                 getFilterClauseAvroKeyPredicate(KEY_ATTRIBUTE, FilterOperationEnum.STARTS_WITH,KEY_VALUE);
@@ -83,7 +88,7 @@ public class FilterClauseAvroPredicateTest {
     }
 
     @Test
-    public void testNullKeyEquals() {
+    void testNullKeyEquals() {
 
         FilterClauseAvroKeyPredicate filterClausePredicate =
                 getFilterClauseAvroKeyPredicate(KEY_ATTRIBUTE, FilterOperationEnum.EQUALS, "null");
@@ -96,7 +101,7 @@ public class FilterClauseAvroPredicateTest {
     }
 
     @Test
-    public void testAvroOrdinaryFieldEquals() {
+    void testAvroOrdinaryFieldEquals() {
 
         FilterClauseAvroValuePredicate filterClausePredicate =
                 getFilterClauseAvroValuePredicate(FIELD_NAME, FilterOperationEnum.EQUALS,FIELD_VALUE_CORRECT);
@@ -112,7 +117,7 @@ public class FilterClauseAvroPredicateTest {
     }
 
     @Test
-    public void testAvroOrdinaryFieldContains() {
+    void testAvroOrdinaryFieldContains() {
 
         FilterClauseAvroValuePredicate filterClausePredicate =
                 getFilterClauseAvroValuePredicate(FIELD_NAME, FilterOperationEnum.CONTAINS,"test");
@@ -129,7 +134,7 @@ public class FilterClauseAvroPredicateTest {
     }
 
     @Test
-    public void testAvroOrdinaryFieldStarts() {
+    void testAvroOrdinaryFieldStarts() {
 
         FilterClauseAvroValuePredicate filterClausePredicate =
                 getFilterClauseAvroValuePredicate(FIELD_NAME, FilterOperationEnum.STARTS_WITH,FIELD_VALUE_CORRECT);
@@ -145,9 +150,158 @@ public class FilterClauseAvroPredicateTest {
 
     }
 
+    @Test
+    void testAvroSubFieldEquals() {
+        GenericRecord subRecordPasses = new GenericData.Record(TEST_SUB_RECORD_SCHEMA);
+        subRecordPasses.put(RECORD_SUB_FIELD_NAME, "test-value");
+
+        GenericRecord subRecordFails = new GenericData.Record(TEST_SUB_RECORD_SCHEMA);
+        subRecordFails.put(RECORD_SUB_FIELD_NAME, "test-value-wrong");
+
+        FilterClauseAvroValuePredicate filterClausePredicate = getFilterClauseAvroValuePredicate(
+                RECORD_FIELD_NAME + "." + RECORD_SUB_FIELD_NAME,
+                FilterOperationEnum.EQUALS,
+                "test-value"
+        );
+
+        Assertions.assertTrue(filterClausePredicate.test(
+                new ConsumerRecord<>(TOPIC_NAME, 0, 0L, KEY_VALUE, getGenericRecord(RECORD_FIELD_NAME, subRecordPasses))
+        ));
+
+        Assertions.assertFalse(filterClausePredicate.test(
+                new ConsumerRecord<>(TOPIC_NAME, 0, 0L, KEY_VALUE, getGenericRecord(RECORD_FIELD_NAME, subRecordFails))
+        ));
+    }
 
     @Test
-    public void testAvroJsonFieldEquals() {
+    void testAvroSubFieldContains() {
+        GenericRecord subRecordPasses = new GenericData.Record(TEST_SUB_RECORD_SCHEMA);
+        subRecordPasses.put(RECORD_SUB_FIELD_NAME, "test-value-contains");
+
+        GenericRecord subRecordFails = new GenericData.Record(TEST_SUB_RECORD_SCHEMA);
+        subRecordFails.put(RECORD_SUB_FIELD_NAME, "wrong-value");
+
+        FilterClauseAvroValuePredicate filterClausePredicate = getFilterClauseAvroValuePredicate(
+                RECORD_FIELD_NAME + "." + RECORD_SUB_FIELD_NAME,
+                FilterOperationEnum.CONTAINS,
+                "test-value"
+        );
+
+        Assertions.assertTrue(filterClausePredicate.test(
+                new ConsumerRecord<>(TOPIC_NAME, 0, 0L, KEY_VALUE, getGenericRecord(RECORD_FIELD_NAME, subRecordPasses))
+        ));
+
+        Assertions.assertFalse(filterClausePredicate.test(
+                new ConsumerRecord<>(TOPIC_NAME, 0, 0L, KEY_VALUE, getGenericRecord(RECORD_FIELD_NAME, subRecordFails))
+        ));
+    }
+
+    @Test
+    void testAvroSubFieldStarts() {
+        GenericRecord subRecordPasses = new GenericData.Record(TEST_SUB_RECORD_SCHEMA);
+        subRecordPasses.put(RECORD_SUB_FIELD_NAME, "test-value-starts-with");
+
+        GenericRecord subRecordFails = new GenericData.Record(TEST_SUB_RECORD_SCHEMA);
+        subRecordFails.put(RECORD_SUB_FIELD_NAME, "wrong-test-value");
+
+        FilterClauseAvroValuePredicate filterClausePredicate = getFilterClauseAvroValuePredicate(
+                RECORD_FIELD_NAME + "." + RECORD_SUB_FIELD_NAME,
+                FilterOperationEnum.STARTS_WITH,
+                "test-value"
+        );
+
+        Assertions.assertTrue(filterClausePredicate.test(
+                new ConsumerRecord<>(TOPIC_NAME, 0, 0L, KEY_VALUE, getGenericRecord(RECORD_FIELD_NAME, subRecordPasses))
+        ));
+
+        Assertions.assertFalse(filterClausePredicate.test(
+                new ConsumerRecord<>(TOPIC_NAME, 0, 0L, KEY_VALUE, getGenericRecord(RECORD_FIELD_NAME, subRecordFails))
+        ));
+    }
+
+    @Test
+    void testWrappedAvroSubFieldEquals() {
+        GenericRecord subRecordPasses = new GenericData.Record(TEST_SUB_RECORD_SCHEMA);
+        subRecordPasses.put(RECORD_SUB_FIELD_NAME, "test-value");
+
+        GenericRecord subRecordFails = new GenericData.Record(TEST_SUB_RECORD_SCHEMA);
+        subRecordFails.put(RECORD_SUB_FIELD_NAME, "test-value-wrong");
+
+        FilterClauseAvroValuePredicate filterClausePredicate = getFilterClauseAvroValuePredicate(
+                RECORD_FIELD_NAME + "." + RECORD_SUB_FIELD_NAME,
+                FilterOperationEnum.EQUALS,
+                "test-value"
+        );
+
+        GenericRecordWrapper wrapper = new GenericRecordWrapper(
+                getGenericRecord(RECORD_FIELD_NAME, subRecordPasses),
+                0L
+        );
+        Assertions.assertTrue(filterClausePredicate.test(new ConsumerRecord<>(TOPIC_NAME, 0, 0L, KEY_VALUE, wrapper)));
+
+        wrapper = new GenericRecordWrapper(
+                getGenericRecord(RECORD_FIELD_NAME, subRecordFails),
+                0L
+        );
+        Assertions.assertFalse(filterClausePredicate.test(new ConsumerRecord<>(TOPIC_NAME, 0, 0L, KEY_VALUE, wrapper)));
+    }
+
+    @Test
+    void testWrappedAvroSubFieldContains() {
+        GenericRecord subRecordPasses = new GenericData.Record(TEST_SUB_RECORD_SCHEMA);
+        subRecordPasses.put(RECORD_SUB_FIELD_NAME, "test-value-contains");
+
+        GenericRecord subRecordFails = new GenericData.Record(TEST_SUB_RECORD_SCHEMA);
+        subRecordFails.put(RECORD_SUB_FIELD_NAME, "wrong-value");
+
+        FilterClauseAvroValuePredicate filterClausePredicate = getFilterClauseAvroValuePredicate(
+                RECORD_FIELD_NAME + "." + RECORD_SUB_FIELD_NAME,
+                FilterOperationEnum.CONTAINS,
+                "test-value"
+        );
+
+        GenericRecordWrapper wrapper = new GenericRecordWrapper(
+                getGenericRecord(RECORD_FIELD_NAME, subRecordPasses),
+                0L
+        );
+        Assertions.assertTrue(filterClausePredicate.test(new ConsumerRecord<>(TOPIC_NAME, 0, 0L, KEY_VALUE, wrapper)));
+
+        wrapper = new GenericRecordWrapper(
+                getGenericRecord(RECORD_FIELD_NAME, subRecordFails),
+                0L
+        );
+        Assertions.assertFalse(filterClausePredicate.test(new ConsumerRecord<>(TOPIC_NAME, 0, 0L, KEY_VALUE, wrapper)));
+    }
+
+    @Test
+    void testWrappedAvroSubFieldStarts() {
+        GenericRecord subRecordPasses = new GenericData.Record(TEST_SUB_RECORD_SCHEMA);
+        subRecordPasses.put(RECORD_SUB_FIELD_NAME, "test-value-starts-with");
+
+        GenericRecord subRecordFails = new GenericData.Record(TEST_SUB_RECORD_SCHEMA);
+        subRecordFails.put(RECORD_SUB_FIELD_NAME, "wrong-test-value");
+
+        FilterClauseAvroValuePredicate filterClausePredicate = getFilterClauseAvroValuePredicate(
+                RECORD_FIELD_NAME + "." + RECORD_SUB_FIELD_NAME,
+                FilterOperationEnum.STARTS_WITH,
+                "test-value"
+        );
+
+        GenericRecordWrapper wrapper = new GenericRecordWrapper(
+                getGenericRecord(RECORD_FIELD_NAME, subRecordPasses),
+                0L
+        );
+        Assertions.assertTrue(filterClausePredicate.test(new ConsumerRecord<>(TOPIC_NAME, 0, 0L, KEY_VALUE, wrapper)));
+
+        wrapper = new GenericRecordWrapper(
+                getGenericRecord(RECORD_FIELD_NAME, subRecordFails),
+                0L
+        );
+        Assertions.assertFalse(filterClausePredicate.test(new ConsumerRecord<>(TOPIC_NAME, 0, 0L, KEY_VALUE, wrapper)));
+    }
+
+    @Test
+    void testAvroJsonFieldEquals() {
 
         FilterClauseAvroValuePredicate filterClausePredicate =
                 getFilterClauseAvroValuePredicate(FIELD_NAME, FilterOperationEnum.EQUALS,"testField:testValue");
@@ -180,7 +334,7 @@ public class FilterClauseAvroPredicateTest {
     }
 
     @Test
-    public void testAvroJsonFieldContains() {
+    void testAvroJsonFieldContains() {
 
         FilterClauseAvroValuePredicate filterClausePredicate =
                 getFilterClauseAvroValuePredicate(FIELD_NAME, FilterOperationEnum.CONTAINS,"testField:test");
@@ -214,7 +368,7 @@ public class FilterClauseAvroPredicateTest {
     }
 
     @Test
-    public void testAvroJsonFieldStartsWith() {
+    void testAvroJsonFieldStartsWith() {
 
         FilterClauseAvroValuePredicate filterClausePredicate =
                 getFilterClauseAvroValuePredicate(FIELD_NAME, FilterOperationEnum.STARTS_WITH,"testField:test");
@@ -247,7 +401,7 @@ public class FilterClauseAvroPredicateTest {
     }
 
     @Test
-    public void testAvroMapFieldEquals() {
+    void testAvroMapFieldEquals() {
 
         FilterClauseAvroValuePredicate filterClausePredicate =
                 getFilterClauseAvroValuePredicate(MAP_FIELD_NAME,FilterOperationEnum.EQUALS,"testField:testValue");
@@ -272,7 +426,7 @@ public class FilterClauseAvroPredicateTest {
     }
 
     @Test
-    public void testAvroMapFieldContains() {
+    void testAvroMapFieldContains() {
 
         FilterClauseAvroValuePredicate filterClausePredicate =
                 getFilterClauseAvroValuePredicate(MAP_FIELD_NAME,FilterOperationEnum.CONTAINS,"testField:Value");
@@ -297,7 +451,7 @@ public class FilterClauseAvroPredicateTest {
     }
 
     @Test
-    public void testAvroMapFieldStartsWith() {
+    void testAvroMapFieldStartsWith() {
 
         FilterClauseAvroValuePredicate filterClausePredicate =
                 getFilterClauseAvroValuePredicate(MAP_FIELD_NAME,FilterOperationEnum.CONTAINS,"testField:test");
