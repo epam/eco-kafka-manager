@@ -32,13 +32,13 @@ import org.apache.kafka.common.record.TimestampType;
 import org.jetbrains.annotations.NotNull;
 
 import com.epam.eco.kafkamanager.FilterClause;
+import com.epam.eco.kafkamanager.ui.topics.browser.handlers.FilterOperationEnum;
 import com.epam.eco.kafkamanager.ui.topics.browser.pedicates.FilterClauseAvroKeyPredicate;
 import com.epam.eco.kafkamanager.ui.topics.browser.pedicates.FilterClauseAvroValuePredicate;
 import com.epam.eco.kafkamanager.ui.topics.browser.pedicates.FilterClauseHeaderPredicate;
 import com.epam.eco.kafkamanager.ui.topics.browser.pedicates.FilterClauseJsonKeyPredicate;
 import com.epam.eco.kafkamanager.ui.topics.browser.pedicates.FilterClauseJsonValuePredicate;
 import com.epam.eco.kafkamanager.ui.topics.browser.pedicates.FilterClauseStringKeyPredicate;
-import com.epam.eco.kafkamanager.ui.topics.browser.handlers.FilterOperationEnum;
 import com.epam.eco.kafkamanager.ui.topics.browser.pedicates.FilterClauseStringValuePredicate;
 import com.epam.eco.kafkamanager.ui.topics.browser.pedicates.FilterClauseTombstonePredicate;
 
@@ -64,21 +64,32 @@ public class FilterPredicateUtils {
     public static final String FIELD_TOMBSTONES = "tombstones";
     public static final String FIELD_VALUE_CORRECT = "testValue";
     public static final String FIELD_VALUE_INCORRECT = "testValueInvalid";
+    public static final String RECORD_FIELD_NAME = "testSubRecord";
+    public static final String RECORD_FIELD_TYPE = "testSubRecordType";
+    public static final String RECORD_SUB_FIELD_NAME = "testSubField";
     public static final Object NULL_VALUE = null;
     public static final String FIELD_VALUE_EMPTY = "";
     public static final String MAP_FIELD_NAME = "mapField";
     public static final String PREFIX = "prefix";
     public static final String SUFFIX = "suffix";
 
+    public static final Schema TEST_SUB_RECORD_SCHEMA = SchemaBuilder.record(RECORD_FIELD_TYPE)
+            .fields()
+            .nullableString(RECORD_SUB_FIELD_NAME, "null")
+            .endRecord();
+
     public static final Schema TEST_SCHEMA = SchemaBuilder.record(NAME_SPACE)
-                                                          .fields()
-                                                          .nullableString(FIELD_NAME,"null")
-                                                          .name(MAP_FIELD_NAME)
-                                                          .type().map().values()
-                                                          .stringBuilder()
-                                                          .endString()
-                                                          .mapDefault(Map.of())
-                                                          .endRecord();
+            .fields()
+            .nullableString(FIELD_NAME, "null")
+            .name(RECORD_FIELD_NAME)
+            .type(Schema.createUnion(Schema.create(Schema.Type.NULL), TEST_SUB_RECORD_SCHEMA))
+            .noDefault()
+            .name(MAP_FIELD_NAME)
+            .type().map().values()
+            .stringBuilder()
+            .endString()
+            .mapDefault(Map.of())
+            .endRecord();
 
     @NotNull
     public static FilterClauseStringKeyPredicate getFilterClauseStringKeyPredicate(String clauseFieldName,

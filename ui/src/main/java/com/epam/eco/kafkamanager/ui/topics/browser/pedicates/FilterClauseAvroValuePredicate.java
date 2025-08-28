@@ -42,7 +42,7 @@ public class FilterClauseAvroValuePredicate extends FilterClauseAbstractValuePre
         if (clauses.isEmpty()) {
             return true;
         }
-        Map<String, Object> mapOfValues = AvroRecordValuesExtractor.getValuesAsMap(record);
+        Map<String, Object> mapOfValues = AvroRecordValuesExtractor.getValuesAsFlattenedMap(record);
         for (FilterClause filterClause : clauses) {
             if (mapOfValues != null && mapOfValues.containsKey(filterClause.getColumn())) {
                 Object value = mapOfValues.get(filterClause.getColumn());

@@ -15,9 +15,8 @@
  *******************************************************************************/
 package com.epam.eco.kafkamanager.ui.browser;
 
-import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.avro.Schema;
@@ -31,7 +30,7 @@ import org.junit.jupiter.api.Test;
 
 import com.google.common.collect.ImmutableList;
 
-import com.epam.eco.kafkamanager.logicaltype.LogicalTypeSchemaConverter;
+import com.epam.eco.kafkamanager.KafkaExtendedAvroDeserializer.GenericRecordWrapper;
 import com.epam.eco.kafkamanager.ui.config.TopicBrowser;
 import com.epam.eco.kafkamanager.ui.topics.browser.AvroRecordValueTabulator;
 import com.epam.eco.kafkamanager.ui.topics.browser.RecordSchema;
@@ -45,10 +44,10 @@ import static com.epam.eco.kafkamanager.ui.utils.SchemaSubjectUtils.VALUE_STRATE
 /**
  * @author Andrei_Tytsik
  */
-public class AvroRecordValueTabulatorTest {
+class AvroRecordValueTabulatorTest {
 
     @Test
-    public void testNullIsTabulated() throws Exception {
+    void testNullIsTabulated() {
         AvroRecordValueTabulator tabulator = new AvroRecordValueTabulator(new Config(Collections.emptyList()),
                                                                           new TopicBrowser());
 
@@ -57,7 +56,7 @@ public class AvroRecordValueTabulatorTest {
     }
 
     @Test
-    public void testPrimitiveObjectIsTabulated() throws Exception {
+    void testPrimitiveObjectIsTabulated() {
         AvroRecordValueTabulator tabulator = new AvroRecordValueTabulator(new Config(Collections.emptyList()),
                                                                           new TopicBrowser());
 
@@ -72,7 +71,7 @@ public class AvroRecordValueTabulatorTest {
     }
 
     @Test
-    public void testRecordIsTabulated() throws Exception {
+    void testGenericRecordIsTabulated() {
         AvroRecordValueTabulator tabulator = new AvroRecordValueTabulator(new Config(Collections.emptyList()), new TopicBrowser());
 
         GenericRecord record = createEmptyTestRecord();
@@ -80,29 +79,59 @@ public class AvroRecordValueTabulatorTest {
         record.put("a", "a");
         record.put("b", "b");
         record.put("c", "c");
-        record.put("d", Arrays.asList("1","2","3"));
+        record.put("d", List.of("1","2","3"));
 
         GenericRecord subRecord = new GenericData.Record(record.getSchema().getField("e").schema());
         subRecord.put("f", "f");
         subRecord.put("g", "g");
         subRecord.put("h", "h");
         record.put("e", subRecord);
-        Map<String, Object> tab = LogicalTypeSchemaConverter.convert(record);
-        Map<String, Object> tabular = tabulator.flatValues(tab, new HashMap<>(), "");
+        Map<String, Object> tabular = tabulator.toTabularValue(createConsumerRecord(record));
 
         Assertions.assertNotNull(tabular);
         Assertions.assertEquals(7, tabular.size());
         Assertions.assertEquals("a", tabular.get("a"));
         Assertions.assertEquals("b", tabular.get("b"));
         Assertions.assertEquals("c", tabular.get("c"));
-        Assertions.assertEquals(Arrays.asList("1","2","3").toString(), tabular.get("d"));
+        Assertions.assertEquals(List.of("1","2","3").toString(), tabular.get("d"));
         Assertions.assertEquals("f", tabular.get("e.f"));
         Assertions.assertEquals("g", tabular.get("e.g"));
         Assertions.assertEquals("h", tabular.get("e.h"));
     }
 
     @Test
-    public void testSchemaTopicNameStrategy() {
+    void testGenericRecordWrapperIsTabulated() {
+        AvroRecordValueTabulator tabulator = new AvroRecordValueTabulator(new Config(Collections.emptyList()), new TopicBrowser());
+
+        GenericRecord record = createEmptyTestRecord();
+
+        record.put("a", "a");
+        record.put("b", "b");
+        record.put("c", "c");
+        record.put("d", List.of("1","2","3"));
+
+        GenericRecord subRecord = new GenericData.Record(record.getSchema().getField("e").schema());
+        subRecord.put("f", "f");
+        subRecord.put("g", "g");
+        subRecord.put("h", "h");
+        record.put("e", subRecord);
+
+        GenericRecordWrapper wrapper = new GenericRecordWrapper(record, 0L);
+        Map<String, Object> tabular = tabulator.toTabularValue(createConsumerRecord(wrapper));
+
+        Assertions.assertNotNull(tabular);
+        Assertions.assertEquals(7, tabular.size());
+        Assertions.assertEquals("a", tabular.get("a"));
+        Assertions.assertEquals("b", tabular.get("b"));
+        Assertions.assertEquals("c", tabular.get("c"));
+        Assertions.assertEquals(List.of("1","2","3").toString(), tabular.get("d"));
+        Assertions.assertEquals("f", tabular.get("e.f"));
+        Assertions.assertEquals("g", tabular.get("e.g"));
+        Assertions.assertEquals("h", tabular.get("e.h"));
+    }
+    
+    @Test
+    void testSchemaTopicNameStrategy() {
         Config config = new Config(ImmutableList.of(
                 new ConfigEntry(KEY_STRATEGY_PROPERTY, TOPIC_NAME_STRATEGY),
                 new ConfigEntry(VALUE_STRATEGY_PROPERTY, TOPIC_NAME_STRATEGY)));
@@ -114,7 +143,7 @@ public class AvroRecordValueTabulatorTest {
     }
 
     @Test
-    public void testSchemaRecordNameStrategy() {
+    void testSchemaRecordNameStrategy() {
         Config config = new Config(ImmutableList.of(
                 new ConfigEntry(KEY_STRATEGY_PROPERTY, RECORD_NAME_STRATEGY),
                 new ConfigEntry(VALUE_STRATEGY_PROPERTY, RECORD_NAME_STRATEGY)));
@@ -126,7 +155,7 @@ public class AvroRecordValueTabulatorTest {
     }
 
     @Test
-    public void testSchemaTopicRecordNameStrategy() {
+    void testSchemaTopicRecordNameStrategy() {
         Config config = new Config(ImmutableList.of(
                 new ConfigEntry(KEY_STRATEGY_PROPERTY, TOPIC_RECORD_NAME_STRATEGY),
                 new ConfigEntry(VALUE_STRATEGY_PROPERTY, TOPIC_RECORD_NAME_STRATEGY)));
