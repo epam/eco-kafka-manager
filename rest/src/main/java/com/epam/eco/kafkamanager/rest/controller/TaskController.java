@@ -17,6 +17,7 @@ package com.epam.eco.kafkamanager.rest.controller;
 
 import java.util.Map;
 import java.util.concurrent.ForkJoinPool;
+import java.util.stream.Collectors;
 
 import org.apache.kafka.common.TopicPartition;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,6 +34,7 @@ import com.epam.eco.commons.kafka.OffsetRange;
 import com.epam.eco.commons.kafka.helpers.RecordFetchResult;
 import com.epam.eco.kafkamanager.KafkaManager;
 import com.epam.eco.kafkamanager.OffsetTimeSeries;
+import com.epam.eco.kafkamanager.core.utils.AuditLogger;
 import com.epam.eco.kafkamanager.exec.TaskResult;
 import com.epam.eco.kafkamanager.rest.config.KafkaManagerRestProperties;
 import com.epam.eco.kafkamanager.rest.request.ConsumerGroupOffsetResetRequest;
@@ -168,6 +170,7 @@ public class TaskController {
             @RequestBody TopicPurgeRequest request) {
         DeferredResult<TaskResult<Void>> response =
                 new DeferredResult<>(properties.getAsyncRequestTimeoutInMs());
+        AuditLogger.logPurgeTopic(request.getTopicName());
         ForkJoinPool.commonPool().submit(DelegatingSecurityContextRunnable.create(() -> {
             try {
                 TaskResult<Void> result = kafkaManager.getTopicPurgerTaskExecutor().executeDetailed(request.getTopicName());
@@ -188,6 +191,15 @@ public class TaskController {
             @RequestBody ConsumerGroupOffsetResetRequest request) {
         DeferredResult<TaskResult<Void>> response =
                 new DeferredResult<>(properties.getAsyncRequestTimeoutInMs());
+        Map<String, Object> resetDetails = Map.of(
+                "offsets", request.getOffsets().entrySet().stream()
+                        .collect(Collectors.toMap(
+                                e -> String.format("%s-%d", e.getKey().topic(), e.getKey().partition()),
+                                Map.Entry::getValue
+                        )),
+                "totalPartitions", request.getOffsets().size()
+        );
+        AuditLogger.logConsumerGroupOffsetsReset(request.getGroupName(), resetDetails);
         ForkJoinPool.commonPool().submit(DelegatingSecurityContextRunnable.create(() -> {
             try {
                 TaskResult<Void> result = kafkaManager.getConsumerGroupOffsetResetterTaskExecutor()

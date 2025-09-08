@@ -44,6 +44,7 @@ import com.epam.eco.kafkamanager.KafkaManager;
 import com.epam.eco.kafkamanager.PermissionCreateParams;
 import com.epam.eco.kafkamanager.PermissionInfo;
 import com.epam.eco.kafkamanager.PermissionSearchCriteria;
+import com.epam.eco.kafkamanager.core.utils.AuditLogger;
 import com.epam.eco.kafkamanager.export.PermissionExporterType;
 
 /**
@@ -156,16 +157,26 @@ public class PermissionController {
             @RequestParam AclOperation operation,
             @RequestParam("kafkaPrincipal") String kafkaPrincipalString,
             @RequestParam String host) {
-        PermissionCreateParams.Builder createParamsBuilder = PermissionCreateParams.builder()
+        PermissionCreateParams createParams = PermissionCreateParams.builder()
                 .resourceType(resourceType)
                 .resourceName(resourceName)
                 .patternType(patternType)
                 .permissionType(permissionType)
                 .operation(operation)
                 .principal(kafkaPrincipalString)
-                .host(host);
+                .host(host)
+                .build();
 
-        kafkaManager.createPermission(createParamsBuilder.build());
+        // Log permission creation
+        String permissionIdentifier = String.format("%s:%s:%s",
+                resourceType,
+                resourceName,
+                kafkaPrincipalString);
+        AuditLogger.logPermissionCreate(permissionIdentifier,
+                Map.of("permissionDetails",
+                        createParams));
+
+        kafkaManager.createPermission(createParams);
         return "redirect:" + ResourcePermissionController.buildResourceUrl(
                 resourceType,
                 resourceName,

@@ -30,6 +30,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import com.epam.eco.kafkamanager.*;
+import com.epam.eco.kafkamanager.core.utils.AuditLogger;
 import com.epam.eco.kafkamanager.ui.utils.ComboBoxModel;
 import jakarta.servlet.http.HttpServletResponse;
 
@@ -221,6 +222,7 @@ public class TopicController {
     @PreAuthorize("@authorizer.isPermitted('TOPIC', #topicName, 'WRITE')")
     @RequestMapping(value=MAPPING_PURGER, method=RequestMethod.POST)
     public String purger(@PathVariable("name") String topicName) throws Exception {
+        AuditLogger.logPurgeTopic(topicName);
         kafkaManager.getTopicPurgerTaskExecutor().execute(topicName);
         return "redirect:" + buildTopicUrl(topicName);
     }
@@ -228,6 +230,7 @@ public class TopicController {
     @PreAuthorize("@authorizer.isPermitted('TOPIC', #topicName, 'DELETE')")
     @RequestMapping(value=MAPPING_DELETE, method=RequestMethod.POST)
     public String delete(@PathVariable("name") String topicName) {
+        AuditLogger.logTopicDelete(topicName);
         kafkaManager.deleteTopic(topicName);
         return "redirect:" + MAPPING_TOPICS;
     }
@@ -251,15 +254,21 @@ public class TopicController {
             @RequestParam(required=false) String description,
             @RequestParam(required=false) String attributes,
             @RequestParam Map<String, String> paramsMap) {
+        Map<String, String> configMap = extractConfigsFromParams(paramsMap, true);
         TopicCreateParams params = TopicCreateParams.builder().
                 topicName(topicName).
                 partitionCount(partitionCount).
                 replicationFactor(replicationFactor).
-                config(extractConfigsFromParams(paramsMap, true)).
+                config(configMap).
                 description(description).
                 attributes(!StringUtils.isBlank(attributes) ? MapperUtils.jsonToMap(attributes) : null).
                 build();
-
+        Map<String, Object> details = Map.of(
+                "partitionCount", partitionCount,
+                "replicationFactor", replicationFactor,
+                "config", configMap
+        );
+        AuditLogger.logTopicCreate(topicName, details);
         TopicInfo topicInfo = kafkaManager.createTopic(params);
         return "redirect:" + buildTopicUrl(topicInfo.getName());
     }
@@ -279,11 +288,12 @@ public class TopicController {
     public String config(
             @RequestParam String topicName,
             @RequestParam Map<String, String> paramsMap) {
+        Map<String, String> configsFromParams= extractConfigsFromParams(paramsMap, false);
         TopicConfigUpdateParams params = TopicConfigUpdateParams.builder().
                 topicName(topicName).
-                config(extractConfigsFromParams(paramsMap, false)).
+                config(configsFromParams).
                 build();
-
+        AuditLogger.logTopicConfigUpdate(topicName, Map.of("configChanges", configsFromParams));
         TopicInfo topicInfo = kafkaManager.updateTopic(params);
         return "redirect:" + buildTopicUrl(topicInfo.getName());
     }

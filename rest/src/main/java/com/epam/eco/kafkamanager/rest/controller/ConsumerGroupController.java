@@ -15,10 +15,14 @@
  *******************************************************************************/
 package com.epam.eco.kafkamanager.rest.controller;
 
+import java.util.Map;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
+
+import com.epam.eco.kafkamanager.core.utils.AuditLogger;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -84,6 +88,8 @@ public class ConsumerGroupController {
     @DeleteMapping("/{groupName}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteConsumerGroup(@PathVariable("groupName") String groupName) {
+        // Log consumer group deletion
+        AuditLogger.logConsumerGroupDelete(groupName);
         kafkaManager.deleteConsumerGroup(groupName);
     }
 

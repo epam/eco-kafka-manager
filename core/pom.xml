@@ -21,6 +21,10 @@
 
     <dependencies>
         <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+        <dependency>
             <groupId>com.epam.eco.kafkamanager</groupId>
             <artifactId>kafka-manager-commons</artifactId>
             <version>${project.version}</version>

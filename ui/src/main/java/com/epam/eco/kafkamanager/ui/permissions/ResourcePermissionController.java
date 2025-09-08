@@ -49,6 +49,7 @@ import com.epam.eco.kafkamanager.PrincipalPermissionsDeleteParams;
 import com.epam.eco.kafkamanager.PrincipalPermissionsDeleteParams.ResourceExcludes;
 import com.epam.eco.kafkamanager.ResourcePermissionFilter;
 import com.epam.eco.kafkamanager.ResourcePermissionsDeleteParams;
+import com.epam.eco.kafkamanager.core.utils.AuditLogger;
 import com.epam.eco.kafkamanager.ui.utils.MetadataWrapper;
 import com.epam.eco.kafkamanager.utils.MapperUtils;
 
@@ -157,6 +158,9 @@ public class ResourcePermissionController {
                                                                   .operationFilterOrElseDefault(operationFilter)
                                                                   .hostFilter(hostFilter)
                                                                   .build();
+
+        String resourceIdentifier = String.format("%s:%s:%s", resourceType, resourceName, patternType);
+        AuditLogger.logPermissionResourcesDelete(resourceIdentifier);
 
         kafkaManager.deletePermissions(new ResourcePermissionsDeleteParams(filter));
 

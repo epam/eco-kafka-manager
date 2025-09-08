@@ -38,6 +38,7 @@ import com.epam.eco.kafkamanager.ConsumerGroupListSearchCriteria;
 import com.epam.eco.kafkamanager.ConsumerGroupMetadataDeleteParams;
 import com.epam.eco.kafkamanager.ConsumerGroupMetadataUpdateParams;
 import com.epam.eco.kafkamanager.KafkaManager;
+import com.epam.eco.kafkamanager.core.utils.AuditLogger;
 import com.epam.eco.kafkamanager.udmetrics.UDMetric;
 import com.epam.eco.kafkamanager.udmetrics.UDMetricManager;
 import com.epam.eco.kafkamanager.udmetrics.UDMetricType;
@@ -130,6 +131,7 @@ public class ConsumerGroupController {
     @PreAuthorize("@authorizer.isPermitted('CONSUMER_GROUP', #groupName, 'DELETE')")
     @RequestMapping(value = MAPPING_DELETE, method = RequestMethod.POST)
     public String delete(@PathVariable("name") String groupName) {
+        AuditLogger.logConsumerGroupDelete(groupName);
         kafkaManager.deleteConsumerGroup(groupName);
         return "redirect:" + MAPPING_GROUPS;
     }
