@@ -21,12 +21,15 @@ import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.kafka.common.acl.AclOperation;
 import org.apache.kafka.common.acl.AclPermissionType;
 import org.apache.kafka.common.resource.PatternType;
 import org.apache.kafka.common.resource.ResourceType;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import com.epam.eco.kafkamanager.core.utils.AuditLogger;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -142,6 +145,14 @@ public class PermissionController {
                 .operation(request.getOperation())
                 .host(request.getHost())
                 .build();
+
+        // Log permission creation
+        String permissionIdentifier = String.format("%s:%s:%s",
+                request.getResourceType(),
+                request.getResourceName(),
+                request.getPrincipal());
+
+        AuditLogger.logPermissionCreate(permissionIdentifier, Map.of("permissionDetails", params));
         kafkaManager.createPermission(params);
     }
 
@@ -187,6 +198,10 @@ public class PermissionController {
                 .hostFilter(hostFilter)
                 .build();
 
+        // Log resource permission deletion
+        String resourceIdentifier = String.format("%s:%s:%s", resourceType, resourceName, patternType);
+        AuditLogger.logPermissionResourcesDelete(resourceIdentifier);
+
         kafkaManager.deletePermissions(new ResourcePermissionsDeleteParams(filter));
     }
 
@@ -194,6 +209,9 @@ public class PermissionController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deletePrincipalPermissions(
             @RequestParam("principalFilter") String principal) {
+        // Log permission deletion
+        AuditLogger.logPermissionPrincipalDelete(principal);
+
         PrincipalPermissionsDeleteParams params = PrincipalPermissionsDeleteParams.builder()
                 .principal(principal)
                 .build();

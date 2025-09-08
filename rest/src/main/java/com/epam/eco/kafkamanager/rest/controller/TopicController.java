@@ -19,6 +19,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+
+import com.epam.eco.kafkamanager.core.utils.AuditLogger;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -107,12 +109,21 @@ public class TopicController {
                 .description(request.getDescription())
                 .attributes(request.getAttributes())
                 .build();
+        
+        Map<String, Object> details = Map.of(
+            "partitionCount", request.getPartitionCount(),
+            "replicationFactor", request.getReplicationFactor(),
+            "config", request.getConfig() != null ? request.getConfig() : Map.of()
+        );
+        AuditLogger.logTopicCreate(request.getTopicName(), details);
+        
         return kafkaManager.createTopic(params);
     }
 
     @DeleteMapping("/{topicName}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteTopic(@PathVariable("topicName") String topicName) {
+        AuditLogger.logTopicDelete(topicName);
         kafkaManager.deleteTopic(topicName);
     }
 
@@ -120,6 +131,11 @@ public class TopicController {
     public TopicInfo putTopicConfigs(
             @PathVariable("topicName") String topicName,
             @RequestBody TopicConfigRequest request) {
+        // Log the config update
+        Map<String, String> configChanges = request.getConfig() != null ? request.getConfig() :
+                Map.of();
+        AuditLogger.logTopicConfigUpdate(topicName, Map.of("configChanges", configChanges));
+        
         TopicConfigUpdateParams params = TopicConfigUpdateParams.builder()
                 .topicName(topicName)
                 .config(request.getConfig())

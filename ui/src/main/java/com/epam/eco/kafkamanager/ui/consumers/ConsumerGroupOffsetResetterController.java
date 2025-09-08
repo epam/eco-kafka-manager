@@ -20,6 +20,8 @@ import java.util.stream.Collectors;
 
 import org.apache.kafka.common.TopicPartition;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import com.epam.eco.kafkamanager.core.utils.AuditLogger;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -92,6 +94,17 @@ public class ConsumerGroupOffsetResetterController {
             throw new RuntimeException(
                     "Selected offsets are equal to current consumer group offsets");
         }
+
+        // Log the offset reset operation
+        Map<String, Object> resetDetails = Map.of(
+                "offsets", offsets.entrySet().stream()
+                        .collect(Collectors.toMap(
+                                e -> String.format("%s-%d", e.getKey().topic(), e.getKey().partition()),
+                                Map.Entry::getValue
+                        )),
+                "totalPartitions", offsets.size()
+        );
+        AuditLogger.logConsumerGroupOffsetsReset(groupName, resetDetails);
 
         kafkaManager.getConsumerGroupOffsetResetterTaskExecutor().execute(groupName, offsets);
 
