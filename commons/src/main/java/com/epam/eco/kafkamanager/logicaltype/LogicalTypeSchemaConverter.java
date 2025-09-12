@@ -77,14 +77,18 @@ public class LogicalTypeSchemaConverter {
             Map<String, Object> convertedValue,
             Schema.Field field
     ) {
+        GenericRecord fieldRecord = (GenericRecord) fieldValue.get(field.name());
         convertedValue.put(field.name(),
-                           convertSchema(extractSchemaFromUnion(field),
-                                         (GenericRecord) fieldValue.get(field.name()),
+                           convertSchema(extractSchemaFromUnion(field, fieldRecord),
+                                         fieldRecord,
                                          new HashMap<>()));
     }
 
-    private static Schema extractSchemaFromUnion(Schema.Field field) {
-        if(field.schema().isUnion()) {
+    private static Schema extractSchemaFromUnion(Schema.Field field, GenericRecord fieldRecord) {
+        if (fieldRecord != null) {
+            return fieldRecord.getSchema();
+        }
+        if (field.schema().isUnion()) {
             return field.schema().getTypes().stream()
                     .filter(isSchemaIsRecordPredicate())
                     .findFirst()
