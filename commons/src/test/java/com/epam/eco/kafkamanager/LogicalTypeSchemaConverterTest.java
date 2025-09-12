@@ -24,12 +24,14 @@ import java.time.temporal.ChronoUnit;
 import java.util.Map;
 import java.util.UUID;
 
+import org.apache.avro.generic.GenericData;
 import org.apache.avro.generic.GenericRecord;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import com.epam.eco.kafkamanager.logicaltype.Duration;
 import com.epam.eco.kafkamanager.logicaltype.LogicalTypeSchemaConverter;
+import com.epam.eco.kafkamanager.utils.LogicalTypeConverterUtils;
 
 import static com.epam.eco.kafkamanager.utils.DateTimeUtils.byteArrayFormDuration;
 import static com.epam.eco.kafkamanager.utils.DateTimeUtils.localDateTimeToLongWithMicros;
@@ -47,6 +49,8 @@ import static com.epam.eco.kafkamanager.utils.LogicalTypeConverterUtils.TIME_MIL
 import static com.epam.eco.kafkamanager.utils.LogicalTypeConverterUtils.UUID_FIELD_NAME;
 import static com.epam.eco.kafkamanager.utils.LogicalTypeConverterUtils.createNewRecord;
 import static com.epam.eco.kafkamanager.utils.LogicalTypeConverterUtils.longToByteBuffer;
+import static com.epam.eco.kafkamanager.utils.LogicalTypeConverterUtils.schemaFromResource;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * @author Mikhail_Vershkov
@@ -67,10 +71,10 @@ public class LogicalTypeSchemaConverterTest {
         Map<String, Object> map = LogicalTypeSchemaConverter.convert(record) ;
 
         Assertions.assertInstanceOf(LocalDateTime.class, map.get(TIMESTAMP_MILLIS_FIELD_NAME));
-        Assertions.assertEquals(now.truncatedTo(ChronoUnit.MILLIS), map.get(TIMESTAMP_MILLIS_FIELD_NAME));
+        assertEquals(now.truncatedTo(ChronoUnit.MILLIS), map.get(TIMESTAMP_MILLIS_FIELD_NAME));
 
         Assertions.assertInstanceOf(LocalDateTime.class, map.get(TIMESTAMP_MICROS_FIELD_NAME));
-        Assertions.assertEquals(now.truncatedTo(ChronoUnit.MICROS), map.get(TIMESTAMP_MICROS_FIELD_NAME));
+        assertEquals(now.truncatedTo(ChronoUnit.MICROS), map.get(TIMESTAMP_MICROS_FIELD_NAME));
     }
 
     @Test
@@ -91,9 +95,9 @@ public class LogicalTypeSchemaConverterTest {
         record.put(TIME_MICROS_FIELD_NAME, localTimeToLongWithMicros(time));
         Map<String, Object> map = LogicalTypeSchemaConverter.convert(record);
         Assertions.assertInstanceOf(LocalTime.class, map.get(TIME_MILLIS_FIELD_NAME));
-        Assertions.assertEquals(time.truncatedTo(ChronoUnit.MILLIS), map.get(TIME_MILLIS_FIELD_NAME));
+        assertEquals(time.truncatedTo(ChronoUnit.MILLIS), map.get(TIME_MILLIS_FIELD_NAME));
         Assertions.assertInstanceOf(LocalTime.class, map.get(TIME_MICROS_FIELD_NAME));
-        Assertions.assertEquals(time.truncatedTo(ChronoUnit.MICROS), map.get(TIME_MICROS_FIELD_NAME));
+        assertEquals(time.truncatedTo(ChronoUnit.MICROS), map.get(TIME_MICROS_FIELD_NAME));
     }
 
     @Test
@@ -114,7 +118,7 @@ public class LogicalTypeSchemaConverterTest {
         record.put(DATE_FIELD_NAME, localDateToInt(date));
         Map<String, Object> map = LogicalTypeSchemaConverter.convert(record);
         Assertions.assertInstanceOf(LocalDate.class, map.get(DATE_FIELD_NAME));
-        Assertions.assertEquals(date, map.get(DATE_FIELD_NAME));
+        assertEquals(date, map.get(DATE_FIELD_NAME));
     }
     @Test
     public void testConvertLogicalDateTypeIfNull() {
@@ -131,7 +135,7 @@ public class LogicalTypeSchemaConverterTest {
         record.put(DECIMAL_FIELD_NAME, longToByteBuffer(DECIMAL_TEST_VALUE));
         Map<String, Object> map = LogicalTypeSchemaConverter.convert(record);
         Assertions.assertInstanceOf(Long.class, map.get(DECIMAL_FIELD_NAME));
-        Assertions.assertEquals(DECIMAL_TEST_VALUE, map.get(DECIMAL_FIELD_NAME));
+        assertEquals(DECIMAL_TEST_VALUE, map.get(DECIMAL_FIELD_NAME));
     }
     @Test
     public void testConvertLogicalDecimalTypeIfNull() {
@@ -148,7 +152,7 @@ public class LogicalTypeSchemaConverterTest {
         record.put(DURATION_FIELD_NAME, ByteBuffer.wrap(byteArrayFormDuration(duration)));
         Map<String, Object> map = LogicalTypeSchemaConverter.convert(record);
         Assertions.assertInstanceOf(Duration.class, map.get(DURATION_FIELD_NAME));
-        Assertions.assertEquals(duration, map.get(DURATION_FIELD_NAME));
+        assertEquals(duration, map.get(DURATION_FIELD_NAME));
     }
 
     @Test
@@ -173,7 +177,7 @@ public class LogicalTypeSchemaConverterTest {
         record.put(UUID_FIELD_NAME, uuid.toString());
         Map<String, Object> map = LogicalTypeSchemaConverter.convert(record);
         Assertions.assertInstanceOf(UUID.class, map.get(UUID_FIELD_NAME));
-        Assertions.assertEquals(uuid, map.get(UUID_FIELD_NAME));
+        assertEquals(uuid, map.get(UUID_FIELD_NAME));
     }
     @Test
     public void testConvertLogicalUuidTypeIfNull() {
@@ -190,4 +194,56 @@ public class LogicalTypeSchemaConverterTest {
         Map<String, Object> map = LogicalTypeSchemaConverter.convert(record);
         Assertions.assertNull(map.get(INT_FIELD_NAME));
     }
+
+    @Test
+    void testUnionConvertFirstType() {
+        GenericRecord record = new GenericData.Record(schemaFromResource(
+                "/schemas/test_union_record.avsc")
+        );
+        GenericRecord subRecord =
+                new GenericData.Record(record.getSchema().getField("attributes")
+                        .schema()
+                        .getTypes()
+                        .get(1)
+                );
+        subRecord.put("project", "a");
+        subRecord.put("service", "b");
+        subRecord.put("namespace", "c");
+        record.put("attributes", subRecord);
+
+        Map<String, Object> map = LogicalTypeSchemaConverter.convert(record);
+
+        Map<String, String> actualAttributes = (Map<String, String>) map.get("attributes");
+        assertEquals(subRecord.getSchema().getFields().size(),
+                actualAttributes.size());
+        assertEquals("a", actualAttributes.get("project"));
+        assertEquals("b", actualAttributes.get("service"));
+        assertEquals("c", actualAttributes.get("namespace"));
+    }
+
+    @Test
+    void testUnionConvertSecondType() {
+        GenericRecord record = new GenericData.Record(schemaFromResource(
+                "/schemas/test_union_record.avsc")
+        );
+        GenericRecord subRecord =
+                new GenericData.Record(record.getSchema().getField("attributes")
+                        .schema()
+                        .getTypes()
+                        .get(2)
+                );
+        subRecord.put("user", "d");
+        subRecord.put("work", "e");
+        subRecord.put("station", "f");
+        record.put("attributes", subRecord);
+
+        Map<String, Object> map = LogicalTypeSchemaConverter.convert(record);
+
+        Map<String, String> actualAttributes = (Map<String, String>) map.get("attributes");
+        assertEquals(subRecord.getSchema().getFields().size(), actualAttributes.size());
+        assertEquals("d", actualAttributes.get("user"));
+        assertEquals("e", actualAttributes.get("work"));
+        assertEquals("f", actualAttributes.get("station"));
+    }
+
 }

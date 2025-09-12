@@ -15,11 +15,14 @@
  *******************************************************************************/
 package com.epam.eco.kafkamanager.utils;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.nio.ByteBuffer;
 
 import org.apache.avro.Schema;
 import org.apache.avro.generic.GenericData;
 import org.apache.avro.generic.GenericRecord;
+import org.apache.commons.lang3.Validate;
 
 /**
  * @author Mikhail_Vershkov
@@ -109,6 +112,16 @@ public class LogicalTypeConverterUtils {
 
     public static GenericRecord createNewRecord() {
         return new GenericData.Record(getTestSchema());
+    }
+
+    public static Schema schemaFromResource(String path) {
+        Validate.notBlank(path, "path is blank", new Object[0]);
+
+        try (InputStream inputStream = LogicalTypeConverterUtils.class.getResourceAsStream(path)) {
+            return (new Schema.Parser()).parse(inputStream);
+        } catch (IOException ioe) {
+            throw new RuntimeException(ioe);
+        }
     }
 
 }

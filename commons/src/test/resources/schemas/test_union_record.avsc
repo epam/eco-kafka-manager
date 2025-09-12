@@ -1,0 +1,74 @@
+{
+  "type": "record",
+  "name": "UnionTestRecord",
+  "namespace": "test.namespace",
+  "fields": [
+    {
+      "name": "attributes",
+      "type": [
+        "null",
+        {
+          "type": "record",
+          "name": "attributes_1",
+          "fields": [
+            {
+              "name": "project",
+              "type": [
+                "null",
+                "string"
+              ],
+              "default": null
+            },
+            {
+              "name": "service",
+              "type": [
+                "null",
+                "string"
+              ],
+              "default": null
+            },
+            {
+              "name": "namespace",
+              "type": [
+                "null",
+                "string"
+              ],
+              "default": null
+            }
+          ],
+          "default": null
+        },
+        {
+          "type": "record",
+          "name": "attributes_2",
+          "fields": [
+            {
+              "name": "user",
+              "type": [
+                "null",
+                "string"
+              ],
+              "default": null
+            },
+            {
+              "name": "work",
+              "type": [
+                "null",
+                "string"
+              ],
+              "default": null
+            },
+            {
+              "name": "station",
+              "type": [
+                "null",
+                "string"
+              ],
+              "default": null
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
