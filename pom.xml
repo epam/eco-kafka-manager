@@ -9,7 +9,7 @@
 
     <groupId>com.epam.eco.kafkamanager</groupId>
     <artifactId>kafka-manager-parent</artifactId>
-    <version>3.0.19-SNAPSHOT</version>
+    <version>3.0.19</version>
     
     <name>Eco Kafka Manager</name>
     <packaging>pom</packaging>
@@ -54,7 +54,7 @@
         <connection>scm:git:git@github.com:epam/eco-kafka-manager.git</connection>
         <developerConnection>scm:git:git@github.com:epam/eco-kafka-manager.git</developerConnection>
         <url>https://github.com/epam/eco-kafka-manager</url>
-        <tag>HEAD</tag>
+        <tag>v3.0.19</tag>
     </scm>
 
     <distributionManagement>
