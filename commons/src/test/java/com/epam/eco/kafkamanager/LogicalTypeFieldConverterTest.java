@@ -15,6 +15,7 @@
  *******************************************************************************/
 package com.epam.eco.kafkamanager;
 
+import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.nio.ByteBuffer;
 import java.time.LocalDate;
@@ -128,9 +129,10 @@ public class LogicalTypeFieldConverterTest {
         byte[] bytes = new byte[] {1,2,3,4,5,6,7,8,9,0};
         ByteBuffer buffer = ByteBuffer.wrap(bytes);
         Object result = LogicalTypeFieldConverter.convert(schema, logicalType, buffer);
-        Assertions.assertInstanceOf(Long.class, result);
-        Long resultLong = (Long) result;
-        Assertions.assertEquals(new BigInteger(bytes).longValue(), resultLong);
+        Assertions.assertInstanceOf(BigDecimal.class, result);
+        BigDecimal resultDecimal = (BigDecimal) result;
+        BigDecimal expected = new BigDecimal(new BigInteger(bytes), 2); // Scale is 2 from schema
+        Assertions.assertEquals(expected, resultDecimal);
     }
 
     @Test
