@@ -15,6 +15,8 @@
  *******************************************************************************/
 package com.epam.eco.kafkamanager;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.nio.ByteBuffer;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -134,8 +136,10 @@ public class LogicalTypeSchemaConverterTest {
         GenericRecord record =  createNewRecord();
         record.put(DECIMAL_FIELD_NAME, longToByteBuffer(DECIMAL_TEST_VALUE));
         Map<String, Object> map = LogicalTypeSchemaConverter.convert(record);
-        Assertions.assertInstanceOf(Long.class, map.get(DECIMAL_FIELD_NAME));
-        assertEquals(DECIMAL_TEST_VALUE, map.get(DECIMAL_FIELD_NAME));
+        Assertions.assertInstanceOf(BigDecimal.class, map.get(DECIMAL_FIELD_NAME));
+        ByteBuffer buffer = longToByteBuffer(DECIMAL_TEST_VALUE);
+        BigDecimal expected = new BigDecimal(new BigInteger(buffer.array()), 2); // Scale is 2 from schema
+        assertEquals(expected, map.get(DECIMAL_FIELD_NAME));
     }
     @Test
     public void testConvertLogicalDecimalTypeIfNull() {

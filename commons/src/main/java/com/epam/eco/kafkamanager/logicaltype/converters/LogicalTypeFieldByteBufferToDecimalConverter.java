@@ -15,11 +15,13 @@
  *******************************************************************************/
 package com.epam.eco.kafkamanager.logicaltype.converters;
 
+import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.nio.ByteBuffer;
 
 import javax.annotation.Nonnull;
 
+import org.apache.avro.LogicalTypes;
 import org.apache.avro.Schema;
 
 import com.epam.eco.kafkamanager.logicaltype.LogicalTypeEnum;
@@ -30,15 +32,30 @@ import static com.epam.eco.kafkamanager.logicaltype.LogicalTypeEnum.DECIMAL;
 /**
  * @author Mikhail_Vershkov
  */
-public class LogicalTypeFieldByteBufferToDecimalConverter implements LogicalTypeFieldAvroConverter<ByteBuffer, Long> {
+public class LogicalTypeFieldByteBufferToDecimalConverter implements LogicalTypeFieldAvroConverter<ByteBuffer, BigDecimal> {
 
 
     @Override
-    public Long convertInternal(
+    public BigDecimal convertInternal(
             Schema schema,
             @Nonnull ByteBuffer value
     ) {
-        return new BigInteger(value.array()).longValue();
+        Schema actualSchema = getSchema(schema);
+
+        LogicalTypes.Decimal decimalType = (LogicalTypes.Decimal) actualSchema.getLogicalType();
+        int scale = decimalType.getScale();
+
+        BigInteger bigInteger = new BigInteger(value.array());
+        return new BigDecimal(bigInteger, scale);
+    }
+
+    private Schema getSchema(Schema schema) {
+        Schema actualSchema = schema.getType() == Schema.Type.UNION ?
+                schema.getTypes().stream()
+                        .filter(s -> s.getLogicalType() instanceof LogicalTypes.Decimal)
+                        .findFirst().orElse(schema) :
+                schema;
+        return actualSchema;
     }
 
     @Override
