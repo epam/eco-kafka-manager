@@ -50,6 +50,18 @@ public class LogicalTypeConverterUtils {
 
     private static final String DURATION_SCHEMA = "[\"null\",{\"type\":\"fixed\",\"name\":\"test\",\"size\":12}]";
 
+    private static final String DECIMAL_FIXED_SCHEMA = "[ \"null\", {\n" +
+            "      \"type\" : \"fixed\",\n" +
+            "      \"name\" : \"fixed\",\n" +
+            "      \"namespace\" : \"optional.test.namespace\",\n" +
+            "      \"size\" : 16,\n" +
+            "      \"logicalType\" : \"decimal\",\n" +
+            "      \"precision\" : 38,\n" +
+            "      \"scale\" : 9\n" +
+            "    } ]";
+
+    private static final String NONE_DURATION_SCHEMA = "[\"null\",{\"type\":\"fixed\",\"name\":\"test\",\"size\":15}]";
+
     private static final String UUID_SCHEMA = "[\"null\",{\"type\":\"string\",\"logicalType\":\"uuid\"}]";
 
     private static final String INT_SCHEMA = "[\"null\",{\"type\":\"int\",\"name\":\"testInt\"}]";
@@ -94,6 +106,14 @@ public class LogicalTypeConverterUtils {
 
     public static Schema getDurationSchema() {
         return new Schema.Parser().parse(DURATION_SCHEMA);
+    }
+
+    public static Schema getFixedDecimalSchema() {
+        return new Schema.Parser().parse(DECIMAL_FIXED_SCHEMA);
+    }
+
+    public static Schema getNoneDurationSchema() {
+        return new Schema.Parser().parse(NONE_DURATION_SCHEMA);
     }
 
     public static Schema getUuidSchema() {
