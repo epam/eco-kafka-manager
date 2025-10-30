@@ -22,6 +22,7 @@ import org.apache.avro.Schema;
 
 import com.epam.eco.kafkamanager.logicaltype.converters.LogicalTypeFieldByteBufferToDecimalConverter;
 import com.epam.eco.kafkamanager.logicaltype.converters.LogicalTypeFieldDurationConverter;
+import com.epam.eco.kafkamanager.logicaltype.converters.LogicalTypeFieldFixedToDecimalConverter;
 import com.epam.eco.kafkamanager.logicaltype.converters.LogicalTypeFieldIntDateConverter;
 import com.epam.eco.kafkamanager.logicaltype.converters.LogicalTypeFieldOtherAvroConverter;
 import com.epam.eco.kafkamanager.logicaltype.converters.LogicalTypeFieldTimeMicrosConverter;
@@ -44,7 +45,8 @@ public class LogicalTypeFieldConverter {
          new LogicalTypeFieldByteBufferToDecimalConverter(),
          new LogicalTypeFieldIntDateConverter(),
          new LogicalTypeFieldDurationConverter(),
-         new LogicalTypeFieldUuidConverter()
+         new LogicalTypeFieldUuidConverter(),
+         new LogicalTypeFieldFixedToDecimalConverter()
     );
 
     public static Object convert(Schema schema,

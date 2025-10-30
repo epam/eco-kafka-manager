@@ -1,5 +1,5 @@
 /*******************************************************************************
- *  Copyright 2024 EPAM Systems
+ *  Copyright 2025 EPAM Systems
  *
  *  Licensed under the Apache License, Version 2.0 (the "License"); you may not
  *  use this file except in compliance with the License.  You may obtain a copy
@@ -15,29 +15,31 @@
  *******************************************************************************/
 package com.epam.eco.kafkamanager.logicaltype.converters;
 
-import java.nio.ByteBuffer;
+import java.math.BigDecimal;
+import java.math.BigInteger;
 
 import javax.annotation.Nonnull;
 
+import org.apache.avro.LogicalTypes;
 import org.apache.avro.Schema;
+import org.apache.avro.generic.GenericData.Fixed;
 
-import com.epam.eco.kafkamanager.logicaltype.Duration;
 import com.epam.eco.kafkamanager.logicaltype.LogicalTypeEnum;
 import com.epam.eco.kafkamanager.logicaltype.LogicalTypeFieldAvroConverter;
 
-/**
- * @author Mikhail_Vershkov
- */
-public class LogicalTypeFieldDurationConverter implements LogicalTypeFieldAvroConverter<ByteBuffer, Duration> {
-
-    private static final int DURATION_SIZE = 12;
+public class LogicalTypeFieldFixedToDecimalConverter implements LogicalTypeFieldAvroConverter<Fixed, BigDecimal> {
 
     @Override
-    public Duration convertInternal(
-            Schema schema,
-            @Nonnull ByteBuffer value
+    public BigDecimal convertInternal(
+            @Nonnull Schema schema,
+            @Nonnull Fixed value
     ) {
-        return new Duration(value.array());
+        Schema decimalSchema = getSchema(schema);
+        LogicalTypes.Decimal decimalType = (LogicalTypes.Decimal) decimalSchema.getLogicalType();
+        int scale = decimalType.getScale();
+
+        BigInteger bigInteger = new BigInteger(value.bytes());
+        return new BigDecimal(bigInteger, scale);
     }
 
     @Override
@@ -47,14 +49,16 @@ public class LogicalTypeFieldDurationConverter implements LogicalTypeFieldAvroCo
 
     @Override
     public LogicalTypeEnum getLocalType() {
-        return LogicalTypeEnum.DURATION;
+        return LogicalTypeEnum.DECIMAL;
     }
 
-    @Override
-    public boolean schemaAndLogicalTypeMatch(Schema schema, LogicalTypeEnum logicalType) {
-         return schema.getType().equals(getType())
-                 && schema.getFixedSize() == DURATION_SIZE
-                 && (logicalType == getLocalType() || logicalType == LogicalTypeEnum.NONE);
+    private Schema getSchema(Schema schema) {
+        if (schema.getType() == Schema.Type.UNION) {
+            return schema.getTypes().stream()
+                    .filter(s -> s.getLogicalType() instanceof LogicalTypes.Decimal)
+                    .findFirst()
+                    .orElse(schema);
+        }
+        return schema;
     }
-
 }

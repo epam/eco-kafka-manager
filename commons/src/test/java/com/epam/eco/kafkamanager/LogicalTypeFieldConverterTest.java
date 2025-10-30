@@ -28,6 +28,7 @@ import java.util.UUID;
 
 import org.apache.avro.LogicalType;
 import org.apache.avro.Schema;
+import org.apache.avro.generic.GenericData;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -39,7 +40,9 @@ import static com.epam.eco.kafkamanager.utils.DateTimeUtils.byteArrayFormDuratio
 import static com.epam.eco.kafkamanager.utils.DateTimeUtils.localDateToInt;
 import static com.epam.eco.kafkamanager.utils.LogicalTypeConverterUtils.getBytesDecimalSchema;
 import static com.epam.eco.kafkamanager.utils.LogicalTypeConverterUtils.getDurationSchema;
+import static com.epam.eco.kafkamanager.utils.LogicalTypeConverterUtils.getFixedDecimalSchema;
 import static com.epam.eco.kafkamanager.utils.LogicalTypeConverterUtils.getIntDateSchema;
+import static com.epam.eco.kafkamanager.utils.LogicalTypeConverterUtils.getNoneDurationSchema;
 import static com.epam.eco.kafkamanager.utils.LogicalTypeConverterUtils.getTimeMicrosSchema;
 import static com.epam.eco.kafkamanager.utils.LogicalTypeConverterUtils.getTimeMillisSchema;
 import static com.epam.eco.kafkamanager.utils.LogicalTypeConverterUtils.getTimestampMicrosSchema;
@@ -136,6 +139,23 @@ public class LogicalTypeFieldConverterTest {
     }
 
     @Test
+    public void fixedByteToDecimalTest() {
+        Schema schema = getFixedDecimalSchema();
+        LogicalType logicalType = LogicalTypeEnum.DECIMAL.getValue();
+        BigDecimal expected = new BigDecimal(new BigInteger("123123456789"), 9);
+
+        // Convert BigDecimal to 16-byte array using ByteBuffer
+        ByteBuffer buffer = convertToFixedByteBuffer(expected, 16);
+
+        Object result = LogicalTypeFieldConverter.convert(schema, logicalType,
+                new GenericData.Fixed(schema, buffer.array()));
+        Assertions.assertInstanceOf(BigDecimal.class, result);
+        BigDecimal resultDecimal = (BigDecimal) result;
+        Assertions.assertEquals(expected, resultDecimal);
+    }
+
+
+    @Test
     public void dateByteToDurationTest() {
         Schema schema = getDurationSchema();
         LogicalType logicalType = LogicalTypeEnum.DURATION.getValue();
@@ -148,6 +168,26 @@ public class LogicalTypeFieldConverterTest {
     }
 
     @Test
+    public void dateByteToDurationIfNullTest() {
+        Schema schema = getDurationSchema();
+        LogicalType logicalType = LogicalTypeEnum.DURATION.getValue();
+        Object result = LogicalTypeFieldConverter.convert(schema, logicalType, null);
+        Assertions.assertNull(result);
+    }
+
+    @Test
+    public void dateByteToDurationIfNoneDurationSchemaTest() {
+        Schema schema = getNoneDurationSchema();
+        LogicalType logicalType = LogicalTypeEnum.DURATION.getValue();
+        Duration testDuration = new Duration(123, 456, 789);
+        ByteBuffer bytes = ByteBuffer.wrap(byteArrayFormDuration(testDuration));
+        Object result = LogicalTypeFieldConverter.convert(schema, logicalType, bytes);
+        Assertions.assertInstanceOf(ByteBuffer.class, result);
+        ByteBuffer buffer = (ByteBuffer) result;
+        Assertions.assertEquals(buffer, bytes);
+    }
+
+    @Test
     public void stringToUuidTest() {
         Schema schema = getUuidSchema();
         LogicalType logicalType = LogicalTypeEnum.UUID.getValue();
@@ -157,4 +197,12 @@ public class LogicalTypeFieldConverterTest {
         Assertions.assertEquals(uuid, result);
     }
 
+    private ByteBuffer convertToFixedByteBuffer(BigDecimal expected, int fixedSize) {
+        ByteBuffer buffer = ByteBuffer.allocate(fixedSize);
+        byte[] unscaledValue = expected.unscaledValue().toByteArray();
+        buffer.position(fixedSize - unscaledValue.length);
+        buffer.put(unscaledValue);
+        buffer.rewind();
+        return buffer;
+    }
 }
