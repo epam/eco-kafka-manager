@@ -75,11 +75,6 @@ eco:
           authorizerConfig[authorizer.ldap.read.timeout.ms]: 20000
           authorizerConfig[authorizer.ldap.connect.timeout.ms]: 3000
 
-      zkClientConfig[zookeeper.clientCnxnSocket]: org.apache.zookeeper.ClientCnxnSocketNetty
-      zkClientConfig[zookeeper.client.secure]: true
-      zkClientConfig[zookeeper.ssl.client.enable]: true
-      zkClientConfig[zookeeper.ssl.trustStore.location]: "c:/ssl/epm-eco-int.truststore.jks"
-      zkClientConfig[zookeeper.ssl.trustStore.password]: "pg0mt1mD"
     ui:
       showGridInTopicBrowser: true
       dataCatalogTool:

@@ -18,7 +18,7 @@ package com.epam.eco.kafkamanager;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.kafka.common.ConsumerGroupState;
+import org.apache.kafka.common.GroupState;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -36,7 +36,7 @@ public class ConsumerGroupSearchCriteriaTest {
     public void testSerializedToJsonAndBack() throws Exception {
         ConsumerGroupSearchCriteria origin = ConsumerGroupSearchCriteria.builder().
                 groupName("group1").
-                state(ConsumerGroupState.STABLE).
+                state(GroupState.STABLE).
                 storageType(StorageType.KAFKA).
                 description("description").
                 build();
@@ -64,7 +64,7 @@ public class ConsumerGroupSearchCriteriaTest {
         ConsumerGroupSearchCriteria criteria = ConsumerGroupSearchCriteria.fromJson(json);
         Assertions.assertNotNull(criteria);
         Assertions.assertEquals("group1", criteria.getGroupName());
-        Assertions.assertEquals(ConsumerGroupState.EMPTY, criteria.getState());
+        Assertions.assertEquals(GroupState.EMPTY, criteria.getState());
         Assertions.assertEquals(StorageType.KAFKA, criteria.getStorageType());
         Assertions.assertEquals("description", criteria.getDescription());
     }
@@ -82,7 +82,7 @@ public class ConsumerGroupSearchCriteriaTest {
         ConsumerGroupSearchCriteria criteria = ConsumerGroupSearchCriteria.fromJson(json);
         Assertions.assertNotNull(criteria);
         Assertions.assertEquals("group1", criteria.getGroupName());
-        Assertions.assertEquals(ConsumerGroupState.COMPLETING_REBALANCE, criteria.getState());
+        Assertions.assertEquals(GroupState.COMPLETING_REBALANCE, criteria.getState());
         Assertions.assertEquals(StorageType.KAFKA, criteria.getStorageType());
         Assertions.assertEquals("description", criteria.getDescription());
     }

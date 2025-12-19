@@ -208,7 +208,7 @@ public class OffsetAndMetadataInfo implements Comparable<OffsetAndMetadataInfo> 
         }
 
         public Builder expireDate(Long expireDate) {
-            if (expireDate == null) {
+            if (expireDate == null || expireDate <= 0) {
                 return expireDate((LocalDateTime)null);
             } else {
                 return expireDate(

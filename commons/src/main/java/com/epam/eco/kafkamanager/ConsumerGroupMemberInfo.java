@@ -40,7 +40,6 @@ public class ConsumerGroupMemberInfo implements Comparable<ConsumerGroupMemberIn
     private final String clientHost;
     private final Integer rebalanceTimeoutMs;
     private final Integer sessionTimeoutMs;
-    private final boolean heartbeatSatisfied;
     private final List<TopicPartition> assignment;
 
     public ConsumerGroupMemberInfo(
@@ -49,7 +48,6 @@ public class ConsumerGroupMemberInfo implements Comparable<ConsumerGroupMemberIn
             @JsonProperty("clientHost") String clientHost,
             @JsonProperty("rebalanceTimeoutMs") Integer rebalanceTimeoutMs,
             @JsonProperty("sessionTimeoutMs") Integer sessionTimeoutMs,
-            @JsonProperty("heartbeatSatisfied") boolean heartbeatSatisfied,
             @JsonProperty("assignment") Collection<TopicPartition> assignment) {
         Validate.notBlank(clientId, "Client id is blank");
         if (assignment != null) {
@@ -61,7 +59,6 @@ public class ConsumerGroupMemberInfo implements Comparable<ConsumerGroupMemberIn
         this.clientHost = clientHost;
         this.rebalanceTimeoutMs = rebalanceTimeoutMs;
         this.sessionTimeoutMs = sessionTimeoutMs;
-        this.heartbeatSatisfied = heartbeatSatisfied;
         this.assignment =
                 !CollectionUtils.isEmpty(assignment) ?
                 assignment.stream().
@@ -88,9 +85,6 @@ public class ConsumerGroupMemberInfo implements Comparable<ConsumerGroupMemberIn
     public Integer getSessionTimeoutMs() {
         return sessionTimeoutMs;
     }
-    public boolean isHeartbeatSatisfied() {
-        return heartbeatSatisfied;
-    }
     public List<TopicPartition> getAssignment() {
         return assignment;
     }
@@ -103,7 +97,6 @@ public class ConsumerGroupMemberInfo implements Comparable<ConsumerGroupMemberIn
                 clientHost,
                 rebalanceTimeoutMs,
                 sessionTimeoutMs,
-                heartbeatSatisfied,
                 assignment);
     }
 
@@ -122,7 +115,6 @@ public class ConsumerGroupMemberInfo implements Comparable<ConsumerGroupMemberIn
                 Objects.equals(this.clientHost, that.clientHost) &&
                 Objects.equals(this.rebalanceTimeoutMs, that.rebalanceTimeoutMs) &&
                 Objects.equals(this.sessionTimeoutMs, that.sessionTimeoutMs) &&
-                Objects.equals(this.heartbeatSatisfied, that.heartbeatSatisfied) &&
                 Objects.equals(this.assignment, that.assignment);
     }
 
@@ -134,7 +126,6 @@ public class ConsumerGroupMemberInfo implements Comparable<ConsumerGroupMemberIn
                 ", clientHost: " + clientHost +
                 ", rebalanceTimeoutMs: " + rebalanceTimeoutMs +
                 ", sessionTimeoutMs: " + sessionTimeoutMs +
-                ", heartbeatSatisfied: " + heartbeatSatisfied +
                 ", assignment: " + assignment +
                 "}";
     }
@@ -198,7 +189,6 @@ public class ConsumerGroupMemberInfo implements Comparable<ConsumerGroupMemberIn
                     clientHost,
                     rebalanceTimeoutMs,
                     sessionTimeoutMs,
-                    heartbeatSatisfied,
                     assignment);
         }
 

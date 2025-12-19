@@ -25,8 +25,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import com.epam.eco.kafkamanager.*;
@@ -55,7 +53,6 @@ import com.epam.eco.kafkamanager.ui.metrics.udm.UDMetricWrapper;
 import com.epam.eco.kafkamanager.ui.topics.export.TopicExporterType;
 import com.epam.eco.kafkamanager.ui.topics.model.TopicInfoToModelMapper;
 import com.epam.eco.kafkamanager.ui.topics.model.TopicTableModel;
-import com.epam.eco.kafkamanager.ui.utils.ComboBoxModel;
 import com.epam.eco.kafkamanager.ui.utils.MetadataWrapper;
 import com.epam.eco.kafkamanager.utils.MapperUtils;
 
@@ -192,8 +189,7 @@ public class TopicController {
     @RequestMapping(value=MAPPING_COUNT_RECORDS, method=RequestMethod.GET)
     public @ResponseBody ResponseEntity<?> countRecords(
             @PathVariable("name") String topicName) throws Exception {
-        Future<Long> future = kafkaManager.getTopicRecordCounterTaskExecutor().submit(topicName);
-        return ResponseEntity.ok(future.get(30, TimeUnit.SECONDS));
+        return ResponseEntity.ok(kafkaManager.getTopicRecordCounterTaskExecutor().execute(topicName));
     }
 
     @RequestMapping(value=MAPPING_EXPORT, method=RequestMethod.GET)

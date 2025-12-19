@@ -78,7 +78,6 @@ public class TaskResultTest {
                         j,
                         new Date().getTime(),
                         TimestampType.NO_TIMESTAMP_TYPE,
-                        (long)-1,
                         -1,
                         -1,
                         i + " " + j,

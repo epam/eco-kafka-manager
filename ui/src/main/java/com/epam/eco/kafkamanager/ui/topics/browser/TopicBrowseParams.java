@@ -25,6 +25,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import org.apache.commons.collections4.ListUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.kafka.clients.admin.Config;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -284,7 +285,7 @@ public class TopicBrowseParams extends HashMap<String, Object> {
 
     private DataFormat getAsDataFormat(String key) {
         Object value = get(key);
-        if (value == null) {
+        if (isBlankValue(value)) {
             return null;
         }
 
@@ -302,7 +303,7 @@ public class TopicBrowseParams extends HashMap<String, Object> {
 
     private FetchMode getAsFetchMode(String key) {
         Object value = get(key);
-        if (value == null) {
+        if (isBlankValue(value)) {
             return null;
         }
 
@@ -318,9 +319,13 @@ public class TopicBrowseParams extends HashMap<String, Object> {
         }
     }
 
+    private boolean isBlankValue(Object value) {
+        return value == null || (value instanceof String && StringUtils.isBlank((String) value));
+    }
+
     private Long getAsLong(String key) {
         Object value = get(key);
-        if (value == null) {
+        if (isBlankValue(value)) {
             return null;
         }
 
@@ -338,7 +343,7 @@ public class TopicBrowseParams extends HashMap<String, Object> {
 
     private Boolean getAsBoolean(String key) {
         Object value = get(key);
-        if (value == null) {
+        if (isBlankValue(value)) {
             return null;
         }
 

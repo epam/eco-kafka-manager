@@ -58,12 +58,6 @@ eco:
         kafka:
           enabled: false
 
-      zkClientConfig[zookeeper.clientCnxnSocket]: org.apache.zookeeper.ClientCnxnSocketNetty
-      zkClientConfig[zookeeper.client.secure]: true
-      zkClientConfig[zookeeper.ssl.client.enable]: true
-      zkClientConfig[zookeeper.ssl.trustStore.location]: "c:/ssl/truststore.jks"
-      zkClientConfig[zookeeper.ssl.trustStore.password]: "password"
-
     ui:
       showGridInTopicBrowser: true
 

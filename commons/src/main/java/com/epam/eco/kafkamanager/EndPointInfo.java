@@ -23,8 +23,6 @@ import org.apache.kafka.common.security.auth.SecurityProtocol;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import kafka.cluster.EndPoint;
-
 /**
  * @author Andrei_Tytsik
  */
@@ -94,12 +92,6 @@ public class EndPointInfo implements Comparable<EndPointInfo> {
 
     public static EndPointInfo with(SecurityProtocol protocol, String host, int port) {
         return new EndPointInfo(protocol, host, port);
-    }
-
-    public static EndPointInfo from(EndPoint endPoint) {
-        Validate.notNull(endPoint, "EndPoint is null");
-
-        return new EndPointInfo(endPoint.securityProtocol(), endPoint.host(), endPoint.port());
     }
 
 }

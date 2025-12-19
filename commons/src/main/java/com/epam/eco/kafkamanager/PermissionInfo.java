@@ -20,13 +20,18 @@ import java.util.Optional;
 
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.Validate;
+import org.apache.kafka.common.acl.AccessControlEntry;
+import org.apache.kafka.common.acl.AclBinding;
 import org.apache.kafka.common.acl.AclOperation;
 import org.apache.kafka.common.acl.AclPermissionType;
 import org.apache.kafka.common.resource.PatternType;
+import org.apache.kafka.common.resource.ResourcePattern;
 import org.apache.kafka.common.resource.ResourceType;
 import org.apache.kafka.common.security.auth.KafkaPrincipal;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+
+import static org.apache.commons.lang3.StringUtils.EMPTY;
 
 /**
  * @author Andrei_Tytsik
@@ -68,6 +73,31 @@ public class PermissionInfo implements MetadataAware, Comparable<PermissionInfo>
         this.host = host;
         this.metadata = metadata;
     }
+
+    public static PermissionInfo fromAclBinding(AclBinding aclBinding, Metadata metadata) {
+        Validate.notNull(aclBinding.entry(), "access entry is null");
+        return new PermissionInfo(
+                buildKafkaPrincipal(aclBinding.entry().principal()),
+                aclBinding.pattern().resourceType(),
+                aclBinding.pattern().name(),
+                aclBinding.pattern().patternType(),
+                aclBinding.entry().permissionType(),
+                aclBinding.entry().operation(),
+                aclBinding.entry().host(),
+                metadata
+        );
+    }
+
+    private static KafkaPrincipal buildKafkaPrincipal(String principal) {
+        Validate.notNull(principal, "principal is null");
+        String[] principalParts = principal.split(":");
+        Validate.isTrue(principalParts.length <= 2, "Invalid Kafka principal: " + principal);
+
+        String principalType = principalParts[0];
+        String principalName = principalParts.length == 1 ? EMPTY : principalParts[1];
+        return new KafkaPrincipal(principalType, principalName);
+    }
+
 
     public KafkaPrincipal getKafkaPrincipal() {
         return kafkaPrincipal;
@@ -169,6 +199,13 @@ public class PermissionInfo implements MetadataAware, Comparable<PermissionInfo>
             result = ObjectUtils.compare(this.host, that.host);
         }
         return result;
+    }
+
+    public AclBinding toAclBinding() {
+        return new AclBinding(
+                new ResourcePattern(getResourceType(), getResourceName(), getPatternType()),
+                new AccessControlEntry(getKafkaPrincipal().toString(), getHost(), getOperation(), getPermissionType())
+        );
     }
 
     public static Builder builder() {

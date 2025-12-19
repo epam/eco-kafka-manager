@@ -27,10 +27,10 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import org.apache.commons.lang3.Validate;
 import org.apache.kafka.common.internals.Topic;
+import org.apache.kafka.coordinator.transaction.TransactionState;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.epam.eco.commons.kafka.TransactionState;
 import com.epam.eco.commons.kafka.cache.CacheListener;
 import com.epam.eco.commons.kafka.cache.ProjectingKafkaCache;
 import com.epam.eco.commons.kafka.consumer.bootstrap.TimestampOffsetInitializer;
@@ -236,7 +236,7 @@ class KafkaTransactionCache implements CacheListener<String, TransactionProjecti
         }
 
         TransactionMetadata current = transaction.getCurrent();
-        TransactionState state = TransactionState.fromScala(current.state());
+        TransactionState state = current.state();
         if (TransactionState.COMPLETE_COMMIT == state) {
             timeSeries.append(current.txnLastUpdateTimestamp(), 1);
         }
@@ -255,7 +255,7 @@ class KafkaTransactionCache implements CacheListener<String, TransactionProjecti
         }
 
         TransactionMetadata current = transaction.getCurrent();
-        TransactionState state = TransactionState.fromScala(current.state());
+        TransactionState state = current.state();
         if (
                 TransactionState.COMPLETE_ABORT == state ||
                 TransactionState.DEAD == state) {

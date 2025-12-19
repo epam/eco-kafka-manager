@@ -21,7 +21,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.Validate;
-import org.apache.kafka.common.ConsumerGroupState;
+import org.apache.kafka.common.GroupState;
 import org.apache.kafka.common.TopicPartition;
 
 import com.epam.eco.kafkamanager.ConsumerGroupInfo;
@@ -55,7 +55,7 @@ public class ConsumerGroupInfoWrapper {
         return groupInfo.getName();
     }
 
-    public ConsumerGroupState getState() {
+    public GroupState getState() {
         return groupInfo.getState();
     }
 

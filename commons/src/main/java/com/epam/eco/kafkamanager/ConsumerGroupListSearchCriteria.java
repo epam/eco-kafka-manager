@@ -21,7 +21,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.BiPredicate;
 
-import org.apache.kafka.common.ConsumerGroupState;
+import org.apache.kafka.common.GroupState;
 
 
 /**
@@ -56,7 +56,7 @@ public class ConsumerGroupListSearchCriteria extends AbstractSearchCriteria<Cons
     public static ConsumerGroupListSearchCriteria parseTopicCriteria(Map<String, ?> map) {
 
         Set<SingleClause<String>> groupNameClauses = new HashSet<>();
-        Set<SingleClause<ConsumerGroupState>> stateClauses = new HashSet<>();
+        Set<SingleClause<GroupState>> stateClauses = new HashSet<>();
         Set<SingleClause<ConsumerGroupInfo.StorageType>> storageClauses = new HashSet<>();
         Set<SingleClause<String>> topicsClauses  = new HashSet<>();
         Set<SingleClause<Integer>> topicsCountClauses = new HashSet<>();
@@ -74,7 +74,7 @@ public class ConsumerGroupListSearchCriteria extends AbstractSearchCriteria<Cons
 
                 switch (filterColumn) {
                     case GROUP_NAME_ATTR -> groupNameClauses.add(new SingleClause<>((String) map.get(key), filterOperation));
-                    case STATE_ATTR -> stateClauses.add(new SingleClause<>(ConsumerGroupState.valueOf((String) map.get(key)), filterOperation));
+                    case STATE_ATTR -> stateClauses.add(new SingleClause<>(GroupState.valueOf((String) map.get(key)), filterOperation));
                     case STORAGE_ATTR -> storageClauses.add(new SingleClause<>(ConsumerGroupInfo.StorageType.valueOf((String)map.get(key)), filterOperation));
                     case TOPICS_ATTR -> topicsClauses.add(new SingleClause<>((String) map.get(key), filterOperation));
                     case TOPICS_COUNT_ATTR -> topicsCountClauses.add(new SingleClause<>(Integer.valueOf((String) map.get(key)), filterOperation));
@@ -92,7 +92,7 @@ public class ConsumerGroupListSearchCriteria extends AbstractSearchCriteria<Cons
                 Set.of(new ClausesWithHandler<>(groupNameClauses, stringClausesHandler, ConsumerGroupInfo::getName),
                        new ClausesWithHandler<ConsumerGroupInfo.StorageType, ConsumerGroupInfo, ConsumerGroupInfo>(storageClauses, storageClausesHandler,
                                                                                                         consumerGroupInfo -> consumerGroupInfo),
-                       new ClausesWithHandler<ConsumerGroupState,ConsumerGroupInfo,ConsumerGroupInfo>(stateClauses, stateClausesHandler, consumerGroupInfo -> consumerGroupInfo),
+                       new ClausesWithHandler<GroupState,ConsumerGroupInfo,ConsumerGroupInfo>(stateClauses, stateClausesHandler, consumerGroupInfo -> consumerGroupInfo),
                        new ClausesWithHandler<String,ConsumerGroupInfo,ConsumerGroupInfo>(topicsClauses, topicsClausesHandler, consumerGroupInfo -> consumerGroupInfo),
                        new ClausesWithHandler<Integer,Integer,ConsumerGroupInfo>(topicsCountClauses, numericClausesHandler, consumerInfo->consumerInfo.getTopicNames().size()),
                        new ClausesWithHandler<String,ConsumerGroupInfo,ConsumerGroupInfo>(membersClauses, membersClausesHandler, groupInfo -> groupInfo),
@@ -105,7 +105,7 @@ public class ConsumerGroupListSearchCriteria extends AbstractSearchCriteria<Cons
     private static final BiPredicate<Set<SingleClause<ConsumerGroupInfo.StorageType>>, ConsumerGroupInfo> storageClausesHandler = (Set<SingleClause<ConsumerGroupInfo.StorageType>> clauses, ConsumerGroupInfo groupInfo) -> clauses.stream().allMatch(
        clause -> groupInfo.getStorageType() == clause.filterValue());
 
-    private static final BiPredicate<Set<SingleClause<ConsumerGroupState>>, ConsumerGroupInfo> stateClausesHandler = (Set<SingleClause<ConsumerGroupState>> clauses, ConsumerGroupInfo groupInfo) -> clauses.stream().allMatch(
+    private static final BiPredicate<Set<SingleClause<GroupState>>, ConsumerGroupInfo> stateClausesHandler = (Set<SingleClause<GroupState>> clauses, ConsumerGroupInfo groupInfo) -> clauses.stream().allMatch(
             clause -> groupInfo.getState() == clause.filterValue());
 
     private static final BiPredicate<Set<SingleClause<String>>, ConsumerGroupInfo> topicsClausesHandler = (Set<SingleClause<String>> clauses, ConsumerGroupInfo groupInfo) -> clauses.stream().allMatch(

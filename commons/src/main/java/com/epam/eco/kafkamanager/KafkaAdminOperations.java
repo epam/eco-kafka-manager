@@ -20,7 +20,11 @@ import java.util.Map;
 
 import org.apache.kafka.clients.admin.Config;
 import org.apache.kafka.clients.admin.ConsumerGroupDescription;
+import org.apache.kafka.clients.admin.FeatureMetadata;
+import org.apache.kafka.clients.admin.TopicDescription;
+import org.apache.kafka.clients.admin.TopicListing;
 import org.apache.kafka.clients.consumer.OffsetAndMetadata;
+import org.apache.kafka.common.Node;
 import org.apache.kafka.common.TopicPartition;
 import org.apache.kafka.common.acl.AclBinding;
 import org.apache.kafka.common.acl.AclBindingFilter;
@@ -30,6 +34,16 @@ import org.apache.kafka.common.acl.AclBindingFilter;
  */
 public interface KafkaAdminOperations {
 
+    Map<TopicPartition, OffsetAndMetadata> listConsumerGroupOffsets(String consumerGroup);
+    boolean consumerGroupExists(String consumerGroup);
+    ConsumerGroupDescription describeConsumerGroup(String consumerGroup);
+    FeatureMetadata describeFeatures();
+    boolean topicExists(String topicName);
+    Map<String, TopicDescription> describeTopics(Collection<String> topics);
+    Collection<TopicListing> listTopics();
+    void deleteAcls(Collection<AclBindingFilter> aclBindingFilters);
+    Collection<AclBinding> describeAcl(AclBindingFilter aclFilter);
+    Collection<Node> describeCluster();
     Config describeBrokerConfig(int brokerId);
     Map<Integer, Config> describeBrokerConfigs(Collection<Integer> brokerIds);
     Config describeTopicConfig(String topicName);
@@ -68,6 +82,21 @@ public interface KafkaAdminOperations {
     Map<String, ConsumerGroupDescription> describeAllConsumerGroups();
     Map<String, Map<TopicPartition, OffsetAndMetadata>> listAllConsumerGroupOffsets();
     void deleteConsumerGroup(String groupName);
-    String getZkConnect();
+    
+    /**
+     * Creates a topic if it doesn't exist.
+     *
+     * @param topicName the name of the topic
+     * @param numPartitions the number of partitions for the topic
+     * @param replicationFactor the replication factor for the topic
+     * @param config additional topic configurations
+     * @return true if the topic was created, false if it already existed
+     * @throws RuntimeException if there's an error creating the topic
+     */
+    boolean createTopicIfNotExists(
+            String topicName,
+            int numPartitions,
+            int replicationFactor,
+            Map<String, String> config);
 
 }

@@ -22,6 +22,8 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
+import org.apache.kafka.common.internals.Topic;
+
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
 
@@ -32,6 +34,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.epam.eco.commons.kafka.ScalaConversions;
+import com.epam.eco.kafkamanager.KafkaAdminOperations;
 import com.epam.eco.kafkamanager.NotFoundException;
 import com.epam.eco.kafkamanager.Statistics;
 import com.epam.eco.kafkamanager.TransactionInfo;
@@ -46,15 +49,22 @@ import com.epam.eco.kafkamanager.repo.CachedRepo;
 
 import kafka.coordinator.transaction.TransactionMetadata;
 
+import static org.apache.kafka.common.config.TopicConfig.CLEANUP_POLICY_COMPACT;
+import static org.apache.kafka.common.config.TopicConfig.CLEANUP_POLICY_CONFIG;
+
 /**
  * @author Andrei_Tytsik
  */
 public class KafkaTransactionRepo extends AbstractKeyValueRepo<String, TransactionInfo, TransactionSearchCriteria> implements TransactionRepo, CachedRepo<String>, KafkaTransactionCache.CacheListener, AsyncStartingBean {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(KafkaTransactionRepo.class);
+    private static final int PARTITION_COUNT = 50;
 
     @Autowired
     private KafkaManagerProperties properties;
+    
+    @Autowired
+    private KafkaAdminOperations adminOperations;
 
     private KafkaTransactionCache transactionCache;
 
@@ -62,9 +72,30 @@ public class KafkaTransactionRepo extends AbstractKeyValueRepo<String, Transacti
 
     @PostConstruct
     private void init() {
+        // Ensure transaction state topic exists before initializing cache
+        createTransactionStateTopic();
         initTransactionCache();
-
+    
         LOGGER.info("Initialized");
+    }
+
+    private void createTransactionStateTopic() {
+        LOGGER.info("Checking and creating transaction state topic if needed");
+        int defaultReplicationFactor = adminOperations.getDefaultReplicationFactor();
+        Map<String, String> topicConfig = Collections.singletonMap(CLEANUP_POLICY_CONFIG,
+                CLEANUP_POLICY_COMPACT);
+
+        boolean created = adminOperations.createTopicIfNotExists(
+                Topic.TRANSACTION_STATE_TOPIC_NAME,
+                PARTITION_COUNT,
+                defaultReplicationFactor,
+                topicConfig);
+
+        if (created) {
+            LOGGER.info("Transaction state topic created successfully with COMPACT cleanup policy");
+        } else {
+            LOGGER.info("Transaction state topic already exists");
+        }
     }
 
     @Override

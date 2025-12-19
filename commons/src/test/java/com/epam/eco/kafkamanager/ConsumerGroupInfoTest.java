@@ -18,7 +18,7 @@ package com.epam.eco.kafkamanager;
 import java.time.LocalDateTime;
 import java.util.Collections;
 
-import org.apache.kafka.common.ConsumerGroupState;
+import org.apache.kafka.common.GroupState;
 import org.apache.kafka.common.TopicPartition;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -37,7 +37,7 @@ public class ConsumerGroupInfoTest {
         ConsumerGroupInfo origin = ConsumerGroupInfo.builder()
                 .name("consumerGroupName")
                 .coordinator(1)
-                .state(ConsumerGroupState.STABLE)
+                .state(GroupState.STABLE)
                 .protocolType("consumer")
                 .partitionAssignor("range")
                 .addMember(ConsumerGroupMemberInfo.builder()

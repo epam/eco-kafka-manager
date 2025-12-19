@@ -29,8 +29,6 @@ import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.Validate;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-
 /**
  * @author Andrei_Tytsik
  */
@@ -39,26 +37,25 @@ public class BrokerInfo implements MetadataAware, Comparable<BrokerInfo> {
     private final int id;
     private final List<EndPointInfo> endPoints;
     private final String rack;
-    private final int version;
+    private final String version;
     private final int jmxPort;
     private final Map<String, String> config;
     private final Metadata metadata;
 
     public BrokerInfo(
-            @JsonProperty("id") int id,
-            @JsonProperty("endPoints") List<EndPointInfo> endPoints,
-            @JsonProperty("rack") String rack,
-            @JsonProperty("version") int version,
-            @JsonProperty("jmxPort") int jmxPort,
-            @JsonProperty("config") Map<String, String> config,
-            @JsonProperty("metadata") Metadata metadata) {
+            int id,
+            List<EndPointInfo> endPoints,
+            String rack,
+            String version,
+            int jmxPort,
+            Map<String, String> config,
+            Metadata metadata) {
         Validate.isTrue(id >= 0, "Id is invalid: %d", id);
         Validate.notEmpty(endPoints, "Collection of endPoints is null or empty");
         Validate.noNullElements(endPoints, "Collection of endPoints contains null elements");
-        Validate.isTrue(version >= 0, "Version is invalid: %d", version);
+        Validate.notNull(version, "Version is null");
         if (!MapUtils.isEmpty(config)) {
             Validate.noNullElements(config.keySet(), "Collection of config keys contains null elements");
-            Validate.noNullElements(config.values(), "Collection of config values contains null elements");
         }
 
         this.id = id;
@@ -84,7 +81,7 @@ public class BrokerInfo implements MetadataAware, Comparable<BrokerInfo> {
     public String getRack() {
         return rack;
     }
-    public int getVersion() {
+    public String getVersion() {
         return version;
     }
     public int getJmxPort() {
@@ -152,7 +149,7 @@ public class BrokerInfo implements MetadataAware, Comparable<BrokerInfo> {
         private int id;
         private final List<EndPointInfo> endPoints = new ArrayList<>();
         private String rack;
-        private int version = 0;
+        private String version = "0";
         private int jmxPort = 0;
         private final Map<String, String> config = new HashMap<>();
         private Metadata metadata;
@@ -194,7 +191,7 @@ public class BrokerInfo implements MetadataAware, Comparable<BrokerInfo> {
             this.rack = rack;
             return this;
         }
-        public Builder version(int version) {
+        public Builder version(String version) {
             this.version = version;
             return this;
         }

@@ -21,8 +21,7 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.Validate;
 import org.apache.kafka.clients.admin.ConsumerGroupDescription;
-import org.apache.kafka.common.ConsumerGroupState;
-
+import org.apache.kafka.common.GroupState;
 
 /**
  * @author Andrei_Tytsik
@@ -52,8 +51,8 @@ class ClientGroupMetadata implements GroupMetadataAdapter {
     }
 
     @Override
-    public ConsumerGroupState getState() {
-        return metadata.state();
+    public GroupState getState() {
+        return metadata.groupState();
     }
 
     @Override

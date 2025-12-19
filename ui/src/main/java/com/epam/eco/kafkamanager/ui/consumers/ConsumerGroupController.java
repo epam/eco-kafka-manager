@@ -21,7 +21,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.kafka.common.ConsumerGroupState;
+import org.apache.kafka.common.GroupState;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
@@ -85,7 +85,7 @@ public class ConsumerGroupController {
             @RequestParam Map<String, Object> paramsMap,
             Model model) {
         model.addAttribute(ATTR_CONSUMER_GROUP_STATES,
-                           Arrays.stream(ConsumerGroupState.values())
+                           Arrays.stream(GroupState.values())
                                  .map(m->ComboBoxModel.build(m.name(), m.toString()))
                                  .collect(Collectors.toList()));
         model.addAttribute(ATTR_CONSUMER_GROUP_STORAGES,

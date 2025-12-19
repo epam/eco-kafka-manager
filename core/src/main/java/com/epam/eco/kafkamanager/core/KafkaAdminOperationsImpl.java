@@ -19,30 +19,35 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
 
-import jakarta.annotation.PostConstruct;
-import jakarta.annotation.PreDestroy;
-
-import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 import org.apache.kafka.clients.admin.AdminClient;
 import org.apache.kafka.clients.admin.Config;
 import org.apache.kafka.clients.admin.ConsumerGroupDescription;
+import org.apache.kafka.clients.admin.FeatureMetadata;
+import org.apache.kafka.clients.admin.TopicDescription;
+import org.apache.kafka.clients.admin.TopicListing;
 import org.apache.kafka.clients.consumer.OffsetAndMetadata;
+import org.apache.kafka.common.Node;
 import org.apache.kafka.common.TopicPartition;
 import org.apache.kafka.common.acl.AclBinding;
 import org.apache.kafka.common.acl.AclBindingFilter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.epam.eco.commons.kafka.AdminClientUtils;
 import com.epam.eco.kafkamanager.KafkaAdminOperations;
 import com.epam.eco.kafkamanager.core.autoconfigure.KafkaManagerProperties;
 
-import kafka.server.KafkaConfig;
+import jakarta.annotation.PostConstruct;
+import jakarta.annotation.PreDestroy;
 
 /**
  * @author Andrei_Tytsik
  */
 public class KafkaAdminOperationsImpl implements KafkaAdminOperations {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(KafkaAdminOperationsImpl.class);
 
     private static final int VERIFY_MAX_ATTEMPTS = 5;
     private static final int VERIFY_BACKOFF = 200;
@@ -60,6 +65,51 @@ public class KafkaAdminOperationsImpl implements KafkaAdminOperations {
     @PreDestroy
     private void destroy() {
         adminClient.close();
+    }
+
+    @Override
+    public boolean consumerGroupExists(String consumerGroup) {
+        return AdminClientUtils.consumerGroupExists(adminClient, consumerGroup);
+    }
+
+    @Override
+    public ConsumerGroupDescription describeConsumerGroup(String consumerGroup) {
+        return AdminClientUtils.describeConsumerGroup(adminClient, consumerGroup);
+    }
+
+    @Override
+    public Map<TopicPartition, OffsetAndMetadata> listConsumerGroupOffsets(String consumerGroup) {
+        return AdminClientUtils.listConsumerGroupOffsets(adminClient, consumerGroup);
+    }
+
+    @Override
+    public FeatureMetadata describeFeatures() {
+       return AdminClientUtils.describeFeatures(adminClient);
+    }
+
+    @Override
+    public boolean topicExists(String topicName) {
+        return AdminClientUtils.topicExists(adminClient, topicName);
+    }
+
+    @Override
+    public Collection<TopicListing> listTopics() {
+        return AdminClientUtils.listTopics(adminClient, true);
+    }
+
+    @Override
+    public Map<String, TopicDescription> describeTopics(Collection<String> topics) {
+        return AdminClientUtils.describeTopics(adminClient, topics);
+    }
+
+    @Override
+    public Collection<AclBinding> describeAcl(AclBindingFilter aclFilter) {
+        return AdminClientUtils.describeAcl(adminClient, aclFilter);
+    }
+
+    @Override
+    public Collection<Node> describeCluster() {
+        return AdminClientUtils.describeCluster(adminClient);
     }
 
     @Override
@@ -90,6 +140,11 @@ public class KafkaAdminOperationsImpl implements KafkaAdminOperations {
     @Override
     public void deleteAcl(AclBindingFilter aclBindingFilter) {
         AdminClientUtils.deleteAcl(adminClient, aclBindingFilter);
+    }
+
+    @Override
+    public void deleteAcls(Collection<AclBindingFilter> aclBindingFilters) {
+        AdminClientUtils.deleteAcl(adminClient, aclBindingFilters);
     }
 
     @Override
@@ -165,7 +220,7 @@ public class KafkaAdminOperationsImpl implements KafkaAdminOperations {
         return Integer.parseInt(
                 AdminClientUtils.describeAnyBrokerConfigEntry(
                         adminClient,
-                        KafkaConfig.DefaultReplicationFactorProp()).value());
+                        "default.replication.factor").value());
     }
 
     @Override
@@ -182,16 +237,22 @@ public class KafkaAdminOperationsImpl implements KafkaAdminOperations {
     public void deleteConsumerGroup(String groupName) {
         AdminClientUtils.deleteConsumerGroup(adminClient, groupName);
     }
-
+    
     @Override
-    public String getZkConnect() {
-        String zkConnect = properties.getZkConnect();
-        if (StringUtils.isBlank(zkConnect)) {
-            zkConnect = AdminClientUtils.describeAnyBrokerConfigEntry(
-                    adminClient,
-                    KafkaConfig.ZkConnectProp()).value();
+    public boolean createTopicIfNotExists(
+            String topicName,
+            int numPartitions,
+            int replicationFactor,
+            Map<String, String> config) {
+        Validate.notBlank(topicName, "Topic name is blank");
+        Validate.isTrue(numPartitions > 0, "Number of partitions must be positive");
+        Validate.isTrue(replicationFactor > 0, "Replication factor must be positive");
+        
+        if (!topicExists(topicName)) {
+            createTopic(topicName, numPartitions, replicationFactor, config);
+            return true;
         }
-        return zkConnect;
+        return false;
     }
 
 }

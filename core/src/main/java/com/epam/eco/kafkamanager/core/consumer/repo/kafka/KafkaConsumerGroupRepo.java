@@ -24,13 +24,12 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
-import jakarta.annotation.PostConstruct;
-import jakarta.annotation.PreDestroy;
-
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.Validate;
+import org.apache.kafka.clients.consumer.OffsetAndMetadata;
 import org.apache.kafka.common.TopicPartition;
+import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,8 +51,14 @@ import com.epam.eco.kafkamanager.OffsetAndMetadataInfo;
 import com.epam.eco.kafkamanager.SearchCriteria;
 import com.epam.eco.kafkamanager.core.autoconfigure.KafkaManagerProperties;
 import com.epam.eco.kafkamanager.core.spring.AsyncStartingBean;
+import com.epam.eco.kafkamanager.core.utils.ExceptionUtils;
 import com.epam.eco.kafkamanager.repo.AbstractKeyValueRepo;
 import com.epam.eco.kafkamanager.repo.CachedRepo;
+
+import jakarta.annotation.PostConstruct;
+import jakarta.annotation.PreDestroy;
+
+import static java.util.Objects.nonNull;
 
 /**
  * @author Andrei_Tytsik
@@ -126,19 +131,25 @@ public class KafkaConsumerGroupRepo extends AbstractKeyValueRepo<String, Consume
     public boolean contains(String groupName) {
         Validate.notBlank(groupName, "Group name can't be blank");
 
-        return groupCache.contains(groupName);
+        return adminOperations.consumerGroupExists(groupName);
     }
 
     @Override
     public ConsumerGroupInfo get(String groupName) {
         Validate.notBlank(groupName, "Group name can't be blank");
 
-        ConsumerGroupInfo groupInfo = getGroupFromInfoCacheOrCreate(groupName);
+        ConsumerGroupInfo groupInfo = fetchConsumerGroup(groupName);
         if (groupInfo == null) {
+            removeFromCaches(groupName);
             throw new NotFoundException(String.format("Group not found by name '%s'", groupName));
         }
-
+        groupInfoCache.put(groupName, groupInfo);
         return groupInfo;
+    }
+
+    private void removeFromCaches(String groupName) {
+        removeGroupFromInfoCache(groupName);
+        groupCache.removeGroup(groupName);
     }
 
     @Override
@@ -260,12 +271,78 @@ public class KafkaConsumerGroupRepo extends AbstractKeyValueRepo<String, Consume
     }
 
     private ConsumerGroupInfo getGroupFromInfoCacheOrCreate(String groupName) {
+
         return groupInfoCache.computeIfAbsent(
                 groupName,
                 key -> {
                     KafkaGroupMetadata groupMetadata = groupCache.getGroupMetadata(groupName);
-                    return groupMetadata != null ? toConsumerGroupInfo(groupMetadata) : null;
+                    return groupMetadata != null ? toConsumerGroupInfo(groupMetadata) :
+                            fetchConsumerGroup(groupName);
                 });
+    }
+
+    private ConsumerGroupInfo fetchConsumerGroup(String groupName) {
+        ClientGroupMetadata clientGroupMetadata =
+                ClientGroupMetadata.ofNullable(
+                        ExceptionUtils.doQuietly(() -> adminOperations.describeConsumerGroup(groupName))
+                );
+        return buildConsumerGroupInfo(groupName, clientGroupMetadata);
+    }
+
+    @Nullable
+    private ConsumerGroupInfo buildConsumerGroupInfo(
+            String groupName,
+            ClientGroupMetadata clientGroupMetadata
+    ) {
+        if (clientGroupMetadata == null) {
+            return null;
+        }
+        Map<TopicPartition, OffsetAndMetadata> rawOffsetsMetadata =
+                adminOperations.listConsumerGroupOffsets(groupName);
+
+        Map<TopicPartition, OffsetAndMetadataAdapter> offsetsMetadata =
+                rawOffsetsMetadata.entrySet().stream()
+                .filter(offset -> nonNull(offset.getValue()))
+                .collect(
+                        Collectors.toMap(
+                                Map.Entry::getKey,
+                                entry -> ClientOffsetAndMetadata.ofNullable(entry.getValue())));
+
+        mergeOffsetsWithCachedData(groupName, offsetsMetadata);
+
+        KafkaGroupMetadata kafkaGroupMetadata = new KafkaGroupMetadata(groupName);
+        kafkaGroupMetadata.setGroupMetadata(clientGroupMetadata);
+        kafkaGroupMetadata.setOffsetsMetadata(offsetsMetadata);
+        return toConsumerGroupInfo(kafkaGroupMetadata);
+    }
+
+
+    /**
+     * Merges the latest offset data from adminClient with particular cached offset data
+     * provided from consumer_offsets topic because adminClient doesn't provide full set of
+     * the offset metadata properties.
+     * This ensures that we maintain the most up-to-date offset information while preserving
+     * any additional metadata that might be present in the cached data.
+     * @param groupName The group name
+     * @param offsetsMetadata The current offsets and metadata fetched by adminClient
+     */
+    private void mergeOffsetsWithCachedData(
+            String groupName,
+            Map<TopicPartition, OffsetAndMetadataAdapter> offsetsMetadata
+    ) {
+        KafkaGroupMetadata cachedKafkaGroupMetadata = groupCache.getGroupMetadata(groupName);
+        if (cachedKafkaGroupMetadata != null) {
+            Map<TopicPartition, OffsetAndMetadataAdapter> cachedOffsets =
+                    cachedKafkaGroupMetadata.getOffsetsMetadata();
+            cachedOffsets.forEach((topic, cachedOffset) -> {
+                if (offsetsMetadata.containsKey(topic)) {
+                    OffsetAndMetadataAdapter offsetAndMetadata = offsetsMetadata.get(topic);
+                    if (cachedOffset.getOffset() == offsetAndMetadata.getOffset()) {
+                        offsetsMetadata.put(topic, cachedOffset);
+                    }
+                }
+            });
+        }
     }
 
     private ConsumerGroupInfo toConsumerGroupInfo(KafkaGroupMetadata metadata) {
@@ -277,7 +354,7 @@ public class KafkaConsumerGroupRepo extends AbstractKeyValueRepo<String, Consume
         return ConsumerGroupInfo.builder().
                 name(groupName).
                 coordinator(groupMetadata.getCoordinator()).
-                state(groupMetadata.getState()).
+                state(metadata.getGroupState()).
                 protocolType(groupMetadata.getProtocolType()).
                 partitionAssignor(groupMetadata.getPartitionAssignor()).
                 members(memberInfos).
@@ -301,7 +378,6 @@ public class KafkaConsumerGroupRepo extends AbstractKeyValueRepo<String, Consume
                         clientHost(metadata.getClientHost()).
                         rebalanceTimeoutMs(metadata.getRebalanceTimeoutMs()).
                         sessionTimeoutMs(metadata.getSessionTimeoutMs()).
-                        heartbeatSatisfied(metadata.isHeartbeatSatisfied()).
                         assignment(metadata.getAssignment()).
                         build()).
                 sorted().

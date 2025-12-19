@@ -22,6 +22,7 @@ import java.util.Map;
 import org.apache.avro.Schema;
 import org.apache.avro.generic.GenericRecord;
 import org.apache.commons.lang3.Validate;
+import org.apache.kafka.common.header.Headers;
 
 import com.epam.eco.kafkamanager.logicaltype.LogicalTypeSchemaConverter;
 
@@ -62,6 +63,11 @@ public class KafkaExtendedAvroDeserializer extends KafkaAvroDeserializer {
 
     @Override
     public Object deserialize(String topic, byte[] bytes, Schema readerSchema) {
+        return getDeserializedResult(topic, bytes);
+    }
+
+    @Override
+    public Object deserialize(String topic, Headers headers, byte[] bytes) {
         return getDeserializedResult(topic, bytes);
     }
 
