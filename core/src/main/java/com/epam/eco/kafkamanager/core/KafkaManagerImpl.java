@@ -77,6 +77,8 @@ import com.epam.eco.kafkamanager.TransactionRepo;
 import com.epam.eco.kafkamanager.TransactionSearchCriteria;
 import com.epam.eco.kafkamanager.repo.CachedRepo;
 
+import io.micrometer.core.annotation.Timed;
+
 /**
  * @author Andrei_Tytsik
  */
@@ -112,6 +114,7 @@ public class KafkaManagerImpl implements KafkaManager {
     @Autowired
     private TopicRecordFetcherTaskExecutor<?, ?> topicRecordFetcherTaskExecutor;
 
+    @Timed("kafka.ui.broker.count")
     @Override
     public int getBrokerCount() {
         return brokerRepo.size();
@@ -137,11 +140,13 @@ public class KafkaManagerImpl implements KafkaManager {
         return brokerRepo.values(criteria);
     }
 
+    @Timed("kafka.ui.broker.values")
     @Override
     public Page<BrokerInfo> getBrokerPage(Pageable pageable) {
         return getBrokerPage(null, pageable);
     }
 
+    @Timed("kafka.rest.broker.values")
     @Override
     public Page<BrokerInfo> getBrokerPage(BrokerSearchCriteria criteria, Pageable pageable) {
         return brokerRepo.page(criteria, pageable);
@@ -215,6 +220,7 @@ public class KafkaManagerImpl implements KafkaManager {
         return topicRepo.values();
     }
 
+    @Timed("kafka.ui.topic.values")
     @Override
     public List<TopicInfo> getTopics(SearchCriteria<TopicInfo> criteria) {
         return topicRepo.values(criteria);
@@ -225,6 +231,7 @@ public class KafkaManagerImpl implements KafkaManager {
         return getTopicPage(null, pageable);
     }
 
+    @Timed("kafka.rest.topic.values")
     @Override
     public Page<TopicInfo> getTopicPage(SearchCriteria<TopicInfo> criteria, Pageable pageable) {
         return topicRepo.page(criteria, pageable);
@@ -464,6 +471,7 @@ public class KafkaManagerImpl implements KafkaManager {
         return consumerGroupTopicOffsetFetcherTaskExecutor;
     }
 
+    @Timed("kafka.ui.permission.count")
     @Override
     public int getPermissionCount() {
         return permissionRepo.size();
@@ -484,6 +492,7 @@ public class KafkaManagerImpl implements KafkaManager {
         return permissionRepo.page(null, pageable);
     }
 
+    @Timed("kafka.ui.permission.values")
     @Override
     public Page<PermissionInfo> getPermissionPage(PermissionSearchCriteria criteria, Pageable pageable) {
         return permissionRepo.page(criteria, pageable);

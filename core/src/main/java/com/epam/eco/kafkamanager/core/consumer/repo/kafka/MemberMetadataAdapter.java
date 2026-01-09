@@ -28,6 +28,5 @@ interface MemberMetadataAdapter {
     String getClientHost();
     Integer getRebalanceTimeoutMs();
     Integer getSessionTimeoutMs();
-    boolean isHeartbeatSatisfied();
     Collection<TopicPartition> getAssignment();
 }

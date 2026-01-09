@@ -1,7 +1,6 @@
 SERVER_PORT: 8085                        # tomcat server port
 KAFKA_SERVERS_URL: localhost:9095        # kafka bootstrap server url
 SCHEMA_REGISTRY_URL: http://schema-registry:8081 # schema-registry url (optional)
-ZK_CONNECT: http://zookepper  # Zookeeper url (Optional)
 
 server:
   port: ${SERVER_PORT:8082}
@@ -58,12 +57,6 @@ eco:
                                                  principal='<kafka-user>' \
                                                  keyTab='c://<path-to-keytab>//kafka-manager.keytab' \
                                                  storeKey=true;"
-
-      zkClientConfig[zookeeper.clientCnxnSocket]: org.apache.zookeeper.ClientCnxnSocketNetty
-      zkClientConfig[zookeeper.client.secure]: true
-      zkClientConfig[zookeeper.ssl.client.enable]: true
-      zkClientConfig[zookeeper.ssl.trustStore.location]: "c:/<path-to-truststore>/truststore.jks"
-      zkClientConfig[zookeeper.ssl.trustStore.password]: "<truststore-password>"
 
 
     udmetrics:

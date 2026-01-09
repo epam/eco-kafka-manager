@@ -20,8 +20,8 @@ import java.util.List;
 
 import org.apache.commons.lang3.Validate;
 import org.apache.kafka.common.TopicPartition;
+import org.apache.kafka.coordinator.transaction.TransactionState;
 
-import com.epam.eco.commons.kafka.TransactionState;
 import com.epam.eco.kafkamanager.TransactionMetadataInfo;
 import com.epam.eco.kafkamanager.ui.utils.CollapsedCollectionIterable;
 

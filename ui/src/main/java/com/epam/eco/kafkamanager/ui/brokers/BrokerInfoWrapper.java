@@ -60,7 +60,7 @@ public class BrokerInfoWrapper {
     public String getRack() {
         return brokerInfo.getRack();
     }
-    public int getVersion() {
+    public String getVersion() {
         return brokerInfo.getVersion();
     }
     public int getJmxPort() {

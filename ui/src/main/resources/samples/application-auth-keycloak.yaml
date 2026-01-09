@@ -51,18 +51,12 @@ eco:
       clientConfig[sasl.kerberos.service.name]: "kafka"
       clientConfig[sasl.jaas.config]: "com.sun.security.auth.module.Krb5LoginModule required \
                                                  useKeyTab=true  \
-                                                 principal='account@EPAM.COM' \
+                                                 principal='account@domain.COM' \
                                                  keyTab='c://ssl//km.keytab' \
                                                  storeKey=true;"
       authz:
         kafka:
           enabled: false
-
-      zkClientConfig[zookeeper.clientCnxnSocket]: org.apache.zookeeper.ClientCnxnSocketNetty
-      zkClientConfig[zookeeper.client.secure]: true
-      zkClientConfig[zookeeper.ssl.client.enable]: true
-      zkClientConfig[zookeeper.ssl.trustStore.location]: "c:/ssl/truststore.jks"
-      zkClientConfig[zookeeper.ssl.trustStore.password]: "password"
 
     ui:
       showGridInTopicBrowser: true
@@ -77,14 +71,6 @@ eco:
             replacement: T(java.time.LocalDateTime).now().toInstant(T(java.time.ZoneOffset).UTC).toEpochMilli()
           - headerName: business_time
             replacement: T(java.time.LocalDateTime).now().toInstant(T(java.time.ZoneOffset).UTC).toEpochMilli()
-
-#      externalTools:
-#        - name: External tool #1
-#          urlTemplate: https://integration.datahub.epam.com/external-tools/1/{topicname}
-#          icon: fa-external-link
-#        - name: External tool #2
-#          urlTemplate: https://integration.datahub.epam.com/external-tools/2/{topicname}
-#          icon: fa-external-link
 
 KEYCLOAK_CLIENT_BASE_URL: ${KEYCLOAK_BASE}/realms/${KEYCLOAK_REALM}/protocol/openid-connect
 KEYCLOAK_AUTH_URL: ${KEYCLOAK_CLIENT_BASE_URL}/auth

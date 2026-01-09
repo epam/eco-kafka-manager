@@ -30,7 +30,7 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.Validate;
-import org.apache.kafka.common.ConsumerGroupState;
+import org.apache.kafka.common.GroupState;
 import org.apache.kafka.common.TopicPartition;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -44,7 +44,7 @@ public class ConsumerGroupInfo implements MetadataAware, Comparable<ConsumerGrou
 
     private final String name;
     private final Integer coordinator;
-    private final ConsumerGroupState state;
+    private final GroupState state;
     private final String protocolType;
     private final String partitionAssignor;
     private final List<ConsumerGroupMemberInfo> members;
@@ -58,7 +58,7 @@ public class ConsumerGroupInfo implements MetadataAware, Comparable<ConsumerGrou
     public ConsumerGroupInfo(
             @JsonProperty("name") String name,
             @JsonProperty("coordinator") Integer coordinator,
-            @JsonProperty("state") ConsumerGroupState state,
+            @JsonProperty("state") GroupState state,
             @JsonProperty("protocolType") String protocolType,
             @JsonProperty("partitionAssignor") String partitionAssignor,
             @JsonProperty("members") Collection<ConsumerGroupMemberInfo> members,
@@ -131,7 +131,7 @@ public class ConsumerGroupInfo implements MetadataAware, Comparable<ConsumerGrou
     public Integer getCoordinator() {
         return coordinator;
     }
-    public ConsumerGroupState getState() {
+    public GroupState getState() {
         return state;
     }
     public String getProtocolType() {
@@ -249,7 +249,7 @@ public class ConsumerGroupInfo implements MetadataAware, Comparable<ConsumerGrou
 
         private String name;
         private Integer coordinator;
-        private ConsumerGroupState state;
+        private GroupState state;
         private String protocolType;
         private String partitionAssignor;
         private final List<ConsumerGroupMemberInfo> members = new ArrayList<>();
@@ -287,7 +287,7 @@ public class ConsumerGroupInfo implements MetadataAware, Comparable<ConsumerGrou
             this.coordinator = coordinator;
             return this;
         }
-        public Builder state(ConsumerGroupState state) {
+        public Builder state(GroupState state) {
             this.state = state;
             return this;
         }

@@ -15,22 +15,16 @@
  *******************************************************************************/
 package com.epam.eco.kafkamanager.core.autoconfigure;
 
-import java.util.Map.Entry;
-
 import javax.cache.CacheManager;
 import javax.cache.Caching;
 
-import org.apache.commons.collections4.MapUtils;
-import org.apache.curator.framework.CuratorFramework;
-import org.apache.curator.framework.CuratorFrameworkFactory;
-import org.apache.curator.retry.RetryForever;
-import org.apache.zookeeper.client.ZKClientConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
+import org.springframework.context.annotation.Primary;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 
 import com.epam.eco.kafkamanager.Authorizer;
@@ -55,23 +49,23 @@ import com.epam.eco.kafkamanager.core.KafkaManagerImpl;
 import com.epam.eco.kafkamanager.core.SecurityContextAdapterImpl;
 import com.epam.eco.kafkamanager.core.authz.PermitAllAuthorizer;
 import com.epam.eco.kafkamanager.core.authz.kafka.KafkaAuthorizerConfiguration;
-import com.epam.eco.kafkamanager.core.broker.repo.zk.ZkBrokerRepo;
+import com.epam.eco.kafkamanager.core.broker.repo.kafka.KafkaBrokerRepo;
 import com.epam.eco.kafkamanager.core.consumer.exec.ConsumerGroupOffsetResetterTaskExecutorImpl;
 import com.epam.eco.kafkamanager.core.consumer.exec.ConsumerGroupTopicOffsetFetcherTaskExecutorImpl;
-import com.epam.eco.kafkamanager.core.consumer.repo.CompositeConsumerGroupRepo;
 import com.epam.eco.kafkamanager.core.consumer.repo.kafka.KafkaConsumerGroupRepo;
-import com.epam.eco.kafkamanager.core.consumer.repo.zk.ZkConsumerGroupRepo;
-import com.epam.eco.kafkamanager.core.metadata.repo.kafka.KafkaMetadataRepo;
-import com.epam.eco.kafkamanager.core.permission.repo.zk.ZkPermissionRepo;
+import com.epam.eco.kafkamanager.core.metadata.repo.kafka.KafkaEcoMetadataRepo;
+import com.epam.eco.kafkamanager.core.permission.repo.kafka.KafkaPermissionRepo;
 import com.epam.eco.kafkamanager.core.spring.AsyncStartingBeanProcessor;
 import com.epam.eco.kafkamanager.core.topic.exec.TopicOffsetForTimeFetcherTaskExecutorImpl;
 import com.epam.eco.kafkamanager.core.topic.exec.TopicOffsetRangeFetcherTaskExecutorImpl;
 import com.epam.eco.kafkamanager.core.topic.exec.TopicPurgerTaskExecutorImpl;
 import com.epam.eco.kafkamanager.core.topic.exec.TopicRecordCounterTaskExecutorImpl;
 import com.epam.eco.kafkamanager.core.topic.exec.TopicRecordFetcherTaskExecutorImpl;
-import com.epam.eco.kafkamanager.core.topic.repo.zk.ZkTopicRepo;
+import com.epam.eco.kafkamanager.core.topic.repo.kafka.KafkaTopicRepo;
 import com.epam.eco.kafkamanager.core.txn.repo.kafka.KafkaTransactionRepo;
-import com.epam.eco.kafkamanager.core.utils.RetriableZookeeperFactory;
+
+import io.micrometer.core.aop.TimedAspect;
+import io.micrometer.core.instrument.MeterRegistry;
 
 /**
  * @author Andrei_Tytsik
@@ -79,7 +73,7 @@ import com.epam.eco.kafkamanager.core.utils.RetriableZookeeperFactory;
 @Configuration
 @EnableConfigurationProperties(KafkaManagerProperties.class)
 @EnableGlobalMethodSecurity(prePostEnabled=true)
-@Import(KafkaAuthorizerConfiguration.class)
+@Import({KafkaAuthorizerConfiguration.class})
 public class KafkaManagerAutoConfiguration {
 
     @Autowired
@@ -143,64 +137,34 @@ public class KafkaManagerAutoConfiguration {
     }
 
     @Bean
-    public BrokerRepo brokerRepo() {
-        return new ZkBrokerRepo();
+    @Primary
+    public BrokerRepo kafkaBrokerRepo() {
+        return new KafkaBrokerRepo();
     }
 
     @Bean
-    public TopicRepo topicRepo() {
-        return new ZkTopicRepo();
+    public TopicRepo kafkaTopicRepo() {
+        return new KafkaTopicRepo();
     }
 
     @Bean
-    public ConsumerGroupRepo consumerGroupRepo() {
-        return new CompositeConsumerGroupRepo();
+    public PermissionRepo kafkaPermissionRepo() {
+        return new KafkaPermissionRepo();
     }
 
-    @Bean("ZK")
-    public ConsumerGroupRepo zkConsumerGroupRepo() {
-        return new ZkConsumerGroupRepo();
-    }
-
-    @Bean("KF")
+    @Bean
     public ConsumerGroupRepo kafkaConsumerGroupRepo() {
         return new KafkaConsumerGroupRepo();
     }
 
     @Bean
-    public PermissionRepo permissionRepo() {
-        return new ZkPermissionRepo();
-    }
-
-    @Bean
     public MetadataRepo metadataRepo() {
-        return new KafkaMetadataRepo();
+        return new KafkaEcoMetadataRepo();
     }
 
     @Bean
     public TransactionRepo transactionRepo() {
         return new KafkaTransactionRepo();
-    }
-
-    @Bean(destroyMethod="close")
-    public CuratorFramework curatorFramework(KafkaAdminOperations adminOperations) {
-        ZKClientConfig clientConfig = null;
-        if (MapUtils.isNotEmpty(properties.getZkClientConfig())) {
-            clientConfig = new ZKClientConfig();
-            for (Entry<String, String> entry : properties.getZkClientConfig().entrySet()) {
-                clientConfig.setProperty(entry.getKey(), entry.getValue());
-            }
-        }
-
-        CuratorFramework client = CuratorFrameworkFactory.builder().
-                zkClientConfig(clientConfig).
-                connectString(adminOperations.getZkConnect()).
-                retryPolicy(new RetryForever(3000)).
-                zookeeperFactory(new RetriableZookeeperFactory()).
-                build();
-        client.start();
-
-        return client;
     }
 
     @Bean
@@ -214,4 +178,8 @@ public class KafkaManagerAutoConfiguration {
         return new AsyncStartingBeanProcessor();
     }
 
+    @Bean
+    public TimedAspect timedAspect(MeterRegistry registry) {
+        return new TimedAspect(registry);
+    }
 }

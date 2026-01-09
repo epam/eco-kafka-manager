@@ -25,10 +25,9 @@ import java.util.TimeZone;
 
 import org.apache.commons.lang3.Validate;
 import org.apache.kafka.common.TopicPartition;
+import org.apache.kafka.coordinator.transaction.TransactionState;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-
-import com.epam.eco.commons.kafka.TransactionState;
 
 /**
  * @author Andrei_Tytsik
@@ -201,10 +200,7 @@ public class TransactionMetadataInfo {
             this.state = state;
             return this;
         }
-        public Builder state(kafka.coordinator.transaction.TransactionState state) {
-            this.state = TransactionState.fromScala(state);
-            return this;
-        }
+
         public Builder partitions(List<TopicPartition> partitions) {
             this.partitions.clear();
             if (partitions != null) {

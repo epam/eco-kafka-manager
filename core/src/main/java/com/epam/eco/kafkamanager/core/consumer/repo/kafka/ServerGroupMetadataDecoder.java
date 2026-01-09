@@ -18,45 +18,44 @@ package com.epam.eco.kafkamanager.core.consumer.repo.kafka;
 import java.nio.ByteBuffer;
 
 import org.apache.commons.lang3.Validate;
-import org.apache.kafka.common.utils.Time;
+import org.apache.kafka.common.protocol.ApiMessage;
+import org.apache.kafka.common.protocol.MessageUtil;
+import org.apache.kafka.coordinator.common.runtime.CoordinatorRecord;
+import org.apache.kafka.coordinator.group.GroupCoordinatorRecordSerde;
 
 import com.epam.eco.commons.kafka.serde.KeyValueDecoder;
 
-import kafka.coordinator.group.BaseKey;
-import kafka.coordinator.group.GroupMetadataKey;
-import kafka.coordinator.group.GroupMetadataManager;
-import kafka.coordinator.group.OffsetKey;
 
 /**
  * @author Andrei_Tytsik
  */
-class ServerGroupMetadataDecoder implements KeyValueDecoder<BaseKey, Object> {
+class ServerGroupMetadataDecoder implements KeyValueDecoder<ApiMessage, Object> {
+
+    private final GroupCoordinatorRecordSerde groupCoordinatorRecordSerde =
+            new GroupCoordinatorRecordSerde();
 
     @Override
-    public BaseKey decodeKey(byte[] keyBytes) {
+    public ApiMessage decodeKey(byte[] keyBytes) {
         Validate.notNull(keyBytes, "Key bytes array can't be null");
-
-        return GroupMetadataManager.readMessageKey(ByteBuffer.wrap(keyBytes));
+        CoordinatorRecord record =
+                groupCoordinatorRecordSerde.deserialize(ByteBuffer.wrap(keyBytes), null);
+        return record.key();
     }
 
     @Override
-    public Object decodeValue(BaseKey key, byte[] valueBytes) {
+    public Object decodeValue(
+            ApiMessage key,
+            byte[] valueBytes
+    ) {
         Validate.notNull(key, "Key can't be null");
 
         if (valueBytes == null) {
             return null;
         }
-
-        if (key instanceof OffsetKey) {
-            return GroupMetadataManager.readOffsetMessageValue(ByteBuffer.wrap(valueBytes));
-        } else if (key instanceof GroupMetadataKey) {
-            return GroupMetadataManager.readGroupMessageValue(
-                    ((GroupMetadataKey)key).key(),
-                    ByteBuffer.wrap(valueBytes),
-                    Time.SYSTEM);
-        } else {
-            throw new IllegalArgumentException("Unsupported key=" + key);
-        }
+        CoordinatorRecord record =
+                groupCoordinatorRecordSerde.deserialize(ByteBuffer.wrap(MessageUtil.toCoordinatorTypePrefixedBytes(key)),
+                        ByteBuffer.wrap(valueBytes));
+        return record.value().message();
     }
 
 }

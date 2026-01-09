@@ -20,7 +20,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.kafka.common.ConsumerGroupState;
+import org.apache.kafka.common.GroupState;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -54,7 +54,7 @@ public class TopicListSearchCriteriaImplTest {
                    ConsumerGroupInfo groupInfo = new ConsumerGroupInfo(
                            invocationOnMock.getArgument(0),
                            0,
-                           ConsumerGroupState.STABLE,
+                           GroupState.STABLE,
                            "TCP",
                            "partitionAssignor",
                            List.of(),

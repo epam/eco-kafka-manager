@@ -2,7 +2,7 @@
 
 Eco Kafka Manager is a tool for monitoring and managing [Apache Kafka](https://kafka.apache.org/).
 
-The currently supported version is [3.0](https://kafka.apache.org/30/documentation.html)
+The currently supported version is [4.1](https://kafka.apache.org/41/)
 
 The currently supported java version 17.
 

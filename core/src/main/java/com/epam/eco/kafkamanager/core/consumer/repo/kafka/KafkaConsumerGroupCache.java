@@ -32,6 +32,11 @@ import org.apache.commons.lang3.Validate;
 import org.apache.kafka.clients.admin.ConsumerGroupDescription;
 import org.apache.kafka.common.TopicPartition;
 import org.apache.kafka.common.internals.Topic;
+import org.apache.kafka.common.protocol.ApiMessage;
+import org.apache.kafka.coordinator.group.generated.GroupMetadataKey;
+import org.apache.kafka.coordinator.group.generated.GroupMetadataValue;
+import org.apache.kafka.coordinator.group.generated.OffsetCommitKey;
+import org.apache.kafka.coordinator.group.generated.OffsetCommitValue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,24 +45,19 @@ import com.epam.eco.commons.kafka.consumer.bootstrap.EndOffsetInitializer;
 import com.epam.eco.kafkamanager.KafkaAdminOperations;
 import com.epam.eco.kafkamanager.OffsetTimeSeries;
 
-import kafka.common.OffsetAndMetadata;
-import kafka.coordinator.group.BaseKey;
-import kafka.coordinator.group.GroupMetadata;
-import kafka.coordinator.group.GroupMetadataKey;
-import kafka.coordinator.group.OffsetKey;
-
 import static java.util.Objects.nonNull;
 
 /**
  * @author Andrei_Tytsik
  */
-class KafkaConsumerGroupCache implements com.epam.eco.commons.kafka.cache.CacheListener<BaseKey, Object> {
+class KafkaConsumerGroupCache implements com.epam.eco.commons.kafka.cache.CacheListener<ApiMessage, Object> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(KafkaConsumerGroupCache.class);
+    public static final String CONSUMER_PROTOCOL_TYPE = "consumer";
 
     private final KafkaAdminOperations adminOperations;
 
-    private final KafkaCache<BaseKey, Object> metadataCache;
+    private final KafkaCache<ApiMessage, Object> metadataCache;
 
     private final Map<String, KafkaGroupMetadata> groupCache = new HashMap<>();
     private final Map<String, Set<String>> topicGroups = new HashMap<>();
@@ -76,7 +76,7 @@ class KafkaConsumerGroupCache implements com.epam.eco.commons.kafka.cache.CacheL
         Validate.notNull(cacheListener, "Cache Listener can't be null");
 
         this.adminOperations = adminOperations;
-        this.metadataCache = KafkaCache.<BaseKey, Object>builder().
+        this.metadataCache = KafkaCache.<ApiMessage, Object>builder().
                 bootstrapServers(bootstrapServers).
                 topicName(Topic.GROUP_METADATA_TOPIC_NAME).
                 bootstrapTimeoutInMs(1).
@@ -91,16 +91,22 @@ class KafkaConsumerGroupCache implements com.epam.eco.commons.kafka.cache.CacheL
     }
 
     public void start() throws Exception {
+        LOGGER.info("bootstrap Initial Consumer Group Data");
         bootstrapInitialData();
         startMetadataCache();
 
-        LOGGER.info("Started");
+        LOGGER.info("Consumer Group Cache Started");
     }
 
     public void close()  {
         destroyMetadataCache();
 
         LOGGER.info("Closed");
+    }
+
+    public void removeGroup(String groupName) {
+        groupCache.remove(groupName);
+        LOGGER.info("Consumer Group {} removed from cache", groupName);
     }
 
     public int size() {
@@ -181,7 +187,7 @@ class KafkaConsumerGroupCache implements com.epam.eco.commons.kafka.cache.CacheL
     }
 
     @Override
-    public void onCacheUpdated(Map<BaseKey, Object> cacheUpdate) {
+    public void onCacheUpdated(Map<ApiMessage, Object> cacheUpdate) {
         if (MapUtils.isEmpty(cacheUpdate)) {
             return;
         }
@@ -191,17 +197,24 @@ class KafkaConsumerGroupCache implements com.epam.eco.commons.kafka.cache.CacheL
 
         cacheUpdate.forEach((key, value) -> {
             if (key instanceof GroupMetadataKey groupMetadataKey) {
-                GroupMetadataAdapter groupMetadata =
-                        ServerGroupMetadata.ofNullable((GroupMetadata)value);
+                GroupMetadataValue groupMetadataValue = (GroupMetadataValue) value;
+                if (groupMetadataValue != null) {
+                    if (groupMetadataValue.protocolType().equals(CONSUMER_PROTOCOL_TYPE)) {
+                        GroupMetadataAdapter groupMetadata =
+                                ServerGroupMetadata.ofNullable((GroupMetadataValue) value);
 
-                String groupName = groupMetadataKey.key();
-                groupUpdates.put(groupName, groupMetadata);
-            } else if (key instanceof OffsetKey offsetKey) {
-                OffsetAndMetadataAdapter offsetAndMetadata =
-                        ServerOffsetAndMetadata.ofNullable((OffsetAndMetadata)value);
+                        groupUpdates.put(groupMetadataKey.group(), groupMetadata);
+                    } else {
+                        LOGGER.debug("Ignoring non-consumer group metadata record: key={}", key);
+                    }
+                } else {
+                    LOGGER.debug("Ignoring nullable group metadata record: key={}", key);
+                }
+            } else if (key instanceof OffsetCommitKey offsetKey) {
+                OffsetAndMetadataAdapter offsetAndMetadata = ServerOffsetAndMetadata.ofNullable((OffsetCommitValue)value);
 
-                String groupName = offsetKey.key().group();
-                TopicPartition topicPartition = offsetKey.key().topicPartition();
+                String groupName = offsetKey.group();
+                TopicPartition topicPartition = new TopicPartition(offsetKey.topic(), offsetKey.partition());
 
                 Map<TopicPartition, OffsetAndMetadataAdapter> offsetsMetadata =
                         offsetUpdates.computeIfAbsent(
@@ -464,6 +477,7 @@ class KafkaConsumerGroupCache implements com.epam.eco.commons.kafka.cache.CacheL
         update.forEach((name, metadata) -> {
             if (metadata != null) {
                 try {
+                    groupCache.put(name, metadata);
                     cacheListener.onGroupMetadataUpdated(metadata);
                 } catch (Exception ex) {
                     LOGGER.error(
@@ -474,6 +488,7 @@ class KafkaConsumerGroupCache implements com.epam.eco.commons.kafka.cache.CacheL
                 }
             } else {
                 try {
+                    groupCache.remove(name);
                     cacheListener.onGroupMetadataRemoved(name);
                 } catch (Exception ex) {
                     LOGGER.error(

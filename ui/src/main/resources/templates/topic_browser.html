@@ -685,7 +685,8 @@
                                                                      th:text="${partition}"></span>
                                                                 <div class="input-group-text col-auto">
                                                                     <input type="checkbox"
-                                                                           class="partition-checkbox form-check-input mt-0"
+                                                                           th:name="${'partition-checkbox form-check-input mt-' + partition}"
+                                                                           class="partition-checkbox form-check-input mt"
                                                                            th:attr="data-partition=${partition}"
                                                                            th:checked="${enabled}"/>
                                                                 </div>
@@ -787,7 +788,7 @@
                                 max="300000"
                                 id="timeout"
                                 name="timeout"
-                                th:value="${browseParams.timeout}"/>
+                                th:value="${browseParams.timeout != null ? browseParams.timeout : 20000}"/>
 
 
                             <label class="centred col-auto" for="limit">Limit</label>
@@ -800,7 +801,7 @@
                                    id="limit"
                                    name="limit"
                                    oninput="maxLimitCheck(this)"
-                                   th:value="${browseParams.limit}"/>
+                                   th:value="${browseParams.limit != null ? browseParams.limit : 100}"/>
 
                         </div>
 

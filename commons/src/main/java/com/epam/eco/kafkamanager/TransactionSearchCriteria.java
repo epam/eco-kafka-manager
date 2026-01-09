@@ -20,10 +20,10 @@ import java.util.Objects;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
+import org.apache.kafka.coordinator.transaction.TransactionState;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import com.epam.eco.commons.kafka.TransactionState;
 import com.epam.eco.kafkamanager.utils.MapperUtils;
 
 /**

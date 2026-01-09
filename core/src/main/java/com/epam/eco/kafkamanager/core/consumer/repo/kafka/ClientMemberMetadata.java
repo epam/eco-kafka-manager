@@ -61,11 +61,6 @@ public class ClientMemberMetadata implements MemberMetadataAdapter {
     }
 
     @Override
-    public boolean isHeartbeatSatisfied() {
-        return false;
-    }
-
-    @Override
     public Collection<TopicPartition> getAssignment() {
         return metadata.assignment().topicPartitions();
     }

@@ -21,6 +21,7 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.Validate;
+import org.apache.kafka.common.GroupState;
 import org.apache.kafka.common.TopicPartition;
 
 /**
@@ -29,6 +30,8 @@ import org.apache.kafka.common.TopicPartition;
 class KafkaGroupMetadata {
 
     private final String name;
+    private final AtomicReference<GroupState> groupState =
+            new AtomicReference<>(GroupState.UNKNOWN);
     private final AtomicReference<GroupMetadataAdapter> groupMetadata = new AtomicReference<>();
     private final Map<TopicPartition, OffsetAndMetadataAdapter> offsetsMetadata = new HashMap<>();
 
@@ -51,7 +54,19 @@ class KafkaGroupMetadata {
     }
 
     public void setGroupMetadata(GroupMetadataAdapter groupMetadata) {
+        if (groupMetadata instanceof ClientGroupMetadata clientGroupMetadata) {
+            // only ClientGroupMetadata has state
+            setGroupState(clientGroupMetadata.getState());
+        }
         this.groupMetadata.set(groupMetadata);
+    }
+
+    public void setGroupState(GroupState groupState) {
+        this.groupState.set(groupState);
+    }
+
+    public GroupState getGroupState() {
+        return groupState.get();
     }
 
     public void setOffsetsMetadata(Map<TopicPartition, OffsetAndMetadataAdapter> offsetsMetadata) {
@@ -88,6 +103,7 @@ class KafkaGroupMetadata {
 
     public KafkaGroupMetadata copyOf() {
         KafkaGroupMetadata copy = new KafkaGroupMetadata(getName());
+        copy.setGroupState(getGroupState());
         copy.setGroupMetadata(getGroupMetadata());
         copy.setOffsetsMetadata(getOffsetsMetadata());
         return copy;

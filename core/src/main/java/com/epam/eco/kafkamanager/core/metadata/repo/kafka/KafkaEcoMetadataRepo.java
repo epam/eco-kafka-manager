@@ -16,12 +16,10 @@
 package com.epam.eco.kafkamanager.core.metadata.repo.kafka;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
-
-import jakarta.annotation.PostConstruct;
-import jakarta.annotation.PreDestroy;
 
 import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
@@ -34,6 +32,7 @@ import com.epam.eco.commons.kafka.config.ConsumerConfigBuilder;
 import com.epam.eco.commons.kafka.config.ProducerConfigBuilder;
 import com.epam.eco.commons.kafka.serde.JsonDeserializer;
 import com.epam.eco.commons.kafka.serde.JsonSerializer;
+import com.epam.eco.kafkamanager.KafkaAdminOperations;
 import com.epam.eco.kafkamanager.Metadata;
 import com.epam.eco.kafkamanager.MetadataKey;
 import com.epam.eco.kafkamanager.MetadataRepo;
@@ -43,27 +42,57 @@ import com.epam.eco.kafkamanager.core.autoconfigure.KafkaManagerProperties;
 import com.epam.eco.kafkamanager.core.spring.AsyncStartingBean;
 import com.epam.eco.kafkamanager.repo.AbstractKeyValueRepo;
 
+import jakarta.annotation.PostConstruct;
+import jakarta.annotation.PreDestroy;
+
+import static org.apache.kafka.common.config.TopicConfig.CLEANUP_POLICY_COMPACT;
+import static org.apache.kafka.common.config.TopicConfig.CLEANUP_POLICY_CONFIG;
+
 /**
  * @author Andrei_Tytsik
  */
-public class KafkaMetadataRepo extends AbstractKeyValueRepo<MetadataKey, Metadata, MetadataSearchCriteria> implements MetadataRepo, CacheListener<MetadataKey, Metadata>, AsyncStartingBean {
+public class KafkaEcoMetadataRepo extends AbstractKeyValueRepo<MetadataKey, Metadata, MetadataSearchCriteria> implements MetadataRepo, CacheListener<MetadataKey, Metadata>, AsyncStartingBean {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(KafkaMetadataRepo.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(KafkaEcoMetadataRepo.class);
 
     private static final String TOPIC = "__eco_entity_metadata";
 
     @Autowired
     private KafkaManagerProperties properties;
-
+    
+    @Autowired
+    private KafkaAdminOperations adminOperations;
+    
     private final List<MetadataUpdateListener> updateListeners = new CopyOnWriteArrayList<>();
 
     private KafkaCache<MetadataKey, Metadata> metadataCache;
 
     @PostConstruct
     private void init() {
+        // Ensure entity metadata topic exists before initializing cache
+        createEntityMetadataTopic();
         initMetadataCache();
-
+    
         LOGGER.info("Initialized");
+    }
+
+    private void createEntityMetadataTopic() {
+        LOGGER.info("Checking and creating entity metadata topic if needed");
+        int defaultReplicationFactor = adminOperations.getDefaultReplicationFactor();
+        Map<String, String> topicConfig = Collections.singletonMap(CLEANUP_POLICY_CONFIG,
+                CLEANUP_POLICY_COMPACT);
+
+        boolean created = adminOperations.createTopicIfNotExists(
+                TOPIC,
+                1,
+                defaultReplicationFactor,
+                topicConfig);
+
+        if (created) {
+            LOGGER.info("Entity metadata topic created successfully with COMPACT cleanup policy");
+        } else {
+            LOGGER.info("Entity metadata topic already exists");
+        }
     }
 
     @Override

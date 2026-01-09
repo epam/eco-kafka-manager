@@ -16,6 +16,7 @@
 package com.epam.eco.kafkamanager.udmetrics.config.repo.kafka;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -34,12 +35,16 @@ import com.epam.eco.commons.kafka.config.ConsumerConfigBuilder;
 import com.epam.eco.commons.kafka.config.ProducerConfigBuilder;
 import com.epam.eco.commons.kafka.serde.JsonDeserializer;
 import com.epam.eco.commons.kafka.serde.JsonSerializer;
+import com.epam.eco.kafkamanager.KafkaAdminOperations;
 import com.epam.eco.kafkamanager.core.autoconfigure.KafkaManagerProperties;
 import com.epam.eco.kafkamanager.core.spring.AsyncStartingBean;
 import com.epam.eco.kafkamanager.repo.AbstractKeyValueRepo;
 import com.epam.eco.kafkamanager.udmetrics.UDMetricConfig;
 import com.epam.eco.kafkamanager.udmetrics.UDMetricConfigRepo;
 import com.epam.eco.kafkamanager.udmetrics.UDMetricConfigSearchCriteria;
+
+import static org.apache.kafka.common.config.TopicConfig.CLEANUP_POLICY_COMPACT;
+import static org.apache.kafka.common.config.TopicConfig.CLEANUP_POLICY_CONFIG;
 
 /**
  * @author Andrei_Tytsik
@@ -49,7 +54,8 @@ public class KafkaUDMetricConfigRepo extends AbstractKeyValueRepo<String, UDMetr
     private static final Logger LOGGER = LoggerFactory.getLogger(KafkaUDMetricConfigRepo.class);
 
     private static final String TOPIC = "__eco_udm_configs";
-
+    @Autowired
+    private KafkaAdminOperations adminOperations;
     @Autowired
     private KafkaManagerProperties kafkaManagerProperties;
     @Autowired
@@ -61,9 +67,30 @@ public class KafkaUDMetricConfigRepo extends AbstractKeyValueRepo<String, UDMetr
 
     @PostConstruct
     private void init() {
+        // Ensure UDM config topic exists before initializing cache
+        createUdmConfigsTopic();
         initConfigCache();
-
+    
         LOGGER.info("Initialized");
+    }
+
+    private void createUdmConfigsTopic() {
+        LOGGER.info("Checking and creating UDM configs topic if needed");
+        int defaultReplicationFactor = adminOperations.getDefaultReplicationFactor();
+        Map<String, String> topicConfig = Collections.singletonMap(CLEANUP_POLICY_CONFIG,
+                CLEANUP_POLICY_COMPACT);
+
+        boolean created = adminOperations.createTopicIfNotExists(
+                TOPIC,
+                1,
+                defaultReplicationFactor,
+                topicConfig);
+
+        if (created) {
+            LOGGER.info("UDM configs topic created successfully with COMPACT cleanup policy");
+        } else {
+            LOGGER.info("UDM configs topic already exists");
+        }
     }
 
     @Override
@@ -86,6 +113,7 @@ public class KafkaUDMetricConfigRepo extends AbstractKeyValueRepo<String, UDMetr
     }
 
     private void initConfigCache() {
+
         configCache = KafkaCache.<String, UDMetricConfig>builder().
                 bootstrapServers(kafkaManagerProperties.getBootstrapServers()).
                 topicName(TOPIC).

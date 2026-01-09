@@ -44,6 +44,11 @@ public interface PermissionRepo extends ValueRepo<PermissionInfo, PermissionSear
             String host);
 
     @PreAuthorize("@authorizer.isPermitted('PERMISSION', null, 'DELETE')")
+    void deleteOfResourceWithoutChecks(
+            ResourcePermissionFilter filter,
+            DeleteCallback deleteCallback);
+
+    @PreAuthorize("@authorizer.isPermitted('PERMISSION', null, 'DELETE')")
     void deleteOfResource(
             ResourcePermissionFilter filter,
             DeleteCallback deleteCallback);

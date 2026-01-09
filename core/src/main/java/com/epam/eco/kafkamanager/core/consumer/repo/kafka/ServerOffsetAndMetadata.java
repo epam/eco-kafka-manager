@@ -16,17 +16,16 @@
 package com.epam.eco.kafkamanager.core.consumer.repo.kafka;
 
 import org.apache.commons.lang3.Validate;
-
-import kafka.common.OffsetAndMetadata;
+import org.apache.kafka.coordinator.group.generated.OffsetCommitValue;
 
 /**
  * @author Andrei_Tytsik
  */
 class ServerOffsetAndMetadata implements OffsetAndMetadataAdapter {
 
-    private final OffsetAndMetadata metadata;
+    private final OffsetCommitValue metadata;
 
-    public ServerOffsetAndMetadata(OffsetAndMetadata metadata) {
+    public ServerOffsetAndMetadata(OffsetCommitValue metadata) {
         Validate.notNull(metadata, "Offset metadata is null");
 
         this.metadata = metadata;
@@ -49,13 +48,10 @@ class ServerOffsetAndMetadata implements OffsetAndMetadataAdapter {
 
     @Override
     public Long getExpireTimestamp() {
-        return
-                metadata.expireTimestamp().isDefined() ?
-                (Long)metadata.expireTimestamp().get() :
-                null;
+        return metadata.expireTimestamp();
     }
 
-    public static ServerOffsetAndMetadata ofNullable(OffsetAndMetadata metadata) {
+    public static ServerOffsetAndMetadata ofNullable(OffsetCommitValue metadata) {
         return metadata != null ? new ServerOffsetAndMetadata(metadata) : null;
     }
 

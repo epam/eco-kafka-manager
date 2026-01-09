@@ -20,7 +20,7 @@ import java.util.Objects;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
-import org.apache.kafka.common.ConsumerGroupState;
+import org.apache.kafka.common.GroupState;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -33,13 +33,13 @@ import com.epam.eco.kafkamanager.utils.MapperUtils;
 public class ConsumerGroupSearchCriteria implements SearchCriteria<ConsumerGroupInfo> {
 
     private final String groupName;
-    private final ConsumerGroupState state;
+    private final GroupState state;
     private final StorageType storageType;
     private final String description;
 
     public ConsumerGroupSearchCriteria(
             @JsonProperty("groupName") String groupName,
-            @JsonProperty("state") ConsumerGroupState state,
+            @JsonProperty("state") GroupState state,
             @JsonProperty("storageType") StorageType storageType,
             @JsonProperty("description") String description) {
         this.groupName = groupName;
@@ -51,7 +51,7 @@ public class ConsumerGroupSearchCriteria implements SearchCriteria<ConsumerGroup
     public String getGroupName() {
         return groupName;
     }
-    public ConsumerGroupState getState() {
+    public GroupState getState() {
         return state;
     }
     public StorageType getStorageType() {
@@ -133,7 +133,7 @@ public class ConsumerGroupSearchCriteria implements SearchCriteria<ConsumerGroup
     public static class Builder {
 
         private String groupName;
-        private ConsumerGroupState state;
+        private GroupState state;
         private StorageType storageType;
         private String description;
 
@@ -153,7 +153,7 @@ public class ConsumerGroupSearchCriteria implements SearchCriteria<ConsumerGroup
             return this;
         }
 
-        public Builder state(ConsumerGroupState state) {
+        public Builder state(GroupState state) {
             this.state = state;
             return this;
         }

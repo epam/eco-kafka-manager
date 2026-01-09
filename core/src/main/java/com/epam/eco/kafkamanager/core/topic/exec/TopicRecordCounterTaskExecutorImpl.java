@@ -17,17 +17,19 @@ package com.epam.eco.kafkamanager.core.topic.exec;
 
 import java.util.concurrent.ExecutorService;
 
-import jakarta.annotation.PreDestroy;
 import javax.cache.CacheManager;
 
+import org.apache.kafka.common.errors.TopicExistsException;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.epam.eco.commons.kafka.helpers.RecordCounter;
-import com.epam.eco.kafkamanager.KafkaManager;
+import com.epam.eco.kafkamanager.KafkaAdminOperations;
 import com.epam.eco.kafkamanager.TopicRecordCounterTaskExecutor;
 import com.epam.eco.kafkamanager.core.autoconfigure.KafkaManagerProperties;
 import com.epam.eco.kafkamanager.exec.AbstractAsyncStatefullTaskExecutor;
 import com.epam.eco.kafkamanager.exec.TaskResult;
+
+import jakarta.annotation.PreDestroy;
 
 /**
  * @author Andrei_Tytsik
@@ -35,7 +37,7 @@ import com.epam.eco.kafkamanager.exec.TaskResult;
 public class TopicRecordCounterTaskExecutorImpl extends AbstractAsyncStatefullTaskExecutor<String, Long> implements TopicRecordCounterTaskExecutor {
 
     @Autowired
-    private KafkaManager kafkaManager;
+    private KafkaAdminOperations adminOperations;
     @Autowired
     protected KafkaManagerProperties properties;
 
@@ -55,8 +57,10 @@ public class TopicRecordCounterTaskExecutorImpl extends AbstractAsyncStatefullTa
     @Override
     protected TaskResult<Long> doExecute(String topicName) {
         return TaskResult.of(() -> {
-            kafkaManager.getTopic(topicName); // sanity check just for case topic doesn't exist
-
+            if (!adminOperations.topicExists(topicName)) {
+                // sanity check just for case topic doesn't exist
+                throw new TopicExistsException(topicName);
+            }
             return RecordCounter.
                     with(properties.getCommonConsumerConfig()).
                     count(topicName);

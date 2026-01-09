@@ -17,7 +17,7 @@ package com.epam.eco.kafkamanager.core.consumer.repo.kafka;
 
 import java.util.Collection;
 
-import org.apache.kafka.common.ConsumerGroupState;
+import org.apache.kafka.common.GroupState;
 
 /**
  * @author Andrei_Tytsik
@@ -25,7 +25,7 @@ import org.apache.kafka.common.ConsumerGroupState;
 interface GroupMetadataAdapter {
     String getGroupId();
     Integer getCoordinator();
-    ConsumerGroupState getState();
+    GroupState getState();
     String getProtocolType();
     String getPartitionAssignor();
     Collection<MemberMetadataAdapter> getMembers();

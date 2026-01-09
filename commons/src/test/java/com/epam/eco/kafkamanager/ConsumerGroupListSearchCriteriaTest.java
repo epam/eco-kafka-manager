@@ -18,7 +18,7 @@ package com.epam.eco.kafkamanager;
 import java.util.Arrays;
 import java.util.Map;
 
-import org.apache.kafka.common.ConsumerGroupState;
+import org.apache.kafka.common.GroupState;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -93,9 +93,9 @@ public class ConsumerGroupListSearchCriteriaTest {
     @Test
     public void groupStateTest() {
 
-        Arrays.stream(ConsumerGroupState.values()).forEach((state-> {
+        Arrays.stream(GroupState.values()).forEach((state-> {
             ConsumerGroupListSearchCriteria criteria = ConsumerGroupListSearchCriteria.parseTopicCriteria(Map.of("state_EQUALS", state.name()));
-            AbstractSearchCriteria.SingleClause<ConsumerGroupState> expectedClause = new AbstractSearchCriteria.SingleClause<>(
+            AbstractSearchCriteria.SingleClause<GroupState> expectedClause = new AbstractSearchCriteria.SingleClause<>(
                     state, AbstractSearchCriteria.Operation.EQUALS);
             checkClause( criteria, expectedClause);
         }));

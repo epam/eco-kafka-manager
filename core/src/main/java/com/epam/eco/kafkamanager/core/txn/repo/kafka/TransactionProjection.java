@@ -29,9 +29,9 @@ import org.apache.commons.collections4.queue.CircularFifoQueue;
 import org.apache.commons.lang3.Validate;
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 import org.apache.kafka.common.TopicPartition;
+import org.apache.kafka.coordinator.transaction.TransactionState;
 
 import com.epam.eco.commons.kafka.ScalaConversions;
-import com.epam.eco.commons.kafka.TransactionState;
 
 import kafka.coordinator.transaction.TransactionMetadata;
 
@@ -177,19 +177,19 @@ class TransactionProjection {
         }
 
         private void updateCommitCountIfNeeded(TransactionMetadata metadata) {
-            if (TransactionState.fromScala(metadata.state()) == TransactionState.COMPLETE_COMMIT) {
+            if (metadata.state() == TransactionState.COMPLETE_COMMIT) {
                 commitCount++;
             }
         }
 
         private void updateAbortCountIfNeeded(TransactionMetadata metadata) {
-            if (TransactionState.fromScala(metadata.state()) == TransactionState.COMPLETE_ABORT) {
+            if (metadata.state() == TransactionState.COMPLETE_ABORT) {
                 abortCount++;
             }
         }
 
         private void updateExecTimeStatsIfNeeded(TransactionMetadata metadata) {
-            if (TransactionState.fromScala(metadata.state()) == TransactionState.COMPLETE_COMMIT) {
+            if (metadata.state() == TransactionState.COMPLETE_COMMIT) {
                 execTimeStats.addValue(metadata.txnLastUpdateTimestamp() - metadata.txnStartTimestamp());
             }
         }

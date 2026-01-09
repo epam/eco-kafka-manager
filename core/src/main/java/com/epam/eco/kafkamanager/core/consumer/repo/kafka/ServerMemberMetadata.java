@@ -19,8 +19,7 @@ import java.util.List;
 
 import org.apache.commons.lang3.Validate;
 import org.apache.kafka.common.TopicPartition;
-
-import kafka.coordinator.group.MemberMetadata;
+import org.apache.kafka.coordinator.group.generated.GroupMetadataValue.MemberMetadata;
 
 /**
  * @author Andrei_Tytsik
@@ -54,17 +53,12 @@ class ServerMemberMetadata implements MemberMetadataAdapter {
 
     @Override
     public Integer getRebalanceTimeoutMs() {
-        return metadata.rebalanceTimeoutMs();
+        return metadata.rebalanceTimeout();
     }
 
     @Override
     public Integer getSessionTimeoutMs() {
-        return metadata.sessionTimeoutMs();
-    }
-
-    @Override
-    public boolean isHeartbeatSatisfied() {
-        return metadata.heartbeatSatisfied();
+        return metadata.sessionTimeout();
     }
 
     @Override

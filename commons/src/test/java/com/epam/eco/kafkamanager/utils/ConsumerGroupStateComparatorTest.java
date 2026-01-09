@@ -20,7 +20,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import org.apache.kafka.common.ConsumerGroupState;
+import org.apache.kafka.common.GroupState;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -31,16 +31,16 @@ public class ConsumerGroupStateComparatorTest {
 
     @Test
     public void testOrdered() throws Exception {
-        List<ConsumerGroupState> expected = Arrays.asList(
-                ConsumerGroupState.STABLE,
-                ConsumerGroupState.COMPLETING_REBALANCE,
-                ConsumerGroupState.PREPARING_REBALANCE,
-                ConsumerGroupState.EMPTY,
-                ConsumerGroupState.DEAD,
-                ConsumerGroupState.UNKNOWN,
+        List<GroupState> expected = Arrays.asList(
+                GroupState.STABLE,
+                GroupState.COMPLETING_REBALANCE,
+                GroupState.PREPARING_REBALANCE,
+                GroupState.EMPTY,
+                GroupState.DEAD,
+                GroupState.UNKNOWN,
                 null);
 
-        List<ConsumerGroupState> actual = new ArrayList<>(expected);
+        List<GroupState> actual = new ArrayList<>(expected);
         Collections.shuffle(actual);
 
         Collections.sort(actual, ConsumerGroupStateComparator.INSTANCE);

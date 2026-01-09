@@ -39,8 +39,8 @@ eco:
       calculationIntervalInMs: 60000
       config.repo.kafka.bootstrapTimeoutInMs: 60000
     core:
-      bootstrapServers: "kafka-int.epm-eco.projects.epam.com:9095"
-      schemaRegistryUrl: "http://schema-registry-int.epm-eco.projects.epam.com:8081"
+      bootstrapServers: "kafka.domain.com:9095"
+      schemaRegistryUrl: "http://schema-registry.domain.com:8081"
       transactionStoreBootstrapTimeoutInMs: 180000
       transactionStoreBootstrapDataFreshness: ONE_HOUR
       consumerStoreBootstrapTimeoutInMs: 180000
@@ -50,13 +50,13 @@ eco:
       clientConfig[fetch.min.bytes]: 20
       clientConfig[max.poll.records]: 1000
       clientConfig[security.protocol]: "SASL_SSL"
-      clientConfig[ssl.truststore.location]: "c:/ssl/epm-eco-int.truststore.jks"
-      clientConfig[ssl.truststore.password]: "pg0mt1mD"
+      clientConfig[ssl.truststore.location]: "c:/ssl/truststore.jks"
+      clientConfig[ssl.truststore.password]: "password"
       clientConfig[sasl.mechanism]: "GSSAPI"
       clientConfig[sasl.kerberos.service.name]: "kafka"
       clientConfig[sasl.jaas.config]: "com.sun.security.auth.module.Krb5LoginModule required \
                                                  useKeyTab=true  \
-                                                 principal='Auto_EPM-IASS_KM_Integration@EPAM.COM' \
+                                                 principal='Auto_IASS_KM_Integration@domain.COM' \
                                                  keyTab='c://ssl//km_int.keytab' \
                                                  storeKey=true;"
       authz:
@@ -64,10 +64,10 @@ eco:
           enabled: false
           authorizerClass: com.epam.eco.kafka.auth.authorizer.ldap.LdapGroupBasedAclAuthorizer
           adminRoles: ROLE_ECO-KM-ADMIN
-          authorizerConfig[authorizer.ldap.url]: "ldap://evzzazrsa0038.epam.com:3268"
-          authorizerConfig[authorizer.ldap.base]: "dc=epam,dc=com"
-          authorizerConfig[authorizer.ldap.user.dn]: "Auto_EPM-IASS_KM_Integration@epam.com"
-          authorizerConfig[authorizer.ldap.password]: "!e,US::F58S<-D/M8r-PndfQb"
+          authorizerConfig[authorizer.ldap.url]: "ldap://domain.com:3268"
+          authorizerConfig[authorizer.ldap.base]: "dc=domain,dc=com"
+          authorizerConfig[authorizer.ldap.user.dn]: "Auto_IASS_KM_Integration@domain.com"
+          authorizerConfig[authorizer.ldap.password]: "password"
           authorizerConfig[authorizer.ldap.group.name.attribute]: "sAMAccountName"
           authorizerConfig[authorizer.user.principal.name.mappers]: REMOVE_DOMAIN,TO_LOWER_CASE
           authorizerConfig[authorizer.group.principal.name.mappers]: REMOVE_DOMAIN,TO_LOWER_CASE
@@ -75,26 +75,21 @@ eco:
           authorizerConfig[authorizer.ldap.read.timeout.ms]: 20000
           authorizerConfig[authorizer.ldap.connect.timeout.ms]: 3000
 
-      zkClientConfig[zookeeper.clientCnxnSocket]: org.apache.zookeeper.ClientCnxnSocketNetty
-      zkClientConfig[zookeeper.client.secure]: true
-      zkClientConfig[zookeeper.ssl.client.enable]: true
-      zkClientConfig[zookeeper.ssl.trustStore.location]: "c:/ssl/epm-eco-int.truststore.jks"
-      zkClientConfig[zookeeper.ssl.trustStore.password]: "pg0mt1mD"
     ui:
       showGridInTopicBrowser: true
       dataCatalogTool:
-        name: EPAM Data Catalog
-        urlTemplate: https://datacatalog.epam.com/data/permanent-link/{topicname}
+        name: Data Catalog
+        urlTemplate: https://datacatalog.domain.com/data/permanent-link/{topicname}
         icon: fa-share
       schemaCatalogTool:
-        name: EPAM Schema Catalog
-        urlTemplate: https://integration.datahub.epam.com/schema-catalog/?query={schemaname}&versionLatestTerm=1
-        urlTemplateById: https://integration.datahub.epam.com/schema-catalog/?query=schemaRegistryId:{schemaId}
+        name: Schema Catalog
+        urlTemplate: https://domain.com/schema-catalog/?query={schemaname}&versionLatestTerm=1
+        urlTemplateById: https://domain.com/schema-catalog/?query=schemaRegistryId:{schemaId}
         icon: fa-external-link
       grafanaMetrics:
         env: integration
         name: Grafana metrics
-        urlTemplate: https://grafana.cloudapp.epam.com/d/z2yi3FY4z/pubsub-topic-insights?from=now-6h&to=now&orgId=1&var-env={env}&var-topic={topicname}
+        urlTemplate: https://grafana.domain.com/d/z2yi3FY4z/pubsub-topic-insights?from=now-6h&to=now&orgId=1&var-env={env}&var-topic={topicname}
         icon: fa-area-chart
 
       topicBrowser:
@@ -110,8 +105,8 @@ eco:
 
       externalTools:
       - name: External tool #1
-        urlTemplate: https://integration.datahub.epam.com/external-tools/1/{topicname}
+        urlTemplate: https://integration.datahub.domain.com/external-tools/1/{topicname}
         icon: fa-external-link
       - name: External tool #2
-        urlTemplate: https://integration.datahub.epam.com/external-tools/2/{topicname}
+        urlTemplate: https://integration.datahub.domain.com/external-tools/2/{topicname}
         icon: fa-external-link

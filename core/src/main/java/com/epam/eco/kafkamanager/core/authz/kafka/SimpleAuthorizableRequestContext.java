@@ -5,6 +5,7 @@ package com.epam.eco.kafkamanager.core.authz.kafka;
 
 import java.net.InetAddress;
 
+import org.apache.kafka.common.protocol.ApiKeys;
 import org.apache.kafka.common.security.auth.KafkaPrincipal;
 import org.apache.kafka.common.security.auth.SecurityProtocol;
 import org.apache.kafka.server.authorizer.AuthorizableRequestContext;
@@ -28,7 +29,7 @@ public class SimpleAuthorizableRequestContext implements AuthorizableRequestCont
             KafkaPrincipal principal) {
         this(
                 "",
-                -1,
+                ApiKeys.FETCH.id,
                 "",
                 clientAddress,
                 principal,

@@ -39,10 +39,8 @@ public class KafkaManagerProperties {
     public static final String GROUP_ID = "_eco_kafka_manager";
 
     private String bootstrapServers;
-    private String zkConnect;
     private String schemaRegistryUrl;
     private Map<String, Object> clientConfig;
-    private Map<String, String> zkClientConfig;
     private long metadataStoreBootstrapTimeoutInMs = 3 * 60 * 1000;
     private long transactionStoreBootstrapTimeoutInMs = 3 * 60 * 1000;
     private DatePeriod transactionStoreBootstrapDataFreshness = DatePeriod.ONE_HOUR;
@@ -64,12 +62,7 @@ public class KafkaManagerProperties {
     public void setBootstrapServers(String bootstrapServers) {
         this.bootstrapServers = bootstrapServers;
     }
-    public String getZkConnect() {
-        return zkConnect;
-    }
-    public void setZkConnect(String zkConnect) {
-        this.zkConnect = zkConnect;
-    }
+
     public String getSchemaRegistryUrl() {
         return schemaRegistryUrl;
     }
@@ -82,12 +75,7 @@ public class KafkaManagerProperties {
     public void setClientConfig(Map<String, Object> clientConfig) {
         this.clientConfig = clientConfig;
     }
-    public Map<String, String> getZkClientConfig() {
-        return zkClientConfig;
-    }
-    public void setZkClientConfig(Map<String, String> zkClientConfig) {
-        this.zkClientConfig = zkClientConfig;
-    }
+
     public long getMetadataStoreBootstrapTimeoutInMs() {
         return metadataStoreBootstrapTimeoutInMs;
     }
@@ -106,6 +94,7 @@ public class KafkaManagerProperties {
     public void setTransactionStoreBootstrapDataFreshness(DatePeriod transactionStoreBootstrapDataFreshness) {
         this.transactionStoreBootstrapDataFreshness = transactionStoreBootstrapDataFreshness;
     }
+
     public Map<String, Object> getCommonConsumerConfig() {
         return commonConsumerConfig;
     }

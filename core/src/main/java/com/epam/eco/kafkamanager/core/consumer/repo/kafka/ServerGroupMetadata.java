@@ -19,32 +19,31 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.Validate;
-import org.apache.kafka.common.ConsumerGroupState;
+import org.apache.kafka.common.GroupState;
+import org.apache.kafka.coordinator.group.generated.GroupMetadataValue;
 
-import com.epam.eco.commons.kafka.ScalaConversions;
-
-import kafka.coordinator.group.GroupMetadata;
+import static org.apache.kafka.common.GroupState.UNKNOWN;
 
 /**
  * @author Andrei_Tytsik
  */
 class ServerGroupMetadata implements GroupMetadataAdapter {
 
-    private final GroupMetadata metadata;
+    private final GroupMetadataValue metadata;
     private final List<MemberMetadataAdapter> members;
 
-    public ServerGroupMetadata(GroupMetadata metadata) {
+    public ServerGroupMetadata(GroupMetadataValue metadata) {
         Validate.notNull(metadata, "Group metadata is null");
 
         this.metadata = metadata;
-        this.members = ScalaConversions.asJavaList(metadata.allMemberMetadata()).stream().
+        this.members = metadata.members().stream().
                 map(ServerMemberMetadata::new).
                 collect(Collectors.toList());
     }
 
     @Override
     public String getGroupId() {
-        return metadata.groupId();
+        return null;
     }
 
     @Override
@@ -53,21 +52,18 @@ class ServerGroupMetadata implements GroupMetadataAdapter {
     }
 
     @Override
-    public ConsumerGroupState getState() {
-        return ScalaConversions.asJavaGroupState(metadata.currentState());
+    public GroupState getState() {
+        return UNKNOWN;
     }
 
     @Override
     public String getProtocolType() {
-        return
-                metadata.protocolType().isDefined() ?
-                metadata.protocolType().get() :
-                null;
+        return metadata.protocolType();
     }
 
     @Override
     public String getPartitionAssignor() {
-        return metadata.protocolName().getOrElse(() -> null);
+        return metadata.protocol();
     }
 
     @Override
@@ -75,7 +71,7 @@ class ServerGroupMetadata implements GroupMetadataAdapter {
         return members;
     }
 
-    public static ServerGroupMetadata ofNullable(GroupMetadata metadata) {
+    public static ServerGroupMetadata ofNullable(GroupMetadataValue metadata) {
         return metadata != null ? new ServerGroupMetadata(metadata) : null;
     }
 

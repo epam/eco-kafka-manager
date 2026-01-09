@@ -19,15 +19,14 @@ import org.apache.kafka.common.acl.AclOperation;
 import org.apache.kafka.common.acl.AclPermissionType;
 import org.apache.kafka.common.resource.ResourceType;
 import org.apache.kafka.common.security.auth.SecurityProtocol;
+import org.apache.kafka.coordinator.transaction.TransactionState;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.epam.eco.commons.kafka.TransactionState;
 import com.epam.eco.kafkamanager.ConsumerGroupInfo;
 import com.epam.eco.kafkamanager.ReplicationState;
 import com.epam.eco.kafkamanager.TopicRecordFetchParams;
-import com.epam.eco.kafkamanager.TopicSearchCriteriaImpl;
 
 /**
  * @author Raman_Babich

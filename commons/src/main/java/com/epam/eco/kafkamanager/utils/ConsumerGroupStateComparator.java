@@ -18,17 +18,17 @@ package com.epam.eco.kafkamanager.utils;
 import java.util.Comparator;
 
 import org.apache.commons.lang3.ObjectUtils;
-import org.apache.kafka.common.ConsumerGroupState;
+import org.apache.kafka.common.GroupState;
 
 /**
  * @author Andrei_Tytsik
  */
-public class ConsumerGroupStateComparator implements Comparator<ConsumerGroupState> {
+public class ConsumerGroupStateComparator implements Comparator<GroupState> {
 
     public static final ConsumerGroupStateComparator INSTANCE = new ConsumerGroupStateComparator();
 
     @Override
-    public int compare(ConsumerGroupState o1, ConsumerGroupState o2) {
+    public int compare(GroupState o1, GroupState o2) {
         if (o1 == null || o2 == null) {
             return -1 * ObjectUtils.compare(o1, o2);
         }
@@ -40,7 +40,7 @@ public class ConsumerGroupStateComparator implements Comparator<ConsumerGroupSta
         return result;
     }
 
-    private static int weightFor(ConsumerGroupState state) {
+    private static int weightFor(GroupState state) {
         switch (state) {
         case STABLE: return 0;
         case COMPLETING_REBALANCE: return 10;
