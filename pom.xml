@@ -90,11 +90,11 @@
         <commons-csv.version>1.5</commons-csv.version>
         <commons-math3.version>3.6.1</commons-math3.version>
         <commons-io.version>2.14.0</commons-io.version>
-        <avro.version>1.11.3</avro.version>
+        <avro.version>1.11.4</avro.version>
         <slf4j.version>2.0.9</slf4j.version>
         <openapi.version>1.6.9</openapi.version>
-        <jackson.version>2.18.2</jackson.version>
-        <jackson-databind.version>2.18.2</jackson-databind.version>
+        <jackson.version>2.21.1</jackson.version>
+        <jackson-annotations.version>2.21</jackson-annotations.version>
         <byte-buddy.version>1.12.19</byte-buddy.version>
         <objenesis.version>2.6</objenesis.version>
 
@@ -156,6 +156,21 @@
                 <groupId>org.springframework.cloud</groupId>
                 <artifactId>spring-cloud-stream</artifactId>
                 <version>${spring-cloud-stream.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.fasterxml.jackson.core</groupId>
+                <artifactId>jackson-databind</artifactId>
+                <version>${jackson.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.fasterxml.jackson.core</groupId>
+                <artifactId>jackson-core</artifactId>
+                <version>${jackson.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.fasterxml.jackson.core</groupId>
+                <artifactId>jackson-annotations</artifactId>
+                <version>${jackson-annotations.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.kafka</groupId>
@@ -290,11 +305,6 @@
                 <version>${openapi.version}</version>
             </dependency>
             <dependency>
-                <groupId>com.fasterxml.jackson.core</groupId>
-                <artifactId>jackson-databind</artifactId>
-                <version>${jackson-databind.version}</version>
-            </dependency>
-            <dependency>
                 <groupId>com.fasterxml.jackson.module</groupId>
                 <artifactId>jackson-module-parameter-names</artifactId>
                 <version>${jackson.version}</version>
@@ -307,16 +317,6 @@
             <dependency>
                 <groupId>com.fasterxml.jackson.datatype</groupId>
                 <artifactId>jackson-datatype-jsr310</artifactId>
-                <version>${jackson.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.fasterxml.jackson.core</groupId>
-                <artifactId>jackson-core</artifactId>
-                <version>${jackson.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.fasterxml.jackson.core</groupId>
-                <artifactId>jackson-annotations</artifactId>
                 <version>${jackson.version}</version>
             </dependency>
             <dependency>
