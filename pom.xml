@@ -94,6 +94,7 @@
         <slf4j.version>2.0.9</slf4j.version>
         <openapi.version>1.6.9</openapi.version>
         <jackson.version>2.21.1</jackson.version>
+        <jackson-annotations.version>2.21</jackson-annotations.version>
         <byte-buddy.version>1.12.19</byte-buddy.version>
         <objenesis.version>2.6</objenesis.version>
 
@@ -160,6 +161,16 @@
                 <groupId>com.fasterxml.jackson.core</groupId>
                 <artifactId>jackson-databind</artifactId>
                 <version>${jackson.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.fasterxml.jackson.core</groupId>
+                <artifactId>jackson-core</artifactId>
+                <version>${jackson.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.fasterxml.jackson.core</groupId>
+                <artifactId>jackson-annotations</artifactId>
+                <version>${jackson-annotations.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.kafka</groupId>
